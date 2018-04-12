@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <plurals name="x_hours">
+        <item quantity="one">@string/x_hour</item>
+        <item quantity="other">@string/x_hours</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">@string/hour</item>
+        <item quantity="other">@string/hours</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">@string/day</item>
+        <item quantity="other">@string/days</item>
+    </plurals>
+
+    <plurals name="inputs">
+        <item quantity="one">@string/input</item>
+        <item quantity="other">@string/inputs</item>
+    </plurals>
+
+    <plurals name="materials">
+        <item quantity="one">@string/material</item>
+        <item quantity="other">@string/materials</item>
+    </plurals>
+
+    <plurals name="equipments">
+        <item quantity="one">@string/equipment</item>
+        <item quantity="other">@string/equipments</item>
+    </plurals>
+
+    <plurals name="persons">
+        <item quantity="one">@string/person</item>
+        <item quantity="other">@string/persons</item>
+    </plurals>
+
+</resources>

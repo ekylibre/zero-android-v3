@@ -1,0 +1,68 @@
+<android.support.v7.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.ekylibre.android.SelectInputFragment"
+    android:background="@color/background">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/input_dialog_appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.Design.NoActionBar">         <!-- android:theme="@style/Base.ThemeOverlay.AppCompat.ActionBar" android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" -->
+
+        <!--<android.support.v7.widget.Toolbar-->
+            <!--android:id="@+id/input_dialog_toolbar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:layout_scrollFlags="scroll|enterAlways"-->
+            <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
+            <!--app:title="Selectionnez un intrant"-->
+            <!--app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"-->
+            <!--app:titleTextColor="@color/white"-->
+            <!--/>-->
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/input_dialog_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="scrollable"
+            app:tabGravity="fill"
+            android:background="@color/accent"
+            app:tabIndicatorColor="@color/icons"
+            app:tabIndicatorHeight="3dp"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/field_search"
+        app:queryBackground="@android:color/transparent"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/input_dialog_create_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/create_new_seed"
+        android:textAllCaps="true"
+        android:textColor="@color/accent"
+        android:visibility="visible"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/input_dialog_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_seed"
+        android:scrollbars="vertical"
+        android:background="@drawable/border_top"/>
+
+
+</android.support.v7.widget.LinearLayoutCompat>

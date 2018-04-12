@@ -1,0 +1,51 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.ekylibre.android.SelectMaterialFragment"
+    android:background="@color/background">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Sélectionnez une personne"
+            app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
+            app:titleTextColor="@color/icons"
+            android:background="@color/accent"/>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/search_person"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/field_search"
+        app:queryBackground="@android:color/transparent"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/person_dialog_create_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/create_new_person"
+        android:textAllCaps="true"
+        android:textColor="@color/accent"
+        android:visibility="visible"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/person_dialog_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_person"
+        android:scrollbars="vertical"
+        android:background="@drawable/border_top"/>
+
+
+</LinearLayout>

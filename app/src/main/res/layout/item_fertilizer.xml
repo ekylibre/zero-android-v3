@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@drawable/border_bottom">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/fertilizer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Fientes de volaille"
+        android:textStyle="bold"
+        android:textColor="#000000"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/fertilizer_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/fertilizer_name"
+        app:layout_constraintTop_toBottomOf="@id/fertilizer_name"
+        android:text="Fertilisant" />
+
+</android.support.constraint.ConstraintLayout>

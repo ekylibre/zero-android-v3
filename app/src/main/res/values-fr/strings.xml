@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Vegetal species -->
+    <string name="prunus_armeniaca">Abricotier</string>
+    <string name="allium_sativum">Ail</string>
+    <string name="cynara_scolymus">Artichaut</string>
+    <string name="solanum_melongena">Aubergine</string>
+    <string name="solanum_torvum">Aubergine pois</string>
+    <string name="avena_sativa">Avoine</string>
+    <string name="beta_vulgaris">Betterave</string>
+    <string name="triticum_durum">Blé dur</string>
+    <string name="triticum_aestivum">Blé tendre</string>
+    <string name="brassica_rapa">Brassica rapa</string>
+    <string name="daucus_carota">Carotte</string>
+    <string name="ribes_nigrum">Cassissier</string>
+    <string name="citrus_medica">Cedratier</string>
+    <string name="apium_graveolens">Céleri</string>
+    <string name="vitis_vinifera">Cépage Vitis vinifera</string>
+    <string name="anthriscus_cerefolium">Cerfeuil</string>
+    <string name="cannabis_sativa">Chanvre</string>
+    <string name="cichorium_endivia">Chicorée endive</string>
+    <string name="cichorium_intybus">Chicorée sauvage</string>
+    <string name="brassica_oleracea">Chou</string>
+    <string name="allium_schoenoprasum">Ciboulette</string>
+    <string name="cucurbita_pepo">Citrouille</string>
+    <string name="cydonia_oblonga">Cognassier</string>
+    <string name="brassica_napus">Colza</string>
+    <string name="cucumis_sativus">Concombre</string>
+    <string name="allium_ascalonicum">Échalotte</string>
+    <string name="spinacia_oleracea">Epinard</string>
+    <string name="foeniculum_vulgare">Fenouil Doux</string>
+    <string name="vicia_faba">Fève ou féverole</string>
+    <string name="rubus_idaeus">Framboisier</string>
+    <string name="ribes_rubrum">Groseiller à grappes</string>
+    <string name="phaseolus_vulgaris">Haricot commun</string>
+    <string name="fortunella_margarita">Kumquat ovale</string>
+    <string name="lactuca_sativa">Laitue cultivée</string>
+    <string name="lens_culinaris">Lentille</string>
+    <string name="linum_usitatissimum">Linum cultivé</string>
+    <string name="lotus_corniculatus">Lotier corniculé</string>
+    <string name="medicago_sativa">Luzerne</string>
+    <string name="valerianella_locusta">Mâche</string>
+    <string name="zea_mays">Maïs</string>
+    <string name="citrus_reticulata">Mandarinier</string>
+    <string name="cucumis_melo">Melon</string>
+    <string name="prunus_avium">Merisier</string>
+    <string name="prunus_mahaleb">Merisier Ste Lucie</string>
+    <string name="corylus_avellana">Noisetier</string>
+    <string name="juglans_regia">Noyer</string>
+    <string name="allium_cepa">Oignon</string>
+    <string name="olea_europaea">Olivier</string>
+    <string name="citrus_sinensis">Oranger</string>
+    <string name="hordeum_vulgare">Orge</string>
+    <string name="citrullus_lanatus">Pastèque</string>
+    <string name="poa_trivialis">Pâturin</string>
+    <string name="prunus_persica">Pêcher</string>
+    <string name="petroselinum_crispum">Persil</string>
+    <string name="allium_porrum">Poireau</string>
+    <string name="pyrus_communis">Poirier</string>
+    <string name="cicer_arietinum">Pois chiche</string>
+    <string name="pisum_sativum">Pois commun</string>
+    <string name="capsicum_annuum">Poivron</string>
+    <string name="solanum_tuberosum">Pomme de terre</string>
+    <string name="malus_pumila">Pommier</string>
+    <string name="cucurbita_maxima">Potiron</string>
+    <string name="prunus_cerasifera">Prunier-cerise (Myrobolan)</string>
+    <string name="prunus_domestica">Prunier domestique</string>
+    <string name="prunus_salicina">Prunier du Japon</string>
+    <string name="prunus_cerasus">Prunus cerasus</string>
+    <string name="raphanus_sativus">Radis</string>
+    <string name="lolium_perenne">Ray grass Anglais</string>
+    <string name="lolium_multiflorum">Ray grass Italien</string>
+    <string name="oryza_sativa">Riz</string>
+    <string name="onobrychis_viciifolia">Sainfoin</string>
+    <string name="glycine_max">Soja</string>
+    <string name="solanum_lycopersicum">Tomate</string>
+    <string name="helianthus_annuus">Tournesol annuel</string>
+    <string name="trifolium_repens">Trèfle blanc</string>
+    <string name="trifolium_alexandrinum">Trèfle d’alexandrie</string>
+    <string name="trifolium_incarnatum">Trèfle incarnat</string>
+    <string name="trifolium_pratense">Trèfle violet</string>
+    <string name="triticosecale">Triticale</string>
+    <string name="vicia_sativa">Vesce cultivée</string>
+    <string name="vicia_villosa">Vesce villosa</string>
+    <string name="vitis">Vigne</string>
+
+    <!-- Procedures -->
+    <string name="irrigation">Irrigation</string>
+    <string name="ground_work">Travail du sol</string>
+    <string name="implantation">Semis</string>
+    <string name="fertilization">Fertilisation</string>
+    <string name="harvest">Récolte</string>
+    <string name="care">Entretien</string>
+    <string name="crop_protection">Pulvérisation</string>
+
+    <!-- Plurals -->
+    <string name="input">%d intrant</string>
+    <string name="inputs">%d intrants</string>
+    <string name="material">%d matériau</string>
+    <string name="materials">%d matériaux</string>
+    <string name="equipment">%d outil</string>
+    <string name="equipments">%d outils</string>
+    <string name="person">%d personne</string>
+    <string name="persons">%d personnes</string>
+    <string name="day">%d jour</string>
+    <string name="days">%d jours</string>
+    <string name="hour">heure</string>
+    <string name="hours">heures</string>
+    <string name="x_hour">%d heure</string>
+    <string name="x_hours">%d heures</string>
+
+    <!-- App strings -->
+    <string name="app_name">Click&amp;Farm</string>
+    <string name="nav_button">nav</string>
+
+    <string name="starting_intervention_text" >Commencer une intervention de…</string>
+    <string name="finishing_intervention_text" >Enregistrer une intervention de…</string>
+    <string name="save_intervention" >Enregistrer</string>
+    <string name="recyclerview_nodata">Commencez à utiliser l\'application en ajoutant votre première intervention à l\'aide des boutons actions ci-dessous.</string>
+    <string name="label_working_period">Temps de travail</string>
+    <string name="default_working_period_main_line">aujourd\'hui • 7 h</string>
+    <string name="starting_date">Débuté le</string>
+    <string name="duration">Durée</string>
+    <string name="default_working_period_duration">7</string>
+    <string name="default_working_period_date">aujourd\'hui</string>
+    <string name="label_inputs">Intrants</string>
+    <string name="add_input">+ Ajouter un intrant</string>
+    <string name="default_input_name">Blé dur</string>
+    <string name="default_input_name_more">Tablur</string>
+    <string name="quantity">Quantité</string>
+    <string name="default_quantity_value">0</string>
+    <string name="default_unit">kg</string>
+    <string name="default_input_summary">pas d\'intrants</string>
+    <string name="seeds">Semences</string>
+    <string name="fertilizers">Fertilisants</string>
+    <string name="phytos">Phyto.</string>
+    <string name="all">Tout</string>
+
+    <string name="create_seed_title">Création d\'une semence</string>
+    <string name="create_phyto_title">Création d\'un produit phyto</string>
+    <string name="create_ferti_title">Création d\'un fertilisant</string>
+
+
+    <string name="create_new_seed">+ Créer une nouvelle semence</string>
+    <string name="create_new_phyto">+ Créer un nouveau phyto</string>
+    <string name="create_new_ferti">+ Créer un nouveau fertilisant</string>
+    <string name="create_new_material">+ Créer un nouveau matériau</string>
+
+    <string name="label_materials">Matériaux</string>
+    <string name="starting_intervention">Qui commence</string>
+    <string name="finished_intervention">Déjà réalisée</string>
+    <string name="register_an_intervention">Enregistrer une intervention</string>
+
+    <string name="none">aucun</string>
+    <string name="add_material">+ Ajouter un matériau</string>
+    <string name="inputs_count">%d intrants</string>
+
+    <string name="chose_specie">Espèce</string>
+    <string name="unspecified">non renseigné</string>
+    <string name="organic">Organique</string>
+    <string name="mineral">Minéral</string>
+    <string name="chose_nature">Nature</string>
+    <string name="create_material_title">Créer un nouveau matériau</string>
+    <string name="label_equipments">Outils</string>
+    <string name="add_equipment">+ Ajouter un outil</string>
+    <string name="create_new_equipment">+ Créer un nouvel outil</string>
+    <string name="create_equipment_title">Création d\'un équipement</string>
+    <string name="chose_type">Type</string>
+    <string name="label_persons">Personnes</string>
+    <string name="add_person">+ Ajouter une personne</string>
+    <string name="create_new_person">+ Créer une personne</string>
+    <string name="create_person_title">Création d\'une personne</string>
+    <string name="label_crops">Cultures</string>
+    <string name="cancel">Annuler</string>
+    <string name="validate">Valider</string>
+
+
+</resources>

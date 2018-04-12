@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border_bottom"
+    android:padding="16dp">
+
+    <!--<CheckBox-->
+        <!--android:id="@+id/plot_checkbox"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:text="La Renambrie"-->
+        <!--android:button="@android:color/transparent"-->
+        <!--android:drawableLeft="@android:drawable/checkbox_off_background"-->
+        <!--android:drawablePadding="16dp"/>-->
+
+    <CheckBox
+        android:id="@+id/plot_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="La Renambrie"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/plot_area"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="17,8 ha"
+        android:textColor="#000000"
+        app:layout_constraintBaseline_toBaselineOf="@id/plot_checkbox"
+        app:layout_constraintEnd_toStartOf="@+id/plot_arrow" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/plot_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        app:layout_constraintTop_toTopOf="@id/plot_checkbox"
+        app:layout_constraintBottom_toBottomOf="@id/plot_checkbox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/icon_arrow_down" />
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/crop_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/plot_checkbox"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/border_angular"/>
+
+</android.support.constraint.ConstraintLayout>

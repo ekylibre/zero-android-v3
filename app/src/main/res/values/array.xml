@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="fertilizer_nature">
+        <item>Organique</item>
+        <item>Minéral</item>
+    </string-array>
+
+    <string-array name="equipment_type">
+        <item>Tracteur</item>
+        <item>Attelage</item>
+        <item>Outil</item>
+        <item>Autoporté</item>
+    </string-array>
+
+</resources>

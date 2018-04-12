@@ -1,0 +1,118 @@
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"    android:background="@drawable/border_bottom"
+    tools:showIn="@layout/activity_intervention">
+
+    <!--android:focusable="true"-->
+    <!--android:focusableInTouchMode="true"-->
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/working_period_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_arrow_down"
+        android:animateLayoutChanges="true"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/working_period_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_dark"
+        android:text="@string/label_working_period"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/working_period_summary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/default_working_period_main_line"
+        app:layout_constraintBaseline_toBaselineOf="@id/working_period_label"
+        app:layout_constraintStart_toEndOf="@+id/working_period_label" />
+
+    <android.support.constraint.Group
+        android:id="@+id/working_period_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="working_period_date_label,working_period_edit_date,
+        working_period_duration_label,working_period_edit_duration,working_period_duration_unit"
+        android:visibility="gone"/>
+
+    <!-- Detailed view below -->
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/working_period_date_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/working_period_edit_date"
+        android:text="@string/starting_date" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/working_period_edit_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_working_period_date"
+        app:layout_constraintStart_toEndOf="@id/working_period_label"
+        app:layout_constraintTop_toBottomOf="@id/working_period_label"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:focusable="false"
+        android:background="@drawable/border_edittext"
+        android:paddingStart="@dimen/regular_margin"
+        android:paddingEnd="@dimen/regular_margin"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/working_period_duration_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/working_period_date_label"
+        app:layout_constraintBaseline_toBaselineOf="@id/working_period_edit_duration"
+        android:text="@string/duration" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/working_period_edit_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_working_period_duration"
+        android:inputType="number"
+        android:ems="2"
+        android:maxLength="2"
+        android:imeOptions="actionDone"
+        android:gravity="end"
+        app:layout_constraintTop_toBottomOf="@id/working_period_edit_date"
+        app:layout_constraintStart_toEndOf="@id/working_period_label"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:paddingStart="@dimen/regular_margin"
+        android:paddingEnd="@dimen/regular_margin"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="@drawable/border_edittext"
+        android:selectAllOnFocus="true" />
+
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/working_period_duration_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hours"
+        app:layout_constraintBaseline_toBaselineOf="@id/working_period_edit_duration"
+        app:layout_constraintStart_toEndOf="@id/working_period_edit_duration"
+        android:layout_marginStart="8dp"/>
+
+</android.support.constraint.ConstraintLayout>

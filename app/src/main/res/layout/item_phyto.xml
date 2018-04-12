@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@drawable/border_bottom">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Fandango S"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:lines="1" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_company"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bayer CropScience France"
+        android:textColor="@color/accent"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/phyto_name"
+        app:layout_constraintTop_toBottomOf="@id/phyto_name"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_amm_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="@id/phyto_company"
+        app:layout_constraintTop_toBottomOf="@id/phyto_company"
+        android:text="N° AMM\u0020"
+        android:textStyle="italic" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_amm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        app:layout_constraintStart_toEndOf="@id/phyto_amm_label"
+        app:layout_constraintBaseline_toBaselineOf="@id/phyto_amm_label"
+        android:textColor="#000000"
+        android:text="2060118" />
+
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/phyto_dose_label"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintStart_toStartOf="@id/phyto_amm_label"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/phyto_amm_label"-->
+        <!--android:text="Dose max.\u0020"-->
+        <!--android:textStyle="italic" />-->
+
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/phyto_dose"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="6dp"-->
+        <!--app:layout_constraintStart_toEndOf="@id/phyto_dose_label"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@id/phyto_dose_label"-->
+        <!--android:textColor="#000000"-->
+        <!--android:text="2 l/ha" />-->
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_delay_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/phyto_amm_label"
+        app:layout_constraintTop_toBottomOf="@id/phyto_amm_label"
+        android:text="Délai de réentrée\u0020"
+        android:textStyle="italic" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_delay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        app:layout_constraintStart_toEndOf="@id/phyto_delay_label"
+        app:layout_constraintBaseline_toBaselineOf="@id/phyto_delay_label"
+        android:textColor="#000000"
+        android:text="6 heures" />
+
+</android.support.constraint.ConstraintLayout>

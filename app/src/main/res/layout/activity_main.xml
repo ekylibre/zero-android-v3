@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ekylibre.android.MainActivity"
+    android:background="#FAFAFA">
+
+    <View
+        android:id="@+id/dark_mask"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#99000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nav_layout"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/intervention_recycler"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nav_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_intervention" />
+
+    <TextView
+        android:id="@+id/empty_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="@string/recyclerview_nodata"
+        android:padding="16dp"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nav_layout" />  <!-- android:fontFamily="@font/unicorn" -->
+
+    <!-- The bottom navigation menu -->
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/nav_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="8dp"
+        android:background="@color/primary">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/nav_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register_an_intervention"
+            android:textAllCaps="true"
+            android:textColor="@color/icons"
+            app:layout_constraintTop_toTopOf="@id/nav_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:autoSizeTextType="uniform"
+            android:lines="1"/>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_finishing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/finished_intervention"
+            app:layout_constraintTop_toBottomOf="@id/nav_message"
+            app:layout_constraintBottom_toBottomOf="@id/nav_layout"
+            app:layout_constraintEnd_toStartOf="@+id/nav_guideline_vertical_center"
+            app:layout_constraintStart_toStartOf="@id/nav_layout"
+            android:layout_marginEnd="8dp"
+            android:visibility="visible" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_starting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/starting_intervention"
+            app:layout_constraintTop_toBottomOf="@id/nav_message"
+            app:layout_constraintBottom_toBottomOf="@id/nav_layout"
+            app:layout_constraintEnd_toEndOf="@id/nav_layout"
+            app:layout_constraintStart_toEndOf="@id/nav_guideline_vertical_center"
+            android:layout_marginStart="8dp"
+            android:visibility="visible" />
+
+        <!-- intervention choices layout -->
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/nav_procedure_choice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/nav_message"
+            app:layout_constraintStart_toStartOf="@id/nav_layout"
+            app:layout_constraintEnd_toEndOf="@id/nav_layout"
+            app:layout_constraintBottom_toBottomOf="@id/nav_layout"
+            android:visibility="gone">
+
+            <!-- First line -->
+            <View android:id="@+id/empty_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="@id/nav_procedure_choice"
+                app:layout_constraintEnd_toStartOf="@id/nav_button_implantation"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY" />
+
+            <!-- Implantation -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_implantation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/empty_view"
+                app:layout_constraintEnd_toStartOf="@id/nav_button_ground_work"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_implantation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_implantation"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/implantation"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1"/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <!-- Ground work -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_ground_work"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/nav_button_implantation"
+                app:layout_constraintEnd_toStartOf="@id/nav_button_irrigation"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_ground_work"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_ground_work"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/ground_work"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1"/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <!-- Irrigation -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_irrigation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/nav_button_ground_work"
+                app:layout_constraintEnd_toEndOf="@id/nav_procedure_choice"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_irrigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_irrigation"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/irrigation"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1"/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <!-- Harvest -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_harvest"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/nav_procedure_choice"
+                app:layout_constraintEnd_toStartOf="@id/nav_button_care"
+                app:layout_constraintTop_toBottomOf="@id/nav_button_irrigation"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_harvest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_harvest"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/harvest"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1"/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <!-- Care -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_care"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/nav_button_harvest"
+                app:layout_constraintEnd_toStartOf="@id/nav_button_fertilization"
+                app:layout_constraintTop_toBottomOf="@id/nav_button_irrigation"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_care"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_care"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/care"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1"/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <!-- Fertilization -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_fertilization"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/nav_button_care"
+                app:layout_constraintEnd_toStartOf="@id/nav_button_crop_protection"
+                app:layout_constraintTop_toBottomOf="@id/nav_button_irrigation"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_fertilization"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_fertilization"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/fertilization"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1"/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <!-- Crop protection -->
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/nav_button_crop_protection"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/nav_button_fertilization"
+                app:layout_constraintEnd_toEndOf="@id/nav_procedure_choice"
+                app:layout_constraintTop_toBottomOf="@id/nav_button_irrigation"
+                android:orientation="vertical">
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/button_crop_protection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/procedure_crop_protection"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"/>
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|bottom"
+                    android:text="@string/crop_protection"
+                    android:textColor="@color/icons"
+                    app:autoSizeTextType="uniform"
+                    android:lines="1" />
+            </android.support.v7.widget.LinearLayoutCompat>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/nav_guideline_vertical_center"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</android.support.constraint.ConstraintLayout>

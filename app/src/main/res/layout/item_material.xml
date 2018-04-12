@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@drawable/border_bottom">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/material_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Piquets en accacia"
+        android:textStyle="bold"
+        android:textColor="#000000"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/material_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/material_name"
+        app:layout_constraintTop_toBottomOf="@id/material_name"
+        android:text="120 cm" />
+
+</android.support.constraint.ConstraintLayout>

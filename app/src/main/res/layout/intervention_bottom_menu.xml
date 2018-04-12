@@ -1,0 +1,22 @@
+<!-- The bottom navigation menu -->
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    android:padding="8dp"
+    android:background="@color/primary">
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/starting_intervention"
+        app:layout_constraintEnd_toEndOf="@id/nav_layout"
+        app:layout_constraintBottom_toBottomOf="@id/nav_layout" />
+
+</android.support.constraint.ConstraintLayout>

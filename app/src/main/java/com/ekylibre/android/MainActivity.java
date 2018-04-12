@@ -1,0 +1,313 @@
+package com.ekylibre.android;
+
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.ekylibre.android.adapters.MainAdapter;
+import com.ekylibre.android.database.models.Crop;
+import com.ekylibre.android.database.models.Plot;
+import com.ekylibre.android.database.pojos.CropWithPlots;
+import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.database.relations.InterventionCrop;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
+
+    public static Locale LOCALE;
+    public int TYPE;
+    public static final int STARTING = 0;
+    public static final int FINISHING = 1;
+
+    // Procedures statics
+    public static final String CARE = "care";
+    public static final String CROP_PROTECTION = "crop_protection";
+    public static final String FERTILIZATION = "fertilization";
+    public static final String GROUND_WORK = "ground_work";
+    public static final String HARVEST = "harvest";
+    public static final String IMPLANTATION = "implantation";
+    public static final String IRRIGATION = "irrigation";
+
+    // Filters statics
+    public static final String FILTER_MY_INTERVENTIONS = "filter_my_interventions";
+    public static final String FILTER_ALL_INTERVENTIONS = "filter_all_interventions";
+
+    // UI components
+    private View darkMask;
+    private ConstraintLayout procedureChoiceLayout;
+    private TextView menuTitle;
+    private Button startingButton;
+    private Button finishingButton;
+    private ImageButton careButton;
+    private ImageButton cropProtectionButton;
+    private ImageButton fertilizationButton;
+    private ImageButton groundWorkButton;
+    private ImageButton harvestButton;
+    private ImageButton implantationButton;
+    private ImageButton irrigationButton;
+    private TextView filterAll;
+    private TextView filterMine;
+
+    private RecyclerView recyclerView;
+    private TextView emptyRecyclerView;
+    private RecyclerView.Adapter adapter;
+    private List<Interventions> interventionsList = new ArrayList<>();
+
+    // Activity variables
+    private AppDatabase database;
+    private SharedPreferences sharedPreferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        LOCALE = getResources().getConfiguration().locale;
+        Log.e(TAG, "Locale: " + LOCALE.getISO3Language());
+
+        // Get shared preferences and set title
+        sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        setTitle(sharedPreferences.getString("farm-variety", "GAEC Tartifume"));
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("locale", "fra");
+        editor.putInt("farm-id", 1);
+        editor.apply();
+
+        if (!sharedPreferences.getBoolean("initial-data-loaded", false)) {
+            new LoadInitialData(this).execute();
+            editor.putBoolean("initial-data-loaded", true);
+            editor.apply();
+        }
+
+        //ConstraintLayout menuLayout = findViewById(R.id.nav_layout);
+        darkMask = findViewById(R.id.dark_mask);
+        procedureChoiceLayout = findViewById(R.id.nav_procedure_choice);
+        menuTitle = findViewById(R.id.nav_message);
+        startingButton = findViewById(R.id.button_starting);
+        finishingButton = findViewById(R.id.button_finishing);
+        careButton = findViewById(R.id.button_care);
+        cropProtectionButton = findViewById(R.id.button_crop_protection);
+        fertilizationButton = findViewById(R.id.button_fertilization);
+        groundWorkButton = findViewById(R.id.button_ground_work);
+        harvestButton = findViewById(R.id.button_harvest);
+        implantationButton = findViewById(R.id.button_implantation);
+        irrigationButton = findViewById(R.id.button_irrigation);
+        emptyRecyclerView = findViewById(R.id.empty_recyclerview);
+        filterAll = findViewById(R.id.filter_all_interventions);
+        filterMine = findViewById(R.id.filter_my_interventions);
+
+        // The interventionEntity list
+        recyclerView = findViewById(R.id.intervention_recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+//        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putBoolean("showcase-passed", true);
+//            editor.apply();
+//            new FancyShowCaseView.Builder(this)
+//                    .focusOn(menuLayout).title("Pour démarrer, c'est ici !")
+//                    .focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(1)
+//                    .disableFocusAnimation().build().show();}
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
+
+        // Update main list
+        new UpdateList(this, filter).execute();
+
+        finishingButton.setOnClickListener(view -> onInterventionTypeSelected(FINISHING));
+        startingButton.setOnClickListener(view -> {
+            //onInterventionTypeSelected(STARTING);
+            //showInputDialog();
+            //new TestCrop(this).execute();
+
+            Toast toast = Toast.makeText(this, "Pas encore implémenté", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 200);
+            toast.show();
+        });
+
+        careButton.setOnClickListener(view -> onProcedureChoice(CARE));
+        cropProtectionButton.setOnClickListener(view -> onProcedureChoice(CROP_PROTECTION));
+        fertilizationButton.setOnClickListener(view -> onProcedureChoice(FERTILIZATION));
+        groundWorkButton.setOnClickListener(view -> onProcedureChoice(GROUND_WORK));
+        harvestButton.setOnClickListener(view -> onProcedureChoice(HARVEST));
+        implantationButton.setOnClickListener(view -> onProcedureChoice(IMPLANTATION));
+        irrigationButton.setOnClickListener(view -> onProcedureChoice(IRRIGATION));
+    }
+
+
+//    public class TestCrop extends AsyncTask<Void, Void, Void> {
+//        Context context;
+//
+//        TestCrop(Context context) {
+//            this.context = context;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            database = AppDatabase.getInstance(context);
+//
+//            // insert interventionCrop
+////            database.dao().insert(new InterventionCrop(1,1, 100));
+////
+////
+////            for (Interventions intervention : database.dao().selectInterventions()) {
+////                Log.e(TAG, intervention.crops.get(0).cropWithPlots.get(0).plot.get(0).name);
+////            }
+//
+//            database.dao().insert(new Plot("2", "La Renambrie", null, 2.3f,
+//                    null, null, null, null));
+//
+//            database.dao().insert(new Crop("2", "Blé tendre de printemps 2018",
+//                    null,null,null,null,
+//                    null,null,2.4f,null, new Date(), new Date(),"2",null,null));
+//
+//            Date date = new Date();
+//            for (CropWithPlots crop : database.dao().listCropWithPlots(date.getTime())) {
+//                Log.e(TAG, crop.plot.get(0).name);
+//            }
+//
+//            return null;
+//        }
+//    }
+
+    public class LoadInitialData extends AsyncTask<Void, Void, Void> {
+        Context context;
+
+        LoadInitialData(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            database = AppDatabase.getInstance(context);
+            database.populateInitialData(context);
+            return null;
+        }
+    }
+
+    public class UpdateList extends AsyncTask<Void, Void, Void> {
+
+        Context context;
+        String filter;
+
+        UpdateList(Context context, String filter) {
+            this.context = context;
+            this.filter = filter;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            database = AppDatabase.getInstance(context);
+            interventionsList.clear();
+            switch (filter) {
+
+                case FILTER_ALL_INTERVENTIONS:
+//                    interventionsList = database.interventionDAO().selectInterventions();
+//                    for (Intervention interventionEntity : interventionsList) {
+//                        interventionEntity.phytos = database.phytoInterDAO().getPhytosForInter(interventionEntity.id);
+//                        interventionEntity.seeds = database.seedInterDAO().getSeedsForInter(interventionEntity.id);
+//                    }
+                    interventionsList = database.dao().selectInterventions();
+                    break;
+
+                case FILTER_MY_INTERVENTIONS:
+                    //interventionsList = database.interventionDAO().selectInterventions();
+                    break;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (interventionsList.isEmpty()) {
+                setEmptyView(true);
+            } else {
+                setEmptyView(false);
+                adapter = new MainAdapter(this.context, interventionsList);
+                recyclerView.setAdapter(adapter);
+            }
+        }
+    }
+
+    private void setEmptyView(Boolean state) {
+        if (state && emptyRecyclerView.getVisibility() == View.GONE)
+            emptyRecyclerView.setVisibility(View.VISIBLE);
+        else if (!state && emptyRecyclerView.getVisibility() == View.VISIBLE)
+            emptyRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void onInterventionTypeSelected(int type) {
+        TYPE = type;
+        if (type == STARTING)
+            menuTitle.setText(R.string.starting_intervention_text);
+        else if (type == FINISHING)
+            menuTitle.setText(R.string.finishing_intervention_text);
+        deployMenu(true);
+    }
+
+    private void onProcedureChoice(String procedure) {
+        Intent intent = new Intent(this, InterventionActivity.class);
+        intent.putExtra("type", TYPE);
+        intent.putExtra("procedure", procedure);
+        startActivity(intent);
+        deployMenu(false);
+    }
+
+    private Boolean deployMenu(Boolean state) {
+        if (!state && procedureChoiceLayout.getVisibility() == View.VISIBLE) {
+            darkMask.setVisibility(View.GONE);
+            procedureChoiceLayout.setVisibility(View.GONE);
+            menuTitle.setText(R.string.register_an_intervention);
+            startingButton.setVisibility(View.VISIBLE);
+            finishingButton.setVisibility(View.VISIBLE);
+            return true;
+        } else if (state && procedureChoiceLayout.getVisibility() == View.GONE) {
+            startingButton.setVisibility(View.GONE);
+            finishingButton.setVisibility(View.GONE);
+            darkMask.setVisibility(View.VISIBLE);
+            darkMask.bringToFront();
+            procedureChoiceLayout.setVisibility(View.VISIBLE);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!deployMenu(false))
+            super.onBackPressed();
+    }
+
+}

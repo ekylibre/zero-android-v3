@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/regular_margin"
+    android:background="@color/icons">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/filter_my_interventions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mes interventions"
+        android:textColor="@color/icons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/filter_background_enabled"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/filter_all_interventions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toutes les interventions"
+        android:textColor="@color/icons"
+        android:layout_margin="@dimen/regular_margin"
+        app:layout_constraintStart_toEndOf="@id/filter_my_interventions"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/filter_my_interventions"
+        android:background="@drawable/filter_background_disabled"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/last_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dernière synchronisation  15:04"
+        android:textSize="@dimen/small_text"
+        android:textColor="@color/grey"
+        android:layout_marginTop="@dimen/small_margin"
+        app:layout_constraintTop_toBottomOf="@id/filter_my_interventions"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/item_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:srcCompat="@drawable/procedure_care"
+        android:background="@color/grey"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/item_procedure"
+        app:layout_constraintBottom_toBottomOf="@id/used_for_constraints"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/item_procedure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/primary_dark"
+        android:text="@string/irrigation"
+        app:layout_constraintTop_toBottomOf="@id/last_sync"
+        app:layout_constraintStart_toEndOf="@id/item_icon"
+        android:layout_marginStart="@dimen/regular_margin"
+        android:layout_marginTop="@dimen/small_margin"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/item_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="hier"
+        android:textColor="@color/accent"
+        app:layout_constraintBaseline_toBaselineOf="@id/item_procedure"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/item_cultures"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12 parcelles • 37,8 ha"
+        app:layout_constraintStart_toEndOf="@id/item_icon"
+        app:layout_constraintTop_toBottomOf="@id/item_procedure"
+        android:layout_marginStart="@dimen/regular_margin"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/used_for_constraints"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/item_icon"
+        app:layout_constraintTop_toBottomOf="@id/item_cultures"
+        android:layout_marginStart="@dimen/regular_margin"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/item_infos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Volume: 18m³ (0,5 m³/ha)"
+        app:layout_constraintStart_toEndOf="@id/item_icon"
+        app:layout_constraintTop_toBottomOf="@id/item_cultures"
+        android:layout_marginStart="@dimen/regular_margin"
+        android:textColor="@color/primary_text"/>
+
+</android.support.constraint.ConstraintLayout>

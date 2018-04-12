@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="volume_unit_values">
+        <item>l</item>
+        <item>l/ha</item>
+        <item>l/m²</item>
+        <item>hl</item>
+        <item>hl/ha</item>
+        <item>hl/m²</item>
+        <item>m³</item>
+        <item>m³/ha</item>
+        <item>m³/m²</item>
+    </string-array>
+
+    <string-array name="volume_unit_keys">
+        <item>liter</item>
+        <item>liter_per_hectare</item>
+        <item>liter_per_square_meter</item>
+        <item>hectoliter</item>
+        <item>hectoliter_per_hectare</item>
+        <item>hectoliter_per_square_meter</item>
+        <item>cubic_meter</item>
+        <item>cubic_meter_per_hectare</item>
+        <item>cubic_meter_per_square_meter</item>
+    </string-array>
+
+
+
+
+    <string-array name="mass_unit_values">
+        <item>g</item>
+        <item>g/ha</item>
+        <item>g/m²</item>
+        <item>kg</item>
+        <item>kg/ha</item>
+        <item>kg/m²</item>
+        <item>q</item>
+        <item>q/ha</item>
+        <item>q/m²</item>
+        <item>t</item>
+        <item>t/ha</item>
+        <item>t/m²</item>
+    </string-array>
+
+    <string-array name="mass_unit_keys">
+        <item>gram</item>
+        <item>gram_per_hectare</item>
+        <item>gram_per_square_meter</item>
+        <item>kilogram</item>
+        <item>kilogram_per_hectare</item>
+        <item>kilogram_per_square_meter</item>
+        <item>quintal</item>
+        <item>quintal_per_hectare</item>
+        <item>quintal_per_square_meter</item>
+        <item>ton</item>
+        <item>ton_per_hectare</item>
+        <item>ton_per_square_meter</item>
+    </string-array>
+
+
+
+
+    <string-array name="unity_unit_values">
+        <item>u</item>
+        <item>u/ha</item>
+        <item>u/m²</item>
+        <item>1000</item>
+        <item>1000/ha</item>
+        <item>1000/m²</item>
+    </string-array>
+
+    <string-array name="unity_unit_keys">
+        <item>unity</item>
+        <item>unity_per_hectare</item>
+        <item>unity_per_square_meter</item>
+        <item>thousand</item>
+        <item>thousand_per_hectare</item>
+        <item>thousand_per_square_meter</item>
+    </string-array>
+
+</resources>
