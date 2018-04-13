@@ -6,7 +6,7 @@ Zero Android v3 includes private json datasets, which have to be copied manualy 
 
 ## Screenshots
 
-![](doc/screenshots/Screenshot_20180413-170514.png?raw=true)
-![](doc/screenshots/Screenshot_20180413-170524.png?raw=true)
-![](doc/screenshots/Screenshot_20180413-170556.png?raw=true)
-![](doc/screenshots/Screenshot_20180413-170705.png?raw=true)
+<img src="https://raw.githubusercontent.com/ekylibre/zero-android-v3/master/doc/screenshots/Screenshot_20180413-170514.png" width="300">
+<img src="https://raw.githubusercontent.com/ekylibre/zero-android-v3/master/doc/screenshots/Screenshot_20180413-170524.png" width="300">
+<img src="https://raw.githubusercontent.com/ekylibre/zero-android-v3/master/doc/screenshots/Screenshot_20180413-170556.png" width="300">
+<img src="https://raw.githubusercontent.com/ekylibre/zero-android-v3/master/doc/screenshots/Screenshot_20180413-170705.png" width="300">
