@@ -27,7 +27,7 @@ import java.util.List;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
-    private static final String TAG = "MainAdapter";
+    private static final String TAG = MainAdapter.class.getName();
     private List<Interventions> interventionsList;
     private Context context;
     private List massUnitValues;
@@ -71,18 +71,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public MainAdapter.ViewHolder onCreateViewHolder(
-            @NonNull ViewGroup parent, int viewType) {
+    public MainAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view;
-        //context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
+        int layoutId = (viewType == 1) ? R.layout.item_intervention_header : R.layout.item_intervention;
+        View view = inflater.inflate(layoutId, parent, false);
 
-        if (viewType == 1) {
-            view = inflater.inflate(R.layout.item_intervention_header, parent, false);
-        } else {
-            view = inflater.inflate(R.layout.item_intervention, parent, false);
-        }
         return new ViewHolder(view);
     }
 
@@ -152,7 +146,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) return 1;
-        else return 2;
+        return (position == 0) ? 1 : 2;
     }
 }

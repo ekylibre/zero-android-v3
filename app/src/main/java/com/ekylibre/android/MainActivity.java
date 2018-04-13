@@ -61,13 +61,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView menuTitle;
     private Button startingButton;
     private Button finishingButton;
-    private ImageButton careButton;
-    private ImageButton cropProtectionButton;
-    private ImageButton fertilizationButton;
-    private ImageButton groundWorkButton;
-    private ImageButton harvestButton;
-    private ImageButton implantationButton;
-    private ImageButton irrigationButton;
     private TextView filterAll;
     private TextView filterMine;
 
@@ -85,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
         Log.e(TAG, "Locale: " + LOCALE.getISO3Language());
 
@@ -103,29 +97,66 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        //ConstraintLayout menuLayout = findViewById(R.id.nav_layout);
+        // Layout
         darkMask = findViewById(R.id.dark_mask);
         procedureChoiceLayout = findViewById(R.id.nav_procedure_choice);
         menuTitle = findViewById(R.id.nav_message);
         startingButton = findViewById(R.id.button_starting);
         finishingButton = findViewById(R.id.button_finishing);
-        careButton = findViewById(R.id.button_care);
-        cropProtectionButton = findViewById(R.id.button_crop_protection);
-        fertilizationButton = findViewById(R.id.button_fertilization);
-        groundWorkButton = findViewById(R.id.button_ground_work);
-        harvestButton = findViewById(R.id.button_harvest);
-        implantationButton = findViewById(R.id.button_implantation);
-        irrigationButton = findViewById(R.id.button_irrigation);
-        emptyRecyclerView = findViewById(R.id.empty_recyclerview);
+        ImageButton careButton = findViewById(R.id.button_care);
+        ImageButton cropProtectionButton = findViewById(R.id.button_crop_protection);
+        ImageButton fertilizationButton = findViewById(R.id.button_fertilization);
+        ImageButton groundWorkButton = findViewById(R.id.button_ground_work);
+        ImageButton harvestButton = findViewById(R.id.button_harvest);
+        ImageButton implantationButton = findViewById(R.id.button_implantation);
+        ImageButton irrigationButton = findViewById(R.id.button_irrigation);
+
         filterAll = findViewById(R.id.filter_all_interventions);
         filterMine = findViewById(R.id.filter_my_interventions);
 
         // The interventionEntity list
+        emptyRecyclerView = findViewById(R.id.empty_recyclerview);
         recyclerView = findViewById(R.id.intervention_recycler);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        adapter = new MainAdapter(this, interventionsList);
 
-//        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                if (adapter.getItemCount() == 0) {
+                    recyclerView.setVisibility(View.GONE);
+                    emptyRecyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    emptyRecyclerView.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+
+
+        // All button events
+        careButton.setOnClickListener(view -> onProcedureChoice(CARE));
+        cropProtectionButton.setOnClickListener(view -> onProcedureChoice(CROP_PROTECTION));
+        fertilizationButton.setOnClickListener(view -> onProcedureChoice(FERTILIZATION));
+        groundWorkButton.setOnClickListener(view -> onProcedureChoice(GROUND_WORK));
+        harvestButton.setOnClickListener(view -> onProcedureChoice(HARVEST));
+        implantationButton.setOnClickListener(view -> onProcedureChoice(IMPLANTATION));
+        irrigationButton.setOnClickListener(view -> onProcedureChoice(IRRIGATION));
+        finishingButton.setOnClickListener(view -> onInterventionTypeSelected(FINISHING));
+        startingButton.setOnClickListener(view -> {
+            //onInterventionTypeSelected(STARTING);
+            //showInputDialog();
+            //new TestCrop(this).execute();
+            Toast toast = Toast.makeText(this, "Pas encore implémenté", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 200);
+            toast.show();
+        });
+
+        //        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
 //            SharedPreferences.Editor editor = sharedPreferences.edit();
 //            editor.putBoolean("showcase-passed", true);
 //            editor.apply();
@@ -145,26 +176,13 @@ public class MainActivity extends AppCompatActivity {
         // Update main list
         new UpdateList(this, filter).execute();
 
-        finishingButton.setOnClickListener(view -> onInterventionTypeSelected(FINISHING));
-        startingButton.setOnClickListener(view -> {
-            //onInterventionTypeSelected(STARTING);
-            //showInputDialog();
-            //new TestCrop(this).execute();
-
-            Toast toast = Toast.makeText(this, "Pas encore implémenté", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.BOTTOM, 0, 200);
-            toast.show();
-        });
-
-        careButton.setOnClickListener(view -> onProcedureChoice(CARE));
-        cropProtectionButton.setOnClickListener(view -> onProcedureChoice(CROP_PROTECTION));
-        fertilizationButton.setOnClickListener(view -> onProcedureChoice(FERTILIZATION));
-        groundWorkButton.setOnClickListener(view -> onProcedureChoice(GROUND_WORK));
-        harvestButton.setOnClickListener(view -> onProcedureChoice(HARVEST));
-        implantationButton.setOnClickListener(view -> onProcedureChoice(IMPLANTATION));
-        irrigationButton.setOnClickListener(view -> onProcedureChoice(IRRIGATION));
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!deployMenu(false))
+            super.onBackPressed();
+    }
 
 //    public class TestCrop extends AsyncTask<Void, Void, Void> {
 //        Context context;
@@ -201,21 +219,6 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
-    public class LoadInitialData extends AsyncTask<Void, Void, Void> {
-        Context context;
-
-        LoadInitialData(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            database = AppDatabase.getInstance(context);
-            database.populateInitialData(context);
-            return null;
-        }
-    }
-
     public class UpdateList extends AsyncTask<Void, Void, Void> {
 
         Context context;
@@ -228,17 +231,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            Log.e(TAG, "Updating interventions recyclerView...");
             database = AppDatabase.getInstance(context);
             interventionsList.clear();
             switch (filter) {
 
                 case FILTER_ALL_INTERVENTIONS:
-//                    interventionsList = database.interventionDAO().selectInterventions();
-//                    for (Intervention interventionEntity : interventionsList) {
-//                        interventionEntity.phytos = database.phytoInterDAO().getPhytosForInter(interventionEntity.id);
-//                        interventionEntity.seeds = database.seedInterDAO().getSeedsForInter(interventionEntity.id);
-//                    }
-                    interventionsList = database.dao().selectInterventions();
+                    interventionsList.addAll(database.dao().selectInterventions());
                     break;
 
                 case FILTER_MY_INTERVENTIONS:
@@ -251,21 +250,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (interventionsList.isEmpty()) {
-                setEmptyView(true);
-            } else {
-                setEmptyView(false);
-                adapter = new MainAdapter(this.context, interventionsList);
-                recyclerView.setAdapter(adapter);
-            }
+            adapter.notifyDataSetChanged();
         }
-    }
-
-    private void setEmptyView(Boolean state) {
-        if (state && emptyRecyclerView.getVisibility() == View.GONE)
-            emptyRecyclerView.setVisibility(View.VISIBLE);
-        else if (!state && emptyRecyclerView.getVisibility() == View.VISIBLE)
-            emptyRecyclerView.setVisibility(View.GONE);
     }
 
     private void onInterventionTypeSelected(int type) {
@@ -304,10 +290,19 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!deployMenu(false))
-            super.onBackPressed();
+    public class LoadInitialData extends AsyncTask<Void, Void, Void> {
+        Context context;
+
+        LoadInitialData(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            database = AppDatabase.getInstance(context);
+            database.populateInitialData(context);
+            return null;
+        }
     }
 
 }
