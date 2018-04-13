@@ -95,6 +95,8 @@
     <string name="crop_protection">Pulvérisation</string>
 
     <!-- Plurals -->
+    <string name="crop">%d culture</string>
+    <string name="crops">%d cultures</string>
     <string name="input">%d intrant</string>
     <string name="inputs">%d intrants</string>
     <string name="material">%d matériau</string>
@@ -174,6 +176,10 @@
     <string name="label_crops">Cultures</string>
     <string name="cancel">Annuler</string>
     <string name="validate">Valider</string>
+    <string name="no_crop_selected">Aucune sélection</string>
+    <string name="select_crops">+ Sélectionner</string>
+    <string name="add">+ Ajouter</string>
+
 
 
 </resources>

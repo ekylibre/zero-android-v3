@@ -2,13 +2,13 @@ package com.ekylibre.android;
 
 
 import android.app.DatePickerDialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,14 +26,16 @@ import com.ekylibre.android.adapters.EquipmentAdapter;
 import com.ekylibre.android.adapters.InputAdapter;
 import com.ekylibre.android.adapters.MaterialAdapter;
 import com.ekylibre.android.adapters.PersonAdapter;
+import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
-import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.pojos.Phytos;
+import com.ekylibre.android.database.pojos.PlotWithCrops;
 import com.ekylibre.android.database.pojos.Seeds;
+import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.utils.Converters;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
@@ -59,8 +61,7 @@ public class InterventionActivity extends AppCompatActivity implements
     InputMethodManager keyboardManager;
 
     // Crops layout
-    private TextView cropSummary;
-    private ConstraintLayout includeCropLayout;
+    private TextView cropSummary, cropAddLabel;
     private DialogFragment selectCropFragment;
 
     // Working period layout
@@ -102,7 +103,8 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Materials> materialList = new ArrayList<>();
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
-    public static List<Crops> cropList = new ArrayList<>();
+    public static List<PlotWithCrops> plotList = new ArrayList<>();
+    public static String cropSummaryText;
 
     private Calendar today = Calendar.getInstance();
     private Calendar date = Calendar.getInstance();
@@ -124,8 +126,10 @@ public class InterventionActivity extends AppCompatActivity implements
         // ================================ LAYOUT ============================================= //
 
         // Crops
-        includeCropLayout = findViewById(R.id.include_crops_layout);
+        ConstraintLayout includeCropLayout = findViewById(R.id.include_crops_layout);
+        cropAddLabel = findViewById(R.id.crops_add_label);
         cropSummary = findViewById(R.id.crops_summary);
+        cropSummary.setText(this.getString(R.string.select_crops));
 
         // Working period
         workingPeriodDetail = findViewById(R.id.working_period_detail);
@@ -238,7 +242,6 @@ public class InterventionActivity extends AppCompatActivity implements
         inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                Log.e(TAG, "Person item count --> " + personAdapter.getItemCount());
                 if (inputAdapter.getItemCount() == 0) {
                     inputArrow.performClick();
                     inputArrow.setVisibility(View.GONE);
@@ -284,7 +287,6 @@ public class InterventionActivity extends AppCompatActivity implements
         materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                Log.e(TAG, "Person item count --> " + personAdapter.getItemCount());
                 if (materialAdapter.getItemCount() == 0) {
                     materialArrow.performClick();
                     materialArrow.setVisibility(View.GONE);
@@ -330,7 +332,6 @@ public class InterventionActivity extends AppCompatActivity implements
         equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                Log.e(TAG, "Person item count --> " + personAdapter.getItemCount());
                 if (equipmentAdapter.getItemCount() == 0) {
                     equipmentArrow.performClick();
                     equipmentArrow.setVisibility(View.GONE);
@@ -376,7 +377,6 @@ public class InterventionActivity extends AppCompatActivity implements
         personAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                Log.e(TAG, "Person item count --> " + personAdapter.getItemCount());
                 if (personAdapter.getItemCount() == 0) {
                     personArrow.performClick();
                     personArrow.setVisibility(View.GONE);
@@ -454,9 +454,10 @@ public class InterventionActivity extends AppCompatActivity implements
                 database.dao().insert(item.inter);
             }
 
-            for (Crops item : cropList) {
-                item.inter.intervention_id = intervention_id;
-                database.dao().insert(item.inter);
+            for (PlotWithCrops plot : plotList) {
+                    for (Crop crop : plot.crops)
+                        if (crop.is_checked)
+                            database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
 
             return null;
@@ -469,7 +470,7 @@ public class InterventionActivity extends AppCompatActivity implements
             materialList.clear();
             equipmentList.clear();
             personList.clear();
-            cropList.clear();
+            plotList.clear();
             finish();
         }
     }
@@ -501,30 +502,34 @@ public class InterventionActivity extends AppCompatActivity implements
                 if (personRecyclerView.getVisibility() == View.GONE)
                     personArrow.performClick();
 
-            } else if (selection instanceof Crops) {
-                selectCropFragment.dismiss();
-                cropList.add((Crops) selection);
-                // TODO: update crops summary
-                //cropAdapter.notifyDataSetChanged();
-
-            } else {
+            } else if (selection instanceof Seeds || selection instanceof Phytos || selection instanceof Fertilizers) {
                 selectInputFragment.dismiss();
                 inputList.add(selection);
                 inputAdapter.notifyDataSetChanged();
                 if (inputRecyclerView.getVisibility() == View.GONE)
                     inputArrow.performClick();
+
+            } else {
+                selectCropFragment.dismiss();
+                if (cropSummaryText.equals(this.getString(R.string.no_crop_selected))) {
+                    cropSummary.setVisibility(View.GONE);
+                    cropAddLabel.setVisibility(View.VISIBLE);
+                } else {
+                    cropAddLabel.setVisibility(View.GONE);
+                    cropSummary.setText(cropSummaryText);
+                    cropSummary.setVisibility(View.VISIBLE);
+                }
+                plotList = (List<PlotWithCrops>) selection;
             }
         }
-        else
-            Log.e(TAG, "onFragmentInteraction --> selection is null");
     }
 
     private FragmentTransaction getFragmentTransaction() {
         // DialogFragment.show() will take care of adding the fragment
         // in a transaction.  We also want to remove any currently showing
         // dialog, so make our own transaction and take care of that here.
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {
             ft.remove(prev);
         }
@@ -547,6 +552,6 @@ public class InterventionActivity extends AppCompatActivity implements
         materialList.clear();
         equipmentList.clear();
         personList.clear();
-        cropList.clear();
+        plotList.clear();
     }
 }

@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
@@ -53,7 +54,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         private final ImageView itemIcon;
         private final TextView itemProcedure;
         private final TextView itemDate;
-        private final TextView itemCultures;
+        private final TextView itemCrops;
         private final TextView itemInfos;
 
         ViewHolder(final View itemView) {
@@ -62,7 +63,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             itemIcon = itemView.findViewById(R.id.item_icon);
             itemProcedure = itemView.findViewById(R.id.item_procedure);
             itemDate = itemView.findViewById(R.id.item_date);
-            itemCultures = itemView.findViewById(R.id.item_cultures);
+            itemCrops = itemView.findViewById(R.id.item_cultures);
             itemInfos = itemView.findViewById(R.id.item_infos);
 
             itemView.setOnClickListener(v -> Log.e(TAG, "clic"));
@@ -86,9 +87,20 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.procedure, "drawable", context.getPackageName()));
         holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.procedure, "string", context.getPackageName()));
         holder.itemDate.setText(DateTools.display(current.intervention.date));
-        //holder.itemCultures.setText(interventionEntity.culture);
-        StringBuilder sb = new StringBuilder();
 
+        // Count parcels and surface
+        float total = 0;
+        int count = 0;
+        for (Crops crop : current.crops) {
+            total +=  crop.crop.get(0).surface_area * crop.inter.work_area_percentage / 100;
+            ++count;
+        }
+        String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
+        String totalString = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
+        holder.itemCrops.setText(totalString);
+
+        // Display input by type
+        StringBuilder sb = new StringBuilder();
         switch (current.intervention.procedure) {
 
             case MainActivity.CROP_PROTECTION:

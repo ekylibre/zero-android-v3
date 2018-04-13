@@ -1,11 +1,14 @@
 package com.ekylibre.android;
 
-import android.app.DialogFragment;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectCropAdapter;
 import com.ekylibre.android.database.models.Plot;
@@ -30,18 +34,18 @@ public class SelectCropFragment extends DialogFragment {
     private Context context;
 
     private OnFragmentInteractionListener fragmentListener;
+    private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
+    public static TextView totalTextView;
+    private AppCompatButton validateButton;
 
-    private ArrayList<PlotWithCrops> dataset;
+    public ArrayList<PlotWithCrops> dataset;
 
     public SelectCropFragment() {
     }
 
     public static SelectCropFragment newInstance() {
-
-        SelectCropFragment fragment = new SelectCropFragment();
-        //fragment.setStyle();
-        return fragment;
+        return new SelectCropFragment();
     }
 
     @Override
@@ -49,31 +53,27 @@ public class SelectCropFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         this.context = getActivity();
         this.dataset = new ArrayList<>();
-
-        Log.e(TAG, "onCreate()");
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        getDialog().setTitle("Sélectionnez des cultures");
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_crop, container, false);
 
-        RecyclerView recyclerView = inflatedView.findViewById(R.id.crop_dialog_recycler);
+        validateButton = inflatedView.findViewById(R.id.button_validate);
+        totalTextView = inflatedView.findViewById(R.id.crop_dialog_total);
+        recyclerView = inflatedView.findViewById(R.id.crop_dialog_recycler);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        adapter = new SelectCropAdapter(dataset, fragmentListener);
+        adapter = new SelectCropAdapter(context, dataset, fragmentListener);
         recyclerView.setAdapter(adapter);
 
+        validateButton.setOnClickListener(view ->
+                fragmentListener.onFragmentInteraction(dataset)
+        );
+
         return inflatedView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        Log.e(TAG, "onResume()");
     }
 
     @Override
@@ -93,6 +93,7 @@ public class SelectCropFragment extends DialogFragment {
 
         if (dataset.isEmpty())
             new RequestDatabase(context).execute();
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -130,13 +131,6 @@ public class SelectCropFragment extends DialogFragment {
 
             return null;
         }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            adapter.notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -165,4 +159,5 @@ public class SelectCropFragment extends DialogFragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Object selection);
     }
+
 }

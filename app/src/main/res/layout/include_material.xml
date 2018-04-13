@@ -50,7 +50,7 @@
         app:layout_constraintBaseline_toBaselineOf="@id/material_label"
         app:layout_constraintStart_toEndOf="@+id/material_label"
         android:layout_marginStart="16dp"
-        android:text="@string/add_material"
+        android:text="@string/add"
         android:textAllCaps="true"
         android:textColor="@color/action_text" />
 

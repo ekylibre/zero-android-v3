@@ -94,6 +94,8 @@
     <string name="crop_protection">Crop protection</string>
 
     <!-- Plurals -->
+    <string name="crop">%d crop</string>
+    <string name="crops">%d crops</string>
     <string name="input">%d input</string>
     <string name="inputs">%d inputs</string>
     <string name="material">%d material</string>
@@ -175,6 +177,9 @@
     <string name="label_crops">Cultures</string>
     <string name="cancel">Annuler</string>
     <string name="validate">Valider</string>
+    <string name="no_crop_selected">No crop selected</string>
+    <string name="select_crops">+ Select</string>
+    <string name="add">+ Add</string>
 
 
 </resources>

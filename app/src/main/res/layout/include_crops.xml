@@ -33,8 +33,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="3 cultures • 17,6 ha"
         app:layout_constraintBaseline_toBaselineOf="@id/crops_label"
-        app:layout_constraintStart_toEndOf="@+id/crops_label" />
+        app:layout_constraintStart_toEndOf="@+id/crops_label"
+        android:visibility="gone"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/crops_add_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBaseline_toBaselineOf="@id/crops_label"
+        app:layout_constraintStart_toEndOf="@+id/crops_label"
+        android:layout_marginStart="16dp"
+        android:text="@string/select_crops"
+        android:textAllCaps="true"
+        android:textColor="@color/action_text"/>
 
 </android.support.constraint.ConstraintLayout>

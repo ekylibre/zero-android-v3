@@ -49,5 +49,6 @@ public class Plot {
         this.startDate = startDate;
         this.stopDate = stopDate;
         this.farm = farm;
+        this.is_checked = false;
     }
 }

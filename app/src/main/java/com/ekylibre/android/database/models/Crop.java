@@ -19,7 +19,7 @@ import java.util.Date;
 public class Crop {
 
     public static final String TABLE_NAME = "crops";
-    public static final String COLUMN_UUID = TABLE_NAME + "uuid";
+    public static final String COLUMN_UUID = TABLE_NAME + "_uuid";
     public static final String COLUMN_PLOT = "plot";
     public static final String COLUMN_SUBPLOT = "subplot";
 
@@ -60,7 +60,10 @@ public class Crop {
     public Integer farm;
 
     @Ignore
-    public boolean is_checked;
+    public Boolean is_checked;
+
+    @Ignore
+    public int work_area_percentage;
 
     public Crop(@NonNull String uuid, String name, String specie, String production_nature,
                 String production_mode, String production_output, String provisional_yield,
@@ -83,5 +86,7 @@ public class Crop {
         this.plot = plot;
         this.subplot = subplot;
         this.farm = farm;
+        this.is_checked = false;
+        this.work_area_percentage = 100;
     }
 }

@@ -51,6 +51,7 @@
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/plot_checkbox"
         android:layout_marginTop="16dp"
-        android:background="@drawable/border_angular"/>
+        android:background="@drawable/border_angular"
+        android:visibility="gone"/>
 
 </android.support.constraint.ConstraintLayout>

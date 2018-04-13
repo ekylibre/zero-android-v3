@@ -42,9 +42,10 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/crop_dialog_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3 cultures • 17,6 ha"
+            android:text="@string/no_crop_selected"
             app:layout_constraintBaseline_toBaselineOf="@id/button_validate"
             app:layout_constraintStart_toStartOf="@id/nav_layout"
             android:layout_marginStart="16dp"

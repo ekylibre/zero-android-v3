@@ -14,7 +14,7 @@ public class Crops {
     public InterventionCrop inter;
 
     @Relation(parentColumn = InterventionCrop.COLUMN_CROP_ID, entityColumn = Crop.COLUMN_UUID, entity = Crop.class)
-    public List<CropWithPlots> cropWithPlots;
+    public List<Crop> crop;
 
     public Crops() {}
 
