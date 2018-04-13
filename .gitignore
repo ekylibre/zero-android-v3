@@ -49,3 +49,6 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
+
+# Private development files
+app/src/main/assets/lexicon/
