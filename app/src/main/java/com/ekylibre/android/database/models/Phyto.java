@@ -35,8 +35,10 @@ public class Phyto {
     @ColumnInfo(index = true)
     public Boolean used;
 
+    public String unit;
+
     public Phyto(Integer id, String name, String nature, String maaid, Integer mix_category_code,
-                 Integer in_field_reentry_delay, String firm_name, Boolean registered, Boolean used) {
+                 Integer in_field_reentry_delay, String firm_name, Boolean registered, Boolean used, String unit) {
         this.id = id;
         this.name = name;
         this.nature = nature;
@@ -46,6 +48,7 @@ public class Phyto {
         this.firm_name = firm_name;
         this.registered = registered;
         this.used = used;
+        this.unit = unit;
     }
 
 }

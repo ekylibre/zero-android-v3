@@ -39,12 +39,15 @@ public class Seed {
     @Ignore
     public String fra;
 
-    public Seed(Integer id, String specie, String variety, Boolean registered, Boolean used) {
+    public String unit;
+
+    public Seed(Integer id, String specie, String variety, Boolean registered, Boolean used, String unit) {
         this.id = id;
         this.specie = specie;
         this.variety = variety;
         this.registered = registered;
         this.used = used;
+        this.unit = unit;
     }
 
 }

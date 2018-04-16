@@ -43,7 +43,9 @@ public class Fertilizer {
     @ColumnInfo(index = true)
     public Boolean used;
 
-    public Fertilizer(Integer id, String name, String label_fra, String variant, String variety, String derivative_of, String nature, String nitrogen_concentration, String phosphorus_concentration, String potassium_concentration, String sulfur_trioxyde_concentration, Boolean registered, Boolean used) {
+    public String unit;
+
+    public Fertilizer(Integer id, String name, String label_fra, String variant, String variety, String derivative_of, String nature, String nitrogen_concentration, String phosphorus_concentration, String potassium_concentration, String sulfur_trioxyde_concentration, Boolean registered, Boolean used, String unit) {
         this.id = id;
         this.name = name;
         this.label_fra = label_fra;
@@ -57,5 +59,6 @@ public class Fertilizer {
         this.sulfur_trioxyde_concentration = sulfur_trioxyde_concentration;
         this.registered = registered;
         this.used = used;
+        this.unit = unit;
     }
 }

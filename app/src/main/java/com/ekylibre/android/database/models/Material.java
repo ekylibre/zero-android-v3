@@ -21,9 +21,12 @@ public class Material {
 
     public String description;
 
-    public Material(String name, String description) {
+    public String unit;
+
+    public Material(String name, String description, String unit) {
         this.name = name;
         this.description = description;
+        this.unit = unit;
     }
 
 
