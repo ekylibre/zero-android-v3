@@ -397,7 +397,10 @@ public class InterventionActivity extends AppCompatActivity implements
                 this, Converters.toDate(date.getTimeInMillis())).execute());
 
         cancelButton = findViewById(R.id.button_cancel);
-        cancelButton.setOnClickListener(view -> finish());
+        cancelButton.setOnClickListener(view -> {
+            clearDatasets();
+            finish();
+        });
 
         // Launch crop selector
         selectCropFragment = SelectCropFragment.newInstance();
@@ -471,11 +474,7 @@ public class InterventionActivity extends AppCompatActivity implements
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            inputList.clear();
-            materialList.clear();
-            equipmentList.clear();
-            personList.clear();
-            plotList.clear();
+            clearDatasets();
             finish();
         }
     }
@@ -554,6 +553,10 @@ public class InterventionActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        clearDatasets();
+    }
+
+    void clearDatasets() {
         inputList.clear();
         materialList.clear();
         equipmentList.clear();

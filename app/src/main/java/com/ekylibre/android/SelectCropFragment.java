@@ -66,9 +66,10 @@ public class SelectCropFragment extends DialogFragment {
         RecyclerView.Adapter adapter = new SelectCropAdapter(context, dataset, fragmentListener);
         recyclerView.setAdapter(adapter);
 
-        validateButton.setOnClickListener(view ->
-                fragmentListener.onFragmentInteraction(dataset)
-        );
+        validateButton.setOnClickListener(view -> {
+            fragmentListener.onFragmentInteraction(dataset);
+            adapter.notifyItemRangeRemoved(0, dataset.size());
+        });
 
         return inflatedView;
     }
