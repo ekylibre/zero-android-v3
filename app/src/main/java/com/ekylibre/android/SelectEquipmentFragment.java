@@ -19,9 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
-import com.ekylibre.android.adapters.SelectMaterialAdapter;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
-import com.ekylibre.android.database.models.Material;
 
 import java.util.ArrayList;
 

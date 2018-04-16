@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectPersonAdapter;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
 
 import java.util.ArrayList;

@@ -20,15 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ekylibre.android.adapters.MainAdapter;
-import com.ekylibre.android.database.models.Crop;
-import com.ekylibre.android.database.models.Plot;
-import com.ekylibre.android.database.pojos.CropWithPlots;
-import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
-import com.ekylibre.android.database.relations.InterventionCrop;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 

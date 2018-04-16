@@ -110,7 +110,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             case MainActivity.CROP_PROTECTION:
                 for (Phytos p : current.phytos) {
                     sb.append(p.phyto.get(0).name).append(" • ");
-                    sb.append(p.inter.quantity).append(" ");
+                    sb.append(String.format(MainActivity.LOCALE, "%.1f", p.inter.quantity)).append(" ");
                     sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(p.inter.unit)));
                     if (current.phytos.indexOf(p) + 1 != current.phytos.size()) sb.append("\n");
                 }
@@ -120,7 +120,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 for (Seeds s : current.seeds) {
                     String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie, "string", context.getPackageName()));
                     sb.append(specie).append(" • ");
-                    sb.append(s.inter.quantity).append(" ");
+                    sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");
                     sb.append(massUnitValues.get(massUnitKeys.indexOf(s.inter.unit)));
                     if (current.seeds.indexOf(s) + 1 != current.seeds.size()) sb.append("\n");
                 }
@@ -129,7 +129,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             case MainActivity.FERTILIZATION:
                 for (Fertilizers f : current.fertilizers) {
                     sb.append(f.fertilizer.get(0).label_fra).append(" • ");
-                    sb.append(f.inter.quantity).append(" ");
+                    sb.append(String.format(MainActivity.LOCALE, "%.1f", f.inter.quantity)).append(" ");
                     sb.append(massUnitValues.get(massUnitKeys.indexOf(f.inter.unit)));
                     if (current.fertilizers.indexOf(f) + 1 != current.fertilizers.size()) sb.append("\n");
                 }

@@ -1,4 +1,4 @@
-package com.ekylibre.android;
+package com.ekylibre.android.database;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
@@ -14,7 +14,6 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
-import com.ekylibre.android.database.DAO;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;

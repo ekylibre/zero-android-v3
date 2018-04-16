@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectInputAdapter;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Seed;

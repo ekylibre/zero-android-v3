@@ -11,7 +11,6 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectMaterialAdapter;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Material;
 
 import java.util.ArrayList;

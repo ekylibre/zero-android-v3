@@ -26,6 +26,7 @@ import com.ekylibre.android.adapters.EquipmentAdapter;
 import com.ekylibre.android.adapters.InputAdapter;
 import com.ekylibre.android.adapters.MaterialAdapter;
 import com.ekylibre.android.adapters.PersonAdapter;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.pojos.Equipments;
