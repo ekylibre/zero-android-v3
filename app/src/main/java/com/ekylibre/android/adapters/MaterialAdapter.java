@@ -18,9 +18,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Materials;
-import com.ekylibre.android.utils.QuantityCalculs;
+import com.ekylibre.android.utils.QuantityCalcul;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +34,6 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
     private Context context;
     private List<Materials> dataset;
     private InputMethodManager keyboardManager;
-    private float surface = 17.3f;
 
     public MaterialAdapter(Context context, List<Materials> dataset) {
         this.context = context;
@@ -128,11 +128,11 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
             approximativeSwitch.setChecked(item.inter.approximative_value);
             totalTextView.setText(calculTotal(quantityAsString));
 
-            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(context, R.array.unity_unit_values, android.R.layout.simple_spinner_dropdown_item);
+            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(context, R.array.unit_values, android.R.layout.simple_spinner_dropdown_item);
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             unitSpinner.setAdapter(spinnerAdapter);
 
-            List unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_values));
+            List unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unit_values));
             unitSpinner.setSelection(unitKeys.indexOf(item.inter.unit));
         }
 
@@ -148,12 +148,12 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
             if (quantity > 0) {
 
                 Materials material = dataset.get(getAdapterPosition());
-                unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_keys));
+                unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unit_keys));
                 unitBefore = material.inter.unit;
                 unitAfter = unitKeys.get(pos).toString();
                 material.inter.unit = unitAfter;
                 material.inter.quantity = quantity;
-                text = QuantityCalculs.getText(quantity, unitBefore, unitAfter, surface);
+                text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
 
                 totalTextView.setVisibility(View.VISIBLE);
 

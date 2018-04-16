@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -155,7 +156,11 @@ public class SelectMaterialFragment extends DialogFragment {
             TextInputLayout descTextInput = dialogView.findViewById(R.id.create_material_desc);
             String desc = descTextInput.getEditText().getText().toString();
 
-            database.dao().insert(new Material(name, desc));
+            AppCompatSpinner unitSpinner = dialogView.findViewById(R.id.create_material_unit_spinner);
+            int spinner_pos = unitSpinner.getSelectedItemPosition();
+            String unit = getResources().getStringArray(R.array.unit_values)[spinner_pos];
+
+            database.dao().insert(new Material(name, desc, unit));
 
             return null;
         }

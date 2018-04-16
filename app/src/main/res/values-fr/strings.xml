@@ -179,7 +179,7 @@
     <string name="no_crop_selected">Aucune sélection</string>
     <string name="select_crops">+ Sélectionner</string>
     <string name="add">+ Ajouter</string>
-
+    <string name="chose_unit">Unité</string>
 
 
 </resources>

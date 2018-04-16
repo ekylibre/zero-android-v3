@@ -180,6 +180,7 @@
     <string name="no_crop_selected">No crop selected</string>
     <string name="select_crops">+ Select</string>
     <string name="add">+ Add</string>
+    <string name="chose_unit">Unité</string>
 
 
 </resources>

@@ -4,28 +4,17 @@ package com.ekylibre.android.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ekylibre.android.R;
-import com.ekylibre.android.database.models.Person;
-import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.pojos.Persons;
-import com.ekylibre.android.utils.QuantityCalculs;
 
-import java.util.Arrays;
 import java.util.List;
 
 

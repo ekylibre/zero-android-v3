@@ -165,6 +165,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
             }
             SelectCropFragment.totalTextView.setText(totalString);
             InterventionActivity.cropSummaryText = totalString;
+            InterventionActivity.surface = total;
 
         }
     }

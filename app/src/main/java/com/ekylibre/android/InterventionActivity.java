@@ -111,6 +111,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
     private String procedure;
     private int duration = 7;
+    public static float surface = 0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

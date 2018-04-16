@@ -37,6 +37,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     private List volumeUnitKeys;
     private List unityUnitValues;
     private List unityUnitKeys;
+    private List unitValues;
+    private List unitKeys;
 
     public MainAdapter(Context context, List<Interventions> interventionsList) {
         this.interventionsList = interventionsList;
@@ -47,6 +49,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         volumeUnitKeys = Arrays.asList(context.getResources().getStringArray(R.array.volume_unit_keys));
         unityUnitValues = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_values));
         unityUnitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_keys));
+        unitValues = Arrays.asList(context.getResources().getStringArray(R.array.unit_values));
+        unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unit_keys));
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -135,7 +139,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 for (Materials m : current.materials) {
                     sb.append(m.material.get(0).name).append(" • ");
                     sb.append(m.inter.quantity).append(" ");
-                    sb.append(unityUnitValues.get(unityUnitKeys.indexOf(m.inter.unit)));
+                    sb.append(unitValues.get(unitKeys.indexOf(m.inter.unit)));
                     if (current.materials.indexOf(m) + 1 != current.materials.size()) sb.append("\n");
                 }
                 break;

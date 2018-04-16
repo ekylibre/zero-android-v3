@@ -35,7 +35,7 @@ public class InterventionPhytosanitary {
     public static final String COLUMN_PHYTO_ID = "phyto" + BaseColumns._ID;
 
     @ColumnInfo(name = COLUMN_QUANTITY)
-    public Integer quantity;
+    public float quantity;
 
     @ColumnInfo(name = COLUMN_UNIT)
     public String unit;
@@ -46,7 +46,7 @@ public class InterventionPhytosanitary {
     @ColumnInfo(name = COLUMN_PHYTO_ID, index = true)
     @NonNull public Integer phyto_id;
 
-    public InterventionPhytosanitary(Integer quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer phyto_id) {
+    public InterventionPhytosanitary(float quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer phyto_id) {
         this.quantity = quantity;
         this.unit = unit;
         this.intervention_id = intervention_id;
@@ -55,7 +55,7 @@ public class InterventionPhytosanitary {
 
     @Ignore
     public InterventionPhytosanitary(int phytoId) {
-        this.quantity = 0;
+        this.quantity = 0f;
         this.unit = "liter_per_hectare";
         this.intervention_id = -1;
         this.phyto_id = phytoId;

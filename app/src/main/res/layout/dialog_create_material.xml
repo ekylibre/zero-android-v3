@@ -45,4 +45,18 @@
             android:hint="Description"/>
     </android.support.design.widget.TextInputLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/chose_unit"
+        style="@style/InputLabel"
+        android:layout_marginTop="16dp"/>
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/create_material_unit_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/unit_values"
+        android:prompt="@string/chose_unit" />
+
 </LinearLayout>

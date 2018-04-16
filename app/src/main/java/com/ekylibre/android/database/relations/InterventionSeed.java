@@ -31,7 +31,7 @@ public class InterventionSeed {
     public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
     public static final String COLUMN_SEED_ID = "seed" + BaseColumns._ID;
 
-    public Integer quantity;
+    public float quantity;
 
     public String unit;
 
@@ -44,7 +44,7 @@ public class InterventionSeed {
     @Ignore
     public Seed seed;
 
-    public InterventionSeed(Integer quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer seed_id) {
+    public InterventionSeed(float quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer seed_id) {
         this.quantity = quantity;
         this.unit = unit;
         this.intervention_id = intervention_id;
@@ -53,7 +53,7 @@ public class InterventionSeed {
 
     @Ignore
     public InterventionSeed(int seedId) {
-        this.quantity = 0;
+        this.quantity = 0f;
         this.unit = "kilogram_per_hectare";
         this.intervention_id = -1;
         this.seed_id = seedId;

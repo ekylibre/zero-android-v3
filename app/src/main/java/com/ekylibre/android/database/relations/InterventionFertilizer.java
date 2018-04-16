@@ -31,7 +31,7 @@ public class InterventionFertilizer {
     public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
     public static final String COLUMN_FERTI_ID = "ferti" + BaseColumns._ID;
 
-    public Integer quantity;
+    public float quantity;
 
     public String unit;
 
@@ -41,7 +41,7 @@ public class InterventionFertilizer {
     @ColumnInfo(name = COLUMN_FERTI_ID, index = true)
     @NonNull public Integer ferti_id;
 
-    public InterventionFertilizer(Integer quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer ferti_id) {
+    public InterventionFertilizer(float quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer ferti_id) {
         this.quantity = quantity;
         this.unit = unit;
         this.intervention_id = intervention_id;
@@ -50,7 +50,7 @@ public class InterventionFertilizer {
 
     @Ignore
     public InterventionFertilizer(int fertiId) {
-        this.quantity = 0;
+        this.quantity = 0f;
         this.unit = "kilogram_per_hectare";
         this.intervention_id = -1;
         this.ferti_id = fertiId;

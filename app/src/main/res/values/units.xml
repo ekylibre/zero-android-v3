@@ -25,9 +25,6 @@
         <item>cubic_meter_per_square_meter</item>
     </string-array>
 
-
-
-
     <string-array name="mass_unit_values">
         <item>g</item>
         <item>g/ha</item>
@@ -58,9 +55,6 @@
         <item>ton_per_square_meter</item>
     </string-array>
 
-
-
-
     <string-array name="unity_unit_values">
         <item>u</item>
         <item>u/ha</item>
@@ -78,5 +72,43 @@
         <item>thousand_per_hectare</item>
         <item>thousand_per_square_meter</item>
     </string-array>
+
+    <string-array name="unit_values">
+        <item>m</item>
+        <item>u</item>
+        <item>1000</item>
+        <item>g</item>
+        <item>kg</item>
+        <item>q</item>
+        <item>t</item>
+        <item>l</item>
+        <item>m³</item>
+        <item>hl</item>
+    </string-array>
+
+    <string-array name="unit_keys">
+        <item>meter</item>
+        <item>unit</item>
+        <item>thousand</item>
+        <item>gram</item>
+        <item>kilogram</item>
+        <item>quintal</item>
+        <item>ton</item>
+        <item>liter</item>
+        <item>cubic_meter</item>
+        <item>hectoliter</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+
+
 
 </resources>

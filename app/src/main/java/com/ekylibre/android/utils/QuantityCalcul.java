@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 
 import com.ekylibre.android.MainActivity;
 
-public class QuantityCalculs {
+public class QuantityCalcul {
 
     // Mass units
     private static final String GRAM = "gram";
@@ -32,7 +32,7 @@ public class QuantityCalculs {
     private static final String CUBIC_METER_PER_SQUARE_METER = "cubic_meter_per_square_meter";
 
 
-    public static String getText(int quantity, String unitBefore, String unitAfter, float surface) {
+    public static String getText(float quantity, String unitBefore, String unitAfter, float surface) {
 
         float result = 0f;
         String unity = "kg";

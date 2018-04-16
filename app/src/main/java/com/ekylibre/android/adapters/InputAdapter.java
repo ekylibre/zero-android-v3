@@ -17,11 +17,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
-import com.ekylibre.android.utils.QuantityCalculs;
+import com.ekylibre.android.utils.QuantityCalcul;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +36,6 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
     private Context context;
     private List<Object> inputList;
     private InputMethodManager keyboardManager;
-
-
-    private float surface = 17.3f;
 
     public InputAdapter(Context context, List<Object> inputList) {
         this.context = context;
@@ -82,12 +80,12 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             });
 
             itemQuantityEdit.setOnEditorActionListener((view, actionId, event) -> {
-                String value = itemQuantityEdit.getText().toString();
                 if (actionId == EditorInfo.IME_ACTION_DONE){
-                    if (value.isEmpty())
+                    String string = itemQuantityEdit.getText().toString();
+                    if (string.isEmpty())
                         return true;
                     else {
-                        itemTotal.setText(calculTotal(value));
+                        itemTotal.setText(calculTotal(Float.valueOf(string)));
                         keyboardManager.hideSoftInputFromWindow(itemQuantityEdit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                         itemQuantityEdit.clearFocus();
                     }
@@ -96,12 +94,12 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             });
 
             itemQuantityEdit.setOnFocusChangeListener((v, hasFocus) -> {
-                String value = itemQuantityEdit.getText().toString();
                 if (!hasFocus) {
-                    if (value.isEmpty()) {
+                    String string = itemQuantityEdit.getText().toString();
+                    if (string.isEmpty()) {
                         itemQuantityEdit.requestFocus();
                     } else {
-                        itemTotal.setText(calculTotal(value));
+                        itemTotal.setText(calculTotal(Float.valueOf(string)));
                     }
                 }
             });
@@ -109,7 +107,11 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    calculTotal(itemQuantityEdit.getText().toString());
+                    String string = itemQuantityEdit.getText().toString();
+                    if (!string.isEmpty()) {
+                        calculTotal(Float.valueOf(string));
+                    }
+
                     // TODO: update quantity on unit change
                 }
                 @Override
@@ -117,13 +119,13 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             });
         }
 
-        void display(int icon, String name, String more, int quantity, String unit, int unit_dimention) {
-            String quantityAsString = String.format("%s", quantity);
+        void display(int icon, String name, String more, float quantity, String unit, int unit_dimention) {
+            String quantityAsString = Float.toString(quantity);
             itemIcon.setImageResource(icon);
             itemName.setText(name);
             itemNameMore.setText(more);
             itemQuantityEdit.setText(quantityAsString);
-            itemTotal.setText(calculTotal(quantityAsString));
+            itemTotal.setText(calculTotal(quantity));
 
             int resKeys = 0, resValues = 0;
             switch (unit_dimention) {
@@ -145,16 +147,15 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner.setSelection(unitKeys.indexOf(unit));
         }
 
-        String calculTotal(String value) {
+        String calculTotal(float quantity) {
 
             List unitKeys;
             String unitBefore;
             String unitAfter;
             String text = "";
-            int quantity = Integer.parseInt(value);
             int pos = itemUnitSpinner.getSelectedItemPosition();
 
-            if (quantity > 0) {
+            if (quantity > 0f) {
                 switch (getItemViewType()) {
 
                     case SEED:
@@ -164,7 +165,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                         unitAfter = unitKeys.get(pos).toString();
                         seed.inter.unit = unitAfter;
                         seed.inter.quantity = quantity;
-                        text = QuantityCalculs.getText(quantity, unitBefore, unitAfter, surface);
+                        text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
                         break;
 
                     case PHYTO:
@@ -174,7 +175,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                         unitAfter = unitKeys.get(pos).toString();
                         phyto.inter.unit = unitAfter;
                         phyto.inter.quantity = quantity;
-                        text = QuantityCalculs.getText(quantity, unitBefore, unitAfter, surface);
+                        text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
                         break;
 
                     case FERTI:
@@ -184,7 +185,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                         unitAfter = unitKeys.get(pos).toString();
                         ferti.inter.unit = unitAfter;
                         ferti.inter.quantity = quantity;
-                        text = QuantityCalculs.getText(quantity, unitBefore, unitAfter, surface);
+                        text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
                         break;
                 }
                 itemTotal.setVisibility(View.VISIBLE);
