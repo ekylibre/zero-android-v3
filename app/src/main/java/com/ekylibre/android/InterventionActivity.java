@@ -169,10 +169,9 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== CROPS EVENTS ======================================== //
 
-        includeCropLayout.setOnClickListener(view -> {
-            selectCropFragment = SelectCropFragment.newInstance();
-            selectCropFragment.show(getFragmentTransaction(), "dialog");
-        });
+        includeCropLayout.setOnClickListener(view ->
+            selectCropFragment.show(getFragmentTransaction(), "dialog")
+        );
 
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
@@ -400,6 +399,10 @@ public class InterventionActivity extends AppCompatActivity implements
         cancelButton = findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(view -> finish());
 
+        // Launch crop selector
+        selectCropFragment = SelectCropFragment.newInstance();
+        selectCropFragment.show(getFragmentTransaction(), "dialog");
+
     }
 
     private class SaveIntervention extends AsyncTask<Void, Void, Void> {
@@ -521,6 +524,7 @@ public class InterventionActivity extends AppCompatActivity implements
                     cropSummary.setText(cropSummaryText);
                     cropSummary.setVisibility(View.VISIBLE);
                 }
+                // Erase plotList with new one from selection
                 plotList = (List<PlotWithCrops>) selection;
             }
         }

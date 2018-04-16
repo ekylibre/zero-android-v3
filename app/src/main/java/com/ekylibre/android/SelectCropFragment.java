@@ -33,12 +33,9 @@ public class SelectCropFragment extends DialogFragment {
     private Context context;
 
     private OnFragmentInteractionListener fragmentListener;
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
     public static TextView totalTextView;
-    private AppCompatButton validateButton;
 
-    public ArrayList<PlotWithCrops> dataset;
+    public List<PlotWithCrops> dataset;
 
     public SelectCropFragment() {
     }
@@ -57,15 +54,16 @@ public class SelectCropFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        dataset = InterventionActivity.plotList;
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_crop, container, false);
 
-        validateButton = inflatedView.findViewById(R.id.button_validate);
+        AppCompatButton validateButton = inflatedView.findViewById(R.id.button_validate);
         totalTextView = inflatedView.findViewById(R.id.crop_dialog_total);
-        recyclerView = inflatedView.findViewById(R.id.crop_dialog_recycler);
+        RecyclerView recyclerView = inflatedView.findViewById(R.id.crop_dialog_recycler);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        adapter = new SelectCropAdapter(context, dataset, fragmentListener);
+        RecyclerView.Adapter adapter = new SelectCropAdapter(context, dataset, fragmentListener);
         recyclerView.setAdapter(adapter);
 
         validateButton.setOnClickListener(view ->
@@ -87,12 +85,14 @@ public class SelectCropFragment extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (dataset.isEmpty())
+        if (dataset.isEmpty()) {
+            Log.e(TAG, "Request database for crop list");
             new RequestDatabase(context).execute();
-        adapter.notifyDataSetChanged();
+        }
+
     }
 
     /**
@@ -107,27 +107,17 @@ public class SelectCropFragment extends DialogFragment {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            adapter.notifyItemRangeRemoved(0, dataset.size());
-        }
-
-        @Override
         protected Void doInBackground(Void... voids) {
 
             AppDatabase database = AppDatabase.getInstance(this.context);
-            //dataset.clear();
-            //dataset.addAll(database.dao().listCropWithPlots(new Date().getTime()));
 
             List<Plot> plotList = database.dao().plotList();
-
 
             for (Plot plot : plotList) {
                 PlotWithCrops plotWithCrops = new PlotWithCrops(plot);
                 plotWithCrops.crops = database.dao().cropsByPlotUuid(plot.uuid);  //new Date().getTime()
                 dataset.add(plotWithCrops);
             }
-
             return null;
         }
     }
@@ -150,10 +140,7 @@ public class SelectCropFragment extends DialogFragment {
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
+     * Interface unused in this case
      */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Object selection);

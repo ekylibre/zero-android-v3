@@ -28,12 +28,10 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
 
     private Context context;
     private List<PlotWithCrops> dataset;
-    private SelectCropFragment.OnFragmentInteractionListener fragmentListener;
 
     public SelectCropAdapter(Context context, List<PlotWithCrops> dataset, SelectCropFragment.OnFragmentInteractionListener fragmentListener) {
         this.context = context;
         this.dataset = dataset;
-        this.fragmentListener = fragmentListener;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -43,8 +41,6 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
         ImageView plotArrow;
         LinearLayoutCompat cropContainer;
         LayoutInflater inflater;
-
-        //List<Crop> crop = new ArrayList<>();
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -61,10 +57,12 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
         void display(PlotWithCrops item) {
 
             plotCheckBox.setText(item.plot.name);
+            plotCheckBox.setChecked(item.plot.is_checked);
             plotArea.setText(String.format(MainActivity.LOCALE, "%.1f ha", item.plot.surface_area));
 
             // Display all crops associated to a plot
             displayCrops(item);
+            updateTotal();
 
             // Accordion control
             plotArrow.setOnClickListener(view -> {
