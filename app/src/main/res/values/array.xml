@@ -7,10 +7,9 @@
     </string-array>
 
     <string-array name="equipment_type">
-        <item>Tracteur</item>
-        <item>Attelage</item>
         <item>Outil</item>
-        <item>Autoporté</item>
+        <item>Tracteur</item>
+        <item>… en cours d'ajout</item>
     </string-array>
 
 </resources>

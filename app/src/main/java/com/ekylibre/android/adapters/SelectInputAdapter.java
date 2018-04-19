@@ -43,7 +43,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.fragmentListener = fragmentListener;
     }
 
-    class SeedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class SeedViewHolder extends RecyclerView.ViewHolder {
 
         private TextView seedSpecie, seedVariety;
         private ImageView seedFavorite;
@@ -53,26 +53,21 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             seedSpecie = itemView.findViewById(R.id.seed_specie);
             seedVariety = itemView.findViewById(R.id.seed_variety);
-            seedFavorite = itemView.findViewById(R.id.seed_favorite);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            Log.e(TAG, "SeedViewHolder onClick()");
-            Seeds seedInput = new Seeds();
-            seedInput.seed = Collections.singletonList(seed);
-            seedInput.inter = new InterventionSeed(seed.id);
-            Log.e(TAG, seedInput.toString());
-            Log.e(TAG, seedInput.seed.get(0).specie);
-            fragmentListener.onFragmentInteraction(seedInput);
+            seedFavorite = itemView.findViewById(R.id.icon_favorite);
+            itemView.setOnClickListener(v -> {
+                Seeds seedInput = new Seeds();
+                seedInput.seed = Collections.singletonList(seed);
+                seedInput.inter = new InterventionSeed(seed.id);
+                fragmentListener.onFragmentInteraction(seedInput);
+            });
         }
     }
 
     class PhytoViewHolder extends RecyclerView.ViewHolder {
 
-        AppCompatTextView phytoName, phythoCompany, phytoAmm, phytoDelay;
-        Phyto phyto;
+        private AppCompatTextView phytoName, phythoCompany, phytoAmm, phytoDelay;
+        private ImageView phytoFavorite;
+        private Phyto phyto;
 
         PhytoViewHolder(View itemView) {
             super(itemView);
@@ -80,6 +75,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             phythoCompany = itemView.findViewById(R.id.phyto_company);
             phytoAmm = itemView.findViewById(R.id.phyto_amm);
             phytoDelay = itemView.findViewById(R.id.phyto_delay);
+            phytoFavorite = itemView.findViewById(R.id.icon_favorite);
             itemView.setOnClickListener(v -> {
                 Phytos phytoInput = new Phytos();
                 phytoInput.phyto = Collections.singletonList(phyto);
@@ -91,14 +87,15 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     class FertiViewHolder extends RecyclerView.ViewHolder {
 
-        TextView fertiName, fertiType;
-        //ImageView fertiFavorite;
-        Fertilizer fertilizer;
+        private TextView fertiName, fertiType;
+        private ImageView fertiFavorite;
+        private Fertilizer fertilizer;
 
         FertiViewHolder(View itemView) {
             super(itemView);
             fertiName = itemView.findViewById(R.id.fertilizer_name);
             fertiType = itemView.findViewById(R.id.fertilizer_type);
+            fertiFavorite = itemView.findViewById(R.id.icon_favorite);
             itemView.setOnClickListener(v -> {
                 Fertilizers fertiInput = new Fertilizers();
                 fertiInput.fertilizer = Collections.singletonList(fertilizer);
@@ -166,6 +163,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     phytoViewHolder.phytoDelay.setText(context.getResources().getQuantityString(R.plurals.x_hours, phyto.in_field_reentry_delay, phyto.in_field_reentry_delay));
                 else
                     phytoViewHolder.phytoDelay.setText(R.string.unspecified);
+                phytoViewHolder.phytoFavorite.setVisibility((!phyto.registered) ? View.VISIBLE : View.GONE);
                 phytoViewHolder.phyto = phyto;
                 break;
 
@@ -175,6 +173,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 fertiViewHolder.fertiName.setText(fertilizer.label_fra);
                 res = context.getResources().getIdentifier(fertilizer.nature, "string", context.getPackageName());
                 fertiViewHolder.fertiType.setText(context.getString(res));
+                fertiViewHolder.fertiFavorite.setVisibility((!fertilizer.registered) ? View.VISIBLE : View.GONE);
                 fertiViewHolder.fertilizer = fertilizer;
                 break;
 

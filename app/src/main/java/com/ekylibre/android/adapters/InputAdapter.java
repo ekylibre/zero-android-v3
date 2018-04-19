@@ -109,7 +109,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                     String string = itemQuantityEdit.getText().toString();
                     if (!string.isEmpty()) {
-                        calculTotal(Float.valueOf(string));
+                        itemTotal.setText(calculTotal(Float.valueOf(string)));
                     }
 
                     // TODO: update quantity on unit change

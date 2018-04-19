@@ -181,5 +181,14 @@
     <string name="add">+ Ajouter</string>
     <string name="chose_unit">Unité</string>
 
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="action_sign_in">Connexion</string>
+    <string name="action_sign_in_short">Connexion</string>
+    <string name="error_invalid_email">Adresse E-mail invalide</string>
+    <string name="error_invalid_password">Mot de passe invalide</string>
+    <string name="error_incorrect_password">Mot de passe incorrect</string>
+    <string name="error_field_required">Ce champ est recquis</string>
 
 </resources>

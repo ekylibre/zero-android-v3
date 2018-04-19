@@ -26,10 +26,10 @@
         android:text="Semence de blé tendre" />
 
     <android.support.v7.widget.AppCompatImageView
-        android:id="@+id/seed_favorite"
+        android:id="@+id/icon_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/icon_favorite"
+        app:srcCompat="@drawable/icon_star"
         app:tint="@color/accent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

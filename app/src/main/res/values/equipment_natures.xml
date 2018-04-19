@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="equipments_keys">
+        <item>tractor</item>
+        <item>harrow</item>
+        <item>seedbed_preparator</item>
+        <item>grinder</item>
+        <item>hiller</item>
+        <item>hoe</item>
+        <item>plow</item>
+        <item>roll</item>
+        <item>soil_loosener</item>
+        <item>superficial_plow</item>
+        <item>subsoil_plow</item>
+        <item>vibrocultivator</item>
+        <item>disc_harrow</item>
+        <item>sower</item>
+        <item>implanter</item>
+        <item>airplanter</item>
+        <item>spreader</item>
+        <item>liquid_manure_spreader</item>
+        <item>spreader_trailer</item>
+        <item>hoe_weeder</item>
+        <item>rotary_hoe</item>
+        <item>weeder</item>
+        <item>sprayer</item>
+        <item>round_baler</item>
+        <item>cubic_baler</item>
+        <item>baler_wrapper</item>
+        <item>trailer</item>
+        <item>corn-topper</item>
+        <item>forager</item>
+        <item>harvester</item>
+        <item>hay_rake</item>
+        <item>mower</item>
+        <item>reaper</item>
+        <item>topper</item>
+        <item>trimmer</item>
+        <item>mower_conditioner</item>
+        <item>tedder</item>
+        <item>wrapper</item>
+        <item>forage_platform</item>
+    </string-array>
+
+    <string-array name="equipments_values">
+        <item>tractor</item>
+        <item>harrow</item>
+        <item>seedbed_preparator</item>
+        <item>grinder</item>
+        <item>hiller</item>
+        <item>hoe</item>
+        <item>plow</item>
+        <item>roll</item>
+        <item>soil_loosener</item>
+        <item>superficial_plow</item>
+        <item>subsoil_plow</item>
+        <item>vibrocultivator</item>
+        <item>disc_harrow</item>
+        <item>sower</item>
+        <item>implanter</item>
+        <item>airplanter</item>
+        <item>spreader</item>
+        <item>liquid_manure_spreader</item>
+        <item>spreader_trailer</item>
+        <item>hoe_weeder</item>
+        <item>rotary_hoe</item>
+        <item>weeder</item>
+        <item>sprayer</item>
+        <item>round_baler</item>
+        <item>cubic_baler</item>
+        <item>baler_wrapper</item>
+        <item>trailer</item>
+        <item>corn-topper</item>
+        <item>forager</item>
+        <item>harvester</item>
+        <item>hay_rake</item>
+        <item>mower</item>
+        <item>reaper</item>
+        <item>topper</item>
+        <item>trimmer</item>
+        <item>mower_conditioner</item>
+        <item>tedder</item>
+        <item>wrapper</item>
+        <item>forage_platform</item>
+    </string-array>
+
+</resources>

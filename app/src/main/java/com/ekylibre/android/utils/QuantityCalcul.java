@@ -1,8 +1,14 @@
 package com.ekylibre.android.utils;
 
-import android.annotation.SuppressLint;
+
+import android.util.Log;
 
 import com.ekylibre.android.MainActivity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class QuantityCalcul {
 
@@ -30,7 +36,6 @@ public class QuantityCalcul {
     private static final String LITER_PER_SQUARE_METER = "liter_per_square_meter";
     private static final String HECTOLITER_PER_SQUARE_METER = "hectoliter_per_square_meter";
     private static final String CUBIC_METER_PER_SQUARE_METER = "cubic_meter_per_square_meter";
-
 
     public static String getText(float quantity, String unitBefore, String unitAfter, float surface) {
 
@@ -73,12 +78,26 @@ public class QuantityCalcul {
             }
 
         }
+//        else {
+//
+//            switch (unitAfter) {
+//
+//            }
+
+//        }
+
         return String.format(MainActivity.LOCALE,"%.1f %s au total", result, unity);
     }
 }
 
 
-
+//    Map<String, Float> map = new HashMap<>();
+//        map.put("gram", 0.001f);
+//                map.put("kilogram", 1f);
+//                map.put("quintal", 100f);
+//                map.put("ton", 1000f);
+//
+//                Log.e(TAG, map.get("quintal").toString());
 
 
 

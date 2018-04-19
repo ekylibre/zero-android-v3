@@ -88,8 +88,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Interventions current = interventionsList.get(position);
-        holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.procedure, "drawable", context.getPackageName()));
-        holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.procedure, "string", context.getPackageName()));
+        holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.type, "drawable", context.getPackageName()));
+        holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.type, "string", context.getPackageName()));
         holder.itemDate.setText(DateTools.display(current.intervention.date));
 
         // Count parcels and surface
@@ -105,7 +105,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
         // Display input by type
         StringBuilder sb = new StringBuilder();
-        switch (current.intervention.procedure) {
+        switch (current.intervention.type) {
 
             case MainActivity.CROP_PROTECTION:
                 for (Phytos p : current.phytos) {

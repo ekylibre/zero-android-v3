@@ -24,8 +24,10 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -146,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             //onInterventionTypeSelected(STARTING);
             //showInputDialog();
             //new TestCrop(this).execute();
-            Toast toast = Toast.makeText(this, "Pas encore implémenté", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible", Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
         });

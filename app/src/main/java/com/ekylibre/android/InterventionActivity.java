@@ -423,9 +423,9 @@ public class InterventionActivity extends AppCompatActivity implements
 
             AppDatabase database = AppDatabase.getInstance(context);
 
-            Intervention intervention = new Intervention(procedure,null, date, duration,
+            Intervention intervention = new Intervention(procedure, date, duration,
                     null,null,null,null,null,
-                    null,null, null, new Date());
+                    null,null, null);
 
             int intervention_id = (int) (long) database.dao().insert(intervention);
 

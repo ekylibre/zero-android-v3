@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.apollographql.android'
+//apply plugin: 'com.apollographql.android'
 
 android {
     compileSdkVersion 27
@@ -39,6 +39,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
+    // Needed for fixing SSL Handshake failed
+    implementation 'com.google.android.gms:play-services-base:15.0.0'
+
     // Room
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
@@ -53,10 +56,15 @@ dependencies {
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+
+    // OkHttp client and Moshi JSON parser
+//    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+//    implementation 'com.squareup.moshi:moshi:1.5.0'
 
     // Apollo GraphQL Client
-    implementation 'com.apollographql.apollo:apollo-runtime:0.4.4'
-    implementation "com.apollographql.apollo:apollo-android-support:0.4.4"
+//    implementation 'com.apollographql.apollo:apollo-runtime:0.5.0'
+//    implementation "com.apollographql.apollo:apollo-android-support:0.5.0"
 
     // Fancy showcase view
     implementation 'com.github.faruktoptas:FancyShowCaseView:1.0.0'

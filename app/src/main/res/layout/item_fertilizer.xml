@@ -25,4 +25,14 @@
         app:layout_constraintTop_toBottomOf="@id/fertilizer_name"
         android:text="Fertilisant" />
 
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/icon_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/icon_star"
+        app:tint="@color/accent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 </android.support.constraint.ConstraintLayout>
