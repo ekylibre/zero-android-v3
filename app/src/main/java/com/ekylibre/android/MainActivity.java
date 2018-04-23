@@ -81,16 +81,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Get shared preferences and set title
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        setTitle(sharedPreferences.getString("farm-variety", "GAEC Tartifume"));
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("locale", "fra");
-        editor.putInt("farm-id", 1);
-        editor.apply();
+        if (!sharedPreferences.getBoolean("is_authenticated", false)) {
+            // Launch login activity
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
 
-        if (!sharedPreferences.getBoolean("initial-data-loaded", false)) {
+
+        if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
             new LoadInitialData(this).execute();
-            editor.putBoolean("initial-data-loaded", true);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("initial_data_loaded", true);
             editor.apply();
         }
 
@@ -167,7 +169,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        // Set Farm name as page title
+        setTitle(sharedPreferences.getString("firstName", "No name"));
+
+        // Get list filter
         String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
 
         // Update main list

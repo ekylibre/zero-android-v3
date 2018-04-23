@@ -46,7 +46,7 @@ import java.util.List;
         Equipment.class, InterventionEquipment.class,
         Person.class, InterventionPerson.class,
         Crop.class, InterventionCrop.class,
-        Plot.class, Subplot.class
+        Plot.class, Subplot.class,
 }, exportSchema = false, version = 1)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {

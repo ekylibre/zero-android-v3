@@ -16,8 +16,6 @@ import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Subplot;
-import com.ekylibre.android.database.pojos.Crops;
-import com.ekylibre.android.database.pojos.PlotWithCrops;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
@@ -62,7 +60,6 @@ public interface DAO {
     @Insert void insert(Plot... plots);
     @Insert void insert(Subplot... subplots);
     @Insert void insert(Crop... crops);
-
 
     /**
      *    Crops selection list

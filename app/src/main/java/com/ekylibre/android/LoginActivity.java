@@ -1,6 +1,9 @@
 package com.ekylibre.android;
 
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
@@ -8,22 +11,30 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
+import com.apollographql.apollo.ApolloCall;
+import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.exception.ApolloException;
 import com.ekylibre.android.network.EkylibreAPI;
+import com.ekylibre.android.network.GraphQLClient;
+import com.ekylibre.android.network.ServiceGenerator;
 import com.ekylibre.android.network.pojos.AccessToken;
 
 import java.io.IOException;
 import java.util.Objects;
 
 import retrofit2.Call;
-import retrofit2.Response;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
+
+import com.apollographql.apollo.api.Response;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 
+import javax.annotation.Nonnull;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -40,6 +51,9 @@ public class LoginActivity extends AppCompatActivity {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask authTask = null;
+    private AccessToken accessToken = null;
+
+    private Context context;
 
     // UI references.
     private TextInputLayout emailView, passwordView;
@@ -48,6 +62,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        context = this;
 
         // Set up the login form.
         emailView = findViewById(R.id.email);
@@ -90,8 +106,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * Represents an asynchronous login/registration task used to authenticate the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -106,52 +121,79 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            Log.e(TAG, "UserLoginTask");
+            // Prevent SSL HandShake failure
             fixHandShakeFailed();
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(OAUTH_URL)
-                    .addConverterFactory(MoshiConverterFactory.create())
-                    .build();
+//            Retrofit retrofit = new Retrofit.Builder()
+//                    .baseUrl(OAUTH_URL)
+//                    .addConverterFactory(MoshiConverterFactory.create())
+//                    .build();
 
-            EkylibreAPI ekylibreAPI = retrofit.create(EkylibreAPI.class);
+            //EkylibreAPI ekylibreAPI = retrofit.create(EkylibreAPI.class);
+            EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class);
+
 
             Call<AccessToken> call = ekylibreAPI.getNewAccessToken(OAUTH_CLIENT_ID,
                     OAUTH_CLIENT_SECRET, OAUTH_GRANT_TYPE, email, password, OAUTH_SCOPE);
 
-            Log.e(TAG, "You are here");
+            call.enqueue(new retrofit2.Callback<AccessToken>() {
+                @Override
+                public void onResponse(@NonNull Call<AccessToken> call, @NonNull retrofit2.Response<AccessToken> response) {
+                    if (response.isSuccessful()) {
 
-            try {
-                // Actually do the request
-                Response<AccessToken> response = call.execute();
-                if (response.isSuccessful()) {
-                    if (response.body() != null)
-                        Log.e(TAG, response.body().getAccessToken());
+                        accessToken = response.body();
+                        Log.e(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
+
+                        ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
+                        ProfileQuery profileQuery = ProfileQuery.builder().build();
+                        ApolloCall<ProfileQuery.Data> profileCall = apolloClient.query(profileQuery);
+
+                        profileCall.enqueue(new ApolloCall.Callback<ProfileQuery.Data>() {
+                            @Override
+                            public void onResponse(@Nonnull Response<ProfileQuery.Data> response) {
+
+                                // We got an access_token
+                                ProfileQuery.Data data = response.data();
+
+                                if (data != null && data.profile != null) {
+                                    //Log.e(TAG, data.profile.farms);
+
+                                    // Get shared preferences and set profile parameters
+                                    SharedPreferences sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("firstName", data.profile.firstName);
+                                    editor.putString("lastName", data.profile.lastName);
+                                    editor.putString("email", email);
+                                    editor.putString("access_token", accessToken.getAccess_token());
+                                    editor.putString("refresh_token", accessToken.getRefresh_token());
+                                    editor.putInt("token_created_at", accessToken.getCreated_at());
+                                    editor.putBoolean("is_authenticated", true);
+                                    //editor.putString("current-farm-name", farmName);
+                                    //editor.putString("farms", data.profile.farms);
+                                    editor.apply();
+
+                                    // Finish th login activity
+                                    finish();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@Nonnull ApolloException e) {
+                                Log.e(TAG, "ApolloException --> " + e.getMessage());
+                                // TODO display toast error connection
+                            }
+                        });
+
+
+
+                    }
                 }
-                else {
-                    Log.e(TAG, "Unsuccessful response " + response.errorBody().string());
+
+                @Override
+                public void onFailure(@NonNull Call<AccessToken> call, @NonNull Throwable t) {
+
                 }
-
-            } catch (IOException e) {
-                Log.e(TAG, String.format("Call error --> %s", e.getMessage()));
-            }
-
-//            try {
-//                // Simulate network access.
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                return false;
-//            }
-//
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(email)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(password);
-//                }
-//            }
-
-
+            });
 
             // TODO: register the new account here.
             return true;
