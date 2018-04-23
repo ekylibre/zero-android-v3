@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.database.models.Farm;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
@@ -47,6 +48,7 @@ import java.util.List;
         Person.class, InterventionPerson.class,
         Crop.class, InterventionCrop.class,
         Plot.class, Subplot.class,
+        Farm.class
 }, exportSchema = false, version = 1)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -120,42 +122,42 @@ public abstract class AppDatabase extends RoomDatabase {
             database.dao().insert(list4.toArray(new Fertilizer[list4.size()]));
 
 
-            database.dao().insert(new Plot("1","La Renambrie",null,3.4f,
-                    null,null,null,null));
-
-
-
-            database.dao().insert(new Plot("2", "Myrmidon", null, 2.3f,
-                    null, null, null, null));
-
-            database.dao().insert(new Subplot("1", null, 1.4f, null,
-                    null, null, "2", null));
-
-            database.dao().insert(new Subplot("2", null, .9f, null,
-                    null, null, "2", null));
-
-
-
-            database.dao().insert(new Plot("3", "Les Grands Pièces", null, 5.6f,
-                    null, null, null, null));
-
-
-
-            database.dao().insert(new Crop("1", "Blé tendre de printemps 2018",
-                    null,null,null,null,
-                    null,null,3.4f,null,null,null,"1",null,null));
-
-            database.dao().insert(new Crop("2", "Orge de printemps 2018",
-                    null,null,null,null,
-                    null,null,1.4f,null,null,null,"2", "1", null));
-
-            database.dao().insert(new Crop("3", "Blé tendre de printemps 2018",
-                    null,null,null,null,
-                    null,null,.9f,null,null,null,"2","2",null));
-
-            database.dao().insert(new Crop("4", "Maïs 2018",
-                    null,null,null,null,
-                    null,null,5.6f,null,null,null,"3",null,null));
+//            database.dao().insert(new Plot("1","La Renambrie",null,3.4f,
+//                    null,null,null,null));
+//
+//
+//
+//            database.dao().insert(new Plot("2", "Myrmidon", null, 2.3f,
+//                    null, null, null, null));
+//
+//            database.dao().insert(new Subplot("1", null, 1.4f, null,
+//                    null, null, "2", null));
+//
+//            database.dao().insert(new Subplot("2", null, .9f, null,
+//                    null, null, "2", null));
+//
+//
+//
+//            database.dao().insert(new Plot("3", "Les Grands Pièces", null, 5.6f,
+//                    null, null, null, null));
+//
+//
+//
+//            database.dao().insert(new Crop("1", "Blé tendre de printemps 2018",
+//                    null,null,null,null,
+//                    null,null,3.4f,null,null,null,"1",null,null));
+//
+//            database.dao().insert(new Crop("2", "Orge de printemps 2018",
+//                    null,null,null,null,
+//                    null,null,1.4f,null,null,null,"2", "1", null));
+//
+//            database.dao().insert(new Crop("3", "Blé tendre de printemps 2018",
+//                    null,null,null,null,
+//                    null,null,.9f,null,null,null,"2","2",null));
+//
+//            database.dao().insert(new Crop("4", "Maïs 2018",
+//                    null,null,null,null,
+//                    null,null,5.6f,null,null,null,"3",null,null));
 
         } catch (IOException ex) {
             ex.printStackTrace();

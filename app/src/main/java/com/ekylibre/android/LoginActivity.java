@@ -19,13 +19,9 @@ import com.ekylibre.android.network.GraphQLClient;
 import com.ekylibre.android.network.ServiceGenerator;
 import com.ekylibre.android.network.pojos.AccessToken;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Retrofit;
-import retrofit2.converter.moshi.MoshiConverterFactory;
 
 import com.apollographql.apollo.api.Response;
 
@@ -54,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
     private AccessToken accessToken = null;
 
     private Context context;
+    private SharedPreferences sharedPreferences;
 
     // UI references.
     private TextInputLayout emailView, passwordView;
@@ -61,16 +58,25 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
-        context = this;
+        sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
-        // Set up the login form.
-        emailView = findViewById(R.id.email);
-        passwordView = findViewById(R.id.password);
+        if (sharedPreferences.getBoolean("is_authenticated", false)) {
+            Log.e(TAG, "Already authenticated. Redirect to MainActivity...");
+            startApp();
 
-        Button signInButton = findViewById(R.id.sign_in_button);
-        signInButton.setOnClickListener(view -> attemptLogin());
+        } else {
+
+            setContentView(R.layout.activity_login);
+
+            context = this;
+
+            // Set up the login form.
+            emailView = findViewById(R.id.email);
+            passwordView = findViewById(R.id.password);
+
+            Button signInButton = findViewById(R.id.sign_in_button);
+            signInButton.setOnClickListener(view -> attemptLogin());
 
 //        passwordView.setOnEditorActionListener((textView, id, keyEvent) -> {
 //            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -80,6 +86,13 @@ public class LoginActivity extends AppCompatActivity {
 //            return false;
 //        });
 
+        }
+    }
+
+    private void startApp() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     /**
@@ -124,14 +137,7 @@ public class LoginActivity extends AppCompatActivity {
             // Prevent SSL HandShake failure
             fixHandShakeFailed();
 
-//            Retrofit retrofit = new Retrofit.Builder()
-//                    .baseUrl(OAUTH_URL)
-//                    .addConverterFactory(MoshiConverterFactory.create())
-//                    .build();
-
-            //EkylibreAPI ekylibreAPI = retrofit.create(EkylibreAPI.class);
             EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class);
-
 
             Call<AccessToken> call = ekylibreAPI.getNewAccessToken(OAUTH_CLIENT_ID,
                     OAUTH_CLIENT_SECRET, OAUTH_GRANT_TYPE, email, password, OAUTH_SCOPE);
@@ -143,6 +149,8 @@ public class LoginActivity extends AppCompatActivity {
 
                         accessToken = response.body();
                         Log.e(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
+
+                        //fixHandShakeFailed();
 
                         ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
                         ProfileQuery profileQuery = ProfileQuery.builder().build();
@@ -156,10 +164,10 @@ public class LoginActivity extends AppCompatActivity {
                                 ProfileQuery.Data data = response.data();
 
                                 if (data != null && data.profile != null) {
-                                    //Log.e(TAG, data.profile.farms);
+                                    //Log.e(TAG, data.profile.farm);
 
                                     // Get shared preferences and set profile parameters
-                                    SharedPreferences sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+//                                    SharedPreferences sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("firstName", data.profile.firstName);
                                     editor.putString("lastName", data.profile.lastName);
@@ -173,7 +181,11 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.apply();
 
                                     // Finish th login activity
+                                    startApp();
                                     finish();
+
+                                } else {
+                                    Log.e(TAG, "Erreur d'authentification");
                                 }
                             }
 
@@ -183,9 +195,6 @@ public class LoginActivity extends AppCompatActivity {
                                 // TODO display toast error connection
                             }
                         });
-
-
-
                     }
                 }
 
@@ -199,17 +208,17 @@ public class LoginActivity extends AppCompatActivity {
             return true;
         }
 
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            authTask = null;
-
-            if (success) {
-                //finish();
-            } else {
-                passwordView.setError(getString(R.string.error_incorrect_password));
-                passwordView.requestFocus();
-            }
-        }
+//        @Override
+//        protected void onPostExecute(final Boolean success) {
+//            authTask = null;
+//
+//            if (success) {
+//                //finish();
+//            } else {
+//                passwordView.setError(getString(R.string.error_incorrect_password));
+//                passwordView.requestFocus();
+//            }
+//        }
 
         @Override
         protected void onCancelled() {
@@ -225,13 +234,16 @@ public class LoginActivity extends AppCompatActivity {
 
         } catch (GooglePlayServicesRepairableException e) {
             // Indicates that Google Play services is out of date, disabled, etc.
+            Log.e(TAG, "GooglePlayServicesRepairableException");
             GoogleApiAvailability.getInstance()
                     .showErrorNotification(this, e.getConnectionStatusCode());
 
         } catch (GooglePlayServicesNotAvailableException e) {
             // Indicates a non-recoverable error; the ProviderInstaller is not able
             // to install an up-to-date Provider.
+            Log.e(TAG, "GooglePlayServicesNotAvailableException");
         }
+        Log.e(TAG, "fixHandShake done");
     }
 }
 

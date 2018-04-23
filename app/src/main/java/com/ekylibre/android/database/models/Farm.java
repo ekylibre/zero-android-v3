@@ -4,32 +4,23 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 
 
 @Entity(tableName = Farm.TABLE_NAME)
 public class Farm {
 
     public static final String TABLE_NAME = "farms";
+    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
 
-    public static final String COLUMN_ID = BaseColumns._ID;
-    public static final String COLUMN_NAME = "variety";
-    public static final String COLUMN_ACTIVE = "active";
-    public static final String COLUMN_EMAIL = "email";
-    public static final String COLUMN_TOKEN = "token";
-
-    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    @PrimaryKey
     @ColumnInfo(name = COLUMN_ID, index = true)
-    public Integer id;
-
-    @ColumnInfo(name = COLUMN_NAME)
+    public String id;
     public String name;
 
-    @ColumnInfo(name = COLUMN_ACTIVE)
-    public Integer active;
-
-    @ColumnInfo(name = COLUMN_EMAIL)
-    public String email;
-
-    @ColumnInfo(name = COLUMN_TOKEN)
-    public String token;
+    public Farm(@NonNull String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

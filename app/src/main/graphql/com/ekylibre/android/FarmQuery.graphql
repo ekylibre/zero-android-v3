@@ -4,3 +4,25 @@ query Profile {
     lastName
   }
 }
+
+query Farms {
+    farms {
+        id
+        name
+        crops {
+            uuid
+            name
+            specie
+            productionNature
+            productionMode
+            centroid
+            startDate
+            stopDate
+            surfaceArea
+            plot {
+                uuid
+                name
+            }
+        }
+    }
+}

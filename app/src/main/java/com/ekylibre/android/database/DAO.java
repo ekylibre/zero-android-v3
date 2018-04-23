@@ -2,11 +2,13 @@ package com.ekylibre.android.database;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.database.models.Farm;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
@@ -59,7 +61,12 @@ public interface DAO {
 
     @Insert void insert(Plot... plots);
     @Insert void insert(Subplot... subplots);
-    @Insert void insert(Crop... crops);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(Crop... crops);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(Farm... farms);
 
     /**
      *    Crops selection list

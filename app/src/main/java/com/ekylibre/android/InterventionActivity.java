@@ -394,7 +394,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         saveButton = findViewById(R.id.button_save);
         saveButton.setOnClickListener(view -> new SaveIntervention(
-                this, Converters.toDate(date.getTimeInMillis())).execute());
+                this, date).execute());
 
         cancelButton = findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(view -> {
@@ -413,9 +413,9 @@ public class InterventionActivity extends AppCompatActivity implements
         Context context;
         Date date;
 
-        SaveIntervention(Context context, Date date) {
+        SaveIntervention(Context context, Calendar date) {
             this.context = context;
-            this.date = date;
+            this.date = date.getTime(); // Converters.toDate(date.getTimeInMillis())
         }
 
         @Override

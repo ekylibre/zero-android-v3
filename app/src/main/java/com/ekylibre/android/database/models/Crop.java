@@ -5,21 +5,25 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
 
 
-@Entity(tableName = Crop.TABLE_NAME, foreignKeys =
-@ForeignKey(entity = Plot.class,
-        parentColumns = Plot.COLUMN_UUID,
-        childColumns = Crop.COLUMN_PLOT)
-  )
+@Entity(tableName = Crop.TABLE_NAME, foreignKeys = {
+
+    @ForeignKey(entity = Plot.class,
+            parentColumns = Plot.COLUMN_UUID,
+            childColumns = Crop.COLUMN_PLOT),
+    @ForeignKey(entity = Farm.class,
+            parentColumns = Farm.COLUMN_ID,
+            childColumns = Crop.COLUMN_FARM)
+})
 public class Crop {
 
     public static final String TABLE_NAME = "crops";
     public static final String COLUMN_UUID = TABLE_NAME + "_uuid";
+    public static final String COLUMN_FARM = "farm";
     public static final String COLUMN_PLOT = "plot";
     public static final String COLUMN_SUBPLOT = "subplot";
 
@@ -57,7 +61,8 @@ public class Crop {
     @ColumnInfo(name = COLUMN_SUBPLOT, index = true)
     public String subplot;
 
-    public Integer farm;
+    @ColumnInfo(name = COLUMN_FARM, index = true)
+    public String farm;
 
     @Ignore
     public Boolean is_checked;
@@ -69,7 +74,7 @@ public class Crop {
                 String production_mode, String production_output, String provisional_yield,
                 String shape, float surface_area, String centroid, Date start_date, Date stop_date,
                 String plot, String subplot,
-                Integer farm) {
+                String farm) {
 
         this.uuid = uuid;
         this.name = name;

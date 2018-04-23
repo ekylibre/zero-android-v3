@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.services.SyncService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,13 +82,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Get shared preferences and set title
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-
-        if (!sharedPreferences.getBoolean("is_authenticated", false)) {
-            // Launch login activity
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        }
-
 
         if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
             new LoadInitialData(this).execute();
@@ -169,8 +163,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Sync data with Ekylibre
+        Log.e(TAG, "Start SyncService");
+        SyncService.startActionFirstTimeSync(this);
+
         // Set Farm name as page title
-        setTitle(sharedPreferences.getString("firstName", "No name"));
+        setTitle(sharedPreferences.getString("current-farm-name", "No name"));
 
         // Get list filter
         String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
@@ -182,8 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!deployMenu(false))
-            super.onBackPressed();
+        deployMenu(false);
+        //super.onBackPressed();
     }
 
 //    public class TestCrop extends AsyncTask<Void, Void, Void> {
