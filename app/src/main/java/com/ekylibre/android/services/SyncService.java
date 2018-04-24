@@ -157,8 +157,10 @@ public class SyncService extends IntentService {
 
                     for (FarmsQuery.Crop crop : Objects.requireNonNull(currentFarm.crops())) {
 
+                        String name = crop.name().replace(String.format("%s | ", crop.plot().name()),"");
+
                         Crop newCrop = new Crop(
-                                crop.uuid(), crop.name(), crop.specie(), crop.productionNature(),
+                                crop.uuid(), name, crop.specie(), crop.productionNature(),
                                 crop.productionMode(),null,null,null,
                                 Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
                                 crop.startDate(), crop.stopDate(), crop.plot().uuid(),
