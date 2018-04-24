@@ -25,6 +25,10 @@ android {
     }
 }
 
+apollo {
+    customTypeMapping['Date'] = "java.util.Date"
+}
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

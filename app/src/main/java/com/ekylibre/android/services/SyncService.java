@@ -1,5 +1,6 @@
 package com.ekylibre.android.services;
 
+
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
@@ -16,17 +17,18 @@ import com.ekylibre.android.ProfileQuery;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Farm;
-import com.ekylibre.android.network.EkylibreAPI;
+import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.network.GraphQLClient;
-import com.ekylibre.android.network.ServiceGenerator;
-import com.ekylibre.android.network.pojos.AccessToken;
 import com.ekylibre.android.utils.Converters;
+
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
-
-import retrofit2.Call;
 
 
 /**
@@ -88,6 +90,15 @@ public class SyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
+        try {
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException e) {
+            Log.e(TAG, "GooglePlayServicesRepairableException");
+            GoogleApiAvailability.getInstance().showErrorNotification(this, e.getConnectionStatusCode());
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Log.e(TAG, "GooglePlayServicesNotAvailableException");
+        }
+
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         ACCESS_TOKEN = sharedPreferences.getString("access_token", null);
 
@@ -117,11 +128,10 @@ public class SyncService extends IntentService {
 
         ApolloClient apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
 
-        FarmsQuery farmsQuery = FarmsQuery.builder().build();
-        ApolloCall<FarmsQuery.Data> farmsCall = apolloClient.query(farmsQuery);
-
-        Log.e(TAG, "FarmsCall enqueue");
-        farmsCall.enqueue(new ApolloCall.Callback<FarmsQuery.Data>() {
+        apolloClient.query(FarmsQuery
+                .builder()
+                .build()
+        ).enqueue(new ApolloCall.Callback<FarmsQuery.Data>() {
 
             @Override
             public void onResponse(@Nonnull Response<FarmsQuery.Data> response) {
@@ -147,24 +157,27 @@ public class SyncService extends IntentService {
 
                     for (FarmsQuery.Crop crop : Objects.requireNonNull(currentFarm.crops())) {
 
-                        Log.e(TAG, "crop");
-
                         Crop newCrop = new Crop(
                                 crop.uuid(), crop.name(), crop.specie(), crop.productionNature(),
                                 crop.productionMode(),null,null,null,
-                                Float.valueOf(crop.surfaceArea()), String.valueOf(crop.centroid()),
-                                Converters.toDate((String) crop.startDate()),
-                                Converters.toDate((String) crop.stopDate()),
-                                crop.plot().uuid(),null, currentFarm.id());
+                                Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
+                                crop.startDate(), crop.stopDate(), crop.plot().uuid(),
+                                null, currentFarm.id());
 
                         database.dao().insert(newCrop);
+
+                        Plot newPlot = new Plot(crop.plot().uuid(), crop.plot().name(), null,
+                                Float.valueOf(crop.plot().surfaceArea().split(" ")[0]), null, null, null, currentFarm.id());
+
+                        database.dao().insert(newPlot);
                     }
                 }
             }
 
             @Override
             public void onFailure(@Nonnull ApolloException e) {
-                Log.e(TAG, "Failure SyncService" + e);
+                Log.e(TAG, e.getMessage(), e);
+
             }
         });
 

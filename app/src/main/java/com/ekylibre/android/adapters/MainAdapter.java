@@ -150,6 +150,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                     if (current.equipments.indexOf(e) + 1 != current.equipments.size()) sb.append("\n");
                 }
                 break;
+            case MainActivity.IRRIGATION:
+                sb.append(String.format(MainActivity.LOCALE, "%.1f", current.intervention.water_quantity)).append(" ");
+                sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(current.intervention.water_unit)));
+                break;
         }
         holder.itemInfos.setText(sb.toString());
     }

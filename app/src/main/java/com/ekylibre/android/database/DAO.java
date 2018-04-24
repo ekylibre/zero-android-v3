@@ -59,7 +59,9 @@ public interface DAO {
     @Insert void insert(InterventionPerson interventionPerson);
     @Insert void insert(InterventionCrop interventionCrop);
 
-    @Insert void insert(Plot... plots);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(Plot... plots);
+
     @Insert void insert(Subplot... subplots);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -84,7 +86,7 @@ public interface DAO {
     /**
      *    Plot list
      */
-    @Query("SELECT * FROM " + Plot.TABLE_NAME)
+    @Query("SELECT * FROM " + Plot.TABLE_NAME + " ORDER BY name")
     List<Plot> plotList();
 
 

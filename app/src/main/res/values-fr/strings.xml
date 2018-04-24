@@ -190,5 +190,6 @@
     <string name="error_invalid_password">Mot de passe invalide</string>
     <string name="error_incorrect_password">Mot de passe incorrect</string>
     <string name="error_field_required">Ce champ est recquis</string>
+    <string name="label_irrigation">Irrigation</string>
 
 </resources>

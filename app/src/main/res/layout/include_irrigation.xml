@@ -1,0 +1,103 @@
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="@drawable/border_bottom"
+    tools:showIn="@layout/activity_intervention">
+
+    <!--android:focusable="true"-->
+    <!--android:focusableInTouchMode="true"-->
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/irrigation_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_arrow_down"
+        android:animateLayoutChanges="true"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/irrigation_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_dark"
+        android:text="@string/label_irrigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/irrigation_summary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/default_working_period_main_line"
+        app:layout_constraintBaseline_toBaselineOf="@id/irrigation_label"
+        app:layout_constraintStart_toEndOf="@+id/irrigation_label" />
+
+    <android.support.constraint.Group
+        android:id="@+id/irrigation_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids=""
+        android:visibility="visible"/>
+
+    <!-- Detailed view below -->
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/irrigation_quantity_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/quantity"
+        app:layout_constraintBaseline_toBaselineOf="@id/irrigation_quantity_edit" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/irrigation_quantity_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/field_part_one"
+        android:ems="4"
+        android:gravity="end"
+        android:imeOptions="actionDone"
+        android:inputType="numberDecimal"
+        android:paddingBottom="4dp"
+        android:paddingEnd="@dimen/regular_margin"
+        android:paddingStart="@dimen/regular_margin"
+        android:paddingTop="4dp"
+        android:text="@string/default_quantity_value"
+        app:layout_constraintStart_toEndOf="@id/irrigation_quantity_label"
+        app:layout_constraintTop_toBottomOf="@id/irrigation_label"
+        android:selectAllOnFocus="true" />
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/irrigation_unit_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/field_part_two"
+        android:gravity="start"
+        app:layout_constraintStart_toEndOf="@id/irrigation_quantity_edit"
+        app:layout_constraintTop_toTopOf="@id/irrigation_quantity_edit"
+        app:layout_constraintBottom_toBottomOf="@id/irrigation_quantity_edit"
+        android:entries="@array/volume_unit_values" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/irrigation_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="13,5 m3 au total"
+        app:layout_constraintTop_toBottomOf="@id/irrigation_quantity_label"
+        app:layout_constraintStart_toStartOf="@id/irrigation_quantity_edit"/>
+
+
+</android.support.constraint.ConstraintLayout>

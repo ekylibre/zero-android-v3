@@ -12,9 +12,9 @@ import java.util.Date;
 
 @Entity(tableName = Crop.TABLE_NAME, foreignKeys = {
 
-    @ForeignKey(entity = Plot.class,
-            parentColumns = Plot.COLUMN_UUID,
-            childColumns = Crop.COLUMN_PLOT),
+//    @ForeignKey(entity = Plot.class,
+//            parentColumns = Plot.COLUMN_UUID,
+//            childColumns = Crop.COLUMN_PLOT),
     @ForeignKey(entity = Farm.class,
             parentColumns = Farm.COLUMN_ID,
             childColumns = Crop.COLUMN_FARM)

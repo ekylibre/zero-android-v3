@@ -5,17 +5,16 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloClient;
+import com.ekylibre.android.network.helpers.ISO8601Adapter;
+import com.ekylibre.android.type.CustomType;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.CipherSuite;
-import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.TlsVersion;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 
@@ -35,6 +34,7 @@ public class GraphQLClient {
         return ApolloClient.builder()
                 .serverUrl(BASE_URL)
                 .okHttpClient(okHttpClient)
+                .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
                 .build();
     }
 

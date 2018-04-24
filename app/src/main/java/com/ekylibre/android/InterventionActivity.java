@@ -11,12 +11,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -37,11 +39,11 @@ import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.PlotWithCrops;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
-import com.ekylibre.android.utils.Converters;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -65,20 +67,24 @@ public class InterventionActivity extends AppCompatActivity implements
     private TextView cropSummary, cropAddLabel;
     private DialogFragment selectCropFragment;
 
+    private Group irrigationDetail;
+    private ImageView irrigationArrow;
+    private TextView irrigationSummary;
+    private EditText irrigationQuantityEdit;
+    private AppCompatSpinner irrigationUnitSpinner;
+
     // Working period layout
     private Group workingPeriodDetail;
     private ImageView workingPeriodArrow;
     private TextView workingPeriodSummary, workingPeriodDurationUnit;
     private EditText workingPeriodEditDate, workingPeriodEditDuration;
 
-    // Input layout
     private ImageView inputArrow;
     private TextView inputSummary, inputAddLabel;
     private DialogFragment selectInputFragment;
     private RecyclerView inputRecyclerView;
     private RecyclerView.Adapter inputAdapter;
 
-    // Material layout
     private ImageView materialArrow;
     private TextView materialSummary, materialAddLabel;
     private DialogFragment selectMaterialFragment;
@@ -113,6 +119,8 @@ public class InterventionActivity extends AppCompatActivity implements
     private String procedure;
     private int duration = 7;
     public static float surface = 0f;
+    private List volumeUnitKeys;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +132,9 @@ public class InterventionActivity extends AppCompatActivity implements
 
         keyboardManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
+        volumeUnitKeys = Arrays.asList(getResources().getStringArray(R.array.volume_unit_keys));
+
+
 
         // ================================ LAYOUT ============================================= //
 
@@ -132,6 +143,13 @@ public class InterventionActivity extends AppCompatActivity implements
         cropAddLabel = findViewById(R.id.crops_add_label);
         cropSummary = findViewById(R.id.crops_summary);
         cropSummary.setText(this.getString(R.string.select_crops));
+
+        // Irrigation
+        ConstraintLayout irrigationLayout = findViewById(R.id.irrigation_layout);
+        irrigationDetail = findViewById(R.id.irrigation_detail);
+        irrigationArrow = findViewById(R.id.irrigation_arrow);
+        irrigationQuantityEdit = findViewById(R.id.irrigation_quantity_edit);
+        irrigationUnitSpinner = findViewById(R.id.irrigation_unit_spinner);
 
         // Working period
         workingPeriodDetail = findViewById(R.id.working_period_detail);
@@ -142,12 +160,14 @@ public class InterventionActivity extends AppCompatActivity implements
         workingPeriodDurationUnit = findViewById(R.id.working_period_duration_unit);
 
         // Inputs
+        ConstraintLayout inputLayout = findViewById(R.id.input_layout);
         inputArrow = findViewById(R.id.input_arrow);
         inputSummary = findViewById(R.id.input_summary);
         inputAddLabel = findViewById(R.id.input_add_label);
         inputRecyclerView = findViewById(R.id.input_recycler);
 
         // Materials
+        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
         materialArrow = findViewById(R.id.material_arrow);
         materialSummary = findViewById(R.id.material_summary);
         materialAddLabel = findViewById(R.id.material_add_label);
@@ -166,12 +186,34 @@ public class InterventionActivity extends AppCompatActivity implements
         personRecyclerView = findViewById(R.id.person_recycler);
 
 
+        // ================================ UI SETTINGS ======================================== //
+
+        irrigationLayout.setVisibility(View.GONE);
+        materialLayout.setVisibility(View.GONE);
+        inputLayout.setVisibility(View.VISIBLE);
+
+        switch (procedure) {
+            case MainActivity.IRRIGATION:
+                irrigationLayout.setVisibility(View.VISIBLE);
+                break;
+            case MainActivity.CARE:
+                materialLayout.setVisibility(View.VISIBLE);
+                break;
+            case MainActivity.GROUND_WORK:
+                materialLayout.setVisibility(View.GONE);
+                break;
+        }
 
         // =============================== CROPS EVENTS ======================================== //
 
         includeCropLayout.setOnClickListener(view ->
             selectCropFragment.show(getFragmentTransaction(), "dialog")
         );
+
+
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.volume_unit_values, android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        irrigationUnitSpinner.setAdapter(spinnerAdapter);
 
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
@@ -424,8 +466,8 @@ public class InterventionActivity extends AppCompatActivity implements
             AppDatabase database = AppDatabase.getInstance(context);
 
             Intervention intervention = new Intervention(procedure, date, duration,
-                    null,null,null,null,null,
-                    null,null, null);
+                    null,null,null,null,Float.valueOf(irrigationQuantityEdit.getText().toString()),
+                    volumeUnitKeys.get(irrigationUnitSpinner.getSelectedItemPosition()).toString(),null, null);
 
             int intervention_id = (int) (long) database.dao().insert(intervention);
 

@@ -15,13 +15,14 @@ query Farms {
             specie
             productionNature
             productionMode
-            centroid
+            #centroid
             startDate
             stopDate
             surfaceArea
             plot {
                 uuid
                 name
+                surfaceArea
             }
         }
     }

@@ -26,14 +26,14 @@ public class Intervention {
     public Integer weather_temp;
     public Integer weather_wind;
     public Integer weather_desc;
-    public Integer water_quantity;
+    public Float water_quantity;
     public String water_unit;
     public Integer farm;
     public String comment;  // not yet implemented in api
     public String status;
     public Date status_time;
 
-    public Intervention(String type, Date date, Integer duration, Integer output, Integer weather_temp, Integer weather_wind, Integer weather_desc, Integer water_quantity, String water_unit, Integer farm, String comment) {
+    public Intervention(String type, Date date, Integer duration, Integer output, Integer weather_temp, Integer weather_wind, Integer weather_desc, Float water_quantity, String water_unit, Integer farm, String comment) {
         this.type = type;
         this.date = date;
         this.duration = duration;

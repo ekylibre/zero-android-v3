@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
             new LoadInitialData(this).execute();
+            SyncService.startActionFirstTimeSync(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("initial_data_loaded", true);
             editor.apply();
@@ -163,12 +164,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Sync data with Ekylibre
-        Log.e(TAG, "Start SyncService");
-        SyncService.startActionFirstTimeSync(this);
-
         // Set Farm name as page title
-        setTitle(sharedPreferences.getString("current-farm-name", "No name"));
+        setTitle(sharedPreferences.getString("current-farm-name", "Synchronisation..."));
 
         // Get list filter
         String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
@@ -302,6 +299,12 @@ public class MainActivity extends AppCompatActivity {
             database = AppDatabase.getInstance(context);
             database.populateInitialData(context);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            setTitle(sharedPreferences.getString("current-farm-name", "No name"));
         }
     }
 

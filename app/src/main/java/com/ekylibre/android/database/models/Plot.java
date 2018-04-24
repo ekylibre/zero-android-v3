@@ -34,13 +34,13 @@ public class Plot {
 
     public Date stopDate;
 
-    public Integer farm;
+    public String farm;
 
     @Ignore
     public Boolean is_checked;
 
     public Plot(@NonNull String uuid, String name, String shape, float surface_area,
-                String centroid, Date startDate, Date stopDate, Integer farm) {
+                String centroid, Date startDate, Date stopDate, String farm) {
         this.uuid = uuid;
         this.name = name;
         this.shape = shape;
