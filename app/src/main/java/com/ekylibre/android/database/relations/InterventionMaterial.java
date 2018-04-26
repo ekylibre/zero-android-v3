@@ -47,7 +47,7 @@ public class InterventionMaterial {
     @Ignore
     public InterventionMaterial(int materialId) {
         this.quantity = 0;
-        this.unit = "unity";
+        this.unit = "UNITY";
         this.intervention_id = -1;
         this.material_id = materialId;
         this.approximative_value = false;

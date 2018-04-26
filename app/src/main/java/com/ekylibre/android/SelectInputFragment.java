@@ -238,7 +238,7 @@ public class SelectInputFragment extends DialogFragment {
                     newId = database.dao().lastSeedId();
                     newId = (newId != null) ? ++newId : 1;
 
-                    database.dao().insert(new Seed(newId, specie, variety, false, true, "kilogram"));
+                    database.dao().insert(new Seed(newId, specie, variety, false, true, "KILOGRAM"));
                     break;
 
                 case PHYTO:
@@ -259,7 +259,7 @@ public class SelectInputFragment extends DialogFragment {
                     newId = database.dao().lastPhytosanitaryId();
                     newId = (newId != null) ? ++newId : 50000;
 
-                    Phyto phyto = new Phyto(newId, null, name, null, maaid, -1, reentryInt, brand, false, true, "liter");
+                    Phyto phyto = new Phyto(newId, null, name, null, maaid, -1, reentryInt, brand, false, true, "LITER");
                     database.dao().insert(phyto);
                     break;
 
@@ -277,7 +277,7 @@ public class SelectInputFragment extends DialogFragment {
 
                     database.dao().insert(new Fertilizer(newId, fertiName, fertiName, null, null,
                             null, nature, null,null,
-                            null, null, false, true, "kilogram"));
+                            null, null, false, true, "KILOGRAM"));
                     break;
             }
 
