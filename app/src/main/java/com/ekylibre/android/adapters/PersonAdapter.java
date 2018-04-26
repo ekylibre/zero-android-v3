@@ -65,7 +65,7 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder
         }
 
         void display(Persons item) {
-            iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
+            //iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
             firstNameTextView.setText(item.person.get(0).first_name);
             lastNameTextView.setText(item.person.get(0).last_name);
             driverSwitch.setChecked(item.inter.is_driver);

@@ -26,6 +26,7 @@ import com.ekylibre.android.database.relations.InterventionMaterial;
 import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
+import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.utils.Converters;
 
 import com.squareup.moshi.JsonAdapter;
@@ -40,6 +41,7 @@ import java.util.List;
 
 @Database(entities = {
         Intervention.class,
+        InterventionWorkingDay.class,
         Phyto.class, InterventionPhytosanitary.class,
         Seed.class, InterventionSeed.class, Specie.class,
         Fertilizer.class, InterventionFertilizer.class,

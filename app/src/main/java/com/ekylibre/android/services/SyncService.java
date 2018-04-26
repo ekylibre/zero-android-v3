@@ -12,12 +12,19 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
-import com.ekylibre.android.FarmsQuery;
+import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.ProfileQuery;
+import com.ekylibre.android.PullQuery;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Farm;
+import com.ekylibre.android.database.models.Intervention;
+import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Plot;
+import com.ekylibre.android.database.relations.InterventionCrop;
+import com.ekylibre.android.database.relations.InterventionPhytosanitary;
+import com.ekylibre.android.database.relations.InterventionSeed;
+import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.network.GraphQLClient;
 import com.ekylibre.android.utils.Converters;
 
@@ -26,6 +33,10 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -51,6 +62,7 @@ public class SyncService extends IntentService {
     private static String ACCESS_TOKEN;
     private static SharedPreferences sharedPreferences;
     private static AppDatabase database;
+
 
     public SyncService() {
         super("SyncService");
@@ -126,53 +138,148 @@ public class SyncService extends IntentService {
 
         database = AppDatabase.getInstance(this);
 
+        List<Integer> interventionEkyIdList = database.dao().interventionsEkiIdList();
+        //List<Integer> phytosEkyIdList = database.dao().phytosEkiIdList();
+        List<String> phytosMaaidList = database.dao().phytosMaaidList();
+
+        Log.e(TAG, phytosMaaidList.toString());
+
         ApolloClient apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
 
-        apolloClient.query(FarmsQuery
-                .builder()
-                .build()
-        ).enqueue(new ApolloCall.Callback<FarmsQuery.Data>() {
+        apolloClient.query(PullQuery.builder().build())
+                .enqueue(new ApolloCall.Callback<PullQuery.Data>() {
 
             @Override
-            public void onResponse(@Nonnull Response<FarmsQuery.Data> response) {
+            public void onResponse(@Nonnull Response<PullQuery.Data> response) {
 
                 Log.e(TAG, "OnResponse FarmCall");
 
-                FarmsQuery.Data data = response.data();
+                PullQuery.Data data = response.data();
 
                 if (data != null && data.farms() != null) {
 
                     Log.e(TAG, "Nombre de fermes: " + data.farms().size());
 
-                    FarmsQuery.Farm currentFarm = data.farms().get(data.farms().size()-1);
-                    Farm farm = new Farm(currentFarm.id(), currentFarm.name());
-                    database.dao().insert(farm);
+                    // TODO: Farms selector
+                    // Saving latest farm (only one for now)
+                    PullQuery.Farm farm = data.farms().get(data.farms().size()-1);
+                    Farm newFarm = new Farm(farm.id(), farm.label());
+                    database.dao().insert(newFarm);
 
+                    // Saving current farm in SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("current-farm-id", currentFarm.id());
-                    editor.putString("current-farm-name", currentFarm.name());
+                    editor.putString("current-farm-id", farm.id());
+                    editor.putString("current-farm-name", farm.label());
                     editor.apply();
 
-                    Log.e(TAG, currentFarm.name());
+                    // Processing crops and associated plots
+                    if (!farm.crops().isEmpty()) {
+                        for (PullQuery.Crop crop : farm.crops()) {
 
-                    for (FarmsQuery.Crop crop : Objects.requireNonNull(currentFarm.crops())) {
+                            // Symplify crop name
+                            String name = crop.name().replace(crop.plot().name() + " | ", "");
 
-                        String name = crop.name().replace(String.format("%s | ", crop.plot().name()),"");
+                            // Saving crop
+                            Crop newCrop = new Crop(
+                                    crop.uuid(), name, crop.specie(), crop.productionNature(),
+                                    crop.productionMode(), null, null, null,
+                                    Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
+                                    crop.startDate(), crop.stopDate(), crop.plot().uuid(),
+                                    null, farm.id());
+                            database.dao().insert(newCrop);
 
-                        Crop newCrop = new Crop(
-                                crop.uuid(), name, crop.specie(), crop.productionNature(),
-                                crop.productionMode(),null,null,null,
-                                Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
-                                crop.startDate(), crop.stopDate(), crop.plot().uuid(),
-                                null, currentFarm.id());
-
-                        database.dao().insert(newCrop);
-
-                        Plot newPlot = new Plot(crop.plot().uuid(), crop.plot().name(), null,
-                                Float.valueOf(crop.plot().surfaceArea().split(" ")[0]), null, null, null, currentFarm.id());
-
-                        database.dao().insert(newPlot);
+                            // Saving plot
+                            Plot newPlot = new Plot(crop.plot().uuid(), crop.plot().name(), null,
+                                    Float.valueOf(crop.plot().surfaceArea().split(" ")[0]), null, null, null, farm.id());
+                            database.dao().insert(newPlot);
+                        }
                     }
+
+                    // Processing articles
+                    if (!farm.articles().isEmpty()) {
+                        for (PullQuery.Article article : farm.articles()) {
+
+                            if (article.type().equals("chemical")) {
+
+                                Log.e(TAG, "referenceId " + article.referenceId());
+                                if (phytosMaaidList.contains(article.referenceId())) {
+                                    Log.e(TAG, "MAAID: " + article.referenceId());
+                                    // Set Ekylibre article id to existing record
+                                    database.dao().setPhytoEkyId(Integer.valueOf(article.id()), article.referenceId());
+                                }
+                                else {
+                                    Integer newId = database.dao().lastPhytosanitaryId();
+                                    newId = (newId != null) ? ++newId : 50000;
+                                    Phyto newPhyto = new Phyto(newId, Integer.valueOf(article.id()), article.name(),
+                                            null, article.referenceId(), null,
+                                            null, null, false, true, null);
+                                    database.dao().insert(newPhyto);
+                                }
+                            }
+                        }
+                    }
+
+                    Log.e(TAG, "liste " + interventionEkyIdList.toString());
+
+                    // Processing interventions
+                    if (!farm.interventions().isEmpty()) {
+                        int index = 0;
+                        for (PullQuery.Intervention inter : farm.interventions()) {
+
+                            if (!interventionEkyIdList.contains(Integer.valueOf(inter.id()))) {
+                                Log.e(TAG, "eky_id " + Integer.valueOf(inter.id()));
+
+                                // Save main intervention
+                                Intervention newInter = new Intervention();
+                                newInter.setEky_id(Integer.valueOf(inter.id()));
+                                newInter.setType(inter.type().toString());
+                                if (inter.waterQuantity() != null) {
+                                    newInter.setWater_quantity((int) (long) inter.waterQuantity());
+                                    newInter.setWater_unit(inter.waterUnit().toString());
+                                }
+                                newInter.setFarm(farm.id());
+                                newInter.setStatus("sync");
+
+                                int newInterId = (int) (long) database.dao().insert(newInter);
+
+                                //                            for (PullQuery.Input input : farm.interventions().get(index).inputs()) {
+                                //                                String type = input.id()
+                                //                            }
+
+                                // Saving WorkingDays
+                                for (PullQuery.WorkingDay wd : farm.interventions().get(index).workingDays()) {
+                                    InterventionWorkingDay interventionWD =
+                                            new InterventionWorkingDay(newInterId, wd.executionDate(), (int) (long) wd.hourDuration());
+                                    database.dao().insert(interventionWD);
+                                }
+
+                                // Saving Crops (targets)
+                                for (PullQuery.Target target : farm.interventions().get(index).targets()) {
+                                    InterventionCrop interventionCrop =
+                                            new InterventionCrop(newInterId, target.crop().uuid(), 100);
+                                    database.dao().insert(interventionCrop);
+                                }
+
+                                // Saving Inputs
+//                                for (PullQuery.Input input : farm.interventions().get(index).inputs()) {
+//
+//                                    Log.e(TAG, "input article id --> " + input.articleId());
+//
+//                                    int localPhytoId = 0;
+//
+//                                    // Phytosanitary products
+//                                    if (input.nature().equals("chemical"))
+//                                        localPhytoId = database.dao().getPhytoId(Integer.valueOf(input.articleId()));
+//                                        Log.e(TAG, "phyto_id = " + localPhytoId);
+//                                        InterventionPhytosanitary interventionPhyto = new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(), newInterId, localPhytoId);
+//                                        database.dao().insert(interventionPhyto);
+//                                }
+                            }
+                            ++index;
+                        }
+                    }
+                    // TODO: update recyclerView MainActivity
+                    MainActivity.lastSyncTime = new Date();
                 }
             }
 

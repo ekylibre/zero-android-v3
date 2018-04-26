@@ -25,6 +25,7 @@ import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.SyncService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -41,13 +42,13 @@ public class MainActivity extends AppCompatActivity {
     public static final int FINISHING = 1;
 
     // Procedures statics
-    public static final String CARE = "care";
-    public static final String CROP_PROTECTION = "crop_protection";
-    public static final String FERTILIZATION = "fertilization";
-    public static final String GROUND_WORK = "ground_work";
-    public static final String HARVEST = "harvest";
-    public static final String IMPLANTATION = "implantation";
-    public static final String IRRIGATION = "irrigation";
+    public static final String CARE = "CARE";
+    public static final String CROP_PROTECTION = "CROP_PROTECTION";
+    public static final String FERTILIZATION = "FERTILIZATION";
+    public static final String GROUND_WORK = "GROUND_WORK";
+    public static final String HARVEST = "HARVEST";
+    public static final String IMPLANTATION = "IMPLANTATION";
+    public static final String IRRIGATION = "IRRIGATION";
 
     // Filters statics
     public static final String FILTER_MY_INTERVENTIONS = "filter_my_interventions";
@@ -71,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
     private AppDatabase database;
     private SharedPreferences sharedPreferences;
 
+    // Farm id
+    public static String currentFarmId;
+    public static Date lastSyncTime = new Date();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,11 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
             new LoadInitialData(this).execute();
-            SyncService.startActionFirstTimeSync(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("initial_data_loaded", true);
             editor.apply();
         }
+
+        currentFarmId = sharedPreferences.getString("current-farm-id", "");
 
         // Layout
         darkMask = findViewById(R.id.dark_mask);
@@ -105,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
         ImageButton implantationButton = findViewById(R.id.button_implantation);
         ImageButton irrigationButton = findViewById(R.id.button_irrigation);
 
-        filterAll = findViewById(R.id.filter_all_interventions);
-        filterMine = findViewById(R.id.filter_my_interventions);
+//        filterAll = findViewById(R.id.filter_all_interventions);
+//        filterMine = findViewById(R.id.filter_my_interventions);
 
         // The interventionEntity list
         emptyRecyclerView = findViewById(R.id.empty_recyclerview);
@@ -224,6 +230,13 @@ public class MainActivity extends AppCompatActivity {
         UpdateList(Context context, String filter) {
             this.context = context;
             this.filter = filter;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            SyncService.startActionFirstTimeSync(context);
+
         }
 
         @Override

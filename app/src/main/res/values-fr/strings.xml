@@ -86,13 +86,13 @@
     <string name="vitis">Vigne</string>
 
     <!-- Procedures -->
-    <string name="irrigation">Irrigation</string>
-    <string name="ground_work">Travail du sol</string>
-    <string name="implantation">Semis</string>
-    <string name="fertilization">Fertilisation</string>
-    <string name="harvest">Récolte</string>
-    <string name="care">Entretien</string>
-    <string name="crop_protection">Pulvérisation</string>
+    <string name="IRRIGATION">Irrigation</string>
+    <string name="GROUND_WORK">Travail du sol</string>
+    <string name="IMPLANTATION">Semis</string>
+    <string name="FERTILIZATION">Fertilisation</string>
+    <string name="HARVEST">Récolte</string>
+    <string name="CARE">Entretien</string>
+    <string name="CROP_PROTECTION">Pulvérisation</string>
 
     <!-- Plurals -->
     <string name="crop">%d culture</string>
@@ -113,7 +113,7 @@
     <string name="x_hours">%d heures</string>
 
     <!-- App strings -->
-    <string name="app_name">Click&amp;Farm</string>
+    <string name="app_name">ClicFarm</string>
     <string name="nav_button">nav</string>
 
     <string name="starting_intervention_text" >Commencer une intervention de…</string>

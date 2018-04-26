@@ -14,15 +14,15 @@
     </string-array>
 
     <string-array name="volume_unit_keys">
-        <item>liter</item>
-        <item>liter_per_hectare</item>
-        <item>liter_per_square_meter</item>
-        <item>hectoliter</item>
-        <item>hectoliter_per_hectare</item>
-        <item>hectoliter_per_square_meter</item>
-        <item>cubic_meter</item>
-        <item>cubic_meter_per_hectare</item>
-        <item>cubic_meter_per_square_meter</item>
+        <item>LITER</item>
+        <item>LITER_PER_HECTARE</item>
+        <item>LITER_PER_SQUARE_METER</item>
+        <item>HECTOLITER</item>
+        <item>HECTOLITER_PER_HECTARE</item>
+        <item>HECTOLITER_PER_SQUARE_METER</item>
+        <item>CUBIC_METER</item>
+        <item>CUBIC_METER_PER_HECTARE</item>
+        <item>CUBIC_METER_PER_SQUARE_METER</item>
     </string-array>
 
     <string-array name="mass_unit_values">
@@ -41,18 +41,18 @@
     </string-array>
 
     <string-array name="mass_unit_keys">
-        <item>gram</item>
-        <item>gram_per_hectare</item>
-        <item>gram_per_square_meter</item>
-        <item>kilogram</item>
-        <item>kilogram_per_hectare</item>
-        <item>kilogram_per_square_meter</item>
-        <item>quintal</item>
-        <item>quintal_per_hectare</item>
-        <item>quintal_per_square_meter</item>
-        <item>ton</item>
-        <item>ton_per_hectare</item>
-        <item>ton_per_square_meter</item>
+        <item>GRAM</item>
+        <item>GRAM_PER_HECTARE</item>
+        <item>GRAM_PER_SQUARE_METER</item>
+        <item>KILOGRAM</item>
+        <item>KILOGRAM_PER_HECTARE</item>
+        <item>KILOGRAM_PER_SQUARE_METER</item>
+        <item>QUINTAL</item>
+        <item>QUINTAL_PER_HECTARE</item>
+        <item>QUINTAL_PER_SQUARE_METER</item>
+        <item>TON</item>
+        <item>TON_PER_HECTARE</item>
+        <item>TON_PER_SQUARE_METER</item>
     </string-array>
 
     <string-array name="unity_unit_values">
@@ -65,12 +65,12 @@
     </string-array>
 
     <string-array name="unity_unit_keys">
-        <item>unity</item>
-        <item>unity_per_hectare</item>
-        <item>unity_per_square_meter</item>
-        <item>thousand</item>
-        <item>thousand_per_hectare</item>
-        <item>thousand_per_square_meter</item>
+        <item>UNITY</item>
+        <item>UNITY_PER_HECTARE</item>
+        <item>UNITY_PER_SQUARE_METER</item>
+        <item>THOUSAND</item>
+        <item>THOUSAND_PER_HECTARE</item>
+        <item>THOUSAND_PER_SQUARE_METER</item>
     </string-array>
 
     <string-array name="unit_values">
@@ -87,16 +87,16 @@
     </string-array>
 
     <string-array name="unit_keys">
-        <item>meter</item>
-        <item>unit</item>
-        <item>thousand</item>
-        <item>gram</item>
-        <item>kilogram</item>
-        <item>quintal</item>
-        <item>ton</item>
-        <item>liter</item>
-        <item>cubic_meter</item>
-        <item>hectoliter</item>
+        <item>METER</item>
+        <item>UNIT</item>
+        <item>THOUSAND</item>
+        <item>GRAM</item>
+        <item>KILOGRAM</item>
+        <item>QUINTAL</item>
+        <item>TON</item>
+        <item>LITER</item>
+        <item>CUBIC_METER</item>
+        <item>HECTOLITER</item>
     </string-array>
 
 

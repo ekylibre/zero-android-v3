@@ -22,6 +22,7 @@ import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.DateTools;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +41,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     private List unitValues;
     private List unitKeys;
 
+    private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("HH:mm", MainActivity.LOCALE);
+
+
     public MainAdapter(Context context, List<Interventions> interventionsList) {
         this.interventionsList = interventionsList;
         this.context = context;
@@ -55,13 +59,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final ImageView itemIcon;
-        private final TextView itemProcedure;
-        private final TextView itemDate;
-        private final TextView itemCrops;
-        private final TextView itemInfos;
+        private final ImageView itemIcon, itemSynchronized;
+        private final TextView itemProcedure, itemDate, itemCrops, itemInfos, syncTime;
 
-        ViewHolder(final View itemView) {
+        ViewHolder(final View itemView, int viewType) {
             super(itemView);
 
             itemIcon = itemView.findViewById(R.id.item_icon);
@@ -69,6 +70,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             itemDate = itemView.findViewById(R.id.item_date);
             itemCrops = itemView.findViewById(R.id.item_cultures);
             itemInfos = itemView.findViewById(R.id.item_infos);
+            itemSynchronized = itemView.findViewById(R.id.item_synchronized);
+            syncTime = (viewType == 1) ? itemView.findViewById(R.id.last_sync) : null;
 
             itemView.setOnClickListener(v -> Log.e(TAG, "clic"));
         }
@@ -82,16 +85,23 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         int layoutId = (viewType == 1) ? R.layout.item_intervention_header : R.layout.item_intervention;
         View view = inflater.inflate(layoutId, parent, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view, viewType);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Interventions current = interventionsList.get(position);
-        holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.type, "drawable", context.getPackageName()));
+        holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.type.toLowerCase(), "drawable", context.getPackageName()));
         holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.type, "string", context.getPackageName()));
-        holder.itemDate.setText(DateTools.display(current.intervention.date));
+        holder.itemDate.setText(DateTools.display(current.workingDays.get(0).execution_date));
 
+        if (current.intervention.eky_id != null)
+            holder.itemSynchronized.setVisibility(View.VISIBLE);
+        else
+            holder.itemSynchronized.setVisibility(View.GONE);
+
+        if (holder.syncTime != null)
+            holder.syncTime.setText("Dernière synchronisation  " + SIMPLE_DATE.format(MainActivity.lastSyncTime));
         // Count parcels and surface
         float total = 0;
         int count = 0;
@@ -99,6 +109,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             total +=  crop.crop.get(0).surface_area * crop.inter.work_area_percentage / 100;
             ++count;
         }
+
         String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
         String totalString = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
         holder.itemCrops.setText(totalString);
@@ -151,7 +162,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
                 break;
             case MainActivity.IRRIGATION:
-                sb.append(String.format(MainActivity.LOCALE, "%.1f", current.intervention.water_quantity)).append(" ");
+                sb.append(current.intervention.water_quantity + " ");
                 sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(current.intervention.water_unit)));
                 break;
         }

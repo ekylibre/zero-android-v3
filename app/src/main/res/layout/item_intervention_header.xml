@@ -7,27 +7,27 @@
     android:padding="@dimen/regular_margin"
     android:background="@color/icons">
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/filter_my_interventions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mes interventions"
-        android:textColor="@color/icons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/filter_background_enabled"/>
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/filter_my_interventions"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Mes interventions"-->
+        <!--android:textColor="@color/icons"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--android:background="@drawable/filter_background_enabled"/>-->
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/filter_all_interventions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Toutes les interventions"
-        android:textColor="@color/icons"
-        android:layout_margin="@dimen/regular_margin"
-        app:layout_constraintStart_toEndOf="@id/filter_my_interventions"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/filter_my_interventions"
-        android:background="@drawable/filter_background_disabled"/>
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/filter_all_interventions"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Toutes les interventions"-->
+        <!--android:textColor="@color/icons"-->
+        <!--android:layout_margin="@dimen/regular_margin"-->
+        <!--app:layout_constraintStart_toEndOf="@id/filter_my_interventions"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@id/filter_my_interventions"-->
+        <!--android:background="@drawable/filter_background_disabled"/>-->
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/last_sync"
@@ -37,15 +37,15 @@
         android:textSize="@dimen/small_text"
         android:textColor="@color/grey"
         android:layout_marginTop="@dimen/small_margin"
-        app:layout_constraintTop_toBottomOf="@id/filter_my_interventions"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"/>  <!--app:layout_constraintTop_toBottomOf="@id/filter_my_interventions" -->
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/item_icon"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:srcCompat="@drawable/procedure_care"
-        android:background="@color/grey"
+        android:tint="#444444"
+        android:background="#eeeeee"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/item_procedure"
         app:layout_constraintBottom_toBottomOf="@id/used_for_constraints"
@@ -58,11 +58,21 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="@color/primary_dark"
-        android:text="@string/irrigation"
+        android:text="@string/IRRIGATION"
         app:layout_constraintTop_toBottomOf="@id/last_sync"
         app:layout_constraintStart_toEndOf="@id/item_icon"
         android:layout_marginStart="@dimen/regular_margin"
         android:layout_marginTop="@dimen/small_margin"/>
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/item_synchronized"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/icon_check"
+        android:tint="@color/accent"
+        app:layout_constraintStart_toEndOf="@id/item_procedure"
+        app:layout_constraintBottom_toBottomOf="@id/item_procedure"
+        android:layout_marginStart="6dp"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_date"

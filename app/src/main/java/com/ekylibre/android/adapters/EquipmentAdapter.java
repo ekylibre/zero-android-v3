@@ -57,7 +57,7 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
         }
 
         void display(Equipments item) {
-            iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
+            //iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
             nameTextView.setText(item.equipment.get(0).name);
             if (!item.equipment.get(0).type.isEmpty())
                 typeTextView.setText(item.equipment.get(0).type);

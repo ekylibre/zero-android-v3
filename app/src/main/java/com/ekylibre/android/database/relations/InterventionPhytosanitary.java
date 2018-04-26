@@ -56,7 +56,7 @@ public class InterventionPhytosanitary {
     @Ignore
     public InterventionPhytosanitary(int phytoId) {
         this.quantity = 0f;
-        this.unit = "liter_per_hectare";
+        this.unit = "LITER_PER_HECTARE";
         this.intervention_id = -1;
         this.phyto_id = phytoId;
 

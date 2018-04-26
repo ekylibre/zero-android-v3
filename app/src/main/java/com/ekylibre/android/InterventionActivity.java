@@ -39,6 +39,7 @@ import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.PlotWithCrops;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
+import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 
@@ -128,6 +129,7 @@ public class InterventionActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_intervention);
 
         procedure = getIntent().getStringExtra("procedure");
+        Log.e(TAG, "procedure " + procedure);
         setTitle(this.getResources().getIdentifier(procedure, "string", this.getPackageName()));
 
         keyboardManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -210,10 +212,26 @@ public class InterventionActivity extends AppCompatActivity implements
             selectCropFragment.show(getFragmentTransaction(), "dialog")
         );
 
+        // =============================== IRRIGATION EVENTS =================================== //
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.volume_unit_values, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         irrigationUnitSpinner.setAdapter(spinnerAdapter);
+
+//        irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                String string = itemQuantityEdit.getText().toString();
+//                if (!string.isEmpty()) {
+//                    itemTotal.setText(calculTotal(Float.valueOf(string)));
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
 
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
@@ -465,11 +483,20 @@ public class InterventionActivity extends AppCompatActivity implements
 
             AppDatabase database = AppDatabase.getInstance(context);
 
-            Intervention intervention = new Intervention(procedure, date, duration,
-                    null,null,null,null,Float.valueOf(irrigationQuantityEdit.getText().toString()),
-                    volumeUnitKeys.get(irrigationUnitSpinner.getSelectedItemPosition()).toString(),null, null);
+            Intervention intervention = new Intervention();
+            intervention.setType(procedure);
+            if (!irrigationQuantityEdit.getText().toString().isEmpty()) {
+                intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
+                intervention.setWater_unit(volumeUnitKeys.get(irrigationUnitSpinner.getSelectedItemPosition()).toString());
+            }
+            intervention.setFarm(MainActivity.currentFarmId);
 
+            // Save intervention and get returning id
             int intervention_id = (int) (long) database.dao().insert(intervention);
+
+            InterventionWorkingDay workingDay = new InterventionWorkingDay(intervention_id, date, duration);
+            Log.e(TAG, workingDay.toString());
+            database.dao().insert(workingDay);
 
             for (Object item : inputList) {
                 if (item instanceof Seeds) {

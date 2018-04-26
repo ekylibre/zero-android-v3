@@ -28,14 +28,6 @@ public class Converters {
 
     private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd");
 
-
-//    private static final SimpleDateFormat iso8601datetime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
-//    @TypeConverter
-//    public static Date toDate(Long timestamp) {
-//        return timestamp == null ? null : new Date(timestamp);
-//    }
-
     @TypeConverter
     public static Date toDate(String value) {
         try {
@@ -44,11 +36,6 @@ public class Converters {
             throw new IllegalArgumentException(value + " is not a valid ISO 8601 date", e );
         }
     }
-
-//    @TypeConverter
-//    public static Long toTimestamp(Date date) {
-//        return date == null ? null : date.getTime();
-//    }
 
     @TypeConverter
     public static String toString(Date date) {

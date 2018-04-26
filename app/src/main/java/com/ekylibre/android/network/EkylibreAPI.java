@@ -21,7 +21,6 @@ public interface EkylibreAPI {
             @Field("scope") String scope);
     //@Field("code") String code,
 
-
     @FormUrlEncoded
     @POST("/oauth/token")
     Call<AccessToken> getRefreshAccessToken(

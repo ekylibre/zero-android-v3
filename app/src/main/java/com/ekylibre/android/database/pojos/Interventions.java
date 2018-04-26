@@ -11,6 +11,7 @@ import com.ekylibre.android.database.relations.InterventionMaterial;
 import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
+import com.ekylibre.android.database.relations.InterventionWorkingDay;
 
 import java.util.List;
 
@@ -18,6 +19,9 @@ public class Interventions {
 
     @Embedded
     public Intervention intervention;
+
+    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionWorkingDay.COLUMN_INTERVENTION_ID, entity = InterventionWorkingDay.class)
+    public List<InterventionWorkingDay> workingDays;
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionPhytosanitary.COLUMN_INTERVENTION_ID, entity = InterventionPhytosanitary.class)
     public List<Phytos> phytos;

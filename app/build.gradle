@@ -27,6 +27,7 @@ android {
 
 apollo {
     customTypeMapping['Date'] = "java.util.Date"
+    customTypeMapping['Point'] = String
 }
 
 
@@ -44,8 +45,8 @@ dependencies {
 
     // Test libraries
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     // Google Services, needed for fixing SSL Handshake error
     implementation 'com.google.android.gms:play-services-base:15.0.0'

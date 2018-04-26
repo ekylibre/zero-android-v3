@@ -5,6 +5,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
+import android.arch.persistence.room.Update;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
@@ -26,6 +27,7 @@ import com.ekylibre.android.database.relations.InterventionMaterial;
 import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
+import com.ekylibre.android.database.relations.InterventionWorkingDay;
 
 import java.util.List;
 
@@ -49,8 +51,10 @@ public interface DAO {
     @Insert void insert(Seed... seeds);
     @Insert void insert(Specie... species);
 
-    @Insert long insert(Intervention intervention);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long insert(Intervention intervention);
 
+    @Insert void insert(InterventionWorkingDay interventionWorkingDay);
     @Insert void insert(InterventionSeed interventionSeeds);
     @Insert void insert(InterventionPhytosanitary interventionPhytosanitary);
     @Insert void insert(InterventionFertilizer interventionFertilizers);
@@ -93,15 +97,24 @@ public interface DAO {
     /**
      *    Interventions (POJO)
      */
-
-    @Transaction @Query("SELECT * FROM " + Intervention.TABLE_NAME + " ORDER BY date DESC")
+    @Transaction @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
+            " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID + " ORDER BY execution_date DESC")  //  + " ORDER BY date DESC"
     List<Interventions> selectInterventions();
+
+
+    /**
+     * Ids lists
+     */
+    @Query("SELECT " + Intervention.COLUMN_ID_EKY + " FROM " + Intervention.TABLE_NAME)
+    List<Integer> interventionsEkiIdList();
+
+    @Query("SELECT " + Phyto.COLUMN_ID_EKY + " FROM " + Phyto.TABLE_NAME)
+    List<Integer> phytosEkiIdList();
 
 
     /**
      *    Equipment
      */
-
     @Query("SELECT * FROM " + Equipment.TABLE_NAME + " ORDER BY name")
     List<Equipment> selectEquipment();
 
@@ -154,9 +167,18 @@ public interface DAO {
     @Transaction @Query("SELECT * FROM " + Phyto.TABLE_NAME + " ORDER BY used DESC")
     List<Phyto> selectPhytosanitary();
 
-
     @Query("SELECT * FROM " + Phyto.TABLE_NAME + " WHERE name LIKE :search ORDER BY name, used DESC")
     List<Phyto> searchPhytosanitary(String search);
+
+    @Transaction
+    @Query("SELECT maaid FROM " + Phyto.TABLE_NAME)  //+ " WHERE maaid NOT NULL"
+    List<String> phytosMaaidList();
+
+    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :id WHERE maaid = :maaid")
+    void setPhytoEkyId(Integer id, String maaid);
+
+    @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " = :eky_id")
+    int getPhytoId(int eky_id);
 
 
     /**

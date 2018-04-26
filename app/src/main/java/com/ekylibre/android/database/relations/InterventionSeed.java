@@ -54,7 +54,7 @@ public class InterventionSeed {
     @Ignore
     public InterventionSeed(int seedId) {
         this.quantity = 0f;
-        this.unit = "kilogram_per_hectare";
+        this.unit = "KILOGRAM_PER_HECTARE";
         this.intervention_id = -1;
         this.seed_id = seedId;
     }

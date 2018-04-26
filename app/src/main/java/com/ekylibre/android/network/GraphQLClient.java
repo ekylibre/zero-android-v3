@@ -35,6 +35,7 @@ public class GraphQLClient {
                 .serverUrl(BASE_URL)
                 .okHttpClient(okHttpClient)
                 .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
+                .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
                 .build();
     }
 

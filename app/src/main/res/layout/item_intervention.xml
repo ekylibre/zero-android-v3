@@ -12,7 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:srcCompat="@drawable/procedure_care"
-        android:background="@color/grey"
+        android:tint="#444444"
+        android:background="#eeeeee"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/used_for_constraints"
@@ -25,9 +26,19 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="@color/primary_dark"
-        android:text="@string/irrigation"
+        android:text="@string/IRRIGATION"
         app:layout_constraintStart_toEndOf="@id/item_icon"
         android:layout_marginStart="@dimen/regular_margin" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/item_synchronized"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/icon_check"
+        android:tint="@color/accent"
+        app:layout_constraintStart_toEndOf="@id/item_procedure"
+        app:layout_constraintBottom_toBottomOf="@id/item_procedure"
+        android:layout_marginStart="6dp"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_date"

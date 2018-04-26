@@ -18,30 +18,26 @@ public class DateTools {
     private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("d MMM", MainActivity.LOCALE);
     private static SimpleDateFormat SIMPLE_DATE_YEAR = new SimpleDateFormat("d MMM yyyy", MainActivity.LOCALE);
     private static long TODAY = setMidnight();
+    private static int DAY = 86400000;
 
     public static String display(Date date) {
 
-        int diffSec = (int) (date.getTime() - TODAY) / 1000;
-        int daySec = 86400;
-        int yearSec = daySec * 365;
-
-        if (diffSec > 0 && diffSec < daySec) {
+        if (date.getTime() == TODAY)
             return "aujourd'hui";
-        }
-        else if (abs(diffSec) < daySec && diffSec < 0) {
+
+        else if (date.getTime() == TODAY - DAY)
             return "hier";
-        }
-        else if (abs(diffSec) < yearSec) {
-            return SIMPLE_DATE.format(date);
-        }
-        return SIMPLE_DATE_YEAR.format(date);
+
+        return SIMPLE_DATE.format(date);
     }
 
     private static long setMidnight() {
         Calendar calendar = Calendar.getInstance();
+        Log.e(TAG, "timezone " + calendar.getTimeZone());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis();
     }
 }

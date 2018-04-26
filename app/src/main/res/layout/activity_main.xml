@@ -129,7 +129,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/implantation"
+                    android:text="@string/IMPLANTATION"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
@@ -154,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/ground_work"
+                    android:text="@string/GROUND_WORK"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
@@ -179,7 +179,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/irrigation"
+                    android:text="@string/IRRIGATION"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
@@ -205,7 +205,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/harvest"
+                    android:text="@string/HARVEST"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
@@ -231,7 +231,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/care"
+                    android:text="@string/CARE"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
@@ -257,7 +257,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/fertilization"
+                    android:text="@string/FERTILIZATION"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
@@ -283,7 +283,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center|bottom"
-                    android:text="@string/crop_protection"
+                    android:text="@string/CROP_PROTECTION"
                     android:textColor="@color/icons"
                     app:autoSizeTextType="uniform"
                     android:lines="1" />

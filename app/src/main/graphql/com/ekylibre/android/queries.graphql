@@ -1,0 +1,63 @@
+query Profile {
+  profile {
+    firstName
+    lastName
+  }
+}
+
+query Pull {
+    farms {
+        id
+        label
+        articles {
+            id
+            type
+            name
+            referenceId
+        }
+        crops {
+            uuid
+            name
+            specie
+            productionNature
+            productionMode
+            #centroid
+            startDate
+            stopDate
+            surfaceArea
+            plot {
+                uuid
+                name
+                surfaceArea
+            }
+        }
+        interventions {
+            id
+            inputs {
+                id
+                articleId
+                nature
+                quantityValue
+                unit
+                unitPrice
+            }
+            operators {
+                id
+                role
+            }
+            targets {
+                crop {
+                    uuid
+                }
+                workingPercentage
+            }
+            type
+            waterQuantity
+            waterUnit
+            workingDays {
+                executionDate
+                hourDuration
+            }
+        }
+    }
+}

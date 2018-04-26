@@ -51,7 +51,7 @@ public class InterventionFertilizer {
     @Ignore
     public InterventionFertilizer(int fertiId) {
         this.quantity = 0f;
-        this.unit = "kilogram_per_hectare";
+        this.unit = "KILOGRAM_PER_HECTARE";
         this.intervention_id = -1;
         this.ferti_id = fertiId;
     }
