@@ -208,16 +208,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         if (resultCode == SyncService.DONE) {
             Log.e(TAG, "Synchronization done");
             swipeRefreshLayout.setRefreshing(false);
-            adapter.notifyDataSetChanged();
-            if (adapter.getItemCount() == 0) {
-                recyclerView.setVisibility(View.GONE);
-                emptyRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                Log.e(TAG, "Display recycler");
-                emptyRecyclerView.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-            }
-
+            new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
         }
     }
 
