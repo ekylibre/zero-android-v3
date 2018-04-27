@@ -88,7 +88,7 @@ public abstract class AppDatabase extends RoomDatabase {
             for (Phyto item : list1) {
                 item.registered = true;
                 item.used = false;
-                item.unit = "liter";
+                item.unit = "LITER";
             }
             database.dao().insert(list1.toArray(new Phyto[list1.size()]));
 
@@ -107,7 +107,7 @@ public abstract class AppDatabase extends RoomDatabase {
             for (Seed item : list3) {
                 item.registered = true;
                 item.used = false;
-                item.unit = "kilogram";
+                item.unit = "KILOGRAM";
             }
             database.dao().insert(list3.toArray(new Seed[list3.size()]));
 
@@ -119,7 +119,7 @@ public abstract class AppDatabase extends RoomDatabase {
             for (Fertilizer item : list4) {
                 item.registered = true;
                 item.used = false;
-                item.unit = "kilogram";
+                item.unit = "KILOGRAM";
             }
             database.dao().insert(list4.toArray(new Fertilizer[list4.size()]));
 

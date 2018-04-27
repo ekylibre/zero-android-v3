@@ -45,7 +45,6 @@
         android:layout_height="0dp"
         app:srcCompat="@drawable/procedure_care"
         android:tint="#444444"
-        android:background="#eeeeee"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/item_procedure"
         app:layout_constraintBottom_toBottomOf="@id/used_for_constraints"
@@ -67,11 +66,14 @@
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/item_synchronized"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:srcCompat="@drawable/icon_check"
         android:tint="@color/accent"
         app:layout_constraintStart_toEndOf="@id/item_procedure"
+        app:layout_constraintTop_toTopOf="@id/item_procedure"
         app:layout_constraintBottom_toBottomOf="@id/item_procedure"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         android:layout_marginStart="6dp"/>
 
     <android.support.v7.widget.AppCompatTextView
@@ -79,7 +81,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="hier"
-        android:textColor="@color/accent"
         app:layout_constraintBaseline_toBaselineOf="@id/item_procedure"
         app:layout_constraintEnd_toEndOf="parent"/>
 

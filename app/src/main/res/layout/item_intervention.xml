@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/regular_margin"
-    android:background="@color/icons">
+    android:background="@color/icons"
+    android:id="@+id/intervention_item_layout">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/item_icon"
@@ -13,12 +14,11 @@
         android:layout_height="0dp"
         app:srcCompat="@drawable/procedure_care"
         android:tint="#444444"
-        android:background="#eeeeee"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/used_for_constraints"
         android:adjustViewBounds="true"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"/>  <!--         android:background="#eeeeee" -->
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_procedure"
@@ -33,19 +33,21 @@
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/item_synchronized"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:srcCompat="@drawable/icon_check"
         android:tint="@color/accent"
         app:layout_constraintStart_toEndOf="@id/item_procedure"
+        app:layout_constraintTop_toTopOf="@id/item_procedure"
         app:layout_constraintBottom_toBottomOf="@id/item_procedure"
-        android:layout_marginStart="6dp"/>
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_marginStart="6dp" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="hier"
-        android:textColor="@color/accent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <android.support.v7.widget.AppCompatTextView

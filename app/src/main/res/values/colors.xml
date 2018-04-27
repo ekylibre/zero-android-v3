@@ -3,6 +3,7 @@
 
     <color name="grey">#cacaca</color>
     <color name="light_grey">#dedede</color>
+    <color name="another_light_grey">#eeeeee</color>
     <color name="background">#fafafa</color>
 
     <color name="primary">#2196F3</color>
@@ -13,4 +14,5 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
+    <color name="orange">#ff9500</color>
 </resources>

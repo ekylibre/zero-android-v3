@@ -3,6 +3,10 @@ query Profile {
     firstName
     lastName
   }
+  farms {
+    label
+    id
+  }
 }
 
 query Pull {

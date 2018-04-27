@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.os.ResultReceiver;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,17 +24,16 @@ import android.widget.Toast;
 import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SyncResultReceiver.Receiver {
 
     private static final String TAG = "MainActivity";
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView filterAll;
     private TextView filterMine;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private TextView emptyRecyclerView;
     private RecyclerView.Adapter adapter;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     // Activity variables
     private AppDatabase database;
     private SharedPreferences sharedPreferences;
+    SyncResultReceiver resultReceiver;
 
     // Farm id
     public static String currentFarmId;
@@ -83,10 +86,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Set locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
-        Log.e(TAG, "Locale: " + LOCALE.getISO3Language());
 
         // Get shared preferences and set title
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+
+        setTitle(sharedPreferences.getString("current-farm-name", "No name"));
+        currentFarmId = sharedPreferences.getString("current-farm-id", "");
 
         if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
             new LoadInitialData(this).execute();
@@ -95,9 +100,11 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        currentFarmId = sharedPreferences.getString("current-farm-id", "");
+        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver.setReceiver(this);
 
         // Layout
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         darkMask = findViewById(R.id.dark_mask);
         procedureChoiceLayout = findViewById(R.id.nav_procedure_choice);
         menuTitle = findViewById(R.id.nav_message);
@@ -119,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.intervention_recycler);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         adapter = new MainAdapter(this, interventionsList);
 
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -156,6 +163,15 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
         });
 
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            Intent intent = new Intent(this, SyncService.class);
+            intent.setAction(SyncService.ACTION_FIRST_TIME_SYNC);
+            intent.putExtra("receiver", resultReceiver);
+            startService(intent);
+        });
+
+
         //        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
 //            SharedPreferences.Editor editor = sharedPreferences.edit();
 //            editor.putBoolean("showcase-passed", true);
@@ -187,40 +203,23 @@ public class MainActivity extends AppCompatActivity {
         //super.onBackPressed();
     }
 
-//    public class TestCrop extends AsyncTask<Void, Void, Void> {
-//        Context context;
-//
-//        TestCrop(Context context) {
-//            this.context = context;
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            database = AppDatabase.getInstance(context);
-//
-//            // insert interventionCrop
-////            database.dao().insert(new InterventionCrop(1,1, 100));
-////
-////
-////            for (Interventions intervention : database.dao().selectInterventions()) {
-////                Log.e(TAG, intervention.crops.get(0).cropWithPlots.get(0).plot.get(0).name);
-////            }
-//
-//            database.dao().insert(new Plot("2", "La Renambrie", null, 2.3f,
-//                    null, null, null, null));
-//
-//            database.dao().insert(new Crop("2", "Blé tendre de printemps 2018",
-//                    null,null,null,null,
-//                    null,null,2.4f,null, new Date(), new Date(),"2",null,null));
-//
-//            Date date = new Date();
-//            for (CropWithPlots crop : database.dao().listCropWithPlots(date.getTime())) {
-//                Log.e(TAG, crop.plot.get(0).name);
-//            }
-//
-//            return null;
-//        }
-//    }
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        if (resultCode == SyncService.DONE) {
+            Log.e(TAG, "Synchronization done");
+            swipeRefreshLayout.setRefreshing(false);
+            adapter.notifyDataSetChanged();
+            if (adapter.getItemCount() == 0) {
+                recyclerView.setVisibility(View.GONE);
+                emptyRecyclerView.setVisibility(View.VISIBLE);
+            } else {
+                Log.e(TAG, "Display recycler");
+                emptyRecyclerView.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+
+        }
+    }
 
     public class UpdateList extends AsyncTask<Void, Void, Void> {
 
@@ -235,8 +234,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            SyncService.startActionFirstTimeSync(context);
-
         }
 
         @Override
@@ -317,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            setTitle(sharedPreferences.getString("current-farm-name", "No name"));
+            adapter.notifyDataSetChanged();
         }
     }
 

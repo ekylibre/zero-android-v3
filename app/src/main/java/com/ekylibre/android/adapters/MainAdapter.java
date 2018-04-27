@@ -2,7 +2,12 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.ImageViewCompat;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,12 +64,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final ImageView itemIcon, itemSynchronized;
+        private final AppCompatImageView itemIcon, itemSynchronized;
         private final TextView itemProcedure, itemDate, itemCrops, itemInfos, syncTime;
+        private final View itemBackground;
 
         ViewHolder(final View itemView, int viewType) {
             super(itemView);
 
+            itemBackground = itemView.findViewById(R.id.intervention_item_layout);
             itemIcon = itemView.findViewById(R.id.item_icon);
             itemProcedure = itemView.findViewById(R.id.item_procedure);
             itemDate = itemView.findViewById(R.id.item_date);
@@ -90,15 +97,25 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+        if (position %2 == 1) {
+            holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.another_light_grey));
+        }
+
         Interventions current = interventionsList.get(position);
         holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.type.toLowerCase(), "drawable", context.getPackageName()));
         holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.type, "string", context.getPackageName()));
         holder.itemDate.setText(DateTools.display(current.workingDays.get(0).execution_date));
 
-        if (current.intervention.eky_id != null)
-            holder.itemSynchronized.setVisibility(View.VISIBLE);
-        else
-            holder.itemSynchronized.setVisibility(View.GONE);
+        if (current.intervention.eky_id != null) {
+            //ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+            holder.itemSynchronized.setImageResource(R.drawable.icon_check);
+            ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+
+        } else {
+            holder.itemSynchronized.setImageResource(R.drawable.icon_sync);
+            ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+        }
 
         if (holder.syncTime != null)
             holder.syncTime.setText("Dernière synchronisation  " + SIMPLE_DATE.format(MainActivity.lastSyncTime));

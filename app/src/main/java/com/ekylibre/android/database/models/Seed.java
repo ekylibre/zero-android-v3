@@ -19,10 +19,15 @@ public class Seed {
     public static final String TABLE_NAME = "seeds";
     public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
     public static final String COLUMN_SPECIE = "specie";
+    public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
+
 
     @PrimaryKey
     @ColumnInfo(name = COLUMN_ID)
     public Integer id;
+
+    @ColumnInfo(name = COLUMN_ID_EKY)
+    public Integer eky_id;
 
     @ColumnInfo(name = COLUMN_SPECIE, index = true)
     public String specie;
@@ -41,8 +46,9 @@ public class Seed {
 
     public String unit;
 
-    public Seed(Integer id, String specie, String variety, Boolean registered, Boolean used, String unit) {
+    public Seed(Integer id, Integer eky_id, String specie, String variety, Boolean registered, Boolean used, String unit) {
         this.id = id;
+        this.eky_id = eky_id;
         this.specie = specie;
         this.variety = variety;
         this.registered = registered;

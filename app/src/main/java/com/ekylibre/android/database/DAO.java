@@ -1,11 +1,13 @@
 package com.ekylibre.android.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 import android.arch.persistence.room.Update;
+import android.database.Cursor;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
@@ -31,6 +33,9 @@ import com.ekylibre.android.database.relations.InterventionWorkingDay;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+
 
 @Dao
 public interface DAO {
@@ -54,14 +59,14 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(Intervention intervention);
 
-    @Insert void insert(InterventionWorkingDay interventionWorkingDay);
-    @Insert void insert(InterventionSeed interventionSeeds);
-    @Insert void insert(InterventionPhytosanitary interventionPhytosanitary);
-    @Insert void insert(InterventionFertilizer interventionFertilizers);
-    @Insert void insert(InterventionMaterial interventionMaterial);
-    @Insert void insert(InterventionEquipment interventionEquipments);
-    @Insert void insert(InterventionPerson interventionPerson);
-    @Insert void insert(InterventionCrop interventionCrop);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay interventionWorkingDay);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed interventionSeeds);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPhytosanitary interventionPhytosanitary);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionFertilizer interventionFertilizers);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionMaterial interventionMaterial);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionEquipment interventionEquipments);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPerson interventionPerson);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Plot... plots);
@@ -152,6 +157,12 @@ public interface DAO {
     @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE specie = :specie" )
     List<Seed> selectBySpecie(String specie);
 
+    @Query("UPDATE " + Seed.TABLE_NAME + " SET " + Seed.COLUMN_ID_EKY + " = :id WHERE " + Seed.COLUMN_ID + " = :refId")
+    int setSeedEkyId(Integer id, String refId);
+
+    @Query("SELECT " + Seed.COLUMN_ID + " FROM " + Seed.TABLE_NAME + " WHERE " + Seed.COLUMN_ID_EKY + " = :eky_id")
+    int getSeedId(int eky_id);
+
 //    @Query("SELECT " + Seed.TABLE_NAME + ".*, " + Specie.TABLE_NAME + ".fra" + " FROM " + Seed.TABLE_NAME
 //    + " INNER JOIN " + Specie.TABLE_NAME + " ON " + Specie.COLUMN_NAME + " = " + Seed.COLUMN_SPECIE)
 //    List<Seed> selectInterventions();
@@ -170,12 +181,11 @@ public interface DAO {
     @Query("SELECT * FROM " + Phyto.TABLE_NAME + " WHERE name LIKE :search ORDER BY name, used DESC")
     List<Phyto> searchPhytosanitary(String search);
 
-    @Transaction
-    @Query("SELECT maaid FROM " + Phyto.TABLE_NAME)  //+ " WHERE maaid NOT NULL"
-    List<String> phytosMaaidList();
+    @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE maaid = :refId")
+    Integer phytoExists(String refId);
 
-    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :id WHERE maaid = :maaid")
-    void setPhytoEkyId(Integer id, String maaid);
+    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :id WHERE " + Phyto.COLUMN_ID + " = :refId")
+    int setPhytoEkyId(Integer id, String refId);
 
     @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " = :eky_id")
     int getPhytoId(int eky_id);

@@ -13,29 +13,29 @@ import java.util.Map;
 public class QuantityCalcul {
 
     // Mass units
-    private static final String GRAM = "gram";
-    private static final String KILOGRAM = "kilogram";
-    private static final String QUINTAL = "quintal";
-    private static final String TON = "ton";
-    private static final String GRAM_PER_HECTAR = "gram_per_hectare";
-    private static final String KILOGRAM_PER_HECTARE = "kilogram_per_hectare";
-    private static final String QUINTAL_PER_HECTARE = "quintal_per_hectare";
-    private static final String TON_PER_HECTARE = "ton_per_hectare";
-    private static final String GRAM_PER_SQUARE_METER = "gram_per_square_meter";
-    private static final String KILOGRAM_PER_SQUARE_METER = "kilogram_per_square_meter";
-    private static final String QUINTAL_PER_SQUARE_METER = "quintal_per_square_meter";
-    private static final String TON_PER_SQUARE_METER = "ton_per_square_meter";
+    private static final String GRAM = "GRAM";
+    private static final String KILOGRAM = "KILOGRAM";
+    private static final String QUINTAL = "QUINTAL";
+    private static final String TON = "TON";
+    private static final String GRAM_PER_HECTAR = "GRAM_PER_HECTARE";
+    private static final String KILOGRAM_PER_HECTARE = "KILOGRAM_PER_HECTARE";
+    private static final String QUINTAL_PER_HECTARE = "QUINTAL_PER_HECTARE";
+    private static final String TON_PER_HECTARE = "TON_PER_HECTARE";
+    private static final String GRAM_PER_SQUARE_METER = "GRAM_PER_SQUARE_METER";
+    private static final String KILOGRAM_PER_SQUARE_METER = "KILOGRAM_PER_SQUARE_METER";
+    private static final String QUINTAL_PER_SQUARE_METER = "QUINTAL_PER_SQUARE_METER";
+    private static final String TON_PER_SQUARE_METER = "TON_PER_SQUARE_METER";
 
     // Volume units
-    private static final String LITER = "liter";
-    private static final String HECTOLITER = "hectoliter";
-    private static final String CUBIC_METER = "cubic_meter";
-    private static final String LITER_PER_HECTARE = "liter_per_hectare";
-    private static final String HECTOLITER_PER_HECTARE = "hectoliter_per_hectare";
-    private static final String CUBIC_METER_PER_HECTARE = "cubic_meter_per_hectare";
-    private static final String LITER_PER_SQUARE_METER = "liter_per_square_meter";
-    private static final String HECTOLITER_PER_SQUARE_METER = "hectoliter_per_square_meter";
-    private static final String CUBIC_METER_PER_SQUARE_METER = "cubic_meter_per_square_meter";
+    private static final String LITER = "LITER";
+    private static final String HECTOLITER = "HECTOLITER";
+    private static final String CUBIC_METER = "CUBIC_METER";
+    private static final String LITER_PER_HECTARE = "LITER_PER_HECTARE";
+    private static final String HECTOLITER_PER_HECTARE = "HECTOLITER_PER_HECTARE";
+    private static final String CUBIC_METER_PER_HECTARE = "CUBIC_METER_PER_HECTARE";
+    private static final String LITER_PER_SQUARE_METER = "LITER_PER_SQUARE_METER";
+    private static final String HECTOLITER_PER_SQUARE_METER = "HECTOLITER_PER_SQUARE_METER";
+    private static final String CUBIC_METER_PER_SQUARE_METER = "CUBIC_METER_PER_SQUARE_METER";
 
     public static String getText(float quantity, String unitBefore, String unitAfter, float surface) {
 

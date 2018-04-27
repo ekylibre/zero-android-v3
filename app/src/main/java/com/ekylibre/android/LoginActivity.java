@@ -176,8 +176,8 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.putString("refresh_token", accessToken.getRefresh_token());
                                     editor.putInt("token_created_at", accessToken.getCreated_at());
                                     editor.putBoolean("is_authenticated", true);
-                                    //editor.putString("current-farm-name", farmName);
-                                    //editor.putString("farms", data.profile.farms);
+                                    editor.putString("current-farm-name", data.farms().get(0).label);
+                                    editor.putString("current-farm-id", data.farms().get(0).id);
                                     editor.apply();
 
                                     // Finish th login activity
