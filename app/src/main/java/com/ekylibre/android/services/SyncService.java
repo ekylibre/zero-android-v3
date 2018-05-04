@@ -6,31 +6,47 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.api.Mutation;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.ProfileQuery;
 import com.ekylibre.android.PullQuery;
+import com.ekylibre.android.PushInterventionMutation;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Farm;
+import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
+import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.database.pojos.Phytos;
+import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
 
+import com.ekylibre.android.database.relations.InterventionFertilizer;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.network.GraphQLClient;
+
+import com.ekylibre.android.type.ArticleAllUnit;
+import com.ekylibre.android.type.ArticleInputObject;
+import com.ekylibre.android.type.ArticleType;
+import com.ekylibre.android.type.ArticleVolumeUnit;
+import com.ekylibre.android.type.InterventionInputInputObject;
+import com.ekylibre.android.type.InterventionTypeEnum;
+import com.ekylibre.android.type.InterventionTargetInputObject;
+import com.ekylibre.android.type.InterventionWorkingDayInputObject;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -38,15 +54,11 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import io.reactivex.Maybe;
-import io.reactivex.MaybeObserver;
-import io.reactivex.SingleObserver;
-import io.reactivex.disposables.Disposable;
 
 
 /**
@@ -60,8 +72,10 @@ public class SyncService extends IntentService {
     private static final String TAG = SyncService.class.getName();
 
     public static final int DONE = 10;
+    public static final int FAILED = 11;
 
-    public static final String ACTION_FIRST_TIME_SYNC = "com.ekylibre.android.services.action.FIRST_TIME_SYNC";
+    public static final String ACTION_SYNC_PULL = "com.ekylibre.android.services.action.SYNC_PULL";
+    public static final String ACTION_SYNC_PUSH = "com.ekylibre.android.services.action.SYNC_PUSH";
     public static final String ACTION_VERIFY_TOKEN = "com.ekylibre.android.services.action.VERIFY_TOKEN";
 
 //    // TODO: Rename parameters
@@ -105,8 +119,8 @@ public class SyncService extends IntentService {
 
         final String action = intent.getAction();
 
-        if (ACTION_FIRST_TIME_SYNC.equals(action))
-            handleActionFirstTimeSync(receiver);
+        if (ACTION_SYNC_PULL.equals(action))
+            handleActionSyncPull(receiver);
 
         else if (ACTION_VERIFY_TOKEN.equals(action))
             handleActionVerifyToken();
@@ -118,11 +132,7 @@ public class SyncService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionFirstTimeSync(ResultReceiver receiver) {
-
-        Log.e(TAG, "FirstTimeSync...");
-
-        Context context = this;
+    private void handleActionSyncPull(ResultReceiver receiver) {
 
         database = AppDatabase.getInstance(this);
 
@@ -182,23 +192,42 @@ public class SyncService extends IntentService {
 
                     // Processing articles
                     if (!farm.articles().isEmpty()) {
+
                         Log.e(TAG, "Fetching articles...");
                         for (PullQuery.Article article : farm.articles()) {
 
                             if (article.type().equals("chemical")) {
                                 if (database.dao().setPhytoEkyId(Integer.valueOf(article.id()), article.referenceId()) != 1) {
-                                    Phyto newPhyto = new Phyto(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), article.name(),
+                                    Phyto phyto = new Phyto(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), article.name(),
                                             null, article.referenceId(), null,
                                             null, null, false, true, "LITER");
-                                    database.dao().insert(newPhyto);
+                                    database.dao().insert(phyto);
                                 }
                             }
 
                             if (article.type().equals("seed")) {
                                 if (database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceId()) != 1) {
-                                    Seed newSeed = new Seed(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), article.name(),
+                                    Seed seed = new Seed(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), article.name(),
                                             null, false, true, "KILOGRAM");
-                                    database.dao().insert(newSeed);
+                                    database.dao().insert(seed);
+                                }
+                            }
+
+                            if (article.type().equals("fertilizer")) {
+                                if (database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), article.referenceId()) != 1) {
+                                    Fertilizer fertilizer = new Fertilizer(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), null,
+                                            article.name(), null, null, null, null, null,
+                                            null, null, null, null, true,"KILOGRAM");
+                                    database.dao().insert(fertilizer);
+                                }
+                            }
+
+                            if (article.type().equals("fertilizer")) {
+                                if (database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), article.referenceId()) != 1) {
+                                    Fertilizer fertilizer = new Fertilizer(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), null,
+                                            article.name(), null, null, null, null, null,
+                                            null, null, null, null, true,"KILOGRAM");
+                                    database.dao().insert(fertilizer);
                                 }
                             }
                         }
@@ -206,8 +235,13 @@ public class SyncService extends IntentService {
 
                     // Processing interventions
                     if (!farm.interventions().isEmpty()) {
+
                         int index = 0;
+                        List<Integer> remoteInterventionList = new ArrayList<>();
+
                         for (PullQuery.Intervention inter : farm.interventions()) {
+
+                            remoteInterventionList.add(Integer.valueOf(inter.id()));
 
                             if (!interventionEkyIdList.contains(Integer.valueOf(inter.id()))) {
                                 // Save main intervention
@@ -239,7 +273,6 @@ public class SyncService extends IntentService {
 
                                 // Saving Inputs
                                 for (PullQuery.Input input : farm.interventions().get(index).inputs()) {
-
                                     // Phytosanitary products
                                     if (input.nature().equals("chemical")) {
                                         Integer phytoId = database.dao().getPhytoId(Integer.valueOf(input.articleId()));
@@ -247,7 +280,6 @@ public class SyncService extends IntentService {
                                                 new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(), newInterId, phytoId);
                                         database.dao().insert(interventionPhyto);
                                     }
-
                                     // Seeds
                                     if (input.nature().equals("seed")) {
                                         Integer seedId = database.dao().getSeedId(Integer.valueOf(input.articleId()));
@@ -255,15 +287,36 @@ public class SyncService extends IntentService {
                                                 new InterventionSeed(input.quantityValue(), input.unit().toString(), newInterId, seedId);
                                         database.dao().insert(interventionSeed);
                                     }
-
+                                    // Fertilizers
+                                    if (input.nature().equals("fertilizer")) {
+                                        Integer fertiId = database.dao().getFertilizerId(Integer.valueOf(input.articleId()));
+                                        InterventionFertilizer interventionFertilizer =
+                                                new InterventionFertilizer(input.quantityValue(), input.unit().toString(), newInterId, fertiId);
+                                        database.dao().insert(interventionFertilizer);
+                                    }
                                 }
+
+                                // Saving Equipments
+//                                for (PullQuery.Tool tool : farm.interventions().get(index).tools()) {
+//                                    InterventionEquipment interventionEquipment =
+//                                            new InterventionEquipment(newInterId, tool.equipment().name(), 100);
+//                                    database.dao().insert(interventionCrop);
+//                                }
                             }
                             ++index;
                         }
+
+//                        for (Integer localInterventionEkyId : interventionEkyIdList) {
+//                            if (!remoteInterventionList.contains(localInterventionEkyId)) {
+//                                database.dao().deleteIntervention(localInterventionEkyId);
+//                            }
+//                        }
                     }
                     // TODO: update recyclerView MainActivity (broadcast)
                     MainActivity.lastSyncTime = new Date();
-                    receiver.send(DONE, new Bundle());
+//                    receiver.send(DONE, new Bundle());
+
+                    handleActionSyncPush(receiver);
                 }
             }
 
@@ -302,6 +355,108 @@ public class SyncService extends IntentService {
             }
 
         });
+
+    }
+
+    private void handleActionSyncPush(ResultReceiver receiver) {
+
+        database = AppDatabase.getInstance(this);
+
+        List<Interventions> interventions = database.dao().getSyncableInterventions();
+
+        Log.e(TAG, interventions.toString());
+
+        ApolloClient apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
+
+        for (Interventions inter : interventions) {
+
+            List<InterventionTargetInputObject> targets = new ArrayList<>();
+            List<InterventionWorkingDayInputObject> workingDays = new ArrayList<>();
+            List<InterventionInputInputObject> inputs = new ArrayList<>();
+
+            for (Crops crop : inter.crops) {
+                targets.add(InterventionTargetInputObject.builder()
+                        .cropID(crop.inter.crop_id)
+                        .workAreaPercentage(crop.inter.work_area_percentage)
+                        .build());
+            }
+
+            for (InterventionWorkingDay wd : inter.workingDays) {
+                workingDays.add(InterventionWorkingDayInputObject.builder()
+                        .executionDate(wd.execution_date)
+                        .hourDuration((long) wd.hour_duration)
+                        .build());
+            }
+
+            for (Phytos phyto : inter.phytos) {
+                if (phyto.phyto.get(0).eky_id == null) {
+                    inputs.add(InterventionInputInputObject.builder()
+                            .marketingAuthorizationNumber(phyto.phyto.get(0).maaid)
+                            .article(ArticleInputObject.builder()
+                                    .referenceID(phyto.phyto.get(0).maaid)
+                                    .type(ArticleType.PHYTOSANITARY).build())
+                            .quantity(phyto.inter.quantity)
+                            .unit(ArticleAllUnit.safeValueOf(phyto.inter.unit))
+                            .build());
+                } else {
+                    inputs.add(InterventionInputInputObject.builder()
+                            .article(ArticleInputObject.builder()
+                                    .id(String.valueOf(phyto.phyto.get(0).eky_id)).build())
+                            .quantity(phyto.inter.quantity)
+                            .unit(ArticleAllUnit.safeValueOf(phyto.inter.unit))
+                            .build());
+                }
+            }
+
+//            for (Seeds seed : inter.seeds) {
+//                if (seed.seed.get(0).eky_id == null) {
+//                    inputs.add(InterventionInputInputObject.builder()
+//                            .marketingAuthorizationNumber(phyto.phyto.get(0).maaid)
+//                            .article(ArticleInputObject.builder()
+//                                    .referenceID(phyto.phyto.get(0).maaid)
+//                                    .type(ArticleType.PHYTOSANITARY).build())
+//                            .quantity(phyto.inter.quantity)
+//                            .unit(ArticleAllUnit.safeValueOf(phyto.inter.unit))
+//                            .build());
+//                }
+//            }
+
+            PushInterventionMutation pushIntervention = PushInterventionMutation.builder()
+                    .farmId(inter.intervention.farm)
+                    .procedure(InterventionTypeEnum.safeValueOf(inter.intervention.type))
+                    .cropList(targets)
+                    .workingDays(workingDays)
+                    .inputs(inputs)
+                    .waterQuantity((inter.intervention.water_quantity != null) ? (long) inter.intervention.water_quantity : null)
+                    .waterUnit((inter.intervention.water_unit != null) ? ArticleVolumeUnit.safeValueOf(inter.intervention.water_unit) : null)
+                    .build();
+
+            apolloClient.mutate(pushIntervention).enqueue(new ApolloCall.Callback<PushInterventionMutation.Data>() {
+                @Override
+                public void onResponse(@Nonnull Response<PushInterventionMutation.Data> response) {
+//                    Log.e(TAG, response.data().toString());
+
+                    if (!response.hasErrors()) {
+
+                        PushInterventionMutation.CreateInterventionMutation mutation = response.data().createInterventionMutation();
+                        if (mutation.errors() == null)
+                            database.dao().setInterventionEkyId(inter.intervention.id, Integer.valueOf(mutation.intervention().id()));
+                    }
+
+                    receiver.send(DONE, new Bundle());
+                }
+
+                @Override
+                public void onFailure(@Nonnull ApolloException e) {
+                    Log.e(TAG, e.getLocalizedMessage());
+
+                    receiver.send(FAILED, new Bundle());
+
+                }
+            });
+        }
+
+        receiver.send(DONE, new Bundle());
 
     }
 }

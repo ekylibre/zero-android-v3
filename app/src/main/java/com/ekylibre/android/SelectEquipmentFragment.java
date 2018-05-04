@@ -150,8 +150,8 @@ public class SelectEquipmentFragment extends DialogFragment {
 
 
             AppCompatSpinner typeSpinner = dialogView.findViewById(R.id.create_equipment_type_spinner);
-            //int natureSpinnerPos = typeSpinner.getSelectedItemPosition();
-            String type = typeSpinner.getSelectedItem().toString();
+            int spinner_pos = typeSpinner.getSelectedItemPosition();
+            String type = getResources().getStringArray(R.array.equipment_keys)[spinner_pos];
 
             TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_equipment_name);
             String name = nameTextInput.getEditText().getText().toString();

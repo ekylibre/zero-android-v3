@@ -93,6 +93,48 @@
     <string name="CARE">Care</string>
     <string name="CROP_PROTECTION">Crop protection</string>
 
+    <!-- Equipments -->
+    <string name="tractor">Tracteur</string>
+    <string name="harrow">Herse</string>
+    <string name="seedbed_preparator">Outil de préparation du lit de semences</string>
+    <string name="grinder">Broyeur</string>
+    <string name="hiller">Butteuse</string>
+    <string name="hoe">Bineuse</string>
+    <string name="plow">Charrue</string>
+    <string name="roll">Rouleau</string>
+    <string name="soil_loosener">Décompacteur</string>
+    <string name="superficial_plow">Déchaumeur</string>
+    <string name="subsoil_plow">Sous soleuse</string>
+    <string name="vibrocultivator">Vibroculteur</string>
+    <string name="disc_harrow">Déchaumeur à disques</string>
+    <string name="sower">Semoir</string>
+    <string name="implanter">Planteuse</string>
+    <string name="airplanter">Semoir monograines</string>
+    <string name="spreader">Épandeur à engrais</string>
+    <string name="liquid_manure_spreader">Tonne à lisier</string>
+    <string name="spreader_trailer">Épandeur à fumier</string>
+    <string name="hoe_weeder">Désherbineuse</string>
+    <string name="rotary_hoe">Houe rotative</string>
+    <string name="weeder">Désherbeur</string>
+    <string name="sprayer">Pulvérisateur</string>
+    <string name="round_baler">Presse balle ronde</string>
+    <string name="cubic_baler">Presse balle cubique</string>
+    <string name="baler_wrapper">Presse enrubanneuse</string>
+    <string name="trailer">Remorque</string>
+    <string name="corn_topper">Castreuse</string>
+    <string name="forager">Ensileuse</string>
+    <string name="harvester">Arracheuse</string>
+    <string name="hay_rake">Andaineur</string>
+    <string name="mower">Faucheuse</string>
+    <string name="reaper">Moissonneuse-batteuse</string>
+    <string name="topper">Effaneuse</string>
+    <string name="trimmer">Écimeuse</string>
+    <string name="mower_conditioner">Faucheuse conditionneuse</string>
+    <string name="tedder">Faneuse</string>
+    <string name="wrapper">Enrubanneuse</string>
+    <string name="forage_platform">Plateau</string>
+
+
     <!-- Plurals -->
     <string name="crop">%d crop</string>
     <string name="crops">%d crops</string>
@@ -193,6 +235,7 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="label_irrigation">Irrigation</string>
+    <string name="menu_logout">Déconnecter</string>
 
 
 </resources>

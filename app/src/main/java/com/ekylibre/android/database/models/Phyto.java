@@ -2,6 +2,7 @@ package com.ekylibre.android.database.models;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.provider.BaseColumns;
 
@@ -41,6 +42,9 @@ public class Phyto {
     public Boolean used;
 
     public String unit;
+
+    @Ignore
+    public Float dose_max;
 
     public Phyto(Integer id, Integer eky_id, String name, String nature, String maaid, Integer mix_category_code,
                  Integer in_field_reentry_delay, String firm_name, Boolean registered, Boolean used, String unit) {

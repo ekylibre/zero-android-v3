@@ -59,7 +59,7 @@ dependencies {
     implementation 'android.arch.persistence.room:rxjava2:1.0.0'
 
     // Retrofit & Picasso
-    implementation 'com.squareup.picasso:picasso:2.71828'
+    //implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/regular_margin"
-    android:background="@color/icons">
+    android:background="@color/icons"
+    android:id="@+id/intervention_item_layout">
 
     <!--<android.support.v7.widget.AppCompatTextView-->
         <!--android:id="@+id/filter_my_interventions"-->
@@ -44,7 +45,6 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:srcCompat="@drawable/procedure_care"
-        android:tint="#444444"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/item_procedure"
         app:layout_constraintBottom_toBottomOf="@id/used_for_constraints"

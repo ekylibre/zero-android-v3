@@ -2,6 +2,7 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import com.ekylibre.android.SelectInputFragment;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Phyto;
@@ -77,6 +79,8 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             phytoDelay = itemView.findViewById(R.id.phyto_delay);
             phytoFavorite = itemView.findViewById(R.id.icon_favorite);
             itemView.setOnClickListener(v -> {
+                // Get Max dose before sending phyto to adapter
+                //phyto.dose_max = AppDatabase.getInstance(context).dao().getMaxDose(phyto.id);
                 Phytos phytoInput = new Phytos();
                 phytoInput.phyto = Collections.singletonList(phyto);
                 phytoInput.inter = new InterventionPhytosanitary(phyto.id);

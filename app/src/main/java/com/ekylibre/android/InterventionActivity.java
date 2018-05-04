@@ -31,6 +31,7 @@ import com.ekylibre.android.adapters.PersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
+import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Materials;
@@ -117,7 +118,7 @@ public class InterventionActivity extends AppCompatActivity implements
     private Calendar today = Calendar.getInstance();
     private Calendar date = Calendar.getInstance();
 
-    private String procedure;
+    public static String procedure;
     private int duration = 7;
     public static float surface = 0f;
     private List volumeUnitKeys;
@@ -389,7 +390,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         equipmentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        equipmentAdapter = new EquipmentAdapter(equipmentList);
+        equipmentAdapter = new EquipmentAdapter(this, equipmentList);
         equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -485,7 +486,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
             Intervention intervention = new Intervention();
             intervention.setType(procedure);
-            if (!irrigationQuantityEdit.getText().toString().isEmpty()) {
+            if (procedure.equals(MainActivity.IRRIGATION)) {
                 intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
                 intervention.setWater_unit(volumeUnitKeys.get(irrigationUnitSpinner.getSelectedItemPosition()).toString());
             }
@@ -548,6 +549,7 @@ public class InterventionActivity extends AppCompatActivity implements
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onFragmentInteraction(Object selection) {
         if (selection != null) {
@@ -581,19 +583,25 @@ public class InterventionActivity extends AppCompatActivity implements
                 inputAdapter.notifyDataSetChanged();
                 if (inputRecyclerView.getVisibility() == View.GONE)
                     inputArrow.performClick();
-
-            } else {
-                selectCropFragment.dismiss();
-                if (cropSummaryText.equals(this.getString(R.string.no_crop_selected))) {
-                    cropSummary.setVisibility(View.GONE);
-                    cropAddLabel.setVisibility(View.VISIBLE);
-                } else {
-                    cropAddLabel.setVisibility(View.GONE);
-                    cropSummary.setText(cropSummaryText);
-                    cropSummary.setVisibility(View.VISIBLE);
+                if (selection instanceof Phytos) {
+                    new GetMaxDose((Phytos) selection).execute();
                 }
-                // Erase plotList with new one from selection
-                plotList = (List<PlotWithCrops>) selection;
+
+            } else if (selectCropFragment.isVisible()){
+                selectCropFragment.dismiss();
+                List<PlotWithCrops> plotWithCropsList = (List<PlotWithCrops>) selection;
+                if (!plotWithCropsList.isEmpty()) {
+                    if (cropSummaryText.equals(this.getString(R.string.no_crop_selected))) {
+                        cropSummary.setVisibility(View.GONE);
+                        cropAddLabel.setVisibility(View.VISIBLE);
+                    } else {
+                        cropAddLabel.setVisibility(View.GONE);
+                        cropSummary.setText(cropSummaryText);
+                        cropSummary.setVisibility(View.VISIBLE);
+                    }
+                    // Erase plotList with new one from selection
+                    plotList = plotWithCropsList;
+                }
             }
         }
     }
@@ -631,5 +639,28 @@ public class InterventionActivity extends AppCompatActivity implements
         equipmentList.clear();
         personList.clear();
         plotList.clear();
+    }
+
+    private class GetMaxDose extends AsyncTask<Void, Void, Void> {
+
+        Phytos phyto;
+        Float dose_max;
+
+        GetMaxDose(Phytos phyto) {
+            this.phyto = phyto;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            dose_max = AppDatabase.getInstance(getBaseContext()).dao().getMaxDose(phyto.phyto.get(0).id);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max = dose_max;
+            Log.e(TAG, "dose max = " + ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max);
+        }
     }
 }

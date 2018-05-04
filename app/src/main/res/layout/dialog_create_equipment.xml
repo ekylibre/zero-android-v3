@@ -30,6 +30,20 @@
             android:hint="Nom"/>
     </android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/create_equipment_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLines="1"
+            android:hint="Numéro"/>
+    </android.support.design.widget.TextInputLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,6 +56,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:prompt="@string/chose_type"
-        android:entries="@array/equipment_type"/>
+        android:entries="@array/equipment_values"/>
 
 </LinearLayout>

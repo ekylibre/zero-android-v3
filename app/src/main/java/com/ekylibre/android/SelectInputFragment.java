@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,6 +42,7 @@ public class SelectInputFragment extends DialogFragment {
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
     private TextView createInput;
+    private TabLayout tabLayout;
 
     private int currentTab;
     private String searchText;
@@ -59,6 +61,18 @@ public class SelectInputFragment extends DialogFragment {
         this.context = getActivity();
         this.selectedList = new ArrayList<>();
         this.searchText = "";
+
+        switch (InterventionActivity.procedure) {
+
+            case MainActivity.IMPLANTATION:
+                this.currentTab = SEED; break;
+
+            case MainActivity.CROP_PROTECTION:
+                this.currentTab = PHYTO; break;
+
+            case MainActivity.FERTILIZATION:
+                this.currentTab = FERTI; break;
+        }
     }
 
     @Override
@@ -67,7 +81,7 @@ public class SelectInputFragment extends DialogFragment {
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_input, container, false);
 
-        TabLayout tabLayout = inflatedView.findViewById(R.id.input_dialog_tabs);
+        tabLayout = inflatedView.findViewById(R.id.input_dialog_tabs);
         tabLayout.addTab(tabLayout.newTab().setText(R.string.seeds));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.phytos));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.fertilizers));
@@ -90,6 +104,7 @@ public class SelectInputFragment extends DialogFragment {
         });
 
         createInput = inflatedView.findViewById(R.id.input_dialog_create_input);
+
         SearchView searchView = inflatedView.findViewById(R.id.search_input);
         RecyclerView recyclerView = inflatedView.findViewById(R.id.input_dialog_recycler);
 
@@ -135,9 +150,19 @@ public class SelectInputFragment extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.e(TAG, "OnViewCreated...");
+
+        TabLayout.Tab tab = tabLayout.getTabAt(currentTab);
+        if (tab != null) {
+            switch (currentTab) {
+                case PHYTO: createInput.setText(R.string.create_new_phyto); break;
+                case SEED: createInput.setText(R.string.create_new_seed); break;
+                case FERTI: createInput.setText(R.string.create_new_ferti); break;
+            }
+            tab.select();
+        }
 
         new RequestDatabase(context).execute();
     }
@@ -275,7 +300,7 @@ public class SelectInputFragment extends DialogFragment {
                     newId = database.dao().lastFertilizerId();
                     newId = (newId != null) ? ++newId : 1000;
 
-                    database.dao().insert(new Fertilizer(newId, fertiName, fertiName, null, null,
+                    database.dao().insert(new Fertilizer(newId, null, null, fertiName, null, null,
                             null, nature, null,null,
                             null, null, false, true, "KILOGRAM"));
                     break;

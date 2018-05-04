@@ -15,6 +15,7 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
+import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
@@ -42,7 +43,7 @@ import java.util.List;
 @Database(entities = {
         Intervention.class,
         InterventionWorkingDay.class,
-        Phyto.class, InterventionPhytosanitary.class,
+        Phyto.class, InterventionPhytosanitary.class, PhytoDose.class,
         Seed.class, InterventionSeed.class, Specie.class,
         Fertilizer.class, InterventionFertilizer.class,
         Material.class, InterventionMaterial.class,
@@ -80,7 +81,7 @@ public abstract class AppDatabase extends RoomDatabase {
             database = AppDatabase.getInstance(context);
             Moshi moshi = new Moshi.Builder().build();
 
-            // Load phytos from Lexicon
+            // Load phytosanitary products from Lexicon
             json = readJsonFromAssets(context, "lexicon/phytosanitary_products.json");
             Type type = Types.newParameterizedType(List.class, Phyto.class);
             JsonAdapter<List<Phyto>> adapter1 = moshi.adapter(type);
@@ -91,6 +92,13 @@ public abstract class AppDatabase extends RoomDatabase {
                 item.unit = "LITER";
             }
             database.dao().insert(list1.toArray(new Phyto[list1.size()]));
+
+            // Load phytosanitary max dose usage from Lexicon
+            json = readJsonFromAssets(context, "lexicon/phytosanitary_doses.json");
+            type = Types.newParameterizedType(List.class, PhytoDose.class);
+            JsonAdapter<List<PhytoDose>> adapter5 = moshi.adapter(type);
+            List<PhytoDose> list5 = adapter5.fromJson(json);
+            database.dao().insert(list5.toArray(new PhytoDose[list5.size()]));
 
             // Load species from Open Nomenclature
 //            json = readJsonFromAssets(context, "lexicon/species.json");
@@ -122,44 +130,6 @@ public abstract class AppDatabase extends RoomDatabase {
                 item.unit = "KILOGRAM";
             }
             database.dao().insert(list4.toArray(new Fertilizer[list4.size()]));
-
-
-//            database.dao().insert(new Plot("1","La Renambrie",null,3.4f,
-//                    null,null,null,null));
-//
-//
-//
-//            database.dao().insert(new Plot("2", "Myrmidon", null, 2.3f,
-//                    null, null, null, null));
-//
-//            database.dao().insert(new Subplot("1", null, 1.4f, null,
-//                    null, null, "2", null));
-//
-//            database.dao().insert(new Subplot("2", null, .9f, null,
-//                    null, null, "2", null));
-//
-//
-//
-//            database.dao().insert(new Plot("3", "Les Grands Pièces", null, 5.6f,
-//                    null, null, null, null));
-//
-//
-//
-//            database.dao().insert(new Crop("1", "Blé tendre de printemps 2018",
-//                    null,null,null,null,
-//                    null,null,3.4f,null,null,null,"1",null,null));
-//
-//            database.dao().insert(new Crop("2", "Orge de printemps 2018",
-//                    null,null,null,null,
-//                    null,null,1.4f,null,null,null,"2", "1", null));
-//
-//            database.dao().insert(new Crop("3", "Blé tendre de printemps 2018",
-//                    null,null,null,null,
-//                    null,null,.9f,null,null,null,"2","2",null));
-//
-//            database.dao().insert(new Crop("4", "Maïs 2018",
-//                    null,null,null,null,
-//                    null,null,5.6f,null,null,null,"3",null,null));
 
         } catch (IOException ex) {
             ex.printStackTrace();

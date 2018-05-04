@@ -17,6 +17,7 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
+import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
@@ -53,6 +54,7 @@ public interface DAO {
     @Insert void insert(Material... materials);
     @Insert void insert(Person... persons);
     @Insert void insert(Phyto... phytos);
+    @Insert void insert(PhytoDose... doses);
     @Insert void insert(Seed... seeds);
     @Insert void insert(Specie... species);
 
@@ -102,9 +104,21 @@ public interface DAO {
     /**
      *    Interventions (POJO)
      */
-    @Transaction @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
-            " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID + " ORDER BY execution_date DESC")  //  + " ORDER BY date DESC"
-    List<Interventions> selectInterventions();
+    @Transaction
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
+            " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+            " WHERE farm = :farmId ORDER BY execution_date DESC, interventions_id_eky DESC")
+    List<Interventions> selectInterventions(String farmId);
+
+    @Transaction
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE interventions_id_eky IS NULL")
+    List<Interventions> getSyncableInterventions();
+
+    @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId WHERE " + Intervention.COLUMN_ID + " = :id")
+    void setInterventionEkyId(int id, int ekyId);
+
+    @Query("DELETE FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " = :ekyId")
+    void deleteIntervention(int ekyId);
 
 
     /**
@@ -130,7 +144,6 @@ public interface DAO {
     /**
      *    Material
      */
-
     @Query("SELECT * FROM " + Material.TABLE_NAME + " ORDER BY name")
     List<Material> selectMaterial();
 
@@ -141,7 +154,6 @@ public interface DAO {
     /**
      *    Seed
      */
-
     @Query("SELECT MAX(" + Seed.COLUMN_ID + ") FROM " + Seed.TABLE_NAME + " WHERE used = 1")
     Integer lastSeedId();
 
@@ -171,7 +183,6 @@ public interface DAO {
     /**
      *    Phytosanitary
      **/
-
     @Query("SELECT MAX(" + Phyto.COLUMN_ID + ") FROM " + Phyto.TABLE_NAME + " WHERE used = 1")
     Integer lastPhytosanitaryId();
 
@@ -190,6 +201,28 @@ public interface DAO {
     @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " = :eky_id")
     int getPhytoId(int eky_id);
 
+    @Query("SELECT dose FROM " + PhytoDose.TABLE_NAME + " WHERE product_id = :product_id")
+    Float getMaxDose(int product_id);
+
+
+    /**
+     *    Fertilizer
+     **/
+    @Query("SELECT MAX(" + Fertilizer.COLUMN_ID + ") FROM " + Fertilizer.TABLE_NAME + " WHERE used = 1")
+    Integer lastFertilizerId();
+
+    @Transaction @Query("SELECT * FROM " + Fertilizer.TABLE_NAME + " ORDER BY used DESC, label_fra")
+    List<Fertilizer> selectFertilizer();
+
+    @Transaction @Query("SELECT * FROM " + Fertilizer.TABLE_NAME + " WHERE label_fra LIKE :search ORDER BY label_fra" )
+    List<Fertilizer> searchFertilizer(String search);
+
+    @Query("UPDATE " + Fertilizer.TABLE_NAME + " SET " + Fertilizer.COLUMN_ID_EKY + " = :id WHERE " + Fertilizer.COLUMN_ID + " = :refId")
+    int setFertilizerEkyId(Integer id, String refId);
+
+    @Query("SELECT " + Fertilizer.COLUMN_ID + " FROM " + Fertilizer.TABLE_NAME + " WHERE " + Fertilizer.COLUMN_ID_EKY + " = :eky_id")
+    int getFertilizerId(int eky_id);
+
 
     /**
      *    Person
@@ -202,18 +235,7 @@ public interface DAO {
     List<Person> searchPerson(String search);
 
 
-    /**
-     *    Fertilizer
-     **/
 
-    @Query("SELECT MAX(" + Fertilizer.COLUMN_ID + ") FROM " + Fertilizer.TABLE_NAME + " WHERE used = 1")
-    Integer lastFertilizerId();
-
-    @Transaction @Query("SELECT * FROM " + Fertilizer.TABLE_NAME + " ORDER BY used DESC, label_fra")
-    List<Fertilizer> selectFertilizer();
-
-    @Transaction @Query("SELECT * FROM " + Fertilizer.TABLE_NAME + " WHERE label_fra LIKE :search ORDER BY label_fra" )
-    List<Fertilizer> searchFertilizer(String search);
 
     /**
      *    Crop

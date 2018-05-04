@@ -62,6 +62,12 @@ query Pull {
                 executionDate
                 hourDuration
             }
+            tools {
+                equipment {
+                    name
+                    number
+                }
+            }
         }
     }
 }

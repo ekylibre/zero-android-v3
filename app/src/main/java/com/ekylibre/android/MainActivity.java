@@ -8,13 +8,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
-import android.os.ResultReceiver;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     private RecyclerView recyclerView;
     private TextView emptyRecyclerView;
     private RecyclerView.Adapter adapter;
-    private List<Interventions> interventionsList = new ArrayList<>();
+    public List<Interventions> interventionsList = new ArrayList<>();
 
     // Activity variables
     private AppDatabase database;
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Intent intent = new Intent(this, SyncService.class);
-            intent.setAction(SyncService.ACTION_FIRST_TIME_SYNC);
+            intent.setAction(SyncService.ACTION_SYNC_PULL);
             intent.putExtra("receiver", resultReceiver);
             startService(intent);
         });
@@ -204,11 +206,43 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.appbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("is_authenticated", false);
+                editor.remove("access_token");
+                editor.apply();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
+
+        swipeRefreshLayout.setRefreshing(false);
+
         if (resultCode == SyncService.DONE) {
             Log.e(TAG, "Synchronization done");
-            swipeRefreshLayout.setRefreshing(false);
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
+        } else if (resultCode == SyncService.FAILED) {
+            Toast toast = Toast.makeText(this, "Echec de la synchronisation...", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 200);
+            toast.show();
         }
     }
 
@@ -235,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             switch (filter) {
 
                 case FILTER_ALL_INTERVENTIONS:
-                    interventionsList.addAll(database.dao().selectInterventions());
+                    interventionsList.addAll(database.dao().selectInterventions(currentFarmId));
                     break;
 
                 case FILTER_MY_INTERVENTIONS:

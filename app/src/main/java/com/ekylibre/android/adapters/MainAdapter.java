@@ -45,6 +45,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     private List unityUnitKeys;
     private List unitValues;
     private List unitKeys;
+//    private List equipmentValues;
+//    private List equipmentKeys;
 
     private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("HH:mm", MainActivity.LOCALE);
 
@@ -60,6 +62,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         unityUnitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_keys));
         unitValues = Arrays.asList(context.getResources().getStringArray(R.array.unit_values));
         unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unit_keys));
+//        equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
+//        equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -100,6 +104,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
         if (position %2 == 1) {
             holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.another_light_grey));
+        } else {
+            holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.icons));
         }
 
         Interventions current = interventionsList.get(position);
@@ -179,9 +185,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
                 break;
             case MainActivity.IRRIGATION:
-                sb.append(current.intervention.water_quantity + " ");
-                sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(current.intervention.water_unit)));
-                break;
+                if (current.intervention.water_quantity != null) {
+                    sb.append(current.intervention.water_quantity + " ");
+                    sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(current.intervention.water_unit)));
+                    break;
+                }
         }
         holder.itemInfos.setText(sb.toString());
     }

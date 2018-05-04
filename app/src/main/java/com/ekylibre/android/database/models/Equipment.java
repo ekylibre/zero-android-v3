@@ -21,6 +21,8 @@ public class Equipment {
 
     public String type;
 
+    public String farmId;
+
     public Equipment(String name, String type) {
         this.name = name;
         this.type = type;

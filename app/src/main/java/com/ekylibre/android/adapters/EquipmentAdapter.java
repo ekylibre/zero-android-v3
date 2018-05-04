@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Equipments;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -22,9 +23,13 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
     private static final String TAG = EquipmentAdapter.class.getName();
 
     private List<Equipments> dataset;
+    private List equipmentValues;
+    private List equipmentKeys;
 
-    public EquipmentAdapter(List<Equipments> dataset) {
+    public EquipmentAdapter(Context context, List<Equipments> dataset) {
         this.dataset = dataset;
+        this.equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
+        this.equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -59,8 +64,10 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
         void display(Equipments item) {
             //iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
             nameTextView.setText(item.equipment.get(0).name);
-            if (!item.equipment.get(0).type.isEmpty())
-                typeTextView.setText(item.equipment.get(0).type);
+            if (!item.equipment.get(0).type.isEmpty()) {
+                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.equipment.get(0).type));
+                typeTextView.setText(equipment_type);
+            }
         }
     }
 

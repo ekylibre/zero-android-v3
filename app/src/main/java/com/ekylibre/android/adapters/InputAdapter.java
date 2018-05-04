@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.AppDatabase;
+import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
@@ -86,8 +89,16 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                         return true;
                     else {
                         itemTotal.setText(calculTotal(Float.valueOf(string)));
+                        itemTotal.setTextColor(context.getResources().getColor(R.color.secondary_text));
                         keyboardManager.hideSoftInputFromWindow(itemQuantityEdit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                         itemQuantityEdit.clearFocus();
+                        if (getItemViewType() == PHYTO) {
+                            Phytos currentPhytos = (Phytos) inputList.get(getAdapterPosition());
+                            Float dose_max = currentPhytos.phyto.get(0).dose_max;
+                            if (dose_max != null)
+                                if (Float.valueOf(string) > dose_max)
+                                    itemTotal.setTextColor(context.getResources().getColor(R.color.warning));
+                        }
                     }
                 }
                 return false;

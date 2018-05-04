@@ -35,7 +35,7 @@ public class GraphQLClient {
                 .serverUrl(BASE_URL)
                 .okHttpClient(okHttpClient)
                 .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
-                .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
+                //.addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
                 .build();
     }
 
@@ -93,7 +93,6 @@ public class GraphQLClient {
             Request request = chain.request();
             Request.Builder requestBuilder = request.newBuilder();
             requestBuilder.addHeader("Authorization", "Bearer " + authToken);
-
 
             return chain.proceed(requestBuilder.build());
         }

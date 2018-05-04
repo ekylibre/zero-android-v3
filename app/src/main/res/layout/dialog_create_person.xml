@@ -55,7 +55,7 @@
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
-            android:hint="Description ou fonction"/>
+            android:hint="Titre"/>
     </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>
