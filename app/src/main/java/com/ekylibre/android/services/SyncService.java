@@ -150,6 +150,7 @@ public class SyncService extends IntentService {
 //        List<Integer> fertilizerEkyIdList = database.dao().fertilizerEkiIdList();
 
         // We always get the full article list from server
+        //List<Integer> personEkyIdList = new ArrayList<>();
         List<Integer> phytoEkyIdList = new ArrayList<>();
         List<Integer> seedEkyIdList = new ArrayList<>();
         List<Integer> fertilizerEkyIdList = new ArrayList<>();
@@ -215,14 +216,17 @@ public class SyncService extends IntentService {
 
                             Log.e(TAG, String.format("[Person] id: %s name: %s", person.id(), person.lastName()));
 
+                            List<Integer> personEkyIdList = database.dao().personEkiIdList();
+                            Log.e(TAG, "personEkyIdList --> " + personEkyIdList);
                             // Save or update Person
-                            if (!database.dao().personEkiIdList().contains(person.id())) {
-                                Log.i(TAG, "save person");
-                                String firstName = (person.firstName().isEmpty()) ? person.firstName() : null;
-                                        database.dao().insert(new Person(Integer.valueOf(person.id()), firstName, person.lastName()));
-                            }
-                            else
+                            if (personEkyIdList.contains(Integer.valueOf(person.id()))) {
+                                Log.i(TAG, "update person " + person.id());
                                 database.dao().updatePerson(person.firstName(), person.lastName(), person.id());
+                            } else {
+                                Log.i(TAG, "save person " + person.id());
+                                String firstName = (person.firstName().isEmpty()) ? person.firstName() : null;
+                                database.dao().insert(new Person(Integer.valueOf(person.id()), firstName, person.lastName()));
+                            }
                         }
                         // TODO: delete person if deleted on server --> or mark status deleted ?
                     }
