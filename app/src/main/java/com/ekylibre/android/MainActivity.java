@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     protected void onResume() {
         super.onResume();
 
-        String date = sharedPreferences.getString("last-sync-time", null);
+        String date = sharedPreferences.getString("last-sync-time", "2018-01-01 12:00");
         try {
             lastSyncTime = LAST_SYNC.parse(date);
         } catch (ParseException e) {
