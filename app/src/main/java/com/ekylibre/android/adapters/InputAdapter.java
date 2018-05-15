@@ -48,13 +48,10 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView itemIcon;
-        TextView itemName;
-        TextView itemNameMore;
+        ImageView itemIcon, itemDelete, itemDoseMax;
+        TextView itemName, itemNameMore, itemTotal;
         EditText itemQuantityEdit;
         AppCompatSpinner itemUnitSpinner;
-        TextView itemTotal;
-        ImageView itemDelete;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -66,6 +63,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner = itemView.findViewById(R.id.item_unit_spinner);
             itemTotal = itemView.findViewById(R.id.item_total);
             itemDelete = itemView.findViewById(R.id.item_delete);
+            itemDoseMax = itemView.findViewById(R.id.item_dose_max);
 
             itemDelete.setOnClickListener(view -> {
                 Context context = itemView.getRootView().getContext();
@@ -97,7 +95,10 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                             Float dose_max = currentPhytos.phyto.get(0).dose_max;
                             if (dose_max != null)
                                 if (Float.valueOf(string) > dose_max)
-                                    itemTotal.setTextColor(context.getResources().getColor(R.color.warning));
+                                    itemDoseMax.setVisibility(View.VISIBLE);
+                                else
+                                    itemDoseMax.setVisibility(View.GONE);
+
                         }
                     }
                 }

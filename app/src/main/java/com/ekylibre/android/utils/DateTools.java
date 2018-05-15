@@ -33,7 +33,6 @@ public class DateTools {
 
     private static long setMidnight() {
         Calendar calendar = Calendar.getInstance();
-        Log.e(TAG, "timezone " + calendar.getTimeZone());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);

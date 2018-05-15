@@ -25,9 +25,11 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
     private List<Equipments> dataset;
     private List equipmentValues;
     private List equipmentKeys;
+    private Context context;
 
     public EquipmentAdapter(Context context, List<Equipments> dataset) {
         this.dataset = dataset;
+        this.context = context;
         this.equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
         this.equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
@@ -68,6 +70,8 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
                 String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.equipment.get(0).type));
                 typeTextView.setText(equipment_type);
             }
+            iconImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.equipment.get(0).type, "drawable", context.getPackageName()));
+
         }
     }
 

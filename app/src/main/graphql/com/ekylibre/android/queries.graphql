@@ -35,12 +35,18 @@ query Pull {
                 surfaceArea
             }
         }
+        people {
+            id
+            firstName
+            lastName
+        }
         interventions {
             id
             inputs {
                 id
                 articleId
                 nature
+                quantity
                 quantityValue
                 unit
                 unitPrice
@@ -48,6 +54,9 @@ query Pull {
             operators {
                 id
                 role
+                person {
+                    id
+                }
             }
             targets {
                 crop {

@@ -153,11 +153,11 @@ public class SelectPersonFragment extends DialogFragment {
             textInputLayout = dialogView.findViewById(R.id.create_person_lastname);
             String lastName = textInputLayout.getEditText().getText().toString();
 
-            textInputLayout = dialogView.findViewById(R.id.create_person_description);
-            String description = textInputLayout.getEditText().getText().toString();
+//            textInputLayout = dialogView.findViewById(R.id.create_person_description);
+//            String description = textInputLayout.getEditText().getText().toString();
 
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Person(firstName, lastName, description));
+            database.dao().insert(new Person(null, firstName, lastName));
 
             return null;
         }

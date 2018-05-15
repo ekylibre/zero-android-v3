@@ -48,8 +48,6 @@ public class LoginActivity extends AppCompatActivity {
      */
     private UserLoginTask authTask = null;
     private AccessToken accessToken = null;
-
-    private Context context;
     private SharedPreferences sharedPreferences;
 
     // UI references.
@@ -68,8 +66,6 @@ public class LoginActivity extends AppCompatActivity {
         } else {
 
             setContentView(R.layout.activity_login);
-
-            context = this;
 
             // Set up the login form.
             emailView = findViewById(R.id.email);

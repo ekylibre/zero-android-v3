@@ -154,7 +154,7 @@
     <string name="x_hours">%d heures</string>
 
     <!-- App strings -->
-    <string name="app_name">ClicFarm</string>
+    <string name="app_name">Clic&amp;Farm</string>
     <string name="nav_button">nav</string>
 
     <string name="starting_intervention_text" >Commencer une intervention de…</string>

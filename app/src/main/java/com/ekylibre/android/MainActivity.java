@@ -29,6 +29,8 @@ import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,7 +81,9 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
     // Farm id
     public static String currentFarmId;
-    public static Date lastSyncTime = new Date();
+    public static Date lastSyncTime;
+    public static final SimpleDateFormat LAST_SYNC = new SimpleDateFormat( "yyyy-MM-dd HH:mm");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +192,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     protected void onResume() {
         super.onResume();
 
+        String date = sharedPreferences.getString("last-sync-time", null);
+        try {
+            lastSyncTime = LAST_SYNC.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         // Set Farm name as page title
         setTitle(sharedPreferences.getString("current-farm-name", "Synchronisation..."));
 
@@ -203,6 +214,12 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public void onBackPressed() {
         deployMenu(false);
         //super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sharedPreferences.edit().putString("last-sync-time", MainActivity.LAST_SYNC.format(lastSyncTime)).apply();
     }
 
     @Override
@@ -334,12 +351,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             database = AppDatabase.getInstance(context);
             database.populateInitialData(context);
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            adapter.notifyDataSetChanged();
         }
     }
 

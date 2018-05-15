@@ -2,87 +2,87 @@
 <resources>
 
     <string-array name="equipment_keys">
-        <item>tractor</item>
-        <item>harrow</item>
-        <item>seedbed_preparator</item>
+        <item>hay_rake</item>
+        <item>harvester</item>
+        <item>hoe</item>
         <item>grinder</item>
         <item>hiller</item>
-        <item>hoe</item>
-        <item>plow</item>
-        <item>roll</item>
-        <item>soil_loosener</item>
-        <item>superficial_plow</item>
-        <item>subsoil_plow</item>
-        <item>vibrocultivator</item>
-        <item>disc_harrow</item>
-        <item>sower</item>
-        <item>implanter</item>
-        <item>airplanter</item>
-        <item>spreader</item>
-        <item>liquid_manure_spreader</item>
-        <item>spreader_trailer</item>
-        <item>hoe_weeder</item>
-        <item>rotary_hoe</item>
-        <item>weeder</item>
-        <item>sprayer</item>
-        <item>round_baler</item>
-        <item>cubic_baler</item>
-        <item>baler_wrapper</item>
-        <item>trailer</item>
         <item>corn-topper</item>
-        <item>forager</item>
-        <item>harvester</item>
-        <item>hay_rake</item>
-        <item>mower</item>
-        <item>reaper</item>
-        <item>topper</item>
+        <item>plow</item>
+        <item>superficial_plow</item>
+        <item>disc_harrow</item>
+        <item>soil_loosener</item>
+        <item>weeder</item>
+        <item>hoe_weeder</item>
         <item>trimmer</item>
-        <item>mower_conditioner</item>
-        <item>tedder</item>
+        <item>topper</item>
         <item>wrapper</item>
+        <item>forager</item>
+        <item>spreader</item>
+        <item>spreader_trailer</item>
+        <item>tedder</item>
+        <item>mower</item>
+        <item>mower_conditioner</item>
+        <item>harrow</item>
+        <item>rotary_hoe</item>
+        <item>reaper</item>
+        <item>seedbed_preparator</item>
+        <item>implanter</item>
         <item>forage_platform</item>
+        <item>cubic_baler</item>
+        <item>round_baler</item>
+        <item>baler_wrapper</item>
+        <item>sprayer</item>
+        <item>trailer</item>
+        <item>roll</item>
+        <item>sower</item>
+        <item>airplanter</item>
+        <item>subsoil_plow</item>
+        <item>liquid_manure_spreader</item>
+        <item>tractor</item>
+        <item>vibrocultivator</item>
     </string-array>
 
     <string-array name="equipment_values">
-        <item>Tracteur</item>
-        <item>Herse</item>
-        <item>Outil de préparation du lit de semences</item>
+        <item>Andaineur</item>
+        <item>Arracheuse</item>
+        <item>Bineuse</item>
         <item>Broyeur</item>
         <item>Butteuse</item>
-        <item>Bineuse</item>
-        <item>Charrue</item>
-        <item>Rouleau</item>
-        <item>Décompacteur</item>
-        <item>Déchaumeur</item>
-        <item>Sous soleuse</item>
-        <item>Vibroculteur</item>
-        <item>Déchaumeur à disques</item>
-        <item>Semoir</item>
-        <item>Planteuse</item>
-        <item>Semoir monograines</item>
-        <item>Épandeur à engrais</item>
-        <item>Tonne à lisier</item>
-        <item>Épandeur à fumier</item>
-        <item>Désherbineuse</item>
-        <item>Houe rotative</item>
-        <item>Désherbeur</item>
-        <item>Pulvérisateur</item>
-        <item>Presse balle ronde</item>
-        <item>Presse balle cubique</item>
-        <item>Presse enrubanneuse</item>
-        <item>Remorque</item>
         <item>Castreuse</item>
-        <item>Ensileuse</item>
-        <item>Arracheuse</item>
-        <item>Andaineur</item>
-        <item>Faucheuse</item>
-        <item>Moissonneuse-batteuse</item>
-        <item>Effaneuse</item>
+        <item>Charrue</item>
+        <item>Déchaumeur</item>
+        <item>Déchaumeur à disques</item>
+        <item>Décompacteur</item>
+        <item>Désherbeur</item>
+        <item>Désherbineuse</item>
         <item>Écimeuse</item>
-        <item>Faucheuse conditionneuse</item>
-        <item>Faneuse</item>
+        <item>Effaneuse</item>
         <item>Enrubanneuse</item>
+        <item>Ensileuse</item>
+        <item>Épandeur à engrais</item>
+        <item>Épandeur à fumier</item>
+        <item>Faneuse</item>
+        <item>Faucheuse</item>
+        <item>Faucheuse conditionneuse</item>
+        <item>Herse</item>
+        <item>Houe rotative</item>
+        <item>Moissonneuse-batteuse</item>
+        <item>Outil de préparation du lit de semences</item>
+        <item>Planteuse</item>
         <item>Plateau</item>
+        <item>Presse balle cubique</item>
+        <item>Presse balle ronde</item>
+        <item>Presse enrubanneuse</item>
+        <item>Pulvérisateur</item>
+        <item>Remorque</item>
+        <item>Rouleau</item>
+        <item>Semoir</item>
+        <item>Semoir monograines</item>
+        <item>Sous soleuse</item>
+        <item>Tonne à lisier</item>
+        <item>Tracteur</item>
+        <item>Vibroculteur</item>
     </string-array>
 
 </resources>

@@ -1,13 +1,10 @@
 package com.ekylibre.android.database;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
-import android.arch.persistence.room.Update;
-import android.database.Cursor;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
@@ -21,7 +18,6 @@ import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
-import com.ekylibre.android.database.models.Subplot;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
@@ -34,9 +30,6 @@ import com.ekylibre.android.database.relations.InterventionWorkingDay;
 
 import java.util.List;
 
-import io.reactivex.Maybe;
-import io.reactivex.Single;
-
 
 @Dao
 public interface DAO {
@@ -44,22 +37,20 @@ public interface DAO {
     /**
      *    Insert queries
      */
+    @Transaction @Insert void insert(Equipment... equipments);
+    @Transaction @Insert void insert(Material... materials);
 
+    @Transaction @Insert void insert(Phyto... phytos);
+    @Transaction @Insert void insert(PhytoDose... doses);
+    @Transaction @Insert void insert(Seed... seeds);
+    @Transaction @Insert void insert(Specie... species);
+    @Transaction @Insert void insert(Fertilizer... fertilizers);
 
-//    @Insert long insert(Farm... farms);
-//    @Insert void insert(ProductionNature... productionNatures);
-
-    @Insert void insert(Equipment... equipments);
-    @Insert void insert(Fertilizer... fertilizers);
-    @Insert void insert(Material... materials);
-    @Insert void insert(Person... persons);
-    @Insert void insert(Phyto... phytos);
-    @Insert void insert(PhytoDose... doses);
-    @Insert void insert(Seed... seeds);
-    @Insert void insert(Specie... species);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insert(Intervention intervention);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... persons);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... crops);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Farm... farms);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Intervention intervention);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay interventionWorkingDay);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed interventionSeeds);
@@ -70,16 +61,7 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPerson interventionPerson);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Plot... plots);
 
-    @Insert void insert(Subplot... subplots);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Crop... crops);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Farm... farms);
 
     /**
      *    Crops selection list
@@ -124,11 +106,20 @@ public interface DAO {
     /**
      * Ids lists
      */
-    @Query("SELECT " + Intervention.COLUMN_ID_EKY + " FROM " + Intervention.TABLE_NAME)
+    @Query("SELECT " + Intervention.COLUMN_ID_EKY + " FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " NOT NULL")
     List<Integer> interventionsEkiIdList();
 
-    @Query("SELECT " + Phyto.COLUMN_ID_EKY + " FROM " + Phyto.TABLE_NAME)
-    List<Integer> phytosEkiIdList();
+    @Query("SELECT " + Phyto.COLUMN_ID_EKY + " FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " NOT NULL")
+    List<Integer> phytoEkiIdList();
+
+    @Query("SELECT " + Seed.COLUMN_ID_EKY + " FROM " + Seed.TABLE_NAME + " WHERE " + Seed.COLUMN_ID_EKY + " NOT NULL")
+    List<Integer> seedEkiIdList();
+
+    @Query("SELECT " + Fertilizer.COLUMN_ID_EKY + " FROM " + Fertilizer.TABLE_NAME + " WHERE " + Fertilizer.COLUMN_ID_EKY + " NOT NULL")
+    List<Integer> fertilizerEkiIdList();
+
+    @Query("SELECT " + Person.COLUMN_ID_EKY + " FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " NOT NULL")
+    List<Integer> personEkiIdList();
 
 
     /**
@@ -234,6 +225,12 @@ public interface DAO {
     @Query("SELECT * FROM " + Person.TABLE_NAME + " WHERE first_name LIKE :search OR last_name LIKE :search ORDER BY first_name" )
     List<Person> searchPerson(String search);
 
+    @Query("UPDATE " + Person.TABLE_NAME + " SET first_name = :firstName, last_name = :lastName WHERE " + Person.COLUMN_ID_EKY + " = :ekyId")
+    void updatePerson(String firstName, String lastName, String ekyId);
+
+    @Query("SELECT " + Person.COLUMN_ID + " FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " = :eky_id")
+    int getPersonId(int eky_id);
+
 
 
 
@@ -244,9 +241,7 @@ public interface DAO {
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " ORDER BY name")
     List<Crop> selectCrop();
 
-    /**
-     *    ProductionNature
-     **/
+
 
 //    @Query("SELECT * FROM " + ProductionNature.TABLE_NAME + " ORDER BY " + ProductionNature.COLUMN_HUMAN_NAME_FRA)
 //    List<ProductionNature> selectProductionNature();

@@ -5,7 +5,6 @@ import android.arch.persistence.room.Relation;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Plot;
-import com.ekylibre.android.database.models.Subplot;
 
 import java.util.List;
 
@@ -17,8 +16,8 @@ public class CropWithPlots {
     @Relation(parentColumn = Crop.COLUMN_PLOT, entityColumn = Plot.COLUMN_UUID, entity = Plot.class)
     public List<Plot> plots;
 
-    @Relation(parentColumn = Crop.COLUMN_SUBPLOT, entityColumn = Subplot.COLUMN_UUID, entity = Subplot.class)
-    public List<Subplot> subplots;
+//    @Relation(parentColumn = Crop.COLUMN_SUBPLOT, entityColumn = Subplot.COLUMN_UUID, entity = Subplot.class)
+//    public List<Subplot> subplots;
 
     public CropWithPlots() {}
 

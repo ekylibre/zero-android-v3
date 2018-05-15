@@ -11,10 +11,14 @@ public class Person {
 
     public static final String TABLE_NAME = "persons";
     public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID_EKY = "eky_id";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID)
     public Integer id;
+
+    @ColumnInfo(name = COLUMN_ID_EKY)
+    public Integer eky_id;
 
     @ColumnInfo(index = true)
     public String first_name;
@@ -22,11 +26,11 @@ public class Person {
     @ColumnInfo(index = true)
     public String last_name;
 
-    public String description;
+    public String role;
 
-    public Person(String first_name, String last_name, String description) {
+    public Person(Integer eky_id, String first_name, String last_name) {
+        this.eky_id = eky_id;
         this.first_name = first_name;
         this.last_name = last_name;
-        this.description = description;
     }
 }

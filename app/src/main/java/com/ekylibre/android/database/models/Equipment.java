@@ -19,13 +19,16 @@ public class Equipment {
     @ColumnInfo(index = true)
     public String name;
 
+    public String number;
+
     public String type;
 
     public String farmId;
 
-    public Equipment(String name, String type) {
+    public Equipment(String name, String type, String number) {
         this.name = name;
         this.type = type;
+        this.number = number;
     }
 
 

@@ -39,7 +39,7 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
 
             firstNameTextView = itemView.findViewById(R.id.person_firstname);
             lastNameTextView = itemView.findViewById(R.id.person_lastname);
-            descTextView = itemView.findViewById(R.id.person_description);
+            //descTextView = itemView.findViewById(R.id.person_description);
 
             itemView.setOnClickListener(v -> {
                 Persons selection = new Persons();
@@ -53,7 +53,7 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
             person = item;
             firstNameTextView.setText(item.first_name);
             lastNameTextView.setText(item.last_name);
-            descTextView.setText(item.description);
+            //descTextView.setText(item.role);
         }
     }
 

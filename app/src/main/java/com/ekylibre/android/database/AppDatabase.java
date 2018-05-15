@@ -19,7 +19,6 @@ import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
-import com.ekylibre.android.database.models.Subplot;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
@@ -50,7 +49,7 @@ import java.util.List;
         Equipment.class, InterventionEquipment.class,
         Person.class, InterventionPerson.class,
         Crop.class, InterventionCrop.class,
-        Plot.class, Subplot.class,
+        Plot.class,
         Farm.class
 }, exportSchema = false, version = 1)
 @TypeConverters(Converters.class)
@@ -81,6 +80,7 @@ public abstract class AppDatabase extends RoomDatabase {
             database = AppDatabase.getInstance(context);
             Moshi moshi = new Moshi.Builder().build();
 
+
             // Load phytosanitary products from Lexicon
             json = readJsonFromAssets(context, "lexicon/phytosanitary_products.json");
             Type type = Types.newParameterizedType(List.class, Phyto.class);
@@ -92,6 +92,18 @@ public abstract class AppDatabase extends RoomDatabase {
                 item.unit = "LITER";
             }
             database.dao().insert(list1.toArray(new Phyto[list1.size()]));
+
+            // Load fertilizers from Lexicon
+            json = readJsonFromAssets(context, "lexicon/fertilizers.json");
+            type = Types.newParameterizedType(List.class, Fertilizer.class);
+            JsonAdapter<List<Fertilizer>> adapter4 = moshi.adapter(type);
+            List<Fertilizer> list4 = adapter4.fromJson(json);
+            for (Fertilizer item : list4) {
+                item.registered = true;
+                item.used = false;
+                item.unit = "KILOGRAM";
+            }
+            database.dao().insert(list4.toArray(new Fertilizer[list4.size()]));
 
             // Load phytosanitary max dose usage from Lexicon
             json = readJsonFromAssets(context, "lexicon/phytosanitary_doses.json");
@@ -119,17 +131,9 @@ public abstract class AppDatabase extends RoomDatabase {
             }
             database.dao().insert(list3.toArray(new Seed[list3.size()]));
 
-            // Load fertilizers from Lexicon
-            json = readJsonFromAssets(context, "lexicon/fertilizers.json");
-            type = Types.newParameterizedType(List.class, Fertilizer.class);
-            JsonAdapter<List<Fertilizer>> adapter4 = moshi.adapter(type);
-            List<Fertilizer> list4 = adapter4.fromJson(json);
-            for (Fertilizer item : list4) {
-                item.registered = true;
-                item.used = false;
-                item.unit = "KILOGRAM";
-            }
-            database.dao().insert(list4.toArray(new Fertilizer[list4.size()]));
+
+
+            Log.e(TAG, "Reference data inserted !");
 
         } catch (IOException ex) {
             ex.printStackTrace();

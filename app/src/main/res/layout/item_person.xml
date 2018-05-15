@@ -34,21 +34,31 @@
         android:id="@+id/person_lastname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="Dupuis"
         android:textColor="#000000"
         android:textStyle="bold"
-        app:layout_goneMarginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/person_firstname"
-        app:layout_constraintBaseline_toBaselineOf="@id/person_firstname" />
+        app:layout_constraintStart_toStartOf="@id/person_firstname"
+        app:layout_constraintTop_toBottomOf="@id/person_firstname" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/person_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/person_icon"
-        app:layout_constraintTop_toBottomOf="@id/person_firstname"
-        android:text="Saisonnier" />
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/person_lastname"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:text="Dupuis"-->
+        <!--android:textColor="#000000"-->
+        <!--android:textStyle="bold"-->
+        <!--app:layout_goneMarginStart="8dp"-->
+        <!--app:layout_constraintStart_toEndOf="@id/person_firstname"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@id/person_firstname" />-->
+
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/person_description"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--app:layout_constraintStart_toEndOf="@id/person_icon"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/person_firstname"-->
+        <!--android:text="Saisonnier" />-->
 
 </android.support.constraint.ConstraintLayout>

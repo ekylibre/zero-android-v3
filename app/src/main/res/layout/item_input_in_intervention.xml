@@ -101,4 +101,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_clear" />
 
+    <android.support.constraint.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/item_dose_max"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:tint="@color/warning"
+        app:layout_constraintStart_toEndOf="@id/item_unit_spinner"
+        app:layout_constraintTop_toTopOf="@id/item_unit_spinner"
+        app:layout_constraintBottom_toBottomOf="@id/item_unit_spinner"
+        android:layout_marginStart="8dp"
+        app:srcCompat="@drawable/icon_dot"
+        android:visibility="gone"/>
+
 </android.support.constraint.ConstraintLayout>

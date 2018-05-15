@@ -91,7 +91,7 @@ public class SelectEquipmentFragment extends DialogFragment {
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        adapter = new SelectEquipmentAdapter(dataset, fragmentListener);
+        adapter = new SelectEquipmentAdapter(context, dataset, fragmentListener);
         recyclerView.setAdapter(adapter);
 
         return inflatedView;
@@ -156,8 +156,13 @@ public class SelectEquipmentFragment extends DialogFragment {
             TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_equipment_name);
             String name = nameTextInput.getEditText().getText().toString();
 
+            TextInputLayout numberTextInput = dialogView.findViewById(R.id.create_equipment_number);
+            String number = numberTextInput.getEditText().getText().toString();
+
+
+
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Equipment(name, type));
+            database.dao().insert(new Equipment(name, type, number));
 
             return null;
         }

@@ -153,7 +153,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 int res = context.getResources().getIdentifier(seed.specie, "string", context.getPackageName());
                 seedViewHolder.seedSpecie.setText(context.getString(res));
                 seedViewHolder.seedVariety.setText(seed.variety);
-                seedViewHolder.seedFavorite.setVisibility((!seed.registered) ? View.VISIBLE : View.GONE);
+                seedViewHolder.seedFavorite.setVisibility((seed.eky_id != null) ? View.VISIBLE : View.GONE);
                 seedViewHolder.seed = seed;
                 break;
 
@@ -167,7 +167,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     phytoViewHolder.phytoDelay.setText(context.getResources().getQuantityString(R.plurals.x_hours, phyto.in_field_reentry_delay, phyto.in_field_reentry_delay));
                 else
                     phytoViewHolder.phytoDelay.setText(R.string.unspecified);
-                phytoViewHolder.phytoFavorite.setVisibility((!phyto.registered) ? View.VISIBLE : View.GONE);
+                phytoViewHolder.phytoFavorite.setVisibility((phyto.eky_id != null) ? View.VISIBLE : View.GONE);
                 phytoViewHolder.phyto = phyto;
                 break;
 
@@ -177,7 +177,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 fertiViewHolder.fertiName.setText(fertilizer.label_fra);
                 res = context.getResources().getIdentifier(fertilizer.nature, "string", context.getPackageName());
                 fertiViewHolder.fertiType.setText(context.getString(res));
-                fertiViewHolder.fertiFavorite.setVisibility((!fertilizer.registered) ? View.VISIBLE : View.GONE);
+                fertiViewHolder.fertiFavorite.setVisibility((fertilizer.eky_id != null) ? View.VISIBLE : View.GONE);
                 fertiViewHolder.fertilizer = fertilizer;
                 break;
 
