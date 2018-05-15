@@ -87,11 +87,11 @@ public class InterventionActivity extends AppCompatActivity implements
     private RecyclerView inputRecyclerView;
     private RecyclerView.Adapter inputAdapter;
 
-    private ImageView materialArrow;
-    private TextView materialSummary, materialAddLabel;
-    private DialogFragment selectMaterialFragment;
-    private RecyclerView materialRecyclerView;
-    private RecyclerView.Adapter materialAdapter;
+//    private ImageView materialArrow;
+//    private TextView materialSummary, materialAddLabel;
+//    private DialogFragment selectMaterialFragment;
+//    private RecyclerView materialRecyclerView;
+//    private RecyclerView.Adapter materialAdapter;
 
     // Equipment layout
     private ImageView equipmentArrow;
@@ -170,11 +170,11 @@ public class InterventionActivity extends AppCompatActivity implements
         inputRecyclerView = findViewById(R.id.input_recycler);
 
         // Materials
-        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
-        materialArrow = findViewById(R.id.material_arrow);
-        materialSummary = findViewById(R.id.material_summary);
-        materialAddLabel = findViewById(R.id.material_add_label);
-        materialRecyclerView = findViewById(R.id.material_recycler);
+//        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
+//        materialArrow = findViewById(R.id.material_arrow);
+//        materialSummary = findViewById(R.id.material_summary);
+//        materialAddLabel = findViewById(R.id.material_add_label);
+//        materialRecyclerView = findViewById(R.id.material_recycler);
 
         // Equipments
         equipmentArrow = findViewById(R.id.equipment_arrow);
@@ -192,19 +192,20 @@ public class InterventionActivity extends AppCompatActivity implements
         // ================================ UI SETTINGS ======================================== //
 
         irrigationLayout.setVisibility(View.GONE);
-        materialLayout.setVisibility(View.GONE);
-        inputLayout.setVisibility(View.VISIBLE);
+        inputLayout.setVisibility(View.VISIBLE); // TODO: hide input in some case
+        // materialLayout.setVisibility(View.GONE);
+
 
         switch (procedure) {
             case MainActivity.IRRIGATION:
                 irrigationLayout.setVisibility(View.VISIBLE);
                 break;
-            case MainActivity.CARE:
-                materialLayout.setVisibility(View.VISIBLE);
-                break;
-            case MainActivity.GROUND_WORK:
-                materialLayout.setVisibility(View.GONE);
-                break;
+//            case MainActivity.CARE:
+//                materialLayout.setVisibility(View.VISIBLE);
+//                break;
+//            case MainActivity.GROUND_WORK:
+//                materialLayout.setVisibility(View.GONE);
+//                break;
         }
 
         // =============================== CROPS EVENTS ======================================== //
@@ -318,47 +319,47 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ============================== MATERIALS EVENTS ===================================== //
 
-        materialAddLabel.setOnClickListener(view -> {
-            selectMaterialFragment = SelectMaterialFragment.newInstance();
-            selectMaterialFragment.show(getFragmentTransaction(), "dialog");
-        });
-
-        View.OnClickListener materialListener = view -> {
-            if (materialRecyclerView.getVisibility() == View.GONE) {
-                materialArrow.setVisibility(View.VISIBLE);
-                materialArrow.setRotation(180);
-                materialSummary.setVisibility(View.GONE);
-                materialAddLabel.setVisibility(View.VISIBLE);
-                materialRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                int count = materialList.size();
-                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
-                materialArrow.setRotation(0);
-                materialSummary.setVisibility(View.VISIBLE);
-                materialAddLabel.setVisibility(View.GONE);
-                materialRecyclerView.setVisibility(View.GONE);
-            }
-        };
-
-        materialArrow.setOnClickListener(materialListener);
-        materialSummary.setOnClickListener(materialListener);
-
-        materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        materialAdapter = new MaterialAdapter(this, materialList);
-        materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                if (materialAdapter.getItemCount() == 0) {
-                    materialArrow.performClick();
-                    materialArrow.setVisibility(View.GONE);
-                    materialSummary.setVisibility(View.GONE);
-                    materialAddLabel.setVisibility(View.VISIBLE);
-                    materialRecyclerView.setVisibility(View.GONE);
-                }
-            }
-        });
-        materialRecyclerView.setAdapter(materialAdapter);
+//        materialAddLabel.setOnClickListener(view -> {
+//            selectMaterialFragment = SelectMaterialFragment.newInstance();
+//            selectMaterialFragment.show(getFragmentTransaction(), "dialog");
+//        });
+//
+//        View.OnClickListener materialListener = view -> {
+//            if (materialRecyclerView.getVisibility() == View.GONE) {
+//                materialArrow.setVisibility(View.VISIBLE);
+//                materialArrow.setRotation(180);
+//                materialSummary.setVisibility(View.GONE);
+//                materialAddLabel.setVisibility(View.VISIBLE);
+//                materialRecyclerView.setVisibility(View.VISIBLE);
+//            } else {
+//                int count = materialList.size();
+//                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
+//                materialArrow.setRotation(0);
+//                materialSummary.setVisibility(View.VISIBLE);
+//                materialAddLabel.setVisibility(View.GONE);
+//                materialRecyclerView.setVisibility(View.GONE);
+//            }
+//        };
+//
+//        materialArrow.setOnClickListener(materialListener);
+//        materialSummary.setOnClickListener(materialListener);
+//
+//        materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+//        materialAdapter = new MaterialAdapter(this, materialList);
+//        materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+//            @Override
+//            public void onChanged() {
+//                if (materialAdapter.getItemCount() == 0) {
+//                    materialArrow.performClick();
+//                    materialArrow.setVisibility(View.GONE);
+//                    materialSummary.setVisibility(View.GONE);
+//                    materialAddLabel.setVisibility(View.VISIBLE);
+//                    materialRecyclerView.setVisibility(View.GONE);
+//                }
+//            }
+//        });
+//        materialRecyclerView.setAdapter(materialAdapter);
 
 
         // ============================= EQUIPMENTS EVENTS ===================================== //
@@ -556,14 +557,14 @@ public class InterventionActivity extends AppCompatActivity implements
 
             Log.e(TAG, "onFragmentInteraction --> " + selection.toString());
 
-            if (selection instanceof Materials) {
-                selectMaterialFragment.dismiss();
-                materialList.add((Materials) selection);
-                materialAdapter.notifyDataSetChanged();
-                if (materialRecyclerView.getVisibility() == View.GONE)
-                    materialArrow.performClick();
+//            if (selection instanceof Materials) {
+//                selectMaterialFragment.dismiss();
+//                materialList.add((Materials) selection);
+//                materialAdapter.notifyDataSetChanged();
+//                if (materialRecyclerView.getVisibility() == View.GONE)
+//                    materialArrow.performClick();
 
-            } else if (selection instanceof Equipments) {
+            if (selection instanceof Equipments) {
                 selectEquipmentFragment.dismiss();
                 equipmentList.add((Equipments) selection);
                 equipmentAdapter.notifyDataSetChanged();

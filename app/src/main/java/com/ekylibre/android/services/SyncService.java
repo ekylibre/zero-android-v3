@@ -445,7 +445,8 @@ public class SyncService extends IntentService {
                         .build());
             }
 
-//            for (Operato operator : inter.op) {
+            // TODO: sync operators
+//            for (Inter operator : inter.persons) {
 //                workingDays.add(InterventionWorkingDayInputObject.builder()
 //                        .executionDate(wd.execution_date)
 //                        .hourDuration((long) wd.hour_duration)

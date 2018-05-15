@@ -169,15 +169,16 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
                 break;
 
-            case MainActivity.CARE:
-                for (Materials m : current.materials) {
-                    sb.append(m.material.get(0).name).append(" • ");
-                    sb.append(m.inter.quantity).append(" ");
-                    sb.append(unitValues.get(unitKeys.indexOf(m.inter.unit)));
-                    if (current.materials.indexOf(m) + 1 != current.materials.size()) sb.append("\n");
-                }
-                break;
+//            case MainActivity.CARE:
+//                for (Materials m : current.materials) {
+//                    sb.append(m.material.get(0).name).append(" • ");
+//                    sb.append(m.inter.quantity).append(" ");
+//                    sb.append(unitValues.get(unitKeys.indexOf(m.inter.unit)));
+//                    if (current.materials.indexOf(m) + 1 != current.materials.size()) sb.append("\n");
+//                }
+//                break;
 
+            case MainActivity.CARE:
             case MainActivity.GROUND_WORK:
                 for (Equipments e : current.equipments) {
                     sb.append(e.equipment.get(0).name);

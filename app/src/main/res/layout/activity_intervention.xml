@@ -28,7 +28,7 @@
 
             <include layout="@layout/include_input" android:id="@+id/input_layout" />
 
-            <include layout="@layout/include_material" android:id="@+id/material_layout" />
+            <!--<include layout="@layout/include_material" android:id="@+id/material_layout" />-->
 
             <include layout="@layout/include_equipment" />
 
