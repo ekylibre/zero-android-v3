@@ -153,6 +153,16 @@
     <string name="x_hour">%d hour</string>
     <string name="x_hours">%d hours</string>
 
+    <string name="LITER">liter</string>
+    <string name="LITER_PER_HECTARE">LITER_PER_HECTARE</string>
+    <string name="LITER_PER_SQUARE_METER">LITER_PER_SQUARE_METER</string>
+    <string name="HECTOLITER">HECTOLITER</string>
+    <string name="HECTOLITER_PER_HECTARE">HECTOLITER_PER_HECTARE</string>
+    <string name="HECTOLITER_PER_SQUARE_METER">HECTOLITER_PER_SQUARE_METER</string>
+    <string name="CUBIC_METER">CUBIC_METER</string>
+    <string name="CUBIC_METER_PER_HECTARE">CUBIC_METER_PER_HECTARE</string>
+    <string name="CUBIC_METER_PER_SQUARE_METER">CUBIC_METER_PER_SQUARE_METER</string>
+
     <!-- App strings -->
     <string name="app_name">Clic&amp;Farm</string>
     <string name="starting_intervention">Start intervention</string>

@@ -1,13 +1,13 @@
 mutation pushIntervention(
   $farmId: ID!,
   $procedure: InterventionTypeEnum!,
-  $cropList: [InterventionTargetInputObject],
-  $workingDays: [InterventionWorkingDayInputObject]
+  $cropList: [CreateInterventionTargetInputObject],
+  $workingDays: [CreateInterventionWorkingDayInputObject]
   $waterQuantity: Int
   $waterUnit: ArticleVolumeUnit
-  $inputs: [InterventionInputInputObject]
-  $tools: [InterventionToolInputObject]
-  $operators: [InterventionOperatorInputObject]
+  $inputs: [CreateInterventionInputInputObject]
+  $tools: [CreateInterventionToolInputObject]
+  $operators: [CreateInterventionOperatorInputObject]
 )
   {
   createInterventionMutation(

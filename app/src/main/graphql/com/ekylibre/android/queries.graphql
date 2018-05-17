@@ -40,16 +40,26 @@ query Pull {
             firstName
             lastName
         }
+        equipments {
+            id
+            name
+            nature
+            number
+        }
         interventions {
             id
+            type
+            validatedAt
+            waterQuantity
+            waterUnit
             inputs {
-                id
-                articleId
-                nature
+                article {
+                  id
+                  type
+                }
                 quantity
                 quantityValue
                 unit
-                unitPrice
             }
             operators {
                 id
@@ -64,18 +74,14 @@ query Pull {
                 }
                 workingPercentage
             }
-            type
-            waterQuantity
-            waterUnit
+            tools {
+                equipment {
+                    id
+                }
+            }
             workingDays {
                 executionDate
                 hourDuration
-            }
-            tools {
-                equipment {
-                    name
-                    number
-                }
             }
         }
     }

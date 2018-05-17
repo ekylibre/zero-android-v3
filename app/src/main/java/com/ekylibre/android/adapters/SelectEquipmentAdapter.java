@@ -64,11 +64,11 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         void display(Equipment item) {
             equipment = item;
             nameTextView.setText(item.name);
-            if (!item.type.isEmpty()) {
-                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.type));
+            if (!item.nature.isEmpty()) {
+                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.nature));
                 typeTextView.setText(equipment_type);
             }
-            typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.type, "drawable", context.getPackageName()));
+            typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.nature, "drawable", context.getPackageName()));
 
         }
     }

@@ -114,8 +114,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
             // Load species from Open Nomenclature
 //            json = readJsonFromAssets(context, "lexicon/species.json");
-//            type = Types.newParameterizedType(List.class, Specie.class);
-//            JsonAdapter<List<Specie>> adapter2 = moshi.adapter(type);
+//            nature = Types.newParameterizedType(List.class, Specie.class);
+//            JsonAdapter<List<Specie>> adapter2 = moshi.adapter(nature);
 //            List<Specie> list2 = adapter2.fromJson(json);
 //            database.specieDAO().insert(list2.toArray(new Specie[list2.size()]));
 

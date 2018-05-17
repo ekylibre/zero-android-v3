@@ -11,7 +11,7 @@ public class Person {
 
     public static final String TABLE_NAME = "persons";
     public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
-    public static final String COLUMN_ID_EKY = "eky_id";
+    public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID)

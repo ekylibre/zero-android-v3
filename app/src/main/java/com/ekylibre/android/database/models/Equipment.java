@@ -11,24 +11,31 @@ public class Equipment {
 
     public static final String TABLE_NAME = "equipments";
     public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
+
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID)
     public Integer id;
+
+    @ColumnInfo(name = COLUMN_ID_EKY)
+    public Integer eky_id;
 
     @ColumnInfo(index = true)
     public String name;
 
     public String number;
 
-    public String type;
+    public String nature;
 
     public String farmId;
 
-    public Equipment(String name, String type, String number) {
+    public Equipment(Integer eky_id, String name, String nature, String number, String farmId) {
+        this.eky_id = eky_id;
         this.name = name;
-        this.type = type;
+        this.nature = nature;
         this.number = number;
+        this.farmId = farmId;
     }
 
 

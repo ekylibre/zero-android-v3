@@ -179,15 +179,18 @@ public class LoginActivity extends AppCompatActivity {
                                     // Finish th login activity
                                     startApp();
                                     finish();
+                                    authTask = null;
 
                                 } else {
                                     Log.e(TAG, "Erreur d'authentification");
+                                    authTask = null;
                                 }
                             }
 
                             @Override
                             public void onFailure(@Nonnull ApolloException e) {
                                 Log.e(TAG, "ApolloException --> " + e.getMessage());
+                                authTask = null;
                                 // TODO display toast error connection
                             }
                         });
@@ -196,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(@NonNull Call<AccessToken> call, @NonNull Throwable t) {
-
+                    authTask = null;
                 }
             });
 

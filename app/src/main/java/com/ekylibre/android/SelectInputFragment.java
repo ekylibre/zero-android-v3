@@ -217,8 +217,8 @@ public class SelectInputFragment extends DialogFragment {
 //
 //        Button createInput = dialog.findViewById(R.id.button_create_input);
 //        createInput.setOnClickListener(v -> {
-//            String type = typeSpinner.getSelectedItem().toString();
-//            //if (type == )
+//            String nature = typeSpinner.getSelectedItem().toString();
+//            //if (nature == )
 //            dialog.dismiss();
 //
 //        });

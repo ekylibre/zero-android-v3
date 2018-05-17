@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             //onInterventionTypeSelected(STARTING);
             //showInputDialog();
             //new TestCrop(this).execute();
-            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
         });
@@ -241,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 finish();
-
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -313,11 +313,18 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     private void onProcedureChoice(String procedure) {
-        Intent intent = new Intent(this, InterventionActivity.class);
-        intent.putExtra("type", TYPE);
-        intent.putExtra("procedure", procedure);
-        startActivity(intent);
-        deployMenu(false);
+        if (procedure.equals(HARVEST)) {
+            deployMenu(false);
+            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 200);
+            toast.show();
+        } else {
+            Intent intent = new Intent(this, InterventionActivity.class);
+            intent.putExtra("nature", TYPE);
+            intent.putExtra("procedure", procedure);
+            startActivity(intent);
+            deployMenu(false);
+        }
     }
 
     private Boolean deployMenu(Boolean state) {

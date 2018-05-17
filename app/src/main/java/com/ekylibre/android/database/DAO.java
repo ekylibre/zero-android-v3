@@ -6,6 +6,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.models.Farm;
@@ -37,8 +38,8 @@ public interface DAO {
     /**
      *    Insert queries
      */
-    @Transaction @Insert void insert(Equipment... equipments);
-    @Transaction @Insert void insert(Material... materials);
+    @Insert void insert(Equipment... equipments);
+    @Insert void insert(Material... materials);
 
     @Transaction @Insert void insert(Phyto... phytos);
     @Transaction @Insert void insert(PhytoDose... doses);
@@ -96,8 +97,12 @@ public interface DAO {
     @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE interventions_id_eky IS NULL")
     List<Interventions> getSyncableInterventions();
 
-    @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId WHERE " + Intervention.COLUMN_ID + " = :id")
+    @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId, " +
+            "status = '" + InterventionActivity.SYNCED + "' WHERE " + Intervention.COLUMN_ID + " = :id")
     void setInterventionEkyId(int id, int ekyId);
+
+    @Query("UPDATE " + Intervention.TABLE_NAME + " SET status = :status WHERE " + Intervention.COLUMN_ID_EKY + " = :ekyId")
+    void updateInterventionStatus(int ekyId, String status);
 
     @Query("DELETE FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " = :ekyId")
     void deleteIntervention(int ekyId);
@@ -130,6 +135,9 @@ public interface DAO {
 
     @Query("SELECT * FROM " + Equipment.TABLE_NAME + " WHERE name LIKE :search ORDER BY name" )
     List<Equipment> searchEquipment(String search);
+
+    @Query("UPDATE " + Equipment.TABLE_NAME + " SET " + Equipment.COLUMN_ID_EKY + " = :ekyId WHERE name LIKE :name")
+    int setEquipmentEkyId(int ekyId, String name);
 
 
     /**

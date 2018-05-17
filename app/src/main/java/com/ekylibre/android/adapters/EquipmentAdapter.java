@@ -66,11 +66,11 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
         void display(Equipments item) {
             //iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
             nameTextView.setText(item.equipment.get(0).name);
-            if (!item.equipment.get(0).type.isEmpty()) {
-                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.equipment.get(0).type));
+            if (!item.equipment.get(0).nature.isEmpty()) {
+                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.equipment.get(0).nature));
                 typeTextView.setText(equipment_type);
             }
-            iconImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.equipment.get(0).type, "drawable", context.getPackageName()));
+            iconImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.equipment.get(0).nature, "drawable", context.getPackageName()));
 
         }
     }

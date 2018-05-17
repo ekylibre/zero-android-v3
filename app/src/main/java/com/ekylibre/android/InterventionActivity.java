@@ -26,12 +26,10 @@ import android.widget.TextView;
 
 import com.ekylibre.android.adapters.EquipmentAdapter;
 import com.ekylibre.android.adapters.InputAdapter;
-import com.ekylibre.android.adapters.MaterialAdapter;
 import com.ekylibre.android.adapters.PersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
-import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Materials;
@@ -59,6 +57,9 @@ public class InterventionActivity extends AppCompatActivity implements
         SelectCropFragment.OnFragmentInteractionListener {
 
     private static final String TAG = InterventionActivity.class.getName();
+    public static final String CREATED = "created";
+    public static final String SYNCED = "synced";
+    public static final String VALIDATED = "validated";
 
     // UI components
     Button saveButton;
@@ -491,6 +492,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
                 intervention.setWater_unit(volumeUnitKeys.get(irrigationUnitSpinner.getSelectedItemPosition()).toString());
             }
+            intervention.setStatus(CREATED);
             intervention.setFarm(MainActivity.currentFarmId);
 
             // Save intervention and get returning id

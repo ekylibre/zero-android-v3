@@ -8,8 +8,7 @@
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".LoginActivity"
-    android:theme="@style/NoActionBar"
-    android:background="@color/primary">
+    android:theme="@style/NoActionBar">
 
 
     <!--<android.support.v7.widget.AppCompatImageView-->
@@ -23,8 +22,7 @@
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bienvenue sur l'application mobile pour Clic&amp;Farm !\nPour commencer, vous devez vous identifier avec votre compte Ekylibre..."
-        android:textColor="@color/icons"
+        android:text="Bienvenue dans l'application mobile pour Clic&amp;Farm !\nPour commencer, identifiez-vous avec votre compte Ekylibre..."
         android:textSize="18sp"
         android:layout_marginBottom="20dp"/>
 

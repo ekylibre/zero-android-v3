@@ -84,7 +84,7 @@ public class ServiceGenerator {
 
                 Request.Builder requestBuilder = original.newBuilder()
                         .header("Accept", "application/json")
-                        .header("Content-type", "application/json")
+                        .header("Content-nature", "application/json")
                         .header("Authorization","Bearer " + token.getAccess_token())
                         .method(original.method(), original.body());
 

@@ -162,7 +162,7 @@ public class SelectEquipmentFragment extends DialogFragment {
 
 
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Equipment(name, type, number));
+            database.dao().insert(new Equipment(null, name, type, number, MainActivity.currentFarmId));
 
             return null;
         }

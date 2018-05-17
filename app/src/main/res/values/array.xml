@@ -6,10 +6,4 @@
         <item>Minéral</item>
     </string-array>
 
-    <string-array name="equipment_type">
-        <item>Outil</item>
-        <item>Tracteur</item>
-        <item>… en cours d'ajout</item>
-    </string-array>
-
 </resources>

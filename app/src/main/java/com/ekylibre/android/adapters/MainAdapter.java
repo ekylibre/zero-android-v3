@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Crops;
@@ -113,14 +114,19 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.type, "string", context.getPackageName()));
         holder.itemDate.setText(DateTools.display(current.workingDays.get(0).execution_date));
 
-        if (current.intervention.eky_id != null) {
-            //ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
-            holder.itemSynchronized.setImageResource(R.drawable.icon_check);
-            ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
-
-        } else {
-            holder.itemSynchronized.setImageResource(R.drawable.icon_sync);
-            ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+        switch (current.intervention.status) {
+            case InterventionActivity.SYNCED:
+                holder.itemSynchronized.setImageResource(R.drawable.icon_check);
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+                break;
+            case InterventionActivity.VALIDATED:
+                holder.itemSynchronized.setImageResource(R.drawable.icon_check_validated);
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+                break;
+            default:
+                holder.itemSynchronized.setImageResource(R.drawable.icon_sync);
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                break;
         }
 
         if (holder.syncTime != null)
@@ -137,7 +143,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         String totalString = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
         holder.itemCrops.setText(totalString);
 
-        // Display input by type
+        // Display input by nature
         StringBuilder sb = new StringBuilder();
         switch (current.intervention.type) {
 
@@ -187,8 +193,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 break;
             case MainActivity.IRRIGATION:
                 if (current.intervention.water_quantity != null) {
-                    sb.append(current.intervention.water_quantity + " ");
-                    sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(current.intervention.water_unit)));
+                    sb.append("Volume: ").append(current.intervention.water_quantity).append(" ");
+                    sb.append(context.getResources().getString(context.getResources().getIdentifier(current.intervention.water_unit, "string", context.getPackageName())));
                     break;
                 }
         }
