@@ -2,8 +2,8 @@
 <resources>
 
     <string-array name="fertilizer_nature">
-        <item>Organic</item>
-        <item>Mineral</item>
+        <item>Organique</item>
+        <item>Minéral</item>
     </string-array>
 
 </resources>

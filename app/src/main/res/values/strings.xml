@@ -206,6 +206,7 @@
 
     <string name="none">none</string>
     <string name="add_material">+ Add material</string>
+    <string name="inputs_count">%d inputs</string>
 
     <string name="create_seed_title">Create new seed</string>
     <string name="create_phyto_title">Create new phyto</string>
@@ -233,7 +234,6 @@
     <string name="select_crops">+ Select</string>
     <string name="add">+ Add</string>
     <string name="chose_unit">Unité</string>
-    <string name="title_activity_login">Connexion</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
