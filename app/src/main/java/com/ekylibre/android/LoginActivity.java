@@ -72,7 +72,10 @@ public class LoginActivity extends AppCompatActivity {
             passwordView = findViewById(R.id.password);
 
             Button signInButton = findViewById(R.id.sign_in_button);
-            signInButton.setOnClickListener(view -> attemptLogin());
+            signInButton.setOnClickListener(view -> {
+                authTask = null;
+                attemptLogin();
+            });
 
 //        passwordView.setOnEditorActionListener((textView, id, keyEvent) -> {
 //            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
