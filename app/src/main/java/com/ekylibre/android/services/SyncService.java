@@ -322,8 +322,8 @@ public class SyncService extends IntentService {
                                 // Saving Equipments
                                 for (PullQuery.Tool tool : farm.interventions().get(index).tools()) {
                                     if (tool.equipment() != null) {
-                                        Log.e(TAG, "Equipment eky_id --> " + tool.equipment().id());
-                                        database.dao().insert(new InterventionEquipment(newInterId, Integer.valueOf(tool.equipment().id())));
+                                        int equipmentId = database.dao().getEquipmentId(Integer.valueOf(tool.equipment().id()));
+                                        database.dao().insert(new InterventionEquipment(newInterId, equipmentId));
                                     }
                                 }
 
@@ -460,7 +460,9 @@ public class SyncService extends IntentService {
 
             for (Equipments equipment : inter.equipments) {
                 if (equipment.equipment.get(0).eky_id == null) {
-
+                    tools.add(CreateInterventionToolInputObject.builder()
+                            .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id))
+                            .build());
                 } else {
                     tools.add(CreateInterventionToolInputObject.builder()
                             .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id))

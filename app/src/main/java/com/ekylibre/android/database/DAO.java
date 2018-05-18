@@ -139,6 +139,9 @@ public interface DAO {
     @Query("UPDATE " + Equipment.TABLE_NAME + " SET " + Equipment.COLUMN_ID_EKY + " = :ekyId WHERE name LIKE :name")
     int setEquipmentEkyId(int ekyId, String name);
 
+    @Query("SELECT " + Equipment.COLUMN_ID + " FROM " + Equipment.TABLE_NAME + " WHERE " + Equipment.COLUMN_ID_EKY + " = :eky_id")
+    int getEquipmentId(int eky_id);
+
 
     /**
      *    Material
@@ -161,6 +164,9 @@ public interface DAO {
 
     @Transaction @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE variety LIKE :search" )
     List<Seed> searchSeedVariety(String search);
+
+    @Transaction @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE variety LIKE :search" )
+    List<Seed> searchSeed(String search);
 
     @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE specie = :specie AND variety LIKE :search" )
     List<Seed> searchBySpecie(String specie, String search);
