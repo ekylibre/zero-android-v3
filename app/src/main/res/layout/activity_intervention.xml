@@ -24,7 +24,7 @@
 
             <include layout="@layout/include_irrigation" android:id="@+id/irrigation_layout"/>
 
-            <include layout="@layout/include_working_period" />
+            <include layout="@layout/include_working_period" android:id="@+id/working_period_layout"/>
 
             <include layout="@layout/include_input" android:id="@+id/input_layout" />
 

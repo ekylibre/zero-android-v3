@@ -78,6 +78,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
     // Working period layout
     private Group workingPeriodDetail;
+    private ConstraintLayout workingPeriodLayout;
     private ImageView workingPeriodArrow;
     private TextView workingPeriodSummary, workingPeriodDurationUnit;
     private EditText workingPeriodEditDate, workingPeriodEditDuration;
@@ -156,6 +157,7 @@ public class InterventionActivity extends AppCompatActivity implements
         irrigationUnitSpinner = findViewById(R.id.irrigation_unit_spinner);
 
         // Working period
+        workingPeriodLayout = findViewById(R.id.working_period_layout);
         workingPeriodDetail = findViewById(R.id.working_period_detail);
         workingPeriodArrow = findViewById(R.id.working_period_arrow);
         workingPeriodSummary = findViewById(R.id.working_period_summary);
@@ -253,8 +255,9 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         };
 
-        workingPeriodSummary.setOnClickListener(workingPeriodListener);
-        workingPeriodArrow.setOnClickListener(workingPeriodListener);
+//        workingPeriodSummary.setOnClickListener(workingPeriodListener);
+//        workingPeriodArrow.setOnClickListener(workingPeriodListener);
+        workingPeriodLayout.setOnClickListener(workingPeriodListener);
         workingPeriodEditDate.setOnClickListener(view -> datePicker());
 
         workingPeriodEditDuration.setOnEditorActionListener((v, actionId, event) -> {
