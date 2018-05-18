@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
-            android:inputType="textPersonName"
+            android:inputType="textCapSentences"
             android:maxLines="1"
             android:hint="Nom"/>
     </android.support.design.widget.TextInputLayout>
@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
-            android:inputType="number"
+            android:inputType="text"
             android:maxLines="1"
             android:hint="Numéro"/>
     </android.support.design.widget.TextInputLayout>
