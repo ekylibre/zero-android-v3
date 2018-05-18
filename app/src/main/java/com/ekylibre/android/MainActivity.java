@@ -359,6 +359,15 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             database.populateInitialData(context);
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Intent intent = new Intent(context, SyncService.class);
+            intent.setAction(SyncService.ACTION_SYNC_PULL);
+            intent.putExtra("receiver", resultReceiver);
+            startService(intent);
+        }
     }
 
 }
