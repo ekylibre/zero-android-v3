@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             app:title="Sélectionnez des cultures"
             app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
-            app:titleTextColor="@color/icons"
+            app:titleTextColor="@color/white"
             android:background="@color/accent"/>
     </android.support.design.widget.AppBarLayout>
 
@@ -49,7 +49,7 @@
             app:layout_constraintBaseline_toBaselineOf="@id/button_validate"
             app:layout_constraintStart_toStartOf="@id/nav_layout"
             android:layout_marginStart="16dp"
-            android:textColor="@color/icons"
+            android:textColor="@color/white"
             android:textStyle="bold"/>
 
         <android.support.v7.widget.AppCompatButton
@@ -57,6 +57,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/validate"
+            android:textColor="@color/white"
+            style="?android:attr/borderlessButtonStyle"
+            app:layout_constraintTop_toTopOf="@id/nav_layout"
             app:layout_constraintEnd_toEndOf="@id/nav_layout"
             app:layout_constraintBottom_toBottomOf="@id/nav_layout" />
 

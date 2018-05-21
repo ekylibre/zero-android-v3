@@ -2,6 +2,7 @@ package com.ekylibre.android.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -65,7 +66,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
             updateTotal();
 
             // Accordion control
-            plotArrow.setOnClickListener(view -> {
+            itemView.setOnClickListener(view -> {
                 if (cropContainer.getVisibility() == View.GONE) {
                     plotArrow.setRotation(180);
                     cropContainer.setVisibility(View.VISIBLE);
@@ -109,6 +110,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                 if (++index < item.crops.size())
                     child.setBackgroundResource(R.drawable.border_bottom_lightgrey);
 
+                ConstraintLayout cropLayout = child.findViewById(R.id.item_crop_layout);
                 CheckBox cropCheckBox = child.findViewById(R.id.crop_checkbox);
                 TextView cropName = child.findViewById(R.id.crop_name);
                 TextView cropArea = child.findViewById(R.id.crop_area);
@@ -133,6 +135,14 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                         item.plot.is_checked = false;
                     }
                     updateTotal();
+                });
+
+                cropLayout.setOnClickListener(view -> {
+                    if (crop.is_checked) {
+                        cropCheckBox.setChecked(false);
+                    } else {
+                        cropCheckBox.setChecked(true);
+                    }
                 });
 
                 // Add rendered view to container layout
