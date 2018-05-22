@@ -7,7 +7,6 @@ import android.support.constraint.Group;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,6 @@ import android.widget.TextView;
 
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
-import com.ekylibre.android.database.AppDatabase;
-import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;

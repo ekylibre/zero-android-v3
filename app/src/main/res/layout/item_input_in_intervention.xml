@@ -22,7 +22,8 @@
         android:text="GLIFOPEC 450 SL"
         android:textColor="#000000"
         app:layout_constraintStart_toEndOf="@id/item_icon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:singleLine="true"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_name_more"
