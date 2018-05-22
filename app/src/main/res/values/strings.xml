@@ -246,6 +246,8 @@
     <string name="error_field_required">This field is required</string>
     <string name="label_irrigation">Irrigation</string>
     <string name="menu_logout">Déconnecter</string>
+    <string name="label_weather">Météo</string>
+    <string name="temperature">Température</string>
 
 
 </resources>

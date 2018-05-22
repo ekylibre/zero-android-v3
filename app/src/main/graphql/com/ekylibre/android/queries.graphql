@@ -52,6 +52,11 @@ query Pull {
             validatedAt
             waterQuantity
             waterUnit
+            weather {
+                temperature
+                windSpeed
+                description
+            }
             inputs {
                 article {
                   id

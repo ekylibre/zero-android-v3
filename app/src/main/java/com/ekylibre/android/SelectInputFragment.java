@@ -171,7 +171,7 @@ public class SelectInputFragment extends DialogFragment {
             tab.select();
         }
 
-        //new RequestDatabase(context).execute();
+        new RequestDatabase(context).execute();
     }
 
     /**
