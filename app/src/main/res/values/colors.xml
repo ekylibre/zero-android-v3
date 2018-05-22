@@ -6,6 +6,7 @@
     <color name="another_light_grey">#eeeeee</color>
     <color name="background">#fafafa</color>
     <color name="warning">#CC0000</color>
+    <color name="transparent">#00FFFFFF</color>
 
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1976D2</color>
@@ -13,8 +14,9 @@
     <color name="accent">#8BC34A</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
-    <color name="icons">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
     <color name="orange">#ff9500</color>
+    <color name="background_material_light">#ffffff</color>
 
 </resources>

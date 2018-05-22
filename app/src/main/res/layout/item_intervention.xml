@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/regular_margin"
-    android:background="@color/icons"
+    android:background="@color/white"
     android:id="@+id/intervention_item_layout">
 
     <android.support.v7.widget.AppCompatImageView

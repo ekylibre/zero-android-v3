@@ -30,6 +30,7 @@ import com.ekylibre.android.adapters.PersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
+import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Materials;
@@ -47,6 +48,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
 
 
 public class InterventionActivity extends AppCompatActivity implements
@@ -88,6 +91,7 @@ public class InterventionActivity extends AppCompatActivity implements
     private DialogFragment selectInputFragment;
     private RecyclerView inputRecyclerView;
     private RecyclerView.Adapter inputAdapter;
+    private Group phytoMixWarning;
 
 //    private ImageView materialArrow;
 //    private TextView materialSummary, materialAddLabel;
@@ -171,6 +175,7 @@ public class InterventionActivity extends AppCompatActivity implements
         inputSummary = findViewById(R.id.input_summary);
         inputAddLabel = findViewById(R.id.input_add_label);
         inputRecyclerView = findViewById(R.id.input_recycler);
+        phytoMixWarning = findViewById(R.id.phyto_mix_warning);
 
         // Materials
 //        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
@@ -309,17 +314,47 @@ public class InterventionActivity extends AppCompatActivity implements
         inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
+
+                Log.e(TAG, "inputList onChange()");
+
+                phytoMixWarning.setVisibility(View.GONE);
+
                 if (inputAdapter.getItemCount() == 0) {
                     inputArrow.performClick();
                     inputArrow.setVisibility(View.GONE);
                     inputSummary.setVisibility(View.GONE);
                     inputAddLabel.setVisibility(View.VISIBLE);
                     inputRecyclerView.setVisibility(View.GONE);
+                } else if (inputAdapter.getItemCount() >= 2) {
+
+                    Log.e(TAG, "inputList >= 2");
+
+//                    List<Integer> phytoMixCodeList = new ArrayList<>();
+//                    for (Object input : inputList) {
+//                        if (input instanceof Phytos) {
+//                            phytoMixCodeList.add(((Phytos) input).phyto.get(0).mix_category_code);
+//                        }
+//                    }
+                    List<Integer> codes = new ArrayList<>();
+                    for (Object input : inputList) {
+                        if (input instanceof Phytos) {
+                            Phyto phyto = ((Phytos) input).phyto.get(0);
+                            if (phyto != null)
+                                codes.add(phyto.mix_category_code);
+                        }
+                    }
+
+                    if (codes.size() >= 2) {
+
+                        Log.e(TAG, "phytos >= 2");
+
+                        if (!mixIsAuthorized(codes))
+                            phytoMixWarning.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
         inputRecyclerView.setAdapter(inputAdapter);
-
 
         // ============================== MATERIALS EVENTS ===================================== //
 
@@ -457,6 +492,8 @@ public class InterventionActivity extends AppCompatActivity implements
 
 
         // ================================ BOTTOM BAR ========================================= //
+
+
 
         saveButton = findViewById(R.id.button_save);
         saveButton.setOnClickListener(view -> new SaveIntervention(

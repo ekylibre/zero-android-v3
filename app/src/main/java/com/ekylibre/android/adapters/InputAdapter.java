@@ -3,6 +3,7 @@ package com.ekylibre.android.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.constraint.Group;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
@@ -48,10 +49,11 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView itemIcon, itemDelete, itemDoseMax;
+        ImageView itemIcon, itemDelete;
         TextView itemName, itemNameMore, itemTotal;
         EditText itemQuantityEdit;
         AppCompatSpinner itemUnitSpinner;
+        Group itemDoseMax;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -63,7 +65,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner = itemView.findViewById(R.id.item_unit_spinner);
             itemTotal = itemView.findViewById(R.id.item_total);
             itemDelete = itemView.findViewById(R.id.item_delete);
-            itemDoseMax = itemView.findViewById(R.id.item_dose_max);
+            itemDoseMax = itemView.findViewById(R.id.item_dose_warning);
 
             itemDelete.setOnClickListener(view -> {
                 Context context = itemView.getRootView().getContext();
@@ -98,7 +100,6 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                                     itemDoseMax.setVisibility(View.VISIBLE);
                                 else
                                     itemDoseMax.setVisibility(View.GONE);
-
                         }
                     }
                 }
@@ -138,6 +139,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemNameMore.setText(more);
             itemQuantityEdit.setText(quantityAsString);
             itemTotal.setText(calculTotal(quantity));
+            itemDoseMax.setVisibility(View.GONE);
 
             int resKeys = 0, resValues = 0;
             switch (unit_dimention) {
@@ -171,7 +173,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                 switch (getItemViewType()) {
 
                     case SEED:
-                        Seeds seed = (Seeds) inputList.get(getAdapterPosition());
+                        Seeds seed = (Seeds) inputList.get(getLayoutPosition());
                         unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.mass_unit_keys));
                         unitBefore = seed.inter.unit;
                         unitAfter = unitKeys.get(pos).toString();
@@ -181,7 +183,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                         break;
 
                     case PHYTO:
-                        Phytos phyto = (Phytos) inputList.get(getAdapterPosition());
+                        Phytos phyto = (Phytos) inputList.get(getLayoutPosition());
                         unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.volume_unit_keys));
                         unitBefore = phyto.inter.unit;
                         unitAfter = unitKeys.get(pos).toString();
@@ -191,7 +193,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                         break;
 
                     case FERTI:
-                        Fertilizers ferti = (Fertilizers) inputList.get(getAdapterPosition());
+                        Fertilizers ferti = (Fertilizers) inputList.get(getLayoutPosition());
                         unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.mass_unit_keys));
                         unitBefore = ferti.inter.unit;
                         unitAfter = unitKeys.get(pos).toString();
@@ -235,6 +237,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
 
             case PHYTO:
                 Phytos phyto = (Phytos) inputList.get(position);
+                holder.itemDoseMax.setVisibility(View.GONE);
                 holder.display(R.drawable.icon_fertilizer, phyto.phyto.get(0).name, phyto.phyto.get(0).firm_name, phyto.inter.quantity, phyto.inter.unit, PHYTO);
                 break;
 

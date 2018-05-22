@@ -4,7 +4,6 @@ package com.ekylibre.android.adapters;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.widget.AppCompatImageView;
@@ -13,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ekylibre.android.InterventionActivity;
@@ -23,7 +21,6 @@ import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
-import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.DateTools;
@@ -106,7 +103,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         if (position %2 == 1) {
             holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.another_light_grey));
         } else {
-            holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.icons));
+            holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         }
 
         Interventions current = interventionsList.get(position);

@@ -8,8 +8,7 @@
     android:paddingBottom="24dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:background="@drawable/border_bottom"
-    tools:showIn="@layout/activity_intervention">
+    android:background="@drawable/border_bottom">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/input_arrow"
@@ -57,12 +56,39 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/input_recycler"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/input_label"
         android:background="@drawable/border_input_list"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        tools:listitem="@layout/item_input_in_intervention" />
+
+    <android.support.constraint.Group
+        android:id="@+id/phyto_mix_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="phyto_mix_allowed,phyto_mix_message"
+        android:visibility="gone" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/phyto_mix_allowed"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_recycler"
+        app:srcCompat="@drawable/icon_dot"
+        android:tint="@color/warning" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_mix_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/phyto_mix_allowed"
+        app:layout_constraintTop_toTopOf="@id/phyto_mix_allowed"
+        android:layout_marginStart="0dp"
+        android:text="mélange non autorisé"
+        android:textColor="@color/warning" />
 
 </android.support.constraint.ConstraintLayout>

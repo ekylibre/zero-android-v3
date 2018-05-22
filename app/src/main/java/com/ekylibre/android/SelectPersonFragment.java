@@ -22,6 +22,7 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class SelectPersonFragment extends DialogFragment {
@@ -56,6 +57,9 @@ public class SelectPersonFragment extends DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        // Disables AppBar
+        Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_person, container, false);
 
@@ -106,7 +110,7 @@ public class SelectPersonFragment extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         new RequestDatabase(context).execute();

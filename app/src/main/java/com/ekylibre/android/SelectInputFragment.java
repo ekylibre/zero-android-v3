@@ -26,8 +26,12 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Seed;
+import com.ekylibre.android.database.pojos.Fertilizers;
+import com.ekylibre.android.database.pojos.Phytos;
+import com.ekylibre.android.database.pojos.Seeds;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class SelectInputFragment extends DialogFragment {
@@ -78,6 +82,9 @@ public class SelectInputFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Disables AppBar
+        Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_input, container, false);
 
@@ -164,7 +171,7 @@ public class SelectInputFragment extends DialogFragment {
             tab.select();
         }
 
-        new RequestDatabase(context).execute();
+        //new RequestDatabase(context).execute();
     }
 
     /**
@@ -344,13 +351,40 @@ public class SelectInputFragment extends DialogFragment {
                         selectedList.addAll(database.dao().selectSeed());
                     else
                         selectedList.addAll(database.dao().searchSeedVariety("%" + searchText + "%"));
+
+                    for (Object item : InterventionActivity.inputList) {
+                        if (item instanceof Seeds) {
+                            Seed seed = ((Seeds) item).seed.get(0);
+                            for (Object object : selectedList) {
+                                if (((Seed) object).id.equals(seed.id)) {
+                                    selectedList.remove(object);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     break;
 
                 case PHYTO:
+
+                    Log.i(TAG, "database queried");
+
                     if (searchText.length() < MIN_SEARCH_SIZE)
                         selectedList.addAll(database.dao().selectPhytosanitary());
                     else
                         selectedList.addAll(database.dao().searchPhytosanitary("%" + searchText + "%"));
+
+                    for (Object item : InterventionActivity.inputList) {
+                        if (item instanceof Phytos) {
+                            Phyto phyto = ((Phytos) item).phyto.get(0);
+                            for (Object object : selectedList) {
+                                if (((Phyto) object).id.equals(phyto.id)) {
+                                    selectedList.remove(object);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     break;
 
                 case FERTI:
@@ -360,6 +394,20 @@ public class SelectInputFragment extends DialogFragment {
                         selectedList.addAll(database.dao().searchFertilizer("%" + searchText + "%"));
                     break;
             }
+
+            // Remove current items
+            for (Object item : InterventionActivity.inputList) {
+                if (item instanceof Fertilizers) {
+                    Fertilizer fertilizer = ((Fertilizers) item).fertilizer.get(0);
+                    for (Object object : selectedList) {
+                        if (((Fertilizer) object).id.equals(fertilizer.id)) {
+                            selectedList.remove(object);
+                            break;
+                        }
+                    }
+                }
+            }
+
             return null;
         }
 

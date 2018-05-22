@@ -52,6 +52,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel"
+            android:textColor="@color/white"
+            style="?android:attr/borderlessButtonStyle"
+            android:background="@color/transparent"
+            android:minHeight="0dp"
+            app:layout_constraintTop_toTopOf="@id/nav_layout"
             app:layout_constraintStart_toStartOf="@id/nav_layout"
             app:layout_constraintBottom_toBottomOf="@id/nav_layout" />
 
@@ -60,8 +65,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save_intervention"
+            android:background="@drawable/background_round_corners"
+            app:layout_constraintTop_toTopOf="@id/nav_layout"
             app:layout_constraintEnd_toEndOf="@id/nav_layout"
-            app:layout_constraintBottom_toBottomOf="@id/nav_layout" />
+            app:layout_constraintBottom_toBottomOf="@id/nav_layout"
+            android:minHeight="0dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_margin="6dp"/>
 
     </android.support.constraint.ConstraintLayout>
 

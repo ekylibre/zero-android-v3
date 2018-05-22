@@ -18,6 +18,16 @@
         android:textColor="#000000"
         android:lines="1" />
 
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/phyto_company"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bayer CropScience France"
+        android:textColor="@color/accent"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/phyto_name"
+        app:layout_constraintTop_toBottomOf="@id/phyto_name"/>
+
     <android.support.constraint.Group
         android:id="@+id/item_mix_warning"
         android:layout_width="wrap_content"
@@ -29,32 +39,19 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:tint="@color/warning"
-        app:layout_constraintStart_toEndOf="@id/phyto_name"
-        app:layout_constraintTop_toTopOf="@id/phyto_name"
-        app:layout_constraintBottom_toBottomOf="@id/phyto_name"
-        android:layout_marginStart="8dp"
-        app:srcCompat="@drawable/icon_dot"
-        android:visibility="visible"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/phyto_company"
+        app:srcCompat="@drawable/icon_dot" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_mix_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/item_mix_allowed"
-        app:layout_constraintBaseline_toBaselineOf="@id/phyto_name"
+        app:layout_constraintTop_toBottomOf="@id/phyto_company"
         android:layout_marginStart="0dp"
-        android:text="mélange"
+        android:text="mélange non autorisé"
         android:textColor="@color/warning" />
-
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/phyto_company"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bayer CropScience France"
-        android:textColor="@color/accent"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@id/phyto_name"
-        app:layout_constraintTop_toBottomOf="@id/phyto_name"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/phyto_amm_label"
@@ -62,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         app:layout_constraintStart_toStartOf="@id/phyto_company"
-        app:layout_constraintTop_toBottomOf="@id/phyto_company"
+        app:layout_constraintTop_toBottomOf="@id/item_mix_allowed"
         android:text="N° AMM\u0020"
         android:textStyle="italic" />
 

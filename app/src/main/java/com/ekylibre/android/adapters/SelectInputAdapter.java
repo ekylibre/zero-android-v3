@@ -19,6 +19,7 @@ import com.ekylibre.android.SelectInputFragment;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;
+import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -29,8 +30,11 @@ import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.utils.PhytosanitaryMiscibility;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
 
 
 public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -40,6 +44,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private Context context;
     private List<Object> inputList;
+    private List<Integer> phytoList;
     private SelectInputFragment.OnFragmentInteractionListener fragmentListener;
 
     public SelectInputAdapter(List<Object> inputList, Context context, SelectInputFragment.OnFragmentInteractionListener fragmentListener) {
@@ -165,6 +170,20 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case PHYTO:
                 PhytoViewHolder phytoViewHolder = (PhytoViewHolder) holder;
                 Phyto phyto = (Phyto) inputList.get(position);
+
+
+//                phytoList = new ArrayList<>();
+//                for (Object item : InterventionActivity.inputList) {
+//                    if (item instanceof Phytos)
+//                        phytoList.add((((Phytos) item).phyto).get(0).id);
+//                }
+//
+//                boolean display = false;
+//                if (phytoList.isEmpty())
+//                    display = true;
+//                else if (!phytoList.contains(phyto.id))
+//                    display = true;
+
                 phytoViewHolder.phytoName.setText(phyto.name);
                 phytoViewHolder.phythoCompany.setText(phyto.firm_name);
                 phytoViewHolder.phytoAmm.setText((!phyto.maaid.isEmpty()) ? phyto.maaid : context.getString(R.string.unspecified));
@@ -172,15 +191,29 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     phytoViewHolder.phytoDelay.setText(context.getResources().getQuantityString(R.plurals.x_hours, phyto.in_field_reentry_delay, phyto.in_field_reentry_delay));
                 else
                     phytoViewHolder.phytoDelay.setText(R.string.unspecified);
+
                 phytoViewHolder.phytoFavorite.setVisibility((phyto.eky_id != null) ? View.VISIBLE : View.GONE);
+                phytoViewHolder.phytoMixWarning.setVisibility(View.GONE);
 
                 if (phyto.mix_category_code != null) {
-                    if (mixIsAuthorized(phyto.mix_category_code)) {
-                        phytoViewHolder.phytoMixWarning.setVisibility(View.GONE);
-                    } else {
-                        phytoViewHolder.phytoMixWarning.setVisibility(View.VISIBLE);
-                    }
+                    Log.e(TAG, "Current item mix_category_code " + phyto.mix_category_code);
 
+                    List<Integer> codes = new ArrayList<>();
+                    for (Object input : InterventionActivity.inputList) {
+                        if (input instanceof Phytos) {
+                            Phyto currentPhyto = ((Phytos) input).phyto.get(0);
+                            if (currentPhyto != null)
+                                codes.add(currentPhyto.mix_category_code);
+                        }
+                    }
+                    codes.add(phyto.mix_category_code);
+
+                    Log.e(TAG, codes.toString());
+
+                    if (codes.size() >= 2) {
+                        if (!mixIsAuthorized(codes))
+                            phytoViewHolder.phytoMixWarning.setVisibility(View.VISIBLE);
+                    }
                 }
                 phytoViewHolder.phyto = phyto;
                 break;
@@ -193,13 +226,6 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 fertiViewHolder.fertiType.setText(context.getString(res));
                 fertiViewHolder.fertiFavorite.setVisibility((fertilizer.eky_id != null) ? View.VISIBLE : View.GONE);
                 fertiViewHolder.fertilizer = fertilizer;
-                break;
-
-            default:
-                SeedViewHolder defaultViewHolder = (SeedViewHolder) holder;
-                Seed defaultItem = (Seed) inputList.get(position);
-                defaultViewHolder.seedSpecie.setText(defaultItem.specie);
-                defaultViewHolder.seedVariety.setText(defaultItem.variety);
                 break;
         }
     }
@@ -222,21 +248,4 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return inputList.size();
     }
 
-    private boolean mixIsAuthorized(int secondProduct) {
-
-        int index = 0;
-        for (Object input : InterventionActivity.inputList) {
-
-            if (input instanceof Phytos) {
-
-                Phyto phyt = ((Phytos) input).phyto.get(0);
-                if (phyt != null) {
-                    if (!PhytosanitaryMiscibility.isValid(phyt.mix_category_code, secondProduct))
-                        ++index;
-                }
-            }
-        }
-
-        return index <= 0;
-    }
 }

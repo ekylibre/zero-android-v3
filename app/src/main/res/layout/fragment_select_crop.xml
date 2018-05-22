@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.ekylibre.android.SelectMaterialFragment"
-    android:background="@color/background">
+    android:background="@color/background"
+    style="@style/NoActionBar">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -57,11 +58,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/validate"
-            android:textColor="@color/white"
-            style="?android:attr/borderlessButtonStyle"
+            android:background="@drawable/background_round_corners"
             app:layout_constraintTop_toTopOf="@id/nav_layout"
             app:layout_constraintEnd_toEndOf="@id/nav_layout"
-            app:layout_constraintBottom_toBottomOf="@id/nav_layout" />
+            app:layout_constraintBottom_toBottomOf="@id/nav_layout"
+            android:minHeight="0dp"
+            android:padding="6dp"
+            android:layout_margin="6dp"/>
 
     </android.support.constraint.ConstraintLayout>
 

@@ -24,6 +24,7 @@ import com.ekylibre.android.database.pojos.PlotWithCrops;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class SelectCropFragment extends DialogFragment {
@@ -55,6 +56,9 @@ public class SelectCropFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         dataset = InterventionActivity.plotList;
+
+        // Disables AppBar
+        Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_crop, container, false);
 

@@ -23,6 +23,7 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Material;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class SelectMaterialFragment extends DialogFragment {
@@ -57,6 +58,9 @@ public class SelectMaterialFragment extends DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        // Disables AppBar
+        Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_material, container, false);
 
@@ -107,7 +111,7 @@ public class SelectMaterialFragment extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         new RequestDatabase(context).execute();

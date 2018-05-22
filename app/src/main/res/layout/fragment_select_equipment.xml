@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             app:title="Sélectionnez un outil"
             app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
-            app:titleTextColor="@color/icons"
+            app:titleTextColor="@color/white"
             android:background="@color/accent"/>
     </android.support.design.widget.AppBarLayout>
 

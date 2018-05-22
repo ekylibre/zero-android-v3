@@ -23,6 +23,7 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class SelectEquipmentFragment extends DialogFragment {
@@ -57,6 +58,9 @@ public class SelectEquipmentFragment extends DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        // Disables AppBar
+        Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_equipment, container, false);
 

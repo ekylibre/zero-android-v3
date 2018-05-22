@@ -34,8 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/chose_nature"
-        style="@style/InputLabel"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"/>  <!-- style="@style/InputLabel" -->
 
     <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/create_ferti_nature_spinner"
