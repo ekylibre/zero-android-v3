@@ -18,6 +18,7 @@ import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.ProfileQuery;
 import com.ekylibre.android.PullQuery;
+import com.ekylibre.android.PushEquipmentMutation;
 import com.ekylibre.android.PushInterventionMutation;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
@@ -55,6 +56,7 @@ import com.ekylibre.android.type.CreateInterventionOperatorInputObject;
 import com.ekylibre.android.type.CreateInterventionTargetInputObject;
 import com.ekylibre.android.type.CreateInterventionToolInputObject;
 import com.ekylibre.android.type.CreateInterventionWorkingDayInputObject;
+import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoles;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -214,7 +216,7 @@ public class SyncService extends IntentService {
                             if (result != 1) {
                                 Log.i(TAG, "Creating equipment");
                                 database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                        equipment.name(), equipment.nature(), equipment.number(), farm.id()));
+                                        equipment.name(), equipment.type().rawValue(), equipment.number(), farm.id()));
                             }
                         }
                     }
@@ -424,9 +426,43 @@ public class SyncService extends IntentService {
 
         database = AppDatabase.getInstance(this);
 
-        List<Interventions> interventions = database.dao().getSyncableInterventions();
-
         ApolloClient apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
+
+
+        // Push new Equipments
+        List<Equipment> newEquipments = database.dao().getEquipmentWithoutEkyId();
+        Log.i(TAG, "new Equipment list --> " + newEquipments.toString());
+
+        if (!newEquipments.isEmpty()) {
+            for (Equipment equipment : newEquipments) {
+
+                PushEquipmentMutation pushEquipment = PushEquipmentMutation.builder()
+                        .farmId(equipment.farmId)
+                        .type(EquipmentTypeEnum.safeValueOf(equipment.type))
+                        .name(equipment.name)
+                        .number(equipment.number)
+                        .build();
+
+                apolloClient.mutate(pushEquipment).enqueue(new ApolloCall.Callback<PushEquipmentMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushEquipmentMutation.Data> response) {
+                        if (!response.hasErrors()) {
+                            PushEquipmentMutation.CreateEquipmentMutation mutation = response.data().createEquipmentMutation();
+                            if (mutation.errors() == null) {
+                                database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Log.e(TAG, e.getLocalizedMessage());
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        }
+
+        List<Interventions> interventions = database.dao().getSyncableInterventions();
 
         for (Interventions inter : interventions) {
 
@@ -459,15 +495,9 @@ public class SyncService extends IntentService {
             }
 
             for (Equipments equipment : inter.equipments) {
-                if (equipment.equipment.get(0).eky_id == null) {
-                    tools.add(CreateInterventionToolInputObject.builder()
-                            .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id))
-                            .build());
-                } else {
-                    tools.add(CreateInterventionToolInputObject.builder()
-                            .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id))
-                            .build());
-                }
+                tools.add(CreateInterventionToolInputObject.builder()
+                        .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id))
+                        .build());
             }
 
             for (Phytos phyto : inter.phytos) {

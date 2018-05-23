@@ -142,6 +142,9 @@ public interface DAO {
     @Query("SELECT " + Equipment.COLUMN_ID + " FROM " + Equipment.TABLE_NAME + " WHERE " + Equipment.COLUMN_ID_EKY + " = :eky_id")
     int getEquipmentId(int eky_id);
 
+    @Query("SELECT * FROM "+Equipment.TABLE_NAME+" WHERE " + Equipment.COLUMN_ID_EKY + " IS NULL")
+    List<Equipment> getEquipmentWithoutEkyId();
+
 
     /**
      *    Material

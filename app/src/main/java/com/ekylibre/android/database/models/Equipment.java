@@ -26,14 +26,14 @@ public class Equipment {
 
     public String number;
 
-    public String nature;
+    public String type;
 
     public String farmId;
 
-    public Equipment(Integer eky_id, String name, String nature, String number, String farmId) {
+    public Equipment(Integer eky_id, String name, String type, String number, String farmId) {
         this.eky_id = eky_id;
         this.name = name;
-        this.nature = nature;
+        this.type = type;
         this.number = number;
         this.farmId = farmId;
     }

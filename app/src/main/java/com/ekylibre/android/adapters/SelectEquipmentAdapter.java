@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,11 +65,9 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         void display(Equipment item) {
             equipment = item;
             nameTextView.setText(item.name);
-            if (!item.nature.isEmpty()) {
-                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.nature));
-                typeTextView.setText(equipment_type);
-            }
-            typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.nature, "drawable", context.getPackageName()));
+            String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.type.toLowerCase()));
+            typeTextView.setText(equipment_type);
+            typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName()));
 
         }
     }

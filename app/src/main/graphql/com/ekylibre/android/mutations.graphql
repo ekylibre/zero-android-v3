@@ -31,3 +31,27 @@ mutation pushIntervention(
     }
   }
 }
+
+mutation pushEquipment(
+  $farmId: ID!,
+  $type: EquipmentTypeEnum,
+  $name: String!
+  $number: String
+) {
+  createEquipmentMutation(
+    input: {
+      equipment: {
+        farmID: $farmId
+        type: $type
+        name: $name
+        number: $number
+      }
+    }
+  ) {
+    errors,
+    equipment {
+      id
+    }
+  }
+
+}

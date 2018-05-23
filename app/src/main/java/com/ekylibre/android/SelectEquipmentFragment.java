@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.type.EquipmentTypeEnum;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -163,10 +164,8 @@ public class SelectEquipmentFragment extends DialogFragment {
             TextInputLayout numberTextInput = dialogView.findViewById(R.id.create_equipment_number);
             String number = numberTextInput.getEditText().getText().toString();
 
-
-
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Equipment(null, name, type, number, MainActivity.currentFarmId));
+            database.dao().insert(new Equipment(null, name, type.toUpperCase(), number, MainActivity.currentFarmId));
 
             return null;
         }
