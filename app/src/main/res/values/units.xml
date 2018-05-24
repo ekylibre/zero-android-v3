@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="irrigation_unit_values">
+        <item>m³</item>
+        <item>liter</item>
+        <item>hl</item>
+    </string-array>
+
+    <string-array name="irrigation_unit_keys">
+        <item>CUBIC_METER</item>
+        <item>LITER</item>
+        <item>HECTOLITER</item>
+    </string-array>
+
+
     <string-array name="volume_unit_values">
         <item>l</item>
         <item>l/ha</item>

@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,6 +50,8 @@ import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
+import com.ekylibre.android.utils.Unit;
+import com.ekylibre.android.utils.Units;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -80,7 +83,7 @@ public class InterventionActivity extends AppCompatActivity implements
     // Irrigation layout
     private Group irrigationDetail;
     private ImageView irrigationArrow;
-    private TextView irrigationSummary;
+    private TextView irrigationSummary, irrigationTotal;
     private EditText irrigationQuantityEdit;
     private AppCompatSpinner irrigationUnitSpinner;
 
@@ -175,6 +178,7 @@ public class InterventionActivity extends AppCompatActivity implements
         irrigationDetail = findViewById(R.id.irrigation_detail);
         irrigationArrow = findViewById(R.id.irrigation_arrow);
         irrigationSummary = findViewById(R.id.irrigation_summary);
+        irrigationTotal = findViewById(R.id.irrigation_total);
         irrigationQuantityEdit = findViewById(R.id.irrigation_quantity_edit);
         irrigationUnitSpinner = findViewById(R.id.irrigation_unit_spinner);
 
@@ -262,9 +266,8 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== IRRIGATION EVENTS =================================== //
 
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.volume_unit_values, android.R.layout.simple_spinner_dropdown_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        irrigationUnitSpinner.setAdapter(spinnerAdapter);
+        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
+        irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
 
         View.OnClickListener irrigationListener = view -> {
             if (irrigationDetail.getVisibility() == View.GONE) {
@@ -280,21 +283,45 @@ public class InterventionActivity extends AppCompatActivity implements
 
         irrigationLayout.setOnClickListener(irrigationListener);
 
+        irrigationQuantityEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-//        irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String string = itemQuantityEdit.getText().toString();
-//                if (!string.isEmpty()) {
-//                    itemTotal.setText(calculTotal(Float.valueOf(string)));
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().equals("0") || editable.length() == 0) {
+                    irrigationTotal.setText(R.string.quantity_cannot_be_null);
+                    irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
+                } else {
+                    String unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).getName();
+                    Log.i(TAG, "Unit --> " + unit);
+                    String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", Integer.valueOf(editable.toString()) / surface, unit);
+                    irrigationTotal.setText(message);
+//                    float total = (Integer.valueOf(editable.toString()) * ) / surface;
+//                    irrigationTotal.setText(String.format(MainActivity.LOCALE, "Soit %f.1 %s", );
+                    irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
+                }
+            }
+        });
+
+        irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String quantityEditText = irrigationQuantityEdit.getText().toString();
+                if (!quantityEditText.isEmpty()) {
+                    Integer quantity = Integer.valueOf(quantityEditText);
+                    Unit unit = Units.IRRIGATION_UNITS.get(position);
+                    String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", quantity / surface, unit.name);
+                    irrigationTotal.setText(message);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
@@ -644,7 +671,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 windSpeed = windSpeedEditText.getText().toString();
 
             if (temperature != null || windSpeed != null || weatherDescription != null) {
-                Weather weather = new Weather(String.valueOf(intervention_id), temperature, windSpeed, weatherDescription);
+                Weather weather = new Weather(intervention_id, temperature, windSpeed, weatherDescription);
                 database.dao().insert(weather);
             }
 

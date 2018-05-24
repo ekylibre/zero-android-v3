@@ -43,7 +43,7 @@ public class Interventions {
     public List<Persons> persons;
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = Weather.COLUMN_INTERVENTION_ID, entity = Weather.class)
-    public Weather weather;
+    public List<Weather> weather;
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionCrop.COLUMN_INTERVENTION_ID, entity = InterventionCrop.class)
     public List<Crops> crops;

@@ -21,16 +21,15 @@ public class Weather {
     public static final String TABLE_NAME = "weather";
     public static final String COLUMN_INTERVENTION_ID = "intervention_id";
 
-    @NonNull
     @PrimaryKey
     @ColumnInfo(index = true, name = COLUMN_INTERVENTION_ID)
-    public String intervention_id;
+    public int intervention_id;
 
     public String temperature;
     public String wind_speed;
     public String description;
 
-    public Weather(@NonNull String intervention_id, String temperature, String wind_speed, String description) {
+    public Weather(int intervention_id, String temperature, String wind_speed, String description) {
         this.intervention_id = intervention_id;
         this.temperature = temperature;
         this.wind_speed = wind_speed;

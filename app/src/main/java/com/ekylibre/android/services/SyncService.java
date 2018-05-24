@@ -324,10 +324,10 @@ public class SyncService extends IntentService {
                                 }
 
                                 // Saving Weather
-                                PullQuery.Weather weather = farm.interventions().get(index).weather();
-                                if ( weather != null) {
-                                    database.dao().insert(new Weather(String.valueOf(newInterId), weather.temperature(), weather.windSpeed(), weather.description().rawValue()));
-                                }
+//                                PullQuery.Weather weather = farm.interventions().get(index).weather();
+//                                if ( weather != null) {
+//                                    database.dao().insert(new Weather(newInterId, weather.temperature(), weather.windSpeed(), weather.description().rawValue()));
+//                                }
 
                                 // Saving Equipments
                                 for (PullQuery.Tool tool : farm.interventions().get(index).tools()) {
@@ -570,11 +570,11 @@ public class SyncService extends IntentService {
                 }
             }
 
-//            if (inter.weather != null) {
+//            for (Weather weather : inter.weather) {
 //                inputs.add(CreateInterventionWeatherInputObject.builder()
-//                        .temperature(inter.weather.temperature)
-//                        .windSpeed(inter.weather.wind_speed)
-//                        .description(WeatherEnum.valueOf(inter.weather.description)) // TODO: handle null
+//                        .temperature(inter.weather.get(0).temperature)
+//                        .windSpeed(inter.weather.get(0).wind_speed)
+//                        .description(WeatherEnum.valueOf(inter.weather.get(0).description)) // TODO: handle null
 //                        .build());
 //            }
 

@@ -28,6 +28,8 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.Unit;
+import com.ekylibre.android.utils.Units;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -92,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         // Set locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
+
+        createUnitsLocale();
 
         // Get shared preferences and set title
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
@@ -313,18 +317,11 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     private void onProcedureChoice(String procedure) {
-        if (procedure.equals(HARVEST)) {
-            deployMenu(false);
-            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.BOTTOM, 0, 200);
-            toast.show();
-        } else {
-            Intent intent = new Intent(this, InterventionActivity.class);
-            intent.putExtra("nature", TYPE);
-            intent.putExtra("procedure", procedure);
-            startActivity(intent);
-            deployMenu(false);
-        }
+        Intent intent = new Intent(this, InterventionActivity.class);
+        intent.putExtra("nature", TYPE);
+        intent.putExtra("procedure", procedure);
+        startActivity(intent);
+        deployMenu(false);
     }
 
     private Boolean deployMenu(Boolean state) {
@@ -367,6 +364,24 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             intent.setAction(SyncService.ACTION_SYNC_PULL);
             intent.putExtra("receiver", resultReceiver);
             startService(intent);
+        }
+    }
+
+    private void createUnitsLocale() {
+        for (Unit unit : Units.IRRIGATION_UNITS) {
+            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            Units.IRRIGATION_UNITS_L10N.add(name);
+            unit.setName(name);
+        }
+        for (Unit unit : Units.VOLUME_UNITS) {
+            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            Units.VOLUME_UNITS_L10N.add(name);
+            unit.setName(name);
+        }
+        for (Unit unit : Units.MASS_UNITS) {
+            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            Units.MASS_UNITS_L10N.add(name);
+            unit.setName(name);
         }
     }
 

@@ -163,6 +163,19 @@
     <string name="CUBIC_METER_PER_HECTARE">CUBIC_METER_PER_HECTARE</string>
     <string name="CUBIC_METER_PER_SQUARE_METER">CUBIC_METER_PER_SQUARE_METER</string>
 
+    <string name="GRAM">grammes</string>
+    <string name="GRAM_PER_HECTARE">g/ha</string>
+    <string name="GRAM_PER_SQUARE_METER">g/m²</string>
+    <string name="KILOGRAM">kg</string>
+    <string name="KILOGRAM_PER_HECTARE">kg/ha</string>
+    <string name="KILOGRAM_PER_SQUARE_METER">kg/m²</string>
+    <string name="QUINTAL">quintaux</string>
+    <string name="QUINTAL_PER_HECTARE">q/ha</string>
+    <string name="QUINTAL_PER_SQUARE_METER">q/m²</string>
+    <string name="TON">tonnes</string>
+    <string name="TON_PER_HECTARE">tonnes/ha</string>
+    <string name="TON_PER_SQUARE_METER">tonnes/m²</string>
+
     <!-- App strings -->
     <string name="app_name">Clic&amp;Farm</string>
     <string name="starting_intervention">Start intervention</string>
@@ -250,6 +263,7 @@
     <string name="temperature">Température</string>
     <string name="not_provided">Non renseignée</string>
     <string name="wind_speed">Vitesse du vent</string>
+    <string name="quantity_cannot_be_null">Quantité ne peut être nulle</string>
 
 
 </resources>
