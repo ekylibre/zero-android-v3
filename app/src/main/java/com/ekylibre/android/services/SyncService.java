@@ -30,6 +30,7 @@ import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
+import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -59,6 +60,7 @@ import com.ekylibre.android.type.CreateInterventionWorkingDayInputObject;
 import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoles;
+import com.ekylibre.android.type.WeatherEnum;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -176,7 +178,7 @@ public class SyncService extends IntentService {
                                     crop.productionMode(), null, null, null,
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
                                     crop.startDate(), crop.stopDate(), crop.plot().uuid(),
-                                    null, farm.id());
+                                    farm.id());
                             database.dao().insert(newCrop);
 
                             // Saving plot
@@ -319,6 +321,12 @@ public class SyncService extends IntentService {
                                         int personId = database.dao().getPersonId(Integer.valueOf(operator.person().id()));
                                         database.dao().insert(new InterventionPerson(newInterId, personId, isDiver));
                                     }
+                                }
+
+                                // Saving Weather
+                                PullQuery.Weather weather = farm.interventions().get(index).weather();
+                                if ( weather != null) {
+                                    database.dao().insert(new Weather(String.valueOf(newInterId), weather.temperature(), weather.windSpeed(), weather.description().rawValue()));
                                 }
 
                                 // Saving Equipments
@@ -561,6 +569,14 @@ public class SyncService extends IntentService {
                             .build());
                 }
             }
+
+//            if (inter.weather != null) {
+//                inputs.add(CreateInterventionWeatherInputObject.builder()
+//                        .temperature(inter.weather.temperature)
+//                        .windSpeed(inter.weather.wind_speed)
+//                        .description(WeatherEnum.valueOf(inter.weather.description)) // TODO: handle null
+//                        .build());
+//            }
 
             PushInterventionMutation pushIntervention = PushInterventionMutation.builder()
                     .farmId(inter.intervention.farm)

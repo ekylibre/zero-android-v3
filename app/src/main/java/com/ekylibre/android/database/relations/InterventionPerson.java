@@ -18,9 +18,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @ForeignKey(entity = Person.class, parentColumns = Person.COLUMN_ID, childColumns = InterventionPerson.COLUMN_PERSON_ID)})
 public class InterventionPerson {
 
-    public static final String TABLE_NAME = "interventions_person";
-    public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
-    public static final String COLUMN_PERSON_ID = "person" + BaseColumns._ID;
+    public static final String TABLE_NAME = "intervention_persons";
+    public static final String COLUMN_INTERVENTION_ID = "intervention_id";
+    public static final String COLUMN_PERSON_ID = "person_id";
 
     @NonNull
     @ColumnInfo(name = COLUMN_INTERVENTION_ID, index = true)

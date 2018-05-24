@@ -1,17 +1,13 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:paddingTop="24dp"
     android:paddingBottom="24dp"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp"    android:background="@drawable/border_bottom"
-    tools:showIn="@layout/activity_intervention">
-
-    <!--android:focusable="true"-->
-    <!--android:focusableInTouchMode="true"-->
+    android:paddingEnd="16dp"
+    android:background="@drawable/border_bottom">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/working_period_arrow"
@@ -48,7 +44,7 @@
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="working_period_date_label,working_period_edit_date,
         working_period_duration_label,working_period_edit_duration,working_period_duration_unit"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
     <!-- Detailed view below -->
     <android.support.v7.widget.AppCompatTextView

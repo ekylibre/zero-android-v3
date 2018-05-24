@@ -19,6 +19,7 @@ import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
+import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
@@ -43,11 +44,12 @@ import java.util.List;
         Intervention.class,
         InterventionWorkingDay.class,
         Phyto.class, InterventionPhytosanitary.class, PhytoDose.class,
-        Seed.class, InterventionSeed.class, Specie.class,
+        Seed.class, InterventionSeed.class,
         Fertilizer.class, InterventionFertilizer.class,
         Material.class, InterventionMaterial.class,
         Equipment.class, InterventionEquipment.class,
         Person.class, InterventionPerson.class,
+        Weather.class,
         Crop.class, InterventionCrop.class,
         Plot.class,
         Farm.class

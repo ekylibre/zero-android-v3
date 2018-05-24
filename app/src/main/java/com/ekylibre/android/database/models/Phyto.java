@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
 public class Phyto {
 
     public static final String TABLE_NAME = "phytos";
-    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID = "phyto_id";
     public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
 
     @PrimaryKey

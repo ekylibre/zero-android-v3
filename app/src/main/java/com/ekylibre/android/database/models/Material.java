@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
 public class Material {
 
     public static final String TABLE_NAME = "materials";
-    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID = "material_id";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID)

@@ -27,9 +27,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         primaryKeys = { InterventionFertilizer.COLUMN_INTERVENTION_ID, InterventionFertilizer.COLUMN_FERTI_ID})
 public class InterventionFertilizer {
 
-    public static final String TABLE_NAME = "interventions_ferti";
-    public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
-    public static final String COLUMN_FERTI_ID = "ferti" + BaseColumns._ID;
+    public static final String TABLE_NAME = "intervention_fertilizers";
+    public static final String COLUMN_INTERVENTION_ID = "intervention_id";
+    public static final String COLUMN_FERTI_ID = "fertilizer_id";
 
     public float quantity;
 

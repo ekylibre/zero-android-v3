@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Non renseignée"
+        android:text="@string/not_provided"
         app:layout_constraintBaseline_toBaselineOf="@id/weather_label"
         app:layout_constraintStart_toEndOf="@+id/weather_label" />
 
@@ -47,8 +47,9 @@
         android:id="@+id/weather_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="weather_temp_label,weather_edit_temp,
-        weather_wind_label,weather_edit_wind,weather_wind_unit"
+        app:constraint_referenced_ids="weather_temp_label,weather_edit_temp,weather_temp_unit,
+        weather_wind_label,weather_edit_wind,weather_wind_unit,
+        weather_broken_clouds, weather_clear_sky,weather_few_clouds,weather_light_rain,weather_mist,weather_shower_rain,weather_snow,weather_thunderstorm"
         android:visibility="visible"/>
 
     <!-- Detailed view below -->
@@ -92,7 +93,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/weather_temp_label"
         app:layout_constraintBaseline_toBaselineOf="@id/weather_edit_wind"
-        android:text="Vitesse du vent" />
+        android:text="@string/wind_speed" />
 
     <android.support.v7.widget.AppCompatEditText
         android:id="@+id/weather_edit_wind"
@@ -127,7 +128,7 @@
         android:id="@+id/weather_broken_clouds"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_broken_clouds"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
@@ -142,7 +143,7 @@
         android:id="@+id/weather_clear_sky"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_clear_sky"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -157,7 +158,7 @@
         android:id="@+id/weather_few_clouds"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_few_clouds"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -172,7 +173,7 @@
         android:id="@+id/weather_light_rain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_light_rain"
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/weather_few_clouds"
@@ -186,7 +187,7 @@
         android:id="@+id/weather_mist"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_mist"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
@@ -201,7 +202,7 @@
         android:id="@+id/weather_shower_rain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_shower_rain"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -216,7 +217,7 @@
         android:id="@+id/weather_snow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_snow"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -231,7 +232,7 @@
         android:id="@+id/weather_thunderstorm"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
+        android:background="@drawable/selectable_image_button"
         app:srcCompat="@drawable/weather_thunderstorm"
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/weather_snow"

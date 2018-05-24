@@ -19,6 +19,7 @@ import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
+import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
@@ -44,8 +45,8 @@ public interface DAO {
     @Transaction @Insert void insert(Phyto... phytos);
     @Transaction @Insert void insert(PhytoDose... doses);
     @Transaction @Insert void insert(Seed... seeds);
-    @Transaction @Insert void insert(Specie... species);
     @Transaction @Insert void insert(Fertilizer... fertilizers);
+    @Transaction @Insert void insert(Weather... weather);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... persons);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
@@ -90,11 +91,11 @@ public interface DAO {
     @Transaction
     @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
             " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
-            " WHERE farm = :farmId ORDER BY execution_date DESC, interventions_id_eky DESC")
+            " WHERE farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
     List<Interventions> selectInterventions(String farmId);
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE interventions_id_eky IS NULL")
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL")
     List<Interventions> getSyncableInterventions();
 
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId, " +

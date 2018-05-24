@@ -27,12 +27,12 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         primaryKeys = { InterventionPhytosanitary.COLUMN_INTERVENTION_ID, InterventionPhytosanitary.COLUMN_PHYTO_ID })
 public class InterventionPhytosanitary {
 
-    public static final String TABLE_NAME = "interventions_phyto";
+    public static final String TABLE_NAME = "intervention_phytosanitary";
 
     public static final String COLUMN_QUANTITY = "quantity";
     public static final String COLUMN_UNIT = "unit";
-    public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
-    public static final String COLUMN_PHYTO_ID = "phyto" + BaseColumns._ID;
+    public static final String COLUMN_INTERVENTION_ID = "intervention_id";
+    public static final String COLUMN_PHYTO_ID = "phytosanitary_id";
 
     @ColumnInfo(name = COLUMN_QUANTITY)
     public float quantity;

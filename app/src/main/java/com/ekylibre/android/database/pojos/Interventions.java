@@ -4,6 +4,7 @@ import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
 
 import com.ekylibre.android.database.models.Intervention;
+import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
@@ -40,6 +41,9 @@ public class Interventions {
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionPerson.COLUMN_INTERVENTION_ID, entity = InterventionPerson.class)
     public List<Persons> persons;
+
+    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = Weather.COLUMN_INTERVENTION_ID, entity = Weather.class)
+    public Weather weather;
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionCrop.COLUMN_INTERVENTION_ID, entity = InterventionCrop.class)
     public List<Crops> crops;

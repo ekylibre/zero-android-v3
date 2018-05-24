@@ -5,7 +5,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 
 import com.ekylibre.android.database.models.Intervention;
@@ -25,9 +24,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 )
 public class InterventionWorkingDay {
 
-    public static final String TABLE_NAME = "interventions_working_day";
-    public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
-    public static final String COLUMN_ID = "working_day" + BaseColumns._ID;
+    public static final String TABLE_NAME = "intervention_working_days";
+    public static final String COLUMN_INTERVENTION_ID = "wd_intervention_id";
+    public static final String COLUMN_ID = "wd_id";
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID, index = true)

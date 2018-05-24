@@ -17,7 +17,7 @@ import android.provider.BaseColumns;
 public class Seed {
 
     public static final String TABLE_NAME = "seeds";
-    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID = "seed_id";
     public static final String COLUMN_SPECIE = "specie";
     public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
 

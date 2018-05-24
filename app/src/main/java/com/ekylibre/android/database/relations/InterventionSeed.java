@@ -27,9 +27,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         primaryKeys = { InterventionSeed.COLUMN_INTERVENTION_ID, InterventionSeed.COLUMN_SEED_ID})
 public class InterventionSeed {
 
-    public static final String TABLE_NAME = "interventions_seed";
-    public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
-    public static final String COLUMN_SEED_ID = "seed" + BaseColumns._ID;
+    public static final String TABLE_NAME = "intervention_seeds";
+    public static final String COLUMN_INTERVENTION_ID = "intervention_id";
+    public static final String COLUMN_SEED_ID = "seed_id";
 
     public float quantity;
 

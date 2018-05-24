@@ -22,10 +22,9 @@ import java.util.Date;
 public class Crop {
 
     public static final String TABLE_NAME = "crops";
-    public static final String COLUMN_UUID = TABLE_NAME + "_uuid";
+    public static final String COLUMN_UUID = "crop_uuid";
     public static final String COLUMN_FARM = "farm";
     public static final String COLUMN_PLOT = "plot";
-    public static final String COLUMN_SUBPLOT = "subplot";
 
     @NonNull
     @PrimaryKey
@@ -58,9 +57,6 @@ public class Crop {
     @ColumnInfo(name = COLUMN_PLOT, index = true)
     public String plot;
 
-    @ColumnInfo(name = COLUMN_SUBPLOT, index = true)
-    public String subplot;
-
     @ColumnInfo(name = COLUMN_FARM, index = true)
     public String farm;
 
@@ -73,8 +69,7 @@ public class Crop {
     public Crop(@NonNull String uuid, String name, String specie, String production_nature,
                 String production_mode, String production_output, String provisional_yield,
                 String shape, float surface_area, String centroid, Date start_date, Date stop_date,
-                String plot, String subplot,
-                String farm) {
+                String plot, String farm) {
 
         this.uuid = uuid;
         this.name = name;
@@ -89,7 +84,6 @@ public class Crop {
         this.start_date = start_date;
         this.stop_date = stop_date;
         this.plot = plot;
-        this.subplot = subplot;
         this.farm = farm;
         this.is_checked = false;
         this.work_area_percentage = 100;

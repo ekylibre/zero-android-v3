@@ -34,7 +34,7 @@
 
             <include layout="@layout/include_person" />
 
-            <include layout="@layout/include_weather" />
+            <include layout="@layout/include_weather" android:id="@+id/weather_layout" />
 
         </android.support.v7.widget.LinearLayoutCompat>
 

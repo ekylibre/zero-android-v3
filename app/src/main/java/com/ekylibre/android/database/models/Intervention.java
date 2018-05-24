@@ -12,7 +12,7 @@ import java.util.Date;
 public class Intervention {
 
     public static final String TABLE_NAME = "interventions";
-    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID = "intervention_id";
     public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
 
     @PrimaryKey(autoGenerate = true)
@@ -22,26 +22,12 @@ public class Intervention {
     public Integer eky_id;
     public String type;
     public Integer output;
-    public Integer weather_temp;
-    public Integer weather_wind;
-    public Integer weather_desc;
+
     public Integer water_quantity;
     public String water_unit;
     public String farm;
     public String comment;  // not yet implemented in api
     public String status;
-
-/*    public Intervention(String type, Integer output, Integer weather_temp, Integer weather_wind, Integer weather_desc, Float water_quantity, String water_unit, String farm, String comment) {
-        this.type = type;
-        this.output = output;
-        this.weather_temp = weather_temp;
-        this.weather_wind = weather_wind;
-        this.weather_desc = weather_desc;
-        this.water_quantity = water_quantity;
-        this.water_unit = water_unit;
-        this.farm = farm;
-        this.comment = comment;
-    }*/
 
     public Integer getEky_id() {
         return eky_id;
@@ -65,30 +51,6 @@ public class Intervention {
 
     public void setOutput(Integer output) {
         this.output = output;
-    }
-
-    public Integer getWeather_temp() {
-        return weather_temp;
-    }
-
-    public void setWeather_temp(Integer weather_temp) {
-        this.weather_temp = weather_temp;
-    }
-
-    public Integer getWeather_wind() {
-        return weather_wind;
-    }
-
-    public void setWeather_wind(Integer weather_wind) {
-        this.weather_wind = weather_wind;
-    }
-
-    public Integer getWeather_desc() {
-        return weather_desc;
-    }
-
-    public void setWeather_desc(Integer weather_desc) {
-        this.weather_desc = weather_desc;
     }
 
     public Integer getWater_quantity() {

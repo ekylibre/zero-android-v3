@@ -248,6 +248,8 @@
     <string name="menu_logout">Déconnecter</string>
     <string name="label_weather">Météo</string>
     <string name="temperature">Température</string>
+    <string name="not_provided">Non renseignée</string>
+    <string name="wind_speed">Vitesse du vent</string>
 
 
 </resources>

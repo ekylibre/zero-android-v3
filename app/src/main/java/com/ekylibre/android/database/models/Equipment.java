@@ -3,14 +3,13 @@ package com.ekylibre.android.database.models;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.provider.BaseColumns;
 
 
 @Entity(tableName = Equipment.TABLE_NAME)
 public class Equipment {
 
     public static final String TABLE_NAME = "equipments";
-    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID = "equipment_id";
     public static final String COLUMN_ID_EKY = COLUMN_ID + "_eky";
 
 

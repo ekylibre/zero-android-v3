@@ -18,9 +18,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @ForeignKey(entity = Crop.class, parentColumns = Crop.COLUMN_UUID, childColumns = InterventionCrop.COLUMN_CROP_ID)})
 public class InterventionCrop {
 
-    public static final String TABLE_NAME = "interventions_crop";
-    public static final String COLUMN_INTERVENTION_ID = "intervention" + BaseColumns._ID;
-    public static final String COLUMN_CROP_ID = "crop" + BaseColumns._ID;
+    public static final String TABLE_NAME = "intervention_crops";
+    public static final String COLUMN_INTERVENTION_ID = "intervention_id";
+    public static final String COLUMN_CROP_ID = "crop_id" + BaseColumns._ID;
 
     public Integer work_area_percentage;
 

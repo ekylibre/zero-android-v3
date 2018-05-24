@@ -11,9 +11,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -31,6 +35,7 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Phyto;
+import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Materials;
@@ -39,10 +44,13 @@ import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.PlotWithCrops;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
+import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
+import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -60,19 +68,16 @@ public class InterventionActivity extends AppCompatActivity implements
         SelectCropFragment.OnFragmentInteractionListener {
 
     private static final String TAG = InterventionActivity.class.getName();
+
     public static final String CREATED = "created";
     public static final String SYNCED = "synced";
     public static final String VALIDATED = "validated";
-
-    // UI components
-    Button saveButton;
-    Button cancelButton;
-    InputMethodManager keyboardManager;
 
     // Crops layout
     private TextView cropSummary, cropAddLabel;
     private DialogFragment selectCropFragment;
 
+    // Irrigation layout
     private Group irrigationDetail;
     private ImageView irrigationArrow;
     private TextView irrigationSummary;
@@ -81,11 +86,11 @@ public class InterventionActivity extends AppCompatActivity implements
 
     // Working period layout
     private Group workingPeriodDetail;
-    private ConstraintLayout workingPeriodLayout;
     private ImageView workingPeriodArrow;
     private TextView workingPeriodSummary, workingPeriodDurationUnit;
     private EditText workingPeriodEditDate, workingPeriodEditDuration;
 
+    // Input layout
     private ImageView inputArrow;
     private TextView inputSummary, inputAddLabel;
     private DialogFragment selectInputFragment;
@@ -113,6 +118,14 @@ public class InterventionActivity extends AppCompatActivity implements
     private RecyclerView personRecyclerView;
     private RecyclerView.Adapter personAdapter;
 
+    // Weather layout
+    private Group weatherDetail;
+    private ImageView weatherArrow;
+    private TextView weatherSummary;
+    private EditText temperatureEditText, windSpeedEditText;
+    private AppCompatImageButton brokenClouds, clearSky, fewClouds, lightRain, mist, showerRain, snow, thunderstorm;
+
+
     // Current Intervention values
     public static List<Object> inputList = new ArrayList<>();
     public static List<Materials> materialList = new ArrayList<>();
@@ -121,13 +134,17 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<PlotWithCrops> plotList = new ArrayList<>();
     public static String cropSummaryText;
 
+    private List<AppCompatImageButton> weatherIcons;
+    private List<String> weatherEnum;
     private Calendar today = Calendar.getInstance();
     private Calendar date = Calendar.getInstance();
 
+    private InputMethodManager keyboardManager;
     public static String procedure;
     private int duration = 7;
     public static float surface = 0f;
     private List volumeUnitKeys;
+    private String weatherDescription;
 
 
     @Override
@@ -157,11 +174,12 @@ public class InterventionActivity extends AppCompatActivity implements
         ConstraintLayout irrigationLayout = findViewById(R.id.irrigation_layout);
         irrigationDetail = findViewById(R.id.irrigation_detail);
         irrigationArrow = findViewById(R.id.irrigation_arrow);
+        irrigationSummary = findViewById(R.id.irrigation_summary);
         irrigationQuantityEdit = findViewById(R.id.irrigation_quantity_edit);
         irrigationUnitSpinner = findViewById(R.id.irrigation_unit_spinner);
 
         // Working period
-        workingPeriodLayout = findViewById(R.id.working_period_layout);
+        ConstraintLayout workingPeriodLayout = findViewById(R.id.working_period_layout);
         workingPeriodDetail = findViewById(R.id.working_period_detail);
         workingPeriodArrow = findViewById(R.id.working_period_arrow);
         workingPeriodSummary = findViewById(R.id.working_period_summary);
@@ -196,23 +214,43 @@ public class InterventionActivity extends AppCompatActivity implements
         personAddLabel = findViewById(R.id.person_add_label);
         personRecyclerView = findViewById(R.id.person_recycler);
 
+        // Weather
+        ConstraintLayout weatherLayout = findViewById(R.id.weather_layout);
+        weatherDetail = findViewById(R.id.weather_detail);
+        weatherArrow = findViewById(R.id.weather_arrow);
+        weatherSummary = findViewById(R.id.weather_summary);
+        temperatureEditText = findViewById(R.id.weather_edit_temp);
+        windSpeedEditText = findViewById(R.id.weather_edit_wind);
+        brokenClouds = findViewById(R.id.weather_broken_clouds);
+        clearSky = findViewById(R.id.weather_clear_sky);
+        fewClouds = findViewById(R.id.weather_few_clouds);
+        lightRain = findViewById(R.id.weather_light_rain);
+        mist = findViewById(R.id.weather_mist);
+        showerRain = findViewById(R.id.weather_shower_rain);
+        snow = findViewById(R.id.weather_snow);
+        thunderstorm = findViewById(R.id.weather_thunderstorm);
 
         // ================================ UI SETTINGS ======================================== //
 
+        // Fold all accordions
+        irrigationDetail.setVisibility(View.GONE);
+        workingPeriodDetail.setVisibility(View.GONE);
+        weatherDetail.setVisibility(View.GONE);
+
+        // Default state of conditional parameters depending on current procedure
         irrigationLayout.setVisibility(View.GONE);
         inputLayout.setVisibility(View.VISIBLE); // TODO: hide input in some case
         // materialLayout.setVisibility(View.GONE);
-
 
         switch (procedure) {
             case MainActivity.IRRIGATION:
                 irrigationLayout.setVisibility(View.VISIBLE);
                 break;
+            case MainActivity.GROUND_WORK:
+                inputLayout.setVisibility(View.GONE);
+                break;
 //            case MainActivity.CARE:
 //                materialLayout.setVisibility(View.VISIBLE);
-//                break;
-//            case MainActivity.GROUND_WORK:
-//                materialLayout.setVisibility(View.GONE);
 //                break;
         }
 
@@ -227,6 +265,21 @@ public class InterventionActivity extends AppCompatActivity implements
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.volume_unit_values, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         irrigationUnitSpinner.setAdapter(spinnerAdapter);
+
+        View.OnClickListener irrigationListener = view -> {
+            if (irrigationDetail.getVisibility() == View.GONE) {
+                irrigationArrow.setRotation(180);
+                irrigationSummary.setVisibility(View.GONE);
+                irrigationDetail.setVisibility(View.VISIBLE);
+            } else {
+                irrigationArrow.setRotation(0);
+                irrigationSummary.setVisibility(View.VISIBLE);
+                irrigationDetail.setVisibility(View.GONE);
+            }
+        };
+
+        irrigationLayout.setOnClickListener(irrigationListener);
+
 
 //        irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 //            @Override
@@ -490,25 +543,65 @@ public class InterventionActivity extends AppCompatActivity implements
         });
         personRecyclerView.setAdapter(personAdapter);
 
+        // =============================== WEATHER EVENTS ====================================== //
+
+        weatherLayout.setOnClickListener(view -> {
+            if (weatherDetail.getVisibility() == View.GONE) {
+                weatherDetail.setVisibility(View.VISIBLE);
+                weatherSummary.setVisibility(View.GONE);
+                weatherArrow.setRotation(180);
+            } else {
+                weatherDetail.setVisibility(View.GONE);
+                weatherSummary.setVisibility(View.VISIBLE);
+                weatherArrow.setRotation(0);
+            }
+        });
+
+        temperatureEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() > 0)
+                    weatherSummary.setText(editable.toString() + "°C");
+                else
+                    weatherSummary.setText(R.string.not_provided);
+            }
+        });
+
+        // Generates all click listeners
+        weatherIcons = Arrays.asList(brokenClouds, clearSky, fewClouds, lightRain, mist, showerRain, snow, thunderstorm);
+        weatherEnum = Arrays.asList(WeatherEnum.BROKEN_CLOUDS.rawValue(), WeatherEnum.CLEAR_SKY.rawValue(), WeatherEnum.FEW_CLOUDS.rawValue(), WeatherEnum.LIGHT_RAIN.rawValue(), WeatherEnum.MIST.rawValue(), WeatherEnum.SHOWER_RAIN.rawValue(), WeatherEnum.SNOW.rawValue(), WeatherEnum.THUNDERSTORM.rawValue());
+        for (AppCompatImageButton weatherIcon : weatherIcons) {
+            weatherIcon.setOnClickListener(view -> selectWeatherIcon(weatherIcon));
+        }
+
 
         // ================================ BOTTOM BAR ========================================= //
 
+        Button saveButton = findViewById(R.id.button_save);
+        saveButton.setOnClickListener(view -> new SaveIntervention(this, date).execute());
 
-
-        saveButton = findViewById(R.id.button_save);
-        saveButton.setOnClickListener(view -> new SaveIntervention(
-                this, date).execute());
-
-        cancelButton = findViewById(R.id.button_cancel);
-        cancelButton.setOnClickListener(view -> {
-            clearDatasets();
-            finish();
-        });
+        Button cancelButton = findViewById(R.id.button_cancel);
+        cancelButton.setOnClickListener(view -> { clearDatasets(); finish(); });
 
         // Launch crop selector
         selectCropFragment = SelectCropFragment.newInstance();
         selectCropFragment.show(getFragmentTransaction(), "dialog");
 
+    }
+
+    private void selectWeatherIcon(AppCompatImageButton selected) {
+        for (AppCompatImageButton icon : weatherIcons) {
+            if (icon == selected) {
+                selected.setSelected(true);
+                weatherDescription = weatherEnum.get(weatherIcons.indexOf(icon));
+            }
+            else
+                icon.setSelected(false);
+        }
     }
 
     private class SaveIntervention extends AsyncTask<Void, Void, Void> {
@@ -518,7 +611,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         SaveIntervention(Context context, Calendar date) {
             this.context = context;
-            this.date = date.getTime(); // Converters.toDate(date.getTimeInMillis())
+            this.date = date.getTime();
         }
 
         @Override
@@ -541,6 +634,19 @@ public class InterventionActivity extends AppCompatActivity implements
             InterventionWorkingDay workingDay = new InterventionWorkingDay(intervention_id, date, duration);
             Log.e(TAG, workingDay.toString());
             database.dao().insert(workingDay);
+
+            String temperature = null;
+            if (temperatureEditText.getText() != null)
+                temperature = temperatureEditText.getText().toString();
+
+            String windSpeed = null;
+            if (windSpeedEditText.getText() != null)
+                windSpeed = windSpeedEditText.getText().toString();
+
+            if (temperature != null || windSpeed != null || weatherDescription != null) {
+                Weather weather = new Weather(String.valueOf(intervention_id), temperature, windSpeed, weatherDescription);
+                database.dao().insert(weather);
+            }
 
             for (Object item : inputList) {
                 if (item instanceof Seeds) {

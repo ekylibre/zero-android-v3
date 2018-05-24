@@ -14,7 +14,7 @@ import java.util.Date;
 public class Plot {
 
     public static final String TABLE_NAME = "plots";
-    public static final String COLUMN_UUID = "uuid";
+    public static final String COLUMN_UUID = "plot_uuid";
 
     @NonNull
     @PrimaryKey

@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 public class Farm {
 
     public static final String TABLE_NAME = "farms";
-    public static final String COLUMN_ID = TABLE_NAME + BaseColumns._ID;
+    public static final String COLUMN_ID = "farm_id";
 
     @NonNull
     @PrimaryKey
