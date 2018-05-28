@@ -8,6 +8,7 @@ mutation pushIntervention(
   $inputs: [CreateInterventionInputInputObject]
   $tools: [CreateInterventionToolInputObject]
   $operators: [CreateInterventionOperatorInputObject]
+  $weather: WeatherInputObjectType
 )
   {
   createInterventionMutation(
@@ -22,6 +23,7 @@ mutation pushIntervention(
         inputs: $inputs
         tools: $tools
         operators: $operators
+        weather: $weather
       }
     }
   ) {
