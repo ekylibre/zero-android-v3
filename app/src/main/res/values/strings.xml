@@ -264,6 +264,11 @@
     <string name="not_provided">Non renseignée</string>
     <string name="wind_speed">Vitesse du vent</string>
     <string name="quantity_cannot_be_null">Quantité ne peut être nulle</string>
+    <string name="label_harvest">Récolte</string>
+    <string name="stock_place">Lieu de stockage</string>
+    <string name="number">Numéro</string>
+    <string name="name">Nom</string>
+    <string name="add_load">Ajouter un chargement</string>
 
 
 </resources>

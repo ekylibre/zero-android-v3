@@ -237,6 +237,7 @@
     <string name="add_person">+ Ajouter une personne</string>
     <string name="create_new_person">+ Créer une personne</string>
     <string name="create_person_title">Création d\'une personne</string>
+    <string name="add_load">+ Ajouter un chargement</string>
     <string name="label_crops">Cultures</string>
     <string name="cancel">Annuler</string>
     <string name="validate">Valider</string>
@@ -254,6 +255,7 @@
     <string name="error_invalid_password">Mot de passe invalide</string>
     <string name="error_incorrect_password">Mot de passe incorrect</string>
     <string name="error_field_required">Ce champ est recquis</string>
+
     <string name="label_irrigation">Irrigation</string>
     <string name="menu_logout">Déconnecter</string>
     <string name="label_weather">Météo</string>
@@ -261,5 +263,9 @@
     <string name="not_provided">Non renseignée</string>
     <string name="wind_speed">Vitesse du vent</string>
     <string name="quantity_cannot_be_null">Quantité ne peut être nulle</string>
+    <string name="label_harvest">Récolte</string>
+    <string name="stock_place">Lieu de stockage</string>
+    <string name="number">Numéro</string>
+    <string name="name">Nom</string>
 
 </resources>

@@ -18,13 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <!--android:paddingBottom="200dp"-->
 
             <include layout="@layout/include_crops" android:id="@+id/include_crops_layout"/>
 
+            <include layout="@layout/include_working_period" android:id="@+id/working_period_layout"/>
+
             <include layout="@layout/include_irrigation" android:id="@+id/irrigation_layout"/>
 
-            <include layout="@layout/include_working_period" android:id="@+id/working_period_layout"/>
+            <include layout="@layout/include_harvest" android:id="@+id/harvest_layout" />
 
             <include layout="@layout/include_input" android:id="@+id/input_layout" />
 

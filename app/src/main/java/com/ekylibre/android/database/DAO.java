@@ -11,6 +11,7 @@ import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.models.Farm;
 import com.ekylibre.android.database.models.Fertilizer;
+import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.models.Person;
@@ -19,6 +20,7 @@ import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
+import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.relations.InterventionCrop;
@@ -47,6 +49,8 @@ public interface DAO {
     @Transaction @Insert void insert(Seed... seeds);
     @Transaction @Insert void insert(Fertilizer... fertilizers);
     @Transaction @Insert void insert(Weather... weather);
+    @Transaction @Insert void insert(Harvest... harvests);
+    @Transaction @Insert void insert(Storage... storages);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... persons);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
