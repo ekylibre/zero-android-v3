@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Seed;
+import com.ekylibre.android.utils.Unit;
+import com.ekylibre.android.utils.Units;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -57,6 +59,15 @@ public class InterventionSeed {
         this.unit = "KILOGRAM_PER_HECTARE";
         this.intervention_id = -1;
         this.seed_id = seedId;
+    }
+
+    public Unit getUnit() {
+        return Units.getUnit(unit);
+    }
+
+    public void setInter(float quantity, String unit) {
+        this.quantity = quantity;
+        this.unit = unit;
     }
 
 }

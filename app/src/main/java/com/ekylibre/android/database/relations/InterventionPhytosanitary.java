@@ -62,4 +62,9 @@ public class InterventionPhytosanitary {
 
     }
 
+    public void setInter(float quantity, String unit) {
+        this.quantity = quantity;
+        this.unit = unit;
+    }
+
 }

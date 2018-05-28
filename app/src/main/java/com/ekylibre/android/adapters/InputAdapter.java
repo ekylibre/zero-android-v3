@@ -24,6 +24,9 @@ import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.QuantityCalcul;
+import com.ekylibre.android.utils.QuantityConverter;
+import com.ekylibre.android.utils.Unit;
+import com.ekylibre.android.utils.Units;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +55,10 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
         AppCompatSpinner itemUnitSpinner;
         Group itemDoseMax;
 
+        List<String> unitsLabel;
+        List<Unit> unitsKey;
+        Unit currentUnit;
+
         ViewHolder(View itemView) {
             super(itemView);
 
@@ -72,7 +79,6 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                 builder.setPositiveButton("oui", (dialog, i) -> {
                     int position = getAdapterPosition();
                     inputList.remove(position);
-                    //notifyItemRemoved(position);
                     notifyDataSetChanged();
                 });
                 AlertDialog dialog = builder.create();
@@ -85,7 +91,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                     if (string.isEmpty())
                         return true;
                     else {
-                        itemTotal.setText(calculTotal(Float.valueOf(string)));
+                        updateTotal();
                         itemTotal.setTextColor(context.getResources().getColor(R.color.secondary_text));
                         keyboardManager.hideSoftInputFromWindow(itemQuantityEdit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                         itemQuantityEdit.clearFocus();
@@ -109,7 +115,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                     if (string.isEmpty()) {
                         itemQuantityEdit.requestFocus();
                     } else {
-                        itemTotal.setText(calculTotal(Float.valueOf(string)));
+                        updateTotal();
                     }
                 }
             });
@@ -117,94 +123,108 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    String string = itemQuantityEdit.getText().toString();
-                    if (!string.isEmpty()) {
-                        itemTotal.setText(calculTotal(Float.valueOf(string)));
-                    }
 
-                    // TODO: update quantity on unit change
+                    updateTotal();
+
+//                    switch (getItemViewType()) {
+//
+//                        case PHYTO:
+//                            ((Phytos) inputList.get(getLayoutPosition())).inter.unit = unitsKey.get(position).key;
+//                            updateTotal();
+//                            break;
+//
+//                        case SEED:
+//                            ((Seeds) inputList.get(getLayoutPosition())).inter.unit = unitsKey.get(position).key;
+//                            updateTotal();
+//                            break;
+//
+//                        case FERTI:
+//                            ((Fertilizers) inputList.get(getLayoutPosition())).inter.unit = unitsKey.get(position).key;
+//                            updateTotal();
+//                            break;
+//                    }
                 }
-                @Override
-                public void onNothingSelected(AdapterView<?> parentView) {}
+                @Override  public void onNothingSelected(AdapterView<?> parentView) {}
             });
         }
 
-        void display(int icon, String name, String more, float quantity, String unit, int unit_dimention) {
-            String quantityAsString = Float.toString(quantity);
+        void display(int icon, String name, String more, float quantity, String unit) {
+
+            if (getItemViewType() == PHYTO) {
+                unitsLabel = Units.VOLUME_UNITS_L10N;
+                unitsKey = Units.VOLUME_UNITS;
+            }
+            else {
+                unitsLabel = Units.MASS_UNITS_L10N;
+                unitsKey = Units.MASS_UNITS;
+            }
+
             itemIcon.setImageResource(icon);
             itemName.setText(name);
             itemNameMore.setText(more);
-            itemQuantityEdit.setText(quantityAsString);
-            itemTotal.setText(calculTotal(quantity));
+            itemQuantityEdit.setText(String.valueOf(quantity));
             itemDoseMax.setVisibility(View.GONE);
 
-            int resKeys = 0, resValues = 0;
-            switch (unit_dimention) {
-                case FERTI:
-                case SEED:
-                    resKeys = R.array.mass_unit_keys;
-                    resValues = R.array.mass_unit_values;
-                    break;
-                case PHYTO:
-                    resKeys = R.array.volume_unit_keys;
-                    resValues = R.array.volume_unit_values;
-                    break;
-            }
-            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(context, resValues, android.R.layout.simple_spinner_dropdown_item);
-            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            itemUnitSpinner.setAdapter(spinnerAdapter);
+            currentUnit = Units.getUnit(unit);
 
-            List unitKeys = Arrays.asList(context.getResources().getStringArray(resKeys));
-            itemUnitSpinner.setSelection(unitKeys.indexOf(unit));
+            ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, unitsLabel);
+            itemUnitSpinner.setAdapter(spinnerAdapter);
+            itemUnitSpinner.setSelection(unitsKey.indexOf(currentUnit));
+
+//            int resKeys = 0, resValues = 0;
+//            switch (unit_dimention) {
+//                case FERTI:
+//                case SEED:
+//                    resKeys = R.array.mass_unit_keys;
+//                    resValues = R.array.mass_unit_values;
+//                    break;
+//                case PHYTO:
+//                    resKeys = R.array.volume_unit_keys;
+//                    resValues = R.array.volume_unit_values;
+//                    break;
+//            }
+
+//            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(context, resValues, android.R.layout.simple_spinner_dropdown_item);
+//            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//            itemUnitSpinner.setAdapter(spinnerAdapter);
+//            List unitKeys = Arrays.asList(context.getResources().getStringArray(resKeys));
         }
 
-        String calculTotal(float quantity) {
+        void updateTotal() {
 
-            List unitKeys;
-            String unitBefore;
-            String unitAfter;
-            String text = "";
-            int pos = itemUnitSpinner.getSelectedItemPosition();
+            float quantity = Float.valueOf(itemQuantityEdit.getText().toString());
+            Unit unit = unitsKey.get(itemUnitSpinner.getSelectedItemPosition());
+            String text = "Nothing to show";
 
             if (quantity > 0f) {
+
                 switch (getItemViewType()) {
 
                     case SEED:
                         Seeds seed = (Seeds) inputList.get(getLayoutPosition());
-                        unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.mass_unit_keys));
-                        unitBefore = seed.inter.unit;
-                        unitAfter = unitKeys.get(pos).toString();
-                        seed.inter.unit = unitAfter;
-                        seed.inter.quantity = quantity;
-                        text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
+                        seed.inter.setInter(quantity, unit.key);
+                        text = QuantityConverter.getText(quantity, unit);
                         break;
 
                     case PHYTO:
                         Phytos phyto = (Phytos) inputList.get(getLayoutPosition());
-                        unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.volume_unit_keys));
-                        unitBefore = phyto.inter.unit;
-                        unitAfter = unitKeys.get(pos).toString();
-                        phyto.inter.unit = unitAfter;
-                        phyto.inter.quantity = quantity;
-                        text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
+                        phyto.inter.setInter(quantity, unit.key);
+                        text = QuantityConverter.getText(quantity, unit);
                         break;
 
                     case FERTI:
-                        Fertilizers ferti = (Fertilizers) inputList.get(getLayoutPosition());
-                        unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.mass_unit_keys));
-                        unitBefore = ferti.inter.unit;
-                        unitAfter = unitKeys.get(pos).toString();
-                        ferti.inter.unit = unitAfter;
-                        ferti.inter.quantity = quantity;
-                        text = QuantityCalcul.getText(quantity, unitBefore, unitAfter, InterventionActivity.surface);
+                        Fertilizers fertilizer = (Fertilizers) inputList.get(getLayoutPosition());
+                        fertilizer.inter.setInter(quantity, unit.key);
+                        text = QuantityConverter.getText(quantity, unit);
                         break;
                 }
+                itemTotal.setText(text);
                 itemTotal.setVisibility(View.VISIBLE);
             }
-            else
+            else {
                 itemTotal.setVisibility(View.GONE);
+            }
 
-            return text;
         }
 
 
@@ -229,18 +249,19 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
 
             case SEED:
                 Seeds seed = (Seeds) inputList.get(position);
-                holder.display(R.drawable.icon_seed, seed.seed.get(0).fra, seed.seed.get(0).variety, seed.inter.quantity, seed.inter.unit, SEED);
+                String speciL10n = context.getString(context.getResources().getIdentifier(seed.seed.get(0).specie, "string", context.getPackageName()));
+                holder.display(R.drawable.icon_seed, speciL10n, seed.seed.get(0).variety, seed.inter.quantity, seed.inter.unit);
                 break;
 
             case PHYTO:
                 Phytos phyto = (Phytos) inputList.get(position);
                 holder.itemDoseMax.setVisibility(View.GONE);
-                holder.display(R.drawable.icon_fertilizer, phyto.phyto.get(0).name, phyto.phyto.get(0).firm_name, phyto.inter.quantity, phyto.inter.unit, PHYTO);
+                holder.display(R.drawable.icon_phytosanitary, phyto.phyto.get(0).name, phyto.phyto.get(0).firm_name, phyto.inter.quantity, phyto.inter.unit);
                 break;
 
             case FERTI:
                 Fertilizers ferti = (Fertilizers) inputList.get(position);
-                holder.display(R.drawable.icon_fertilizer, ferti.fertilizer.get(0).label_fra, ferti.fertilizer.get(0).variety, ferti.inter.quantity, ferti.inter.unit, FERTI);
+                holder.display(R.drawable.icon_fertilizer, ferti.fertilizer.get(0).label_fra, ferti.fertilizer.get(0).variety, ferti.inter.quantity, ferti.inter.unit);
                 break;
         }
     }

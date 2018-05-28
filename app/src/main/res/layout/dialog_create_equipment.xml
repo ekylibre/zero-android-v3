@@ -27,7 +27,7 @@
             android:imeOptions="actionDone"
             android:inputType="textCapSentences"
             android:maxLines="1"
-            android:hint="Nom"/>
+            android:hint="@string/name"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -41,7 +41,7 @@
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"
-            android:hint="Numéro"/>
+            android:hint="@string/number"/>
     </android.support.design.widget.TextInputLayout>
 
     <TextView

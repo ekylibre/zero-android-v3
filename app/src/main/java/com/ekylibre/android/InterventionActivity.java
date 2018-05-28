@@ -101,6 +101,13 @@ public class InterventionActivity extends AppCompatActivity implements
     private RecyclerView.Adapter inputAdapter;
     private Group phytoMixWarning;
 
+    // Harvest layout
+    private ImageView harvestArrow;
+    private TextView harvestAddLabel;
+    private RecyclerView harvestRecyclerView;
+    private RecyclerView.Adapter harvestAdapter;
+    private Group harvestDetail;
+
 //    private ImageView materialArrow;
 //    private TextView materialSummary, materialAddLabel;
 //    private DialogFragment selectMaterialFragment;
@@ -126,7 +133,6 @@ public class InterventionActivity extends AppCompatActivity implements
     private ImageView weatherArrow;
     private TextView weatherSummary;
     private EditText temperatureEditText, windSpeedEditText;
-    private AppCompatImageButton brokenClouds, clearSky, fewClouds, lightRain, mist, showerRain, snow, thunderstorm;
 
 
     // Current Intervention values
@@ -135,6 +141,8 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
     public static List<PlotWithCrops> plotList = new ArrayList<>();
+    //public static List<Outputs> outputList = new ArrayList<>();
+
     public static String cropSummaryText;
 
     private List<AppCompatImageButton> weatherIcons;
@@ -199,6 +207,13 @@ public class InterventionActivity extends AppCompatActivity implements
         inputRecyclerView = findViewById(R.id.input_recycler);
         phytoMixWarning = findViewById(R.id.phyto_mix_warning);
 
+        // Harvest layout
+        ConstraintLayout harvestLayout = findViewById(R.id.harvest_layout);
+        harvestArrow = findViewById(R.id.harvest_arrow);
+        harvestAddLabel = findViewById(R.id.harvest_add_label);
+        harvestRecyclerView = findViewById(R.id.harvest_recycler);
+        harvestDetail = findViewById(R.id.harvest_detail);
+
         // Materials
 //        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
 //        materialArrow = findViewById(R.id.material_arrow);
@@ -225,14 +240,14 @@ public class InterventionActivity extends AppCompatActivity implements
         weatherSummary = findViewById(R.id.weather_summary);
         temperatureEditText = findViewById(R.id.weather_edit_temp);
         windSpeedEditText = findViewById(R.id.weather_edit_wind);
-        brokenClouds = findViewById(R.id.weather_broken_clouds);
-        clearSky = findViewById(R.id.weather_clear_sky);
-        fewClouds = findViewById(R.id.weather_few_clouds);
-        lightRain = findViewById(R.id.weather_light_rain);
-        mist = findViewById(R.id.weather_mist);
-        showerRain = findViewById(R.id.weather_shower_rain);
-        snow = findViewById(R.id.weather_snow);
-        thunderstorm = findViewById(R.id.weather_thunderstorm);
+        AppCompatImageButton brokenClouds = findViewById(R.id.weather_broken_clouds);
+        AppCompatImageButton clearSky = findViewById(R.id.weather_clear_sky);
+        AppCompatImageButton fewClouds = findViewById(R.id.weather_few_clouds);
+        AppCompatImageButton lightRain = findViewById(R.id.weather_light_rain);
+        AppCompatImageButton mist = findViewById(R.id.weather_mist);
+        AppCompatImageButton showerRain = findViewById(R.id.weather_shower_rain);
+        AppCompatImageButton snow = findViewById(R.id.weather_snow);
+        AppCompatImageButton thunderstorm = findViewById(R.id.weather_thunderstorm);
 
         // ================================ UI SETTINGS ======================================== //
 
@@ -240,10 +255,12 @@ public class InterventionActivity extends AppCompatActivity implements
         irrigationDetail.setVisibility(View.GONE);
         workingPeriodDetail.setVisibility(View.GONE);
         weatherDetail.setVisibility(View.GONE);
+        harvestDetail.setVisibility(View.GONE);
 
         // Default state of conditional parameters depending on current procedure
         irrigationLayout.setVisibility(View.GONE);
-        inputLayout.setVisibility(View.VISIBLE); // TODO: hide input in some case
+        harvestLayout.setVisibility(View.GONE);
+        inputLayout.setVisibility(View.VISIBLE);
         // materialLayout.setVisibility(View.GONE);
 
         switch (procedure) {
@@ -253,6 +270,8 @@ public class InterventionActivity extends AppCompatActivity implements
             case MainActivity.GROUND_WORK:
                 inputLayout.setVisibility(View.GONE);
                 break;
+            case MainActivity.HARVEST:
+                harvestLayout.setVisibility(View.VISIBLE);
 //            case MainActivity.CARE:
 //                materialLayout.setVisibility(View.VISIBLE);
 //                break;
@@ -266,7 +285,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== IRRIGATION EVENTS =================================== //
 
-        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
+        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
         irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
 
         View.OnClickListener irrigationListener = view -> {
@@ -405,16 +424,8 @@ public class InterventionActivity extends AppCompatActivity implements
                     inputSummary.setVisibility(View.GONE);
                     inputAddLabel.setVisibility(View.VISIBLE);
                     inputRecyclerView.setVisibility(View.GONE);
-                } else if (inputAdapter.getItemCount() >= 2) {
-
-                    Log.e(TAG, "inputList >= 2");
-
-//                    List<Integer> phytoMixCodeList = new ArrayList<>();
-//                    for (Object input : inputList) {
-//                        if (input instanceof Phytos) {
-//                            phytoMixCodeList.add(((Phytos) input).phyto.get(0).mix_category_code);
-//                        }
-//                    }
+                }
+                else if (inputAdapter.getItemCount() >= 2) {
                     List<Integer> codes = new ArrayList<>();
                     for (Object input : inputList) {
                         if (input instanceof Phytos) {
@@ -423,11 +434,7 @@ public class InterventionActivity extends AppCompatActivity implements
                                 codes.add(phyto.mix_category_code);
                         }
                     }
-
                     if (codes.size() >= 2) {
-
-                        Log.e(TAG, "phytos >= 2");
-
                         if (!mixIsAuthorized(codes))
                             phytoMixWarning.setVisibility(View.VISIBLE);
                     }
@@ -435,6 +442,24 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         });
         inputRecyclerView.setAdapter(inputAdapter);
+
+
+        // ================================ HARVEST EVENTS ===================================== //
+
+//        harvestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        harvestRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+//        harvestAdapter = new InputAdapter(this, harvestList);
+//        harvestAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+//           @Override
+//           public void onChanged() {
+//               harvestAdapter.notifyDataSetChanged();
+//           }
+//        });
+//        harvestAddLabel.setOnClickListener(view -> {
+//            har
+//        });
+
+
 
         // ============================== MATERIALS EVENTS ===================================== //
 
@@ -621,13 +646,16 @@ public class InterventionActivity extends AppCompatActivity implements
     }
 
     private void selectWeatherIcon(AppCompatImageButton selected) {
-        for (AppCompatImageButton icon : weatherIcons) {
-            if (icon == selected) {
-                selected.setSelected(true);
-                weatherDescription = weatherEnum.get(weatherIcons.indexOf(icon));
+        if (selected.isSelected())
+            selected.setSelected(false);
+        else {
+            for (AppCompatImageButton icon : weatherIcons) {
+                if (icon == selected) {
+                    selected.setSelected(true);
+                    weatherDescription = weatherEnum.get(weatherIcons.indexOf(icon));
+                } else
+                    icon.setSelected(false);
             }
-            else
-                icon.setSelected(false);
         }
     }
 
@@ -662,13 +690,13 @@ public class InterventionActivity extends AppCompatActivity implements
             Log.e(TAG, workingDay.toString());
             database.dao().insert(workingDay);
 
-            String temperature = null;
+            Float temperature = null;
             if (temperatureEditText.getText() != null)
-                temperature = temperatureEditText.getText().toString();
+                temperature = Float.valueOf(temperatureEditText.getText().toString());
 
-            String windSpeed = null;
+            Float windSpeed = null;
             if (windSpeedEditText.getText() != null)
-                windSpeed = windSpeedEditText.getText().toString();
+                windSpeed = Float.valueOf(windSpeedEditText.getText().toString());
 
             if (temperature != null || windSpeed != null || weatherDescription != null) {
                 Weather weather = new Weather(intervention_id, temperature, windSpeed, weatherDescription);

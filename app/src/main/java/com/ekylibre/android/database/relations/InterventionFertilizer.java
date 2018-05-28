@@ -56,4 +56,9 @@ public class InterventionFertilizer {
         this.ferti_id = fertiId;
     }
 
+    public void setInter(float quantity, String unit) {
+        this.quantity = quantity;
+        this.unit = unit;
+    }
+
 }

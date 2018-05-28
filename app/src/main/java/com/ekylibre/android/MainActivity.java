@@ -368,20 +368,34 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     private void createUnitsLocale() {
+        String name;
+        String quantity_name_only;
         for (Unit unit : Units.IRRIGATION_UNITS) {
-            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            if (unit.surface_factor != 0)
+                quantity_name_only = getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName()));
+            else
+                quantity_name_only = null;
             Units.IRRIGATION_UNITS_L10N.add(name);
-            unit.setName(name);
+            unit.setName(name, quantity_name_only);
         }
         for (Unit unit : Units.VOLUME_UNITS) {
-            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            if (unit.surface_factor != 0)
+                quantity_name_only = getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName()));
+            else
+                quantity_name_only = null;
             Units.VOLUME_UNITS_L10N.add(name);
-            unit.setName(name);
+            unit.setName(name, quantity_name_only);
         }
         for (Unit unit : Units.MASS_UNITS) {
-            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            if (unit.surface_factor != 0)
+                quantity_name_only = getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName()));
+            else
+                quantity_name_only = null;
             Units.MASS_UNITS_L10N.add(name);
-            unit.setName(name);
+            unit.setName(name, quantity_name_only);
         }
     }
 
