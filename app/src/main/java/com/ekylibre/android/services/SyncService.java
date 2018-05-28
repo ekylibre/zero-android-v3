@@ -61,6 +61,7 @@ import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoles;
 import com.ekylibre.android.type.WeatherEnum;
+import com.ekylibre.android.type.WeatherInputObjectType;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -324,10 +325,13 @@ public class SyncService extends IntentService {
                                 }
 
                                 // Saving Weather
-//                                PullQuery.Weather weather = farm.interventions().get(index).weather();
-//                                if ( weather != null) {
-//                                    database.dao().insert(new Weather(newInterId, weather.temperature(), weather.windSpeed(), weather.description().rawValue()));
-//                                }
+                                PullQuery.Weather weather = farm.interventions().get(index).weather();
+                                if ( weather != null) {
+                                    Float temp =  weather.temperature() != null ? weather.temperature().floatValue() : null;
+                                    Float wind =  weather.windSpeed() != null ? weather.windSpeed().floatValue() : null;
+                                    String description =  weather.description() != null ? weather.description().rawValue() : null;
+                                    database.dao().insert(new Weather(newInterId, temp, wind, description));
+                                }
 
                                 // Saving Equipments
                                 for (PullQuery.Tool tool : farm.interventions().get(index).tools()) {
@@ -479,6 +483,7 @@ public class SyncService extends IntentService {
             List<CreateInterventionInputInputObject> inputs = new ArrayList<>();
             List<CreateInterventionOperatorInputObject> operators = new ArrayList<>();
             List<CreateInterventionToolInputObject> tools = new ArrayList<>();
+            WeatherInputObjectType weatherInput = null;
             // TODO InterventionOutputsInputObject
 
             for (Crops crop : inter.crops) {
@@ -570,13 +575,13 @@ public class SyncService extends IntentService {
                 }
             }
 
-//            for (Weather weather : inter.weather) {
-//                inputs.add(CreateInterventionWeatherInputObject.builder()
-//                        .temperature(inter.weather.get(0).temperature)
-//                        .windSpeed(inter.weather.get(0).wind_speed)
-//                        .description(WeatherEnum.valueOf(inter.weather.get(0).description)) // TODO: handle null
-//                        .build());
-//            }
+            for (Weather weather : inter.weather) {
+                weatherInput = WeatherInputObjectType.builder()
+                        .description(WeatherEnum.valueOf(weather.description))
+                        .temperature(Double.valueOf(weather.temperature))
+                        .windSpeed(Double.valueOf(weather.wind_speed))
+                        .build();
+            }
 
             PushInterventionMutation pushIntervention = PushInterventionMutation.builder()
                     .farmId(inter.intervention.farm)
@@ -586,6 +591,7 @@ public class SyncService extends IntentService {
                     .inputs(inputs)
                     .tools(tools)
                     .operators(operators)
+                    .weather(weatherInput)
                     .waterQuantity((inter.intervention.water_quantity != null) ? (long) inter.intervention.water_quantity : null)
                     .waterUnit((inter.intervention.water_unit != null) ? ArticleVolumeUnit.safeValueOf(inter.intervention.water_unit) : null)
                     .build();

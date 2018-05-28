@@ -25,11 +25,11 @@ public class Weather {
     @ColumnInfo(index = true, name = COLUMN_INTERVENTION_ID)
     public int intervention_id;
 
-    public String temperature;
-    public String wind_speed;
+    public Float temperature;
+    public Float wind_speed;
     public String description;
 
-    public Weather(int intervention_id, String temperature, String wind_speed, String description) {
+    public Weather(int intervention_id, Float temperature, Float wind_speed, String description) {
         this.intervention_id = intervention_id;
         this.temperature = temperature;
         this.wind_speed = wind_speed;
