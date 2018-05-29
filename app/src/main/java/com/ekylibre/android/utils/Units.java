@@ -8,7 +8,7 @@ import java.util.List;
 public class Units {
 
     private static final float HECTARE_FACTOR = 1;
-    private static final float SQUARE_METER_FACTOR = .00001f;
+    private static final float SQUARE_METER_FACTOR = 10000;
 
     private static final float LITER_FACTOR = 1;
     private static final float HECTOLITER_FACTOR = .001f;
