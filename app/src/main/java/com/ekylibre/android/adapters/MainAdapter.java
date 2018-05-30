@@ -2,6 +2,7 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -24,10 +25,11 @@ import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.DateTools;
+import com.ekylibre.android.utils.Units;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
@@ -35,14 +37,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     private static final String TAG = MainAdapter.class.getName();
     private List<Interventions> interventionsList;
     private Context context;
-    private List massUnitValues;
-    private List massUnitKeys;
-    private List volumeUnitValues;
-    private List volumeUnitKeys;
-    private List unityUnitValues;
-    private List unityUnitKeys;
-    private List unitValues;
-    private List unitKeys;
 //    private List equipmentValues;
 //    private List equipmentKeys;
 
@@ -52,14 +46,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     public MainAdapter(Context context, List<Interventions> interventionsList) {
         this.interventionsList = interventionsList;
         this.context = context;
-        massUnitValues = Arrays.asList(context.getResources().getStringArray(R.array.mass_unit_values));
-        massUnitKeys = Arrays.asList(context.getResources().getStringArray(R.array.mass_unit_keys));
-        volumeUnitValues = Arrays.asList(context.getResources().getStringArray(R.array.volume_unit_values));
-        volumeUnitKeys = Arrays.asList(context.getResources().getStringArray(R.array.volume_unit_keys));
-        unityUnitValues = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_values));
-        unityUnitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unity_unit_keys));
-        unitValues = Arrays.asList(context.getResources().getStringArray(R.array.unit_values));
-        unitKeys = Arrays.asList(context.getResources().getStringArray(R.array.unit_keys));
 //        equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
 //        equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
@@ -82,7 +68,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             itemSynchronized = itemView.findViewById(R.id.item_synchronized);
             syncTime = (viewType == 1) ? itemView.findViewById(R.id.last_sync) : null;
 
-            itemView.setOnClickListener(v -> Log.e(TAG, "clic"));
+            itemView.setOnClickListener(v -> {
+                Log.e(TAG, "clic");
+                Intent intent = new Intent(itemView.getContext(), InterventionActivity.class);
+                //intent.putExtra("nature", TYPE);
+                intent.putExtra("intervention_id", getAdapterPosition());
+                intent.putExtra("edition", true);
+                itemView.getContext().startActivity(intent);
+            });
         }
     }
 
@@ -127,7 +120,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         }
 
         if (holder.syncTime != null)
-            holder.syncTime.setText("Dernière synchronisation  " + SIMPLE_DATE.format(MainActivity.lastSyncTime));
+            holder.syncTime.setText(String.format("Dernière synchronisation  %s", SIMPLE_DATE.format(MainActivity.lastSyncTime)));
         // Count parcels and surface
         float total = 0;
         int count = 0;
@@ -148,7 +141,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 for (Phytos p : current.phytos) {
                     sb.append(p.phyto.get(0).name).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", p.inter.quantity)).append(" ");
-                    sb.append(volumeUnitValues.get(volumeUnitKeys.indexOf(p.inter.unit)));
+                    sb.append(Objects.requireNonNull(Units.getUnit(p.inter.unit)).name);
                     if (current.phytos.indexOf(p) + 1 != current.phytos.size()) sb.append("\n");
                 }
                 break;
@@ -158,7 +151,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                     String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie, "string", context.getPackageName()));
                     sb.append(specie).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");
-                    sb.append(massUnitValues.get(massUnitKeys.indexOf(s.inter.unit)));
+                    sb.append(Objects.requireNonNull(Units.getUnit(s.inter.unit)).name);
                     if (current.seeds.indexOf(s) + 1 != current.seeds.size()) sb.append("\n");
                 }
                 break;
@@ -167,7 +160,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 for (Fertilizers f : current.fertilizers) {
                     sb.append(f.fertilizer.get(0).label_fra).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", f.inter.quantity)).append(" ");
-                    sb.append(massUnitValues.get(massUnitKeys.indexOf(f.inter.unit)));
+                    sb.append(Objects.requireNonNull(Units.getUnit(f.inter.unit)).name);
                     if (current.fertilizers.indexOf(f) + 1 != current.fertilizers.size()) sb.append("\n");
                 }
                 break;
@@ -190,8 +183,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 break;
             case MainActivity.IRRIGATION:
                 if (current.intervention.water_quantity != null) {
-                    sb.append("Volume: ").append(current.intervention.water_quantity).append(" ");
-                    sb.append(context.getResources().getString(context.getResources().getIdentifier(current.intervention.water_unit, "string", context.getPackageName())));
+                    sb.append("Volume • ").append(current.intervention.water_quantity).append(" ");
+                    sb.append(Objects.requireNonNull(Units.getUnit(current.intervention.water_unit)).name);
                     break;
                 }
         }

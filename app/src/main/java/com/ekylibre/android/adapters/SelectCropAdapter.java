@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ import java.util.List;
 
 public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.ViewHolder> {
 
-    private static final String TAG = SelectCropAdapter.class.getName();
+    private static final String TAG = "CropAdapter";
 
     private Context context;
     private List<PlotWithCrops> dataset;

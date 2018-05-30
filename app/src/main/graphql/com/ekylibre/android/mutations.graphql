@@ -1,4 +1,4 @@
-mutation pushIntervention(
+mutation pushInter(
   $farmId: ID!,
   $procedure: InterventionTypeEnum!,
   $cropList: [CreateInterventionTargetInputObject],
@@ -31,6 +31,41 @@ mutation pushIntervention(
     intervention {
       id
     }
+  }
+}
+
+mutation updateInter(
+  $interventionId: ID!
+  $farmId: ID!,
+  $procedure: InterventionTypeEnum!,
+  $weather: WeatherInputObjectType
+  $waterQuantity: Int
+  $waterUnit: ArticleVolumeUnit
+  $cropList: [InterventionTargetInputObject],
+  $workingDays: [InterventionWorkingDayInputObject]
+  $inputs: [InterventionInputInputObject]
+  $tools: [InterventionToolInputObject]
+  $operators: [InterventionOperatorInputObject]
+)
+  {
+  updateInterventionMutation(
+    input: {
+      intervention: {
+        interventionId: $interventionId
+        farmID: $farmId
+        type: $procedure
+        targets: $cropList
+        workingDays: $workingDays
+        waterQuantity: $waterQuantity
+        waterUnit: $waterUnit
+        inputs: $inputs
+        tools: $tools
+        operators: $operators
+        weather: $weather
+      }
+    }
+  ) {
+    errors
   }
 }
 

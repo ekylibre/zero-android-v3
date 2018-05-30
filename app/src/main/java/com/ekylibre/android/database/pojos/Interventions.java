@@ -33,8 +33,8 @@ public class Interventions {
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionFertilizer.COLUMN_INTERVENTION_ID, entity = InterventionFertilizer.class)
     public List<Fertilizers> fertilizers;
 
-    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionMaterial.COLUMN_INTERVENTION_ID, entity = InterventionMaterial.class)
-    public List<Materials> materials;
+//    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionMaterial.COLUMN_INTERVENTION_ID, entity = InterventionMaterial.class)
+//    public List<Materials> materials;
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionEquipment.COLUMN_INTERVENTION_ID, entity = InterventionEquipment.class)
     public List<Equipments> equipments;

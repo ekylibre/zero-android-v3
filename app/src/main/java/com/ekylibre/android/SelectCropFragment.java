@@ -89,43 +89,42 @@ public class SelectCropFragment extends DialogFragment {
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (dataset.isEmpty()) {
-            Log.e(TAG, "Request database for crop list");
-            new RequestDatabase(context).execute();
-        }
-
-    }
-
-    /**
-     * The asynchrone request task
-     */
-    private class RequestDatabase extends AsyncTask<Void, Void, Void> {
-
-        Context context;
-
-        RequestDatabase(final Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            AppDatabase database = AppDatabase.getInstance(this.context);
-
-            List<Plot> plotList = database.dao().plotList();
-
-            for (Plot plot : plotList) {
-                PlotWithCrops plotWithCrops = new PlotWithCrops(plot);
-                plotWithCrops.crops = database.dao().cropsByPlotUuid(plot.uuid);  //new Date().getTime()
-                dataset.add(plotWithCrops);
-            }
-            return null;
-        }
-    }
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//
+//        if (dataset.isEmpty()) {
+//            Log.e(TAG, "Request database for crop list");
+//            new RequestDatabase(context).execute();
+//        }
+//    }
+//
+//    /**
+//     * The asynchrone request task
+//     */
+//    private class RequestDatabase extends AsyncTask<Void, Void, Void> {
+//
+//        Context context;
+//
+//        RequestDatabase(final Context context) {
+//            this.context = context;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//
+//            AppDatabase database = AppDatabase.getInstance(this.context);
+//
+//            List<Plot> plotList = database.dao().plotList();
+//
+//            for (Plot plot : plotList) {
+//                PlotWithCrops plotWithCrops = new PlotWithCrops(plot);
+//                plotWithCrops.crops = database.dao().cropsByPlotUuid(plot.uuid);  //new Date().getTime()
+//                dataset.add(plotWithCrops);
+//            }
+//            return null;
+//        }
+//    }
 
     @Override
     public void onAttach(Context context) {

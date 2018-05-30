@@ -22,15 +22,13 @@ public class InterventionCrop {
     public static final String COLUMN_INTERVENTION_ID = "intervention_id";
     public static final String COLUMN_CROP_ID = "crop_id" + BaseColumns._ID;
 
-    public Integer work_area_percentage;
-
-    @NonNull
     @ColumnInfo(name = COLUMN_INTERVENTION_ID, index = true)
-    public Integer intervention_id;
+    @NonNull public Integer intervention_id;
 
-    @NonNull
     @ColumnInfo(name = COLUMN_CROP_ID, index = true)
-    public String crop_id;
+    @NonNull public String crop_id;
+
+    public Integer work_area_percentage;
 
     public InterventionCrop(@NonNull Integer intervention_id, @NonNull String crop_id, Integer work_area_percentage) {
         this.intervention_id = intervention_id;

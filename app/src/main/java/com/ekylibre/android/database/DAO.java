@@ -1,6 +1,7 @@
 package com.ekylibre.android.database;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
@@ -67,6 +68,15 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPerson interventionPerson);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
 
+    @Delete void delete(InterventionWorkingDay... workingDays);
+    @Delete void delete(InterventionSeed... seeds);
+    @Delete void delete(InterventionPhytosanitary... phytosanitaries);
+    @Delete void delete(InterventionFertilizer... fertilizers);
+    @Delete void delete(InterventionEquipment... equipment);
+    @Delete void delete(InterventionPerson... people);
+    @Delete void delete(InterventionCrop... crops);
+    @Delete void delete(Weather... weather);
+
 
 
     /**
@@ -102,9 +112,16 @@ public interface DAO {
     @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL")
     List<Interventions> getSyncableInterventions();
 
+    @Transaction
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE status = 'updated'")
+    List<Interventions> getUpdatableInterventions();
+
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId, " +
             "status = '" + InterventionActivity.SYNCED + "' WHERE " + Intervention.COLUMN_ID + " = :id")
     void setInterventionEkyId(int id, int ekyId);
+
+    @Query("UPDATE " + Intervention.TABLE_NAME + " SET status = '" + InterventionActivity.SYNCED + "' WHERE " + Intervention.COLUMN_ID + " = :id")
+    void setInterventionSynced(int id);
 
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET status = :status WHERE " + Intervention.COLUMN_ID_EKY + " = :ekyId")
     void updateInterventionStatus(int ekyId, String status);
@@ -208,8 +225,8 @@ public interface DAO {
     @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE maaid = :refId")
     Integer phytoExists(String refId);
 
-    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :id WHERE " + Phyto.COLUMN_ID + " = :refId")
-    int setPhytoEkyId(Integer id, String refId);
+    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :id WHERE " + Phyto.COLUMN_ID + " = :refId AND name LIKE :name")
+    int setPhytoEkyId(Integer id, String refId, String name);
 
     @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " = :eky_id")
     int getPhytoId(int eky_id);

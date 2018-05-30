@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     private RecyclerView recyclerView;
     private TextView emptyRecyclerView;
     private RecyclerView.Adapter adapter;
-    public List<Interventions> interventionsList = new ArrayList<>();
+    public static List<Interventions> interventionsList = new ArrayList<>();
 
     // Activity variables
     private AppDatabase database;
@@ -216,8 +216,8 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
     @Override
     public void onBackPressed() {
-        deployMenu(false);
-        //super.onBackPressed();
+        if (!deployMenu(false))
+            super.onBackPressed();
     }
 
     @Override
@@ -320,6 +320,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         Intent intent = new Intent(this, InterventionActivity.class);
         intent.putExtra("nature", TYPE);
         intent.putExtra("procedure", procedure);
+        intent.putExtra("edition", false);
         startActivity(intent);
         deployMenu(false);
     }
@@ -367,6 +368,9 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         }
     }
 
+    /**
+     * Creates units lists based on current locale
+     */
     private void createUnitsLocale() {
         String name;
         String quantity_name_only;

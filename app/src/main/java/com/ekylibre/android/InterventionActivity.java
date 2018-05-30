@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -28,24 +28,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ekylibre.android.adapters.EquipmentAdapter;
 import com.ekylibre.android.adapters.InputAdapter;
 import com.ekylibre.android.adapters.PersonAdapter;
+import com.ekylibre.android.adapters.SelectCropAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Phyto;
+import com.ekylibre.android.database.models.PhytoDose;
+import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Weather;
+import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
-import com.ekylibre.android.database.pojos.Materials;
+import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.PlotWithCrops;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
-import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.DateTools;
@@ -53,7 +57,6 @@ import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -73,8 +76,10 @@ public class InterventionActivity extends AppCompatActivity implements
     private static final String TAG = InterventionActivity.class.getName();
 
     public static final String CREATED = "created";
+    public static final String UPDATED = "updated";
     public static final String SYNCED = "synced";
     public static final String VALIDATED = "validated";
+    public static final String DELETED = "deleted";  // TODO: use it
 
     // Crops layout
     private TextView cropSummary, cropAddLabel;
@@ -133,29 +138,26 @@ public class InterventionActivity extends AppCompatActivity implements
     private ImageView weatherArrow;
     private TextView weatherSummary;
     private EditText temperatureEditText, windSpeedEditText;
-
+    private List<AppCompatImageButton> weatherIcons;
+    private List<String> weatherEnum;
 
     // Current Intervention values
     public static List<Object> inputList = new ArrayList<>();
-    public static List<Materials> materialList = new ArrayList<>();
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
     public static List<PlotWithCrops> plotList = new ArrayList<>();
     //public static List<Outputs> outputList = new ArrayList<>();
+    //public static List<Materials> materialList = new ArrayList<>();
 
-    public static String cropSummaryText;
-
-    private List<AppCompatImageButton> weatherIcons;
-    private List<String> weatherEnum;
-    private Calendar today = Calendar.getInstance();
-    private Calendar date = Calendar.getInstance();
-
-    private InputMethodManager keyboardManager;
     public static String procedure;
-    private int duration = 7;
+    private Calendar date = Calendar.getInstance();
+    private Integer duration = 7;
     public static float surface = 0f;
-    private List volumeUnitKeys;
     private String weatherDescription;
+
+    private Interventions editIntervention;
+    public static String cropSummaryText;
+    private InputMethodManager keyboardManager;
 
 
     @Override
@@ -163,14 +165,16 @@ public class InterventionActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intervention);
 
-        procedure = getIntent().getStringExtra("procedure");
-        Log.e(TAG, "procedure " + procedure);
+        if (getIntent().getBooleanExtra("edition", false)) {
+            editIntervention = MainActivity.interventionsList.get(getIntent().getIntExtra("intervention_id", -1));
+            procedure = editIntervention.intervention.type;
+        } else {
+            procedure = getIntent().getStringExtra("procedure");
+        }
+
         setTitle(this.getResources().getIdentifier(procedure, "string", this.getPackageName()));
 
         keyboardManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        volumeUnitKeys = Arrays.asList(getResources().getStringArray(R.array.volume_unit_keys));
-
 
 
         // ================================ LAYOUT ============================================= //
@@ -279,11 +283,26 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== CROPS EVENTS ======================================== //
 
-        includeCropLayout.setOnClickListener(view ->
-            selectCropFragment.show(getFragmentTransaction(), "dialog")
-        );
+        // Feed plotList with all available plots
+        new RequestPlotList(this).execute();
+
+        includeCropLayout.setOnClickListener(view -> {
+            selectCropFragment = SelectCropFragment.newInstance();
+            selectCropFragment.show(getFragmentTransaction(), "dialog");
+        });
 
         // =============================== IRRIGATION EVENTS =================================== //
+
+        if (editIntervention != null) {
+            if (editIntervention.intervention.type.equals(MainActivity.IRRIGATION)) {
+                Integer volume = editIntervention.intervention.water_quantity;
+                irrigationQuantityEdit.setText(String.valueOf(volume));
+                Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
+                irrigationUnitSpinner.setSelection(Units.IRRIGATION_UNITS.indexOf(unit));
+                irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
+                irrigationSummary.setText(String.format(MainActivity.LOCALE, "Volume %d %s", volume, unit.name));
+            }
+        }
 
         ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
         irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
@@ -303,47 +322,50 @@ public class InterventionActivity extends AppCompatActivity implements
         irrigationLayout.setOnClickListener(irrigationListener);
 
         irrigationQuantityEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.toString().equals("0") || editable.length() == 0) {
+            @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override public void onTextChanged(CharSequence charSequence, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable editable) {
+                if (!editable.toString().equals("0") && editable.length() != 0) {
+                    Log.i(TAG, "afterTextChanged");
+                    Integer volume = Integer.valueOf(editable.toString());
+                    String unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).getName();
+                    String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", volume / surface, unit);
+                    irrigationTotal.setText(message);
+                    irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
+                    irrigationSummary.setText(String.format("Volume %s %s", volume, unit));
+                } else {
                     irrigationTotal.setText(R.string.quantity_cannot_be_null);
                     irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
-                } else {
-                    String unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).getName();
-                    Log.i(TAG, "Unit --> " + unit);
-                    String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", Integer.valueOf(editable.toString()) / surface, unit);
-                    irrigationTotal.setText(message);
-//                    float total = (Integer.valueOf(editable.toString()) * ) / surface;
-//                    irrigationTotal.setText(String.format(MainActivity.LOCALE, "Soit %f.1 %s", );
-                    irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
                 }
             }
         });
 
         irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String quantityEditText = irrigationQuantityEdit.getText().toString();
-                if (!quantityEditText.isEmpty()) {
+                if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
+                    Log.i(TAG, "onItemSelected");
                     Integer quantity = Integer.valueOf(quantityEditText);
                     Unit unit = Units.IRRIGATION_UNITS.get(position);
                     String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", quantity / surface, unit.name);
                     irrigationTotal.setText(message);
                 }
             }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
         });
 
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
+
+        if (editIntervention != null) {
+            duration = editIntervention.workingDays.get(0).hour_duration;
+            date.setTime(editIntervention.workingDays.get(0).execution_date);
+            workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), duration));
+        }
+
+        workingPeriodEditDuration.setText(String.valueOf(duration));
+        workingPeriodEditDate.setText(DateTools.display(date.getTime()));
+
 
         View.OnClickListener workingPeriodListener = view -> {
             if (workingPeriodSummary.getVisibility() == View.VISIBLE) {
@@ -351,8 +373,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 workingPeriodSummary.setVisibility(View.GONE);
                 workingPeriodDetail.setVisibility(View.VISIBLE);
             } else {
-                workingPeriodSummary.setText(
-                        String.format("%s • %s h", DateTools.display(date.getTime()), duration));
+                workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), duration));
                 workingPeriodArrow.setRotation(0);
                 workingPeriodSummary.setVisibility(View.VISIBLE);
                 workingPeriodDetail.setVisibility(View.GONE);
@@ -407,17 +428,21 @@ public class InterventionActivity extends AppCompatActivity implements
         inputArrow.setOnClickListener(inputListener);
         inputSummary.setOnClickListener(inputListener);
 
+        // Fill data if editing
+        if (editIntervention != null) {
+            inputList.addAll(editIntervention.phytos);
+            inputList.addAll(editIntervention.seeds);
+            inputList.addAll(editIntervention.fertilizers);
+            inputArrow.performClick();
+        }
+
         inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         inputRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         inputAdapter = new InputAdapter(this, inputList);
         inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-
-                Log.e(TAG, "inputList onChange()");
-
                 phytoMixWarning.setVisibility(View.GONE);
-
                 if (inputAdapter.getItemCount() == 0) {
                     inputArrow.performClick();
                     inputArrow.setVisibility(View.GONE);
@@ -426,6 +451,7 @@ public class InterventionActivity extends AppCompatActivity implements
                     inputRecyclerView.setVisibility(View.GONE);
                 }
                 else if (inputAdapter.getItemCount() >= 2) {
+                    // Phyto warnings
                     List<Integer> codes = new ArrayList<>();
                     for (Object input : inputList) {
                         if (input instanceof Phytos) {
@@ -434,15 +460,14 @@ public class InterventionActivity extends AppCompatActivity implements
                                 codes.add(phyto.mix_category_code);
                         }
                     }
-                    if (codes.size() >= 2) {
+                    if (codes.size() >= 2)
                         if (!mixIsAuthorized(codes))
                             phytoMixWarning.setVisibility(View.VISIBLE);
-                    }
                 }
             }
         });
         inputRecyclerView.setAdapter(inputAdapter);
-
+        inputAdapter.notifyDataSetChanged();
 
         // ================================ HARVEST EVENTS ===================================== //
 
@@ -533,6 +558,11 @@ public class InterventionActivity extends AppCompatActivity implements
         equipmentArrow.setOnClickListener(equipmentListener);
         equipmentSummary.setOnClickListener(equipmentListener);
 
+        if (editIntervention != null) {
+            equipmentList.addAll(editIntervention.equipments);
+            equipmentArrow.performClick();
+        }
+
         equipmentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         equipmentAdapter = new EquipmentAdapter(this, equipmentList);
@@ -549,6 +579,7 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         });
         equipmentRecyclerView.setAdapter(equipmentAdapter);
+        equipmentAdapter.notifyDataSetChanged();
 
 
         // =============================== PERSONS EVENTS ====================================== //
@@ -578,6 +609,11 @@ public class InterventionActivity extends AppCompatActivity implements
         personArrow.setOnClickListener(personListener);
         personSummary.setOnClickListener(personListener);
 
+        if (editIntervention != null) {
+            personList.addAll(editIntervention.persons);
+            personArrow.performClick();
+        }
+
         personRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         personRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         personAdapter = new PersonAdapter(personList);
@@ -594,6 +630,7 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         });
         personRecyclerView.setAdapter(personAdapter);
+        personAdapter.notifyDataSetChanged();
 
         // =============================== WEATHER EVENTS ====================================== //
 
@@ -630,6 +667,18 @@ public class InterventionActivity extends AppCompatActivity implements
             weatherIcon.setOnClickListener(view -> selectWeatherIcon(weatherIcon));
         }
 
+        if (editIntervention != null) {
+            if (!editIntervention.weather.isEmpty()) {
+                if (editIntervention.weather.get(0).temperature != null)
+                    temperatureEditText.setText(String.valueOf(editIntervention.weather.get(0).temperature));
+                if (editIntervention.weather.get(0).wind_speed != null)
+                    windSpeedEditText.setText(String.valueOf(editIntervention.weather.get(0).wind_speed));
+                if (editIntervention.weather.get(0).description != null) {
+                    weatherDescription = editIntervention.weather.get(0).description;
+                    selectWeatherIcon(weatherIcons.get(weatherEnum.indexOf(weatherDescription)));
+                }
+            }
+        }
 
         // ================================ BOTTOM BAR ========================================= //
 
@@ -639,9 +688,20 @@ public class InterventionActivity extends AppCompatActivity implements
         Button cancelButton = findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(view -> { clearDatasets(); finish(); });
 
-        // Launch crop selector
-        selectCropFragment = SelectCropFragment.newInstance();
-        selectCropFragment.show(getFragmentTransaction(), "dialog");
+        if (editIntervention == null) {
+            // Launch crop selector
+            selectCropFragment = SelectCropFragment.newInstance();
+            selectCropFragment.show(getFragmentTransaction(), "dialog");
+        } else if (editIntervention.intervention.status.equals(VALIDATED)){
+            saveButton.setOnClickListener(null);
+            saveButton.setBackground(getResources().getDrawable(R.drawable.background_round_corners_disabled));
+            saveButton.setTextColor(getResources().getColor(R.color.secondary_text));
+            saveButton.setOnClickListener(view -> {
+                Toast toast = Toast.makeText(this, "Cette intervention n'est pas modifiable", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                toast.show();
+            });
+        }
 
     }
 
@@ -655,6 +715,59 @@ public class InterventionActivity extends AppCompatActivity implements
                     weatherDescription = weatherEnum.get(weatherIcons.indexOf(icon));
                 } else
                     icon.setSelected(false);
+            }
+        }
+    }
+
+    private class RequestPlotList extends AsyncTask<Void, Void, Void> {
+
+        Context context;
+
+        RequestPlotList(final Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            AppDatabase database = AppDatabase.getInstance(this.context);
+
+            List<Plot> plots = database.dao().plotList();
+
+            for (Plot plot : plots) {
+                PlotWithCrops plotWithCrops = new PlotWithCrops(plot);
+                plotWithCrops.crops = database.dao().cropsByPlotUuid(plot.uuid);  //new Date().getTime()
+                plotList.add(plotWithCrops);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (editIntervention != null) {
+                int count = 0;
+                float total = 0;
+                Log.e(TAG, plotList.toString());
+                for (PlotWithCrops plot : plotList) {
+                    for (Crops culture : editIntervention.crops) {
+                        for (Crop crop : plot.crops) {
+                            if (culture.crop.get(0).uuid.equals(crop.uuid)) {
+                                crop.is_checked = true;
+                                plot.plot.is_checked = true;
+                                total += crop.surface_area;
+                                ++count;
+                            }
+                        }
+                    }
+                }
+                surface = total;
+                String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
+                cropSummaryText = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
+                cropSummary.setText(cropSummaryText);
+                cropAddLabel.setVisibility(View.GONE);
+                cropSummary.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -674,28 +787,53 @@ public class InterventionActivity extends AppCompatActivity implements
 
             AppDatabase database = AppDatabase.getInstance(context);
 
-            Intervention intervention = new Intervention();
-            intervention.setType(procedure);
+            Intervention intervention;
+
+            if (editIntervention != null) {
+                // We are editing an existing intervention
+                intervention = editIntervention.intervention;
+                if (intervention.status.equals(SYNCED))
+                    intervention.setStatus(UPDATED);
+                // Deletes relations
+                database.dao().delete(editIntervention.workingDays.get(0));
+                database.dao().delete(editIntervention.weather.get(0));
+                for (Crops crop : editIntervention.crops)
+                    database.dao().delete(crop.inter);
+                for (Persons person : editIntervention.persons)
+                    database.dao().delete(person.inter);
+                for (Phytos phyto : editIntervention.phytos)
+                    database.dao().delete(phyto.inter);
+                for (Seeds seed : editIntervention.seeds)
+                    database.dao().delete(seed.inter);
+                for (Fertilizers fertilizer : editIntervention.fertilizers)
+                    database.dao().delete(fertilizer.inter);
+                for (Equipments equipment : editIntervention.equipments)
+                    database.dao().delete(equipment.inter);
+            } else {
+                // Creates a new intervention
+                intervention = new Intervention();
+                intervention.setType(procedure);
+                intervention.setFarm(MainActivity.currentFarmId);
+                intervention.setStatus(CREATED);
+            }
+
             if (procedure.equals(MainActivity.IRRIGATION)) {
                 intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
-                intervention.setWater_unit(volumeUnitKeys.get(irrigationUnitSpinner.getSelectedItemPosition()).toString());
+                intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
             }
-            intervention.setStatus(CREATED);
-            intervention.setFarm(MainActivity.currentFarmId);
 
             // Save intervention and get returning id
             int intervention_id = (int) (long) database.dao().insert(intervention);
 
             InterventionWorkingDay workingDay = new InterventionWorkingDay(intervention_id, date, duration);
-            Log.e(TAG, workingDay.toString());
             database.dao().insert(workingDay);
 
             Float temperature = null;
-            if (temperatureEditText.getText() != null)
+            if (!temperatureEditText.getText().toString().isEmpty())
                 temperature = Float.valueOf(temperatureEditText.getText().toString());
 
             Float windSpeed = null;
-            if (windSpeedEditText.getText() != null)
+            if (!windSpeedEditText.getText().toString().isEmpty())
                 windSpeed = Float.valueOf(windSpeedEditText.getText().toString());
 
             if (temperature != null || windSpeed != null || weatherDescription != null) {
@@ -721,11 +859,6 @@ public class InterventionActivity extends AppCompatActivity implements
                 }
             }
 
-            for (Materials item : materialList) {
-                item.inter.intervention_id = intervention_id;
-                database.dao().insert(item.inter);
-            }
-
             for (Equipments item : equipmentList) {
                 item.inter.intervention_id = intervention_id;
                 database.dao().insert(item.inter);
@@ -741,6 +874,11 @@ public class InterventionActivity extends AppCompatActivity implements
                         if (crop.is_checked)
                             database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
+
+//            for (Materials item : materialList) {
+//                item.inter.intervention_id = intervention_id;
+//                database.dao().insert(item.inter);
+//            }
 
             return null;
         }
@@ -827,7 +965,8 @@ public class InterventionActivity extends AppCompatActivity implements
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, day) -> {
             date.set(year, month, day);
             workingPeriodEditDate.setText(DateTools.display(date.getTime()));
-        }, today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH));
+        }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
+        // today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH)
         datePickerDialog.show();
     }
 
@@ -839,7 +978,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
     void clearDatasets() {
         inputList.clear();
-        materialList.clear();
+        //materialList.clear();
         equipmentList.clear();
         personList.clear();
         plotList.clear();
