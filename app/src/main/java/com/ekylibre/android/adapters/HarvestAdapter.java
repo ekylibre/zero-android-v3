@@ -7,12 +7,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Persons;
@@ -42,7 +40,7 @@ public class HarvestAdapter extends RecyclerView.Adapter<HarvestAdapter.ViewHold
             quantityEditText = itemView.findViewById(R.id.harvest_quantity_edit);
             numberEditText = itemView.findViewById(R.id.harvest_number_edit);
             deleteImageView = itemView.findViewById(R.id.harvest_delete);
-            storageSpinner = itemView.findViewById(R.id.stock_place_spinner);
+            storageSpinner = itemView.findViewById(R.id.storage_spinner);
             unitSpinner = itemView.findViewById(R.id.harvest_unit_spinner);
 
             deleteImageView.setOnClickListener(view -> {

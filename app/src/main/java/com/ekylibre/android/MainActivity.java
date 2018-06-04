@@ -28,6 +28,7 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.SpinnerLists;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     SyncResultReceiver resultReceiver;
 
     // Farm id
-    public static String currentFarmId;
+    public static String FARM_ID;
     public static Date lastSyncTime;
     public static final SimpleDateFormat LAST_SYNC = new SimpleDateFormat( "yyyy-MM-dd HH:mm");
 
@@ -92,17 +93,21 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set locale one time for the app
-        LOCALE = getResources().getConfiguration().locale;
-
-        createUnitsLocale();
+        // Generates localized string lists for spinners
+        generateUnitLists();
+        SpinnerLists.generate(this);
 
         // Get shared preferences and set title
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-
         setTitle(sharedPreferences.getString("current-farm-name", "No name"));
-        currentFarmId = sharedPreferences.getString("current-farm-id", "");
 
+        // Get current farm_id
+        FARM_ID = sharedPreferences.getString("current-farm-id", "");
+
+        // Get locale one time for the app
+        LOCALE = getResources().getConfiguration().locale;
+
+        // Load initial data if not already done
         if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
             new LoadInitialData(this).execute();
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -113,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         resultReceiver = new SyncResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
-        // Layout
+        // Get layout refs
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         darkMask = findViewById(R.id.dark_mask);
         procedureChoiceLayout = findViewById(R.id.nav_procedure_choice);
@@ -165,14 +170,10 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         irrigationButton.setOnClickListener(view -> onProcedureChoice(IRRIGATION));
         finishingButton.setOnClickListener(view -> onInterventionTypeSelected(FINISHING));
         startingButton.setOnClickListener(view -> {
-            //onInterventionTypeSelected(STARTING);
-            //showInputDialog();
-            //new TestCrop(this).execute();
             Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
         });
-
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Intent intent = new Intent(this, SyncService.class);
@@ -218,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public void onBackPressed() {
         if (!deployMenu(false))
             super.onBackPressed();
+            AppDatabase.revokeInstance();
     }
 
     @Override
@@ -290,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             switch (filter) {
 
                 case FILTER_ALL_INTERVENTIONS:
-                    interventionsList.addAll(database.dao().selectInterventions(currentFarmId));
+                    interventionsList.addAll(database.dao().selectInterventions(FARM_ID));
                     break;
 
                 case FILTER_MY_INTERVENTIONS:
@@ -371,36 +373,19 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     /**
      * Creates units lists based on current locale
      */
-    private void createUnitsLocale() {
-        String name;
-        String quantity_name_only;
-        for (Unit unit : Units.IRRIGATION_UNITS) {
-            name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
-            if (unit.surface_factor != 0)
-                quantity_name_only = getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName()));
-            else
-                quantity_name_only = null;
-            Units.IRRIGATION_UNITS_L10N.add(name);
-            unit.setName(name, quantity_name_only);
-        }
-        for (Unit unit : Units.VOLUME_UNITS) {
-            name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
-            if (unit.surface_factor != 0)
-                quantity_name_only = getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName()));
-            else
-                quantity_name_only = null;
-            Units.VOLUME_UNITS_L10N.add(name);
-            unit.setName(name, quantity_name_only);
-        }
-        for (Unit unit : Units.MASS_UNITS) {
-            name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
-            if (unit.surface_factor != 0)
-                quantity_name_only = getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName()));
-            else
-                quantity_name_only = null;
-            Units.MASS_UNITS_L10N.add(name);
+    private void generateUnitLists() {
+        setUnitsName(Units.IRRIGATION_UNITS, Units.IRRIGATION_UNITS_L10N);
+        setUnitsName(Units.OUTPUT_UNITS, Units.OUTPUT_UNITS_L10N);
+        setUnitsName(Units.VOLUME_UNITS, Units.VOLUME_UNITS_L10N);
+        setUnitsName(Units.MASS_UNITS, Units.MASS_UNITS_L10N);
+    }
+
+    private void setUnitsName(List<Unit> unitList, List<String> unitListString) {
+        for (Unit unit : unitList) {
+            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+            String quantity_name_only = (unit.surface_factor != 0) ? getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName())) : null;
+            unitListString.add(name);
             unit.setName(name, quantity_name_only);
         }
     }
-
 }

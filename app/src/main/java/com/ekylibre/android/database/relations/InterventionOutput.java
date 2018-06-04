@@ -24,46 +24,37 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 
         @ForeignKey(entity = Harvest.class,
             parentColumns = Harvest.COLUMN_ID,
-            childColumns = InterventionOutput.COLUMN_SEED_ID
+            childColumns = InterventionOutput.COLUMN_OUTPUT_ID
         )},
-        primaryKeys = { InterventionOutput.COLUMN_INTERVENTION_ID, InterventionOutput.COLUMN_SEED_ID})
+        primaryKeys = { InterventionOutput.COLUMN_INTERVENTION_ID, InterventionOutput.COLUMN_OUTPUT_ID})
 public class InterventionOutput {
 
-    public static final String TABLE_NAME = "intervention_seeds";
-    public static final String COLUMN_INTERVENTION_ID = "intervention_id";
-    public static final String COLUMN_SEED_ID = "seed_id";
+    public static final String TABLE_NAME = "intervention_outputs";
+    public static final String COLUMN_INTERVENTION_ID = "id_intervention";
+    public static final String COLUMN_OUTPUT_ID = "id_output";
 
     public float quantity;
 
     public String unit;
 
     @ColumnInfo(name = COLUMN_INTERVENTION_ID, index = true)
-    @NonNull public Integer intervention_id;
+    @NonNull public Integer id_intervention;
 
-    @ColumnInfo(name = COLUMN_SEED_ID, index = true)
-    @NonNull public Integer seed_id;
+    @ColumnInfo(name = COLUMN_OUTPUT_ID, index = true)
+    @NonNull public Integer id_output;
 
     @Ignore
     public Seed seed;
 
-    public InterventionOutput(float quantity, String unit, @NonNull Integer intervention_id, @NonNull Integer seed_id) {
+    public InterventionOutput(float quantity, String unit, @NonNull Integer id_intervention, @NonNull Integer id_output) {
         this.quantity = quantity;
         this.unit = unit;
-        this.intervention_id = intervention_id;
-        this.seed_id = seed_id;
+        this.id_intervention = id_intervention;
+        this.id_output = id_output;
     }
 
     @Ignore
-    public InterventionOutput(int seedId) {
-        this.quantity = 0f;
-        this.unit = "KILOGRAM_PER_HECTARE";
-        this.intervention_id = -1;
-        this.seed_id = seedId;
-    }
-
-    public Unit getUnit() {
-        return Units.getUnit(unit);
-    }
+    public InterventionOutput() {}
 
     public void setInter(float quantity, String unit) {
         this.quantity = quantity;

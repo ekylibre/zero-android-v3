@@ -70,9 +70,15 @@ public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase database;
 
     public static synchronized AppDatabase getInstance(Context context) {
-        if (database == null) database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db").build();
+        if (database == null)
+            database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db").build();
         return database;
     }
+
+    public static synchronized void revokeInstance() {
+        database = null;
+    }
+
 
     /**
      * Populate database with initial Lexicon data

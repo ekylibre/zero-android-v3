@@ -76,8 +76,7 @@ public interface DAO {
     @Delete void delete(InterventionPerson... people);
     @Delete void delete(InterventionCrop... crops);
     @Delete void delete(Weather... weather);
-
-
+    @Delete void delete(Intervention intervention);
 
     /**
      *    Crops selection list
@@ -105,7 +104,7 @@ public interface DAO {
     @Transaction
     @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
             " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
-            " WHERE farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
+            " WHERE status != 'deleted' AND farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
     List<Interventions> selectInterventions(String farmId);
 
     @Transaction
@@ -129,6 +128,9 @@ public interface DAO {
     @Query("DELETE FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " = :ekyId")
     void deleteIntervention(int ekyId);
 
+    @Query("UPDATE " + Intervention.TABLE_NAME + " SET status = 'deleted' WHERE " + Intervention.COLUMN_ID + " = :id")
+    void setDeleted(int id);
+
 
     /**
      * Ids lists
@@ -147,6 +149,12 @@ public interface DAO {
 
     @Query("SELECT " + Person.COLUMN_ID_EKY + " FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " NOT NULL")
     List<Integer> personEkiIdList();
+
+    /**
+     *    Storage
+     */
+    @Query("SELECT * FROM " + Storage.TABLE_NAME + " ORDER BY name")
+    List<Storage> getStorages();
 
 
     /**
@@ -269,6 +277,12 @@ public interface DAO {
 
     @Query("SELECT " + Person.COLUMN_ID + " FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " = :eky_id")
     int getPersonId(int eky_id);
+
+    @Query("SELECT * FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " IS NULL")
+    List<Person> getPersonsWithoutEkyId();
+
+    @Query("UPDATE " + Person.TABLE_NAME + " SET " + Person.COLUMN_ID_EKY + " = :ekyId WHERE " + Person.COLUMN_ID + " = :id")
+    void setPersonEkyId(int id, int ekyId);
 
 
 

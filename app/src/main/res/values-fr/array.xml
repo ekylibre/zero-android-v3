@@ -6,4 +6,8 @@
         <item>Minéral</item>
     </string-array>
 
+    <string-array name="default_entries">
+        <item>Aucune entité</item>
+    </string-array>
+
 </resources>

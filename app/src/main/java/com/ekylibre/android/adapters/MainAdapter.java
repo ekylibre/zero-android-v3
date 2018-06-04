@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -25,6 +26,7 @@ import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.DateTools;
+import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
 import java.text.SimpleDateFormat;
@@ -181,12 +183,21 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                     if (current.equipments.indexOf(e) + 1 != current.equipments.size()) sb.append("\n");
                 }
                 break;
+
             case MainActivity.IRRIGATION:
                 if (current.intervention.water_quantity != null) {
                     sb.append("Volume • ").append(current.intervention.water_quantity).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(current.intervention.water_unit)).name);
                     break;
                 }
+
+            case MainActivity.HARVEST:
+                for (Harvest harvest : current.harvests) {
+                    sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
+                    sb.append(harvest.quantity).append(" ").append(Objects.requireNonNull(Units.getUnit(harvest.unit)).name);
+                    sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+                }
+                break;
         }
         holder.itemInfos.setText(sb.toString());
     }

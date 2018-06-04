@@ -28,9 +28,12 @@ public class Person {
 
     public String role;
 
-    public Person(Integer eky_id, String first_name, String last_name) {
+    public String farm_id;
+
+    public Person(Integer eky_id, String first_name, String last_name, String farm_id) {
         this.eky_id = eky_id;
         this.first_name = first_name;
         this.last_name = last_name;
+        this.farm_id = farm_id;
     }
 }

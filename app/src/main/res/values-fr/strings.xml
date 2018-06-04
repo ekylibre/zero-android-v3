@@ -153,6 +153,7 @@
     <string name="x_hour">%d heure</string>
     <string name="x_hours">%d heures</string>
 
+    <!-- Volume units -->
     <string name="LITER">litres</string>
     <string name="LITER_PER_HECTARE">litres/ha</string>
     <string name="LITER_PER_SQUARE_METER">litres/m²</string>
@@ -163,6 +164,7 @@
     <string name="CUBIC_METER_PER_HECTARE">m³/ha</string>
     <string name="CUBIC_METER_PER_SQUARE_METER">m³/m²</string>
 
+    <!-- Mass units -->
     <string name="GRAM">grammes</string>
     <string name="GRAM_PER_HECTARE">g/ha</string>
     <string name="GRAM_PER_SQUARE_METER">g/m²</string>
@@ -173,8 +175,13 @@
     <string name="QUINTAL_PER_HECTARE">q/ha</string>
     <string name="QUINTAL_PER_SQUARE_METER">q/m²</string>
     <string name="TON">tonnes</string>
-    <string name="TON_PER_HECTARE">tonnes/ha</string>
+    <string name="TON_PER_HECTARE">t/ha</string>
     <string name="TON_PER_SQUARE_METER">tonnes/m²</string>
+
+    <!-- Output types -->
+    <string name="STRAW">paille</string>
+    <string name="GRAIN">grain</string>
+    <string name="SILAGE">ensilage</string>
 
     <!-- App strings -->
     <string name="app_name">Clic&amp;Farm</string>
@@ -267,5 +274,6 @@
     <string name="stock_place">Lieu de stockage</string>
     <string name="number">Numéro</string>
     <string name="name">Nom</string>
+    <string name="delete">Supprimer</string>
 
 </resources>

@@ -19,6 +19,11 @@ query Pull {
             name
             referenceId
         }
+        storages {
+            id
+            name
+            type
+        }
         crops {
             uuid
             name

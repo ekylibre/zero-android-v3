@@ -3,12 +3,15 @@ package com.ekylibre.android;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatImageButton;
@@ -19,6 +22,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -32,13 +38,13 @@ import android.widget.Toast;
 
 import com.ekylibre.android.adapters.EquipmentAdapter;
 import com.ekylibre.android.adapters.InputAdapter;
+import com.ekylibre.android.adapters.OutputAdapter;
 import com.ekylibre.android.adapters.PersonAdapter;
-import com.ekylibre.android.adapters.SelectCropAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
+import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Phyto;
-import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Crops;
@@ -54,6 +60,7 @@ import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
+import com.ekylibre.android.utils.SpinnerLists;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
@@ -73,7 +80,7 @@ public class InterventionActivity extends AppCompatActivity implements
         SelectPersonFragment.OnFragmentInteractionListener,
         SelectCropFragment.OnFragmentInteractionListener {
 
-    private static final String TAG = InterventionActivity.class.getName();
+    private static final String TAG = "InterventionActivity";
 
     public static final String CREATED = "created";
     public static final String UPDATED = "updated";
@@ -108,10 +115,9 @@ public class InterventionActivity extends AppCompatActivity implements
 
     // Harvest layout
     private ImageView harvestArrow;
-    private TextView harvestAddLabel;
-    private RecyclerView harvestRecyclerView;
     private RecyclerView.Adapter harvestAdapter;
     private Group harvestDetail;
+    private AppCompatSpinner harvestOutputType;
 
 //    private ImageView materialArrow;
 //    private TextView materialSummary, materialAddLabel;
@@ -141,22 +147,22 @@ public class InterventionActivity extends AppCompatActivity implements
     private List<AppCompatImageButton> weatherIcons;
     private List<String> weatherEnum;
 
-    // Current Intervention values
+    // Current intervention datasets
     public static List<Object> inputList = new ArrayList<>();
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
     public static List<PlotWithCrops> plotList = new ArrayList<>();
-    //public static List<Outputs> outputList = new ArrayList<>();
+    public static List<Harvest> outputList = new ArrayList<>();
     //public static List<Materials> materialList = new ArrayList<>();
 
+    public static float surface = 0f;
     public static String procedure;
+    public static String cropSummaryText;
+
     private Calendar date = Calendar.getInstance();
     private Integer duration = 7;
-    public static float surface = 0f;
     private String weatherDescription;
-
     private Interventions editIntervention;
-    public static String cropSummaryText;
     private InputMethodManager keyboardManager;
 
 
@@ -214,9 +220,10 @@ public class InterventionActivity extends AppCompatActivity implements
         // Harvest layout
         ConstraintLayout harvestLayout = findViewById(R.id.harvest_layout);
         harvestArrow = findViewById(R.id.harvest_arrow);
-        harvestAddLabel = findViewById(R.id.harvest_add_label);
-        harvestRecyclerView = findViewById(R.id.harvest_recycler);
+        TextView harvestAddLabel = findViewById(R.id.harvest_add_label);
+        RecyclerView harvestRecyclerView = findViewById(R.id.harvest_recycler);
         harvestDetail = findViewById(R.id.harvest_detail);
+        harvestOutputType = findViewById(R.id.harvest_output_spinner);
 
         // Materials
 //        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
@@ -471,18 +478,31 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ================================ HARVEST EVENTS ===================================== //
 
-//        harvestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        harvestRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-//        harvestAdapter = new InputAdapter(this, harvestList);
-//        harvestAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//           @Override
-//           public void onChanged() {
-//               harvestAdapter.notifyDataSetChanged();
-//           }
-//        });
-//        harvestAddLabel.setOnClickListener(view -> {
-//            har
-//        });
+        ArrayAdapter outputTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, SpinnerLists.OUTPUT_LIST_L10N);
+        outputTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        harvestOutputType.setAdapter(outputTypeAdapter);
+        //harvestOutputType.setSelection(SpinnerLists.OUTPUT_LIST.indexOf(outputList.get(0).unit));
+
+        harvestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        harvestRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        harvestAdapter = new OutputAdapter(this, outputList);
+        harvestRecyclerView.setAdapter(harvestAdapter);
+
+        harvestAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+           @Override
+           public void onChanged() {
+               if (outputList.size() > 0)
+                   harvestDetail.setVisibility(View.VISIBLE);
+               else
+                   harvestDetail.setVisibility(View.GONE);
+           }
+        });
+
+        harvestAddLabel.setOnClickListener(view -> {
+            outputList.add(new Harvest());
+            Log.e(TAG, "harvest number " + outputList.size() + " list " + outputList.toString());
+            harvestAdapter.notifyDataSetChanged();
+        });
 
 
 
@@ -813,7 +833,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 // Creates a new intervention
                 intervention = new Intervention();
                 intervention.setType(procedure);
-                intervention.setFarm(MainActivity.currentFarmId);
+                intervention.setFarm(MainActivity.FARM_ID);
                 intervention.setStatus(CREATED);
             }
 
@@ -874,6 +894,16 @@ public class InterventionActivity extends AppCompatActivity implements
                         if (crop.is_checked)
                             database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
+
+            if (procedure.equals(MainActivity.HARVEST)) {
+                for (Harvest harvest : outputList) {
+                    String type = SpinnerLists.OUTPUT_LIST.get(harvestOutputType.getSelectedItemPosition());
+                    harvest.intervention_id = intervention_id;
+                    harvest.type = type;
+                    database.dao().insert(harvest);
+                }
+            }
+
 
 //            for (Materials item : materialList) {
 //                item.inter.intervention_id = intervention_id;
@@ -954,9 +984,8 @@ public class InterventionActivity extends AppCompatActivity implements
         // dialog, so make our own transaction and take care of that here.
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
-        if (prev != null) {
+        if (prev != null)
             ft.remove(prev);
-        }
         ft.addToBackStack(null);
         return ft;
     }
@@ -966,7 +995,6 @@ public class InterventionActivity extends AppCompatActivity implements
             date.set(year, month, day);
             workingPeriodEditDate.setText(DateTools.display(date.getTime()));
         }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
-        // today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH)
         datePickerDialog.show();
     }
 
@@ -978,10 +1006,10 @@ public class InterventionActivity extends AppCompatActivity implements
 
     void clearDatasets() {
         inputList.clear();
-        //materialList.clear();
         equipmentList.clear();
         personList.clear();
         plotList.clear();
+        //materialList.clear();
     }
 
     private class GetMaxDose extends AsyncTask<Void, Void, Void> {
@@ -1004,6 +1032,57 @@ public class InterventionActivity extends AppCompatActivity implements
             super.onPostExecute(aVoid);
             ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max = dose_max;
             Log.e(TAG, "dose max = " + ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (editIntervention != null) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.intervention, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_delete_intervention:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Etes-vous sûr de vouloir supprimer l'intervention ?");
+                builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
+                builder.setPositiveButton("oui", (dialog, i) -> {
+                    if (editIntervention.intervention.status.equals(CREATED)) {
+                        new DeleteCurrentIntervention(this).execute();
+                        clearDatasets();
+                        finish();
+                    } else {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public class DeleteCurrentIntervention extends AsyncTask<Void, Void, Void> {
+
+        Context context;
+
+        DeleteCurrentIntervention(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            AppDatabase database = AppDatabase.getInstance(context);
+            database.dao().setDeleted(editIntervention.intervention.id);
+            return null;
         }
     }
 }

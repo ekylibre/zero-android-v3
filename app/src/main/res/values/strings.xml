@@ -134,7 +134,6 @@
     <string name="wrapper">Enrubanneuse</string>
     <string name="forage_platform">Plateau</string>
 
-
     <!-- Plurals -->
     <string name="crop">%d crop</string>
     <string name="crops">%d crops</string>
@@ -153,6 +152,7 @@
     <string name="x_hour">%d hour</string>
     <string name="x_hours">%d hours</string>
 
+    <!-- Volume units -->
     <string name="LITER">liter</string>
     <string name="LITER_PER_HECTARE">LITER_PER_HECTARE</string>
     <string name="LITER_PER_SQUARE_METER">LITER_PER_SQUARE_METER</string>
@@ -163,6 +163,7 @@
     <string name="CUBIC_METER_PER_HECTARE">CUBIC_METER_PER_HECTARE</string>
     <string name="CUBIC_METER_PER_SQUARE_METER">CUBIC_METER_PER_SQUARE_METER</string>
 
+    <!-- Mass units -->
     <string name="GRAM">grammes</string>
     <string name="GRAM_PER_HECTARE">g/ha</string>
     <string name="GRAM_PER_SQUARE_METER">g/m²</string>
@@ -175,6 +176,11 @@
     <string name="TON">tonnes</string>
     <string name="TON_PER_HECTARE">tonnes/ha</string>
     <string name="TON_PER_SQUARE_METER">tonnes/m²</string>
+
+    <!-- Output types -->
+    <string name="STRAW">paille</string>
+    <string name="GRAIN">grain</string>
+    <string name="SILAGE">ensilage</string>
 
     <!-- App strings -->
     <string name="app_name">Clic&amp;Farm</string>
@@ -269,6 +275,7 @@
     <string name="number">Numéro</string>
     <string name="name">Nom</string>
     <string name="add_load">Ajouter un chargement</string>
+    <string name="delete">Supprimer</string>
 
 
 </resources>

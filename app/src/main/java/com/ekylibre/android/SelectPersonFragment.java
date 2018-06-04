@@ -21,6 +21,7 @@ import com.ekylibre.android.adapters.SelectPersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
 
+import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -161,7 +162,7 @@ public class SelectPersonFragment extends DialogFragment {
 //            String description = textInputLayout.getEditText().getText().toString();
 
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Person(null, firstName, lastName));
+            database.dao().insert(new Person(null, firstName, lastName, MainActivity.FARM_ID));
 
             return null;
         }

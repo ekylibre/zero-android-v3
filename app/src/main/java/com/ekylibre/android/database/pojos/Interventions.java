@@ -3,6 +3,7 @@ package com.ekylibre.android.database.pojos;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
 
+import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.relations.InterventionCrop;
@@ -47,6 +48,9 @@ public class Interventions {
 
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionCrop.COLUMN_INTERVENTION_ID, entity = InterventionCrop.class)
     public List<Crops> crops;
+
+    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = Harvest.COLUMN_INTERVENTION_ID, entity = Harvest.class)
+    public List<Harvest> harvests;
 
     public Interventions() {}
 
