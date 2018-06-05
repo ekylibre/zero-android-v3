@@ -58,6 +58,7 @@ import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.type.WeatherEnum;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.ekylibre.android.utils.SpinnerLists;
@@ -275,13 +276,13 @@ public class InterventionActivity extends AppCompatActivity implements
         // materialLayout.setVisibility(View.GONE);
 
         switch (procedure) {
-            case MainActivity.IRRIGATION:
+            case App.IRRIGATION:
                 irrigationLayout.setVisibility(View.VISIBLE);
                 break;
-            case MainActivity.GROUND_WORK:
+            case App.GROUND_WORK:
                 inputLayout.setVisibility(View.GONE);
                 break;
-            case MainActivity.HARVEST:
+            case App.HARVEST:
                 harvestLayout.setVisibility(View.VISIBLE);
 //            case MainActivity.CARE:
 //                materialLayout.setVisibility(View.VISIBLE);
@@ -301,7 +302,7 @@ public class InterventionActivity extends AppCompatActivity implements
         // =============================== IRRIGATION EVENTS =================================== //
 
         if (editIntervention != null) {
-            if (editIntervention.intervention.type.equals(MainActivity.IRRIGATION)) {
+            if (editIntervention.intervention.type.equals(App.IRRIGATION)) {
                 Integer volume = editIntervention.intervention.water_quantity;
                 irrigationQuantityEdit.setText(String.valueOf(volume));
                 Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
@@ -837,7 +838,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 intervention.setStatus(CREATED);
             }
 
-            if (procedure.equals(MainActivity.IRRIGATION)) {
+            if (procedure.equals(App.IRRIGATION)) {
                 intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
                 intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
             }
@@ -895,7 +896,7 @@ public class InterventionActivity extends AppCompatActivity implements
                             database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
 
-            if (procedure.equals(MainActivity.HARVEST)) {
+            if (procedure.equals(App.HARVEST)) {
                 for (Harvest harvest : outputList) {
                     String type = SpinnerLists.OUTPUT_LIST.get(harvestOutputType.getSelectedItemPosition());
                     harvest.intervention_id = intervention_id;

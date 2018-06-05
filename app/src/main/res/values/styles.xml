@@ -14,9 +14,9 @@
     <!--</style>-->
 
     <style name="NoActionBar" parent="AppTheme">
-        <item name="android:windowActionBar">false</item>
+        <!--<item name="android:windowActionBar">false</item>-->
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
+        <!--<item name="android:windowFullscreen">true</item>-->
     </style>
 
 </resources>

@@ -29,6 +29,7 @@ import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
+import com.ekylibre.android.utils.App;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -68,13 +69,13 @@ public class SelectInputFragment extends DialogFragment {
 
         switch (InterventionActivity.procedure) {
 
-            case MainActivity.IMPLANTATION:
+            case App.IMPLANTATION:
                 this.currentTab = SEED; break;
 
-            case MainActivity.CROP_PROTECTION:
+            case App.CROP_PROTECTION:
                 this.currentTab = PHYTO; break;
 
-            case MainActivity.FERTILIZATION:
+            case App.FERTILIZATION:
                 this.currentTab = FERTI; break;
         }
     }

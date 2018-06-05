@@ -253,6 +253,10 @@
     <string name="create_new_equipment">+ Create new tool</string>
     <string name="create_new_person">+ Create new person</string>
 
+    <string name="selecting_crops">Select a crop</string>
+    <string name="selecting_tools">Select a tool</string>
+    <string name="selecting_people">Select a person</string>
+
     <string name="add">+ Add</string>
     <string name="add_equipment">+ Add tool</string>
     <string name="add_material">+ Add material</string>
@@ -273,5 +277,7 @@
     <string name="stock_place">Storage</string>
     <string name="number">Number</string>
     <string name="name">Name</string>
+    <string name="welcome_text"><![CDATA[Welcome in Clic&Farm app! \nTo get started, sign in with your Ekylibre account …]]></string>
+
 
 </resources>
