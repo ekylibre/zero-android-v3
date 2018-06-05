@@ -28,6 +28,7 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.SpinnerLists;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
@@ -48,15 +49,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public int TYPE;
     public static final int STARTING = 0;
     public static final int FINISHING = 1;
-
-    // Procedures statics
-    public static final String CARE = "CARE";
-    public static final String CROP_PROTECTION = "CROP_PROTECTION";
-    public static final String FERTILIZATION = "FERTILIZATION";
-    public static final String GROUND_WORK = "GROUND_WORK";
-    public static final String HARVEST = "HARVEST";
-    public static final String IMPLANTATION = "IMPLANTATION";
-    public static final String IRRIGATION = "IRRIGATION";
 
     // Filters statics
     public static final String FILTER_MY_INTERVENTIONS = "filter_my_interventions";
@@ -107,14 +99,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         // Get locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
 
-        // Load initial data if not already done
-        if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
-            new LoadInitialData(this).execute();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("initial_data_loaded", true);
-            editor.apply();
-        }
-
         resultReceiver = new SyncResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
@@ -161,13 +145,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
 
         // All button events
-        careButton.setOnClickListener(view -> onProcedureChoice(CARE));
-        cropProtectionButton.setOnClickListener(view -> onProcedureChoice(CROP_PROTECTION));
-        fertilizationButton.setOnClickListener(view -> onProcedureChoice(FERTILIZATION));
-        groundWorkButton.setOnClickListener(view -> onProcedureChoice(GROUND_WORK));
-        harvestButton.setOnClickListener(view -> onProcedureChoice(HARVEST));
-        implantationButton.setOnClickListener(view -> onProcedureChoice(IMPLANTATION));
-        irrigationButton.setOnClickListener(view -> onProcedureChoice(IRRIGATION));
+        careButton.setOnClickListener(view -> onProcedureChoice(App.CARE));
+        cropProtectionButton.setOnClickListener(view -> onProcedureChoice(App.CROP_PROTECTION));
+        fertilizationButton.setOnClickListener(view -> onProcedureChoice(App.FERTILIZATION));
+        groundWorkButton.setOnClickListener(view -> onProcedureChoice(App.GROUND_WORK));
+        harvestButton.setOnClickListener(view -> onProcedureChoice(App.HARVEST));
+        implantationButton.setOnClickListener(view -> onProcedureChoice(App.IMPLANTATION));
+        irrigationButton.setOnClickListener(view -> onProcedureChoice(App.IRRIGATION));
         finishingButton.setOnClickListener(view -> onInterventionTypeSelected(FINISHING));
         startingButton.setOnClickListener(view -> {
             Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
@@ -181,6 +165,12 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             intent.putExtra("receiver", resultReceiver);
             startService(intent);
         });
+
+        // First time sync on create
+        Intent intent = new Intent(this, SyncService.class);
+        intent.setAction(SyncService.ACTION_SYNC_PULL);
+        intent.putExtra("receiver", resultReceiver);
+        startService(intent);
 
 
         //        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
@@ -230,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Add the menubar (top right) with disconnect option
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.appbar, menu);
         return true;
@@ -241,8 +232,11 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         switch (item.getItemId()) {
             case R.id.action_logout:
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("is_authenticated", false);
+                editor.remove("is_authenticated");
                 editor.remove("access_token");
+                editor.remove("refresh_token");
+                editor.remove("current-farm-name");
+                editor.remove("current-farm-id");
                 editor.apply();
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
@@ -344,30 +338,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             return true;
         }
         return false;
-    }
-
-    public class LoadInitialData extends AsyncTask<Void, Void, Void> {
-        Context context;
-
-        LoadInitialData(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            database = AppDatabase.getInstance(context);
-            database.populateInitialData(context);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_SYNC_PULL);
-            intent.putExtra("receiver", resultReceiver);
-            startService(intent);
-        }
     }
 
     /**

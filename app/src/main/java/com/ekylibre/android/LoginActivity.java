@@ -1,5 +1,6 @@
 package com.ekylibre.android;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,11 +10,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.exception.ApolloException;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.network.EkylibreAPI;
 import com.ekylibre.android.network.GraphQLClient;
 import com.ekylibre.android.network.ServiceGenerator;
@@ -25,6 +35,7 @@ import retrofit2.Call;
 
 import com.apollographql.apollo.api.Response;
 
+import com.ekylibre.android.utils.App;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -35,13 +46,7 @@ import javax.annotation.Nonnull;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = LoginActivity.class.getName();
-
-    public static final String OAUTH_URL = "https://ekylibre-test.com";
-    public static final String OAUTH_GRANT_TYPE = "password";
-    public static final String OAUTH_CLIENT_ID = "e31cb2014a4604ff169b08ab171715a290bd2b24f7b0409a8cc428c75a2f3b75";
-    public static final String OAUTH_CLIENT_SECRET = "aa33d1f551329fc8504e2d860767428d500418132c64f746afcc9fc160476293";
-    public static final String OAUTH_SCOPE = "public read:profile read:lexicon read:plots read:crops read:interventions write:interventions read:equipment write:equipment read:articles write:articles read:person write:person";
+    private static final String TAG = "LoginActivity";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -52,10 +57,23 @@ public class LoginActivity extends AppCompatActivity {
 
     // UI references.
     private TextInputLayout emailView, passwordView;
+    private TextView welcomeText;
+    private Button signInButton;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Remove title bar
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        //Remove notification bar
+        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
+        App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
+        App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
 
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
@@ -68,30 +86,56 @@ public class LoginActivity extends AppCompatActivity {
             setContentView(R.layout.activity_login);
 
             // Set up the login form.
-            emailView = findViewById(R.id.email);
-            passwordView = findViewById(R.id.password);
+            welcomeText = findViewById(R.id.login_welcome_text);
+            emailView = findViewById(R.id.login_email);
+            passwordView = findViewById(R.id.login_password);
 
-            Button signInButton = findViewById(R.id.sign_in_button);
+            EditText passEditText = passwordView.getEditText();
+            Objects.requireNonNull(passEditText).setOnEditorActionListener((textView, id, keyEvent) -> {
+                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                    authTask = null;
+                    hideKeyboard();
+                    attemptLogin();
+                    return true;
+                }
+                return false;
+            });
+
+            signInButton = findViewById(R.id.sign_in_button);
             signInButton.setOnClickListener(view -> {
                 authTask = null;
+                hideKeyboard();
                 attemptLogin();
             });
 
-//        passwordView.setOnEditorActionListener((textView, id, keyEvent) -> {
-//            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-//                attemptLogin();
-//                return true;
-//            }
-//            return false;
-//        });
-
+            dialog = new ProgressDialog(this);
+            dialog.setMessage("Tentative de connection, merci de patienter...");
         }
     }
 
     private void startApp() {
+        authTask = null;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void setFormDisplay(boolean setting){
+//        int visibility = setting ? View.VISIBLE : View.GONE;
+//        welcomeText.setVisibility(visibility);
+//        emailView.setVisibility(visibility);
+//        passwordView.setVisibility(visibility);
+//        signInButton.setVisibility(visibility);
+        if (setting) dialog.dismiss();
+        else dialog.show();
+    }
+
+    private void hideKeyboard() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     /**
@@ -131,15 +175,20 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            setFormDisplay(false);
+        }
+
+        @Override
         protected Boolean doInBackground(Void... params) {
 
             // Prevent SSL HandShake failure
             fixHandShakeFailed();
 
             EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class);
-
-            Call<AccessToken> call = ekylibreAPI.getNewAccessToken(OAUTH_CLIENT_ID,
-                    OAUTH_CLIENT_SECRET, OAUTH_GRANT_TYPE, email, password, OAUTH_SCOPE);
+            Call<AccessToken> call = ekylibreAPI.getNewAccessToken(App.OAUTH_CLIENT_ID,
+                    App.OAUTH_CLIENT_SECRET, App.OAUTH_GRANT_TYPE, email, password, App.OAUTH_SCOPE);
 
             call.enqueue(new retrofit2.Callback<AccessToken>() {
                 @Override
@@ -148,8 +197,6 @@ public class LoginActivity extends AppCompatActivity {
 
                         accessToken = response.body();
                         Log.e(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
-
-                        //fixHandShakeFailed();
 
                         ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
                         ProfileQuery profileQuery = ProfileQuery.builder().build();
@@ -162,47 +209,54 @@ public class LoginActivity extends AppCompatActivity {
                                 // We got an access_token
                                 ProfileQuery.Data data = response.data();
 
-                                if (data != null && data.profile != null) {
-                                    //Log.e(TAG, data.profile.farm);
+                                Log.e(TAG, data.toString());
 
-                                    // Get shared preferences and set profile parameters
-//                                    SharedPreferences sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putString("firstName", data.profile.firstName);
-                                    editor.putString("lastName", data.profile.lastName);
-                                    editor.putString("email", email);
-                                    editor.putString("access_token", accessToken.getAccess_token());
-                                    editor.putString("refresh_token", accessToken.getRefresh_token());
-                                    editor.putInt("token_created_at", accessToken.getCreated_at());
-                                    editor.putBoolean("is_authenticated", true);
-                                    editor.putString("current-farm-name", data.farms().get(0).label);
-                                    editor.putString("current-farm-id", data.farms().get(0).id);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("firstName", data.profile.firstName);
+                                editor.putString("lastName", data.profile.lastName);
+                                editor.putString("email", email);
+                                editor.putString("access_token", accessToken.getAccess_token());
+                                editor.putString("refresh_token", accessToken.getRefresh_token());
+                                editor.putInt("token_created_at", accessToken.getCreated_at());
+                                editor.putString("current-farm-name", data.farms().get(0).label);
+                                editor.putString("current-farm-id", data.farms().get(0).id);
+                                editor.putBoolean("is_authenticated", true);
+                                editor.apply();
+
+                                // Finish th login activity
+                                if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
+                                    runOnUiThread(changeMessage);
+                                    new LoadInitialData(getBaseContext()).execute();
+                                    editor.putBoolean("initial_data_loaded", true);
                                     editor.apply();
-
-                                    // Finish th login activity
-                                    startApp();
-                                    finish();
-                                    authTask = null;
-
                                 } else {
-                                    Log.e(TAG, "Erreur d'authentification");
-                                    authTask = null;
+                                    startApp();
                                 }
+
                             }
 
                             @Override
                             public void onFailure(@Nonnull ApolloException e) {
                                 Log.e(TAG, "ApolloException --> " + e.getMessage());
                                 authTask = null;
+                                setFormDisplay(true);
+                                Toast toast = Toast.makeText(getBaseContext(), "Erreur de connexion, votre smartphone n'est peut-être pas connecter. Veuillez réessayer plus tard.", Toast.LENGTH_LONG);
+                                toast.show();
                                 // TODO display toast error connection
                             }
                         });
+                    } else {
+                        authTask = null;
+                        setFormDisplay(true);
+                        Toast toast = Toast.makeText(getBaseContext(), "Identifiant inconnu ou mot de passe incorrect. Veuillez réessayer.", Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<AccessToken> call, @NonNull Throwable t) {
                     authTask = null;
+                    setFormDisplay(true);
                 }
             });
 
@@ -225,8 +279,37 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             authTask = null;
+            setFormDisplay(true);
         }
 
+    }
+
+    private Runnable changeMessage = new Runnable() {
+        @Override
+        public void run() {
+            dialog.setMessage("Chargement des données de référence...");
+        }
+    };
+
+    public class LoadInitialData extends AsyncTask<Void, Void, Void> {
+        Context context;
+
+        LoadInitialData(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            AppDatabase database = AppDatabase.getInstance(context);
+            database.populateInitialData(context);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            startApp();
+        }
     }
 
     void fixHandShakeFailed() {

@@ -25,6 +25,7 @@ import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
@@ -139,7 +140,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         StringBuilder sb = new StringBuilder();
         switch (current.intervention.type) {
 
-            case MainActivity.CROP_PROTECTION:
+            case App.CROP_PROTECTION:
                 for (Phytos p : current.phytos) {
                     sb.append(p.phyto.get(0).name).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", p.inter.quantity)).append(" ");
@@ -148,7 +149,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
                 break;
 
-            case MainActivity.IMPLANTATION:
+            case App.IMPLANTATION:
                 for (Seeds s : current.seeds) {
                     String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie, "string", context.getPackageName()));
                     sb.append(specie).append(" • ");
@@ -158,7 +159,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
                 break;
 
-            case MainActivity.FERTILIZATION:
+            case App.FERTILIZATION:
                 for (Fertilizers f : current.fertilizers) {
                     sb.append(f.fertilizer.get(0).label_fra).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", f.inter.quantity)).append(" ");
@@ -176,22 +177,22 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 //                }
 //                break;
 
-            case MainActivity.CARE:
-            case MainActivity.GROUND_WORK:
+            case App.CARE:
+            case App.GROUND_WORK:
                 for (Equipments e : current.equipments) {
                     sb.append(e.equipment.get(0).name);
                     if (current.equipments.indexOf(e) + 1 != current.equipments.size()) sb.append("\n");
                 }
                 break;
 
-            case MainActivity.IRRIGATION:
+            case App.IRRIGATION:
                 if (current.intervention.water_quantity != null) {
                     sb.append("Volume • ").append(current.intervention.water_quantity).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(current.intervention.water_unit)).name);
                     break;
                 }
 
-            case MainActivity.HARVEST:
+            case App.HARVEST:
                 for (Harvest harvest : current.harvests) {
                     sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
                     sb.append(harvest.quantity).append(" ").append(Objects.requireNonNull(Units.getUnit(harvest.unit)).name);

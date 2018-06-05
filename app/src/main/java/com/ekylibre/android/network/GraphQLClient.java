@@ -7,6 +7,7 @@ import android.util.Log;
 import com.apollographql.apollo.ApolloClient;
 import com.ekylibre.android.network.helpers.ISO8601Adapter;
 import com.ekylibre.android.type.CustomType;
+import com.ekylibre.android.utils.App;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +22,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public class GraphQLClient {
 
     private static final int TIME_OUT = 5000;
-    private static final String BASE_URL = "https://ekylibre-test.com/v1/graphql";  // TODO replace in production
     private static OkHttpClient okHttpClient;
 
     // get the instance of apollo client with all the headers and correct url
@@ -32,7 +32,7 @@ public class GraphQLClient {
         }
 
         return ApolloClient.builder()
-                .serverUrl(BASE_URL)
+                .serverUrl(App.API_URL + "/v1/graphql")
                 .okHttpClient(okHttpClient)
                 .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
                 //.addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)

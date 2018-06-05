@@ -1,20 +1,20 @@
 mutation pushInter(
   $farmId: ID!,
   $procedure: InterventionTypeEnum!,
-  $cropList: [CreateInterventionTargetInputObject],
-  $workingDays: [CreateInterventionWorkingDayInputObject]
+  $cropList: [InterventionTargetAttributes!]!,
+  $workingDays: [InterventionWorkingDayAttributes!]
   $waterQuantity: Int
-  $waterUnit: ArticleVolumeUnit
-  $inputs: [CreateInterventionInputInputObject]
-  $outputs: [CreateInterventionOutputInputObject]
-  $tools: [CreateInterventionToolInputObject]
-  $operators: [CreateInterventionOperatorInputObject]
-  $weather: WeatherInputObjectType
+  $waterUnit: ArticleVolumeUnitEnum
+  $inputs: [InterventionInputAttributes!]
+  $outputs: [InterventionOutputAttributes!]
+  $tools: [InterventionToolAttributes!]
+  $operators: [InterventionOperatorAttributes!]
+  $weather: WeatherAttributes
 )
   {
-  createInterventionMutation(
+  createIntervention(
     input: {
-      intervention: {
+      interventionArgs: {
         farmID: $farmId
         type: $procedure
         targets: $cropList
@@ -40,20 +40,20 @@ mutation updateInter(
   $interventionId: ID!
   $farmId: ID!,
   $procedure: InterventionTypeEnum!,
-  $weather: WeatherInputObjectType
+  $cropList: [InterventionTargetAttributes!]!,
+  $workingDays: [InterventionWorkingDayAttributes!]
   $waterQuantity: Int
-  $waterUnit: ArticleVolumeUnit
-  $cropList: [InterventionTargetInputObject],
-  $workingDays: [InterventionWorkingDayInputObject]
-  $inputs: [InterventionInputInputObject]
-  $outputs: [InterventionOutputInputObject]
-  $tools: [InterventionToolInputObject]
-  $operators: [InterventionOperatorInputObject]
+  $waterUnit: ArticleVolumeUnitEnum
+  $inputs: [InterventionInputAttributes!]
+  $outputs: [InterventionOutputAttributes!]
+  $tools: [InterventionToolAttributes!]
+  $operators: [InterventionOperatorAttributes!]
+  $weather: WeatherAttributes
 )
   {
-  updateInterventionMutation(
+  updateIntervention(
     input: {
-      intervention: {
+      interventionArgs: {
         interventionId: $interventionId
         farmID: $farmId
         type: $procedure
@@ -79,9 +79,9 @@ mutation pushEquipment(
   $name: String!
   $number: String
 ) {
-  createEquipmentMutation(
+  createEquipment(
     input: {
-      equipment: {
+      argsEquipment: {
         farmID: $farmId
         type: $type
         name: $name
@@ -101,9 +101,9 @@ mutation pushPerson(
   $firstName: String
   $lastName: String!
 ) {
-  createPersonMutation(
+  createPerson(
     input: {
-      person: {
+      argsPerson: {
         farmID: $farmId
         firstName: $firstName
         lastName: $lastName

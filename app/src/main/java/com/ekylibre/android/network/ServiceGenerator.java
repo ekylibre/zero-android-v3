@@ -7,15 +7,13 @@ import android.util.Log;
 
 import com.ekylibre.android.LoginActivity;
 import com.ekylibre.android.network.pojos.AccessToken;
+import com.ekylibre.android.utils.App;
 
 import java.io.IOException;
 
-import okhttp3.CipherSuite;
-import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.TlsVersion;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -38,7 +36,7 @@ public class ServiceGenerator {
         httpClient = new OkHttpClient.Builder();
 
         builder = new Retrofit.Builder()
-                .baseUrl(LoginActivity.OAUTH_URL)
+                .baseUrl(App.API_URL)
                 .addConverterFactory(MoshiConverterFactory.create());
 
 //        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
@@ -73,7 +71,7 @@ public class ServiceGenerator {
         httpClient = new OkHttpClient.Builder();
 
         builder = new Retrofit.Builder()
-                .baseUrl(LoginActivity.OAUTH_URL)
+                .baseUrl(App.API_URL)
                 .addConverterFactory(MoshiConverterFactory.create());
 
         if (accessToken != null) {
