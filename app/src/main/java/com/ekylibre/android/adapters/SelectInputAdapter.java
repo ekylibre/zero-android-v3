@@ -2,7 +2,6 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.constraint.Group;
 import android.support.v7.widget.AppCompatTextView;
@@ -14,12 +13,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.SelectInputFragment;
 import com.ekylibre.android.R;
-import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;
-import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -28,7 +26,6 @@ import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
-import com.ekylibre.android.utils.PhytosanitaryMiscibility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,7 +141,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 break;
 
             default:
-                Log.e(TAG, "default viewHolder --> pas normal");
+                if (BuildConfig.DEBUG) Log.e(TAG, "default viewHolder --> pas normal");
                 View defaultView = inflater.inflate(R.layout.item_seed, parent, false);
                 viewHolder = new SeedViewHolder(defaultView);
                 break;
@@ -160,7 +157,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case SEED:
                 SeedViewHolder seedViewHolder = (SeedViewHolder) holder;
                 Seed seed = (Seed) inputList.get(position);
-                int res = context.getResources().getIdentifier(seed.specie, "string", context.getPackageName());
+                int res = context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName());
                 seedViewHolder.seedSpecie.setText(context.getString(res));
                 seedViewHolder.seedVariety.setText(seed.variety);
                 seedViewHolder.seedFavorite.setVisibility((seed.eky_id != null) ? View.VISIBLE : View.GONE);
@@ -196,7 +193,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 phytoViewHolder.phytoMixWarning.setVisibility(View.GONE);
 
                 if (phyto.mix_category_code != null) {
-                    Log.e(TAG, "Current item mix_category_code " + phyto.mix_category_code);
+                    if (BuildConfig.DEBUG) Log.e(TAG, "Current item mix_category_code " + phyto.mix_category_code);
 
                     List<Integer> codes = new ArrayList<>();
                     for (Object input : InterventionActivity.inputList) {
@@ -208,7 +205,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                     codes.add(phyto.mix_category_code);
 
-                    Log.e(TAG, codes.toString());
+                    if (BuildConfig.DEBUG) Log.e(TAG, codes.toString());
 
                     if (codes.size() >= 2) {
                         if (!mixIsAuthorized(codes))

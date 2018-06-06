@@ -76,6 +76,7 @@ public interface DAO {
     @Delete void delete(InterventionPerson... people);
     @Delete void delete(InterventionCrop... crops);
     @Delete void delete(Weather... weather);
+    @Delete void delete(Harvest... harvests);
     @Delete void delete(Intervention intervention);
 
     /**
@@ -108,7 +109,7 @@ public interface DAO {
     List<Interventions> selectInterventions(String farmId);
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL")
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL AND status != 'deleted'")
     List<Interventions> getSyncableInterventions();
 
     @Transaction

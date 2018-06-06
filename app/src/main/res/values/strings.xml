@@ -257,6 +257,12 @@
     <string name="selecting_tools">Select a tool</string>
     <string name="selecting_people">Select a person</string>
 
+    <string name="delete_input_prompt">Are you sure you want to remove the input?</string>
+    <string name="delete_harvest_prompt">Are you sure you want to remove the load?</string>
+    <string name="delete_equipment_prompt">Are you sure you want to remove the tool?</string>
+    <string name="delete_material_prompt">Are you sure you want to remove the material?</string>
+    <string name="delete_person_prompt">Are you sure you want to remove the person?</string>
+
     <string name="add">+ Add</string>
     <string name="add_equipment">+ Add tool</string>
     <string name="add_material">+ Add material</string>
@@ -278,6 +284,13 @@
     <string name="number">Number</string>
     <string name="name">Name</string>
     <string name="welcome_text"><![CDATA[Welcome in Clic&Farm app! \nTo get started, sign in with your Ekylibre account …]]></string>
+    <string name="no">no</string>
+    <string name="yes">yes</string>
+    <string name="sync_failure">Sync failure…</string>
+    <string name="network_failure">Network error, try again later.</string>
+    <string name="login_failure">Unknown E-mail or invalid password. Try again.</string>
+    <string name="loading_initial_data">Loading initial data…</string>
+    <string name="authenticating">Authenticating, please wait…</string>
 
 
 </resources>

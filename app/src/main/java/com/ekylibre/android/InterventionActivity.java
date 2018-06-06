@@ -115,7 +115,6 @@ public class InterventionActivity extends AppCompatActivity implements
     private Group phytoMixWarning;
 
     // Harvest layout
-    private ImageView harvestArrow;
     private RecyclerView.Adapter harvestAdapter;
     private Group harvestDetail;
     private AppCompatSpinner harvestOutputType;
@@ -220,7 +219,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // Harvest layout
         ConstraintLayout harvestLayout = findViewById(R.id.harvest_layout);
-        harvestArrow = findViewById(R.id.harvest_arrow);
+        ImageView harvestArrow = findViewById(R.id.harvest_arrow);
         TextView harvestAddLabel = findViewById(R.id.harvest_add_label);
         RecyclerView harvestRecyclerView = findViewById(R.id.harvest_recycler);
         harvestDetail = findViewById(R.id.harvest_detail);
@@ -284,6 +283,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 break;
             case App.HARVEST:
                 harvestLayout.setVisibility(View.VISIBLE);
+                inputLayout.setVisibility(View.GONE);
 //            case MainActivity.CARE:
 //                materialLayout.setVisibility(View.VISIBLE);
 //                break;
@@ -353,7 +353,7 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String quantityEditText = irrigationQuantityEdit.getText().toString();
                 if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
-                    Log.i(TAG, "onItemSelected");
+                    if (BuildConfig.DEBUG) Log.i(TAG, "onItemSelected");
                     Integer quantity = Integer.valueOf(quantityEditText);
                     Unit unit = Units.IRRIGATION_UNITS.get(position);
                     String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", quantity / surface, unit.name);
@@ -479,10 +479,19 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ================================ HARVEST EVENTS ===================================== //
 
+
+
         ArrayAdapter outputTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, SpinnerLists.OUTPUT_LIST_L10N);
         outputTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         harvestOutputType.setAdapter(outputTypeAdapter);
-        //harvestOutputType.setSelection(SpinnerLists.OUTPUT_LIST.indexOf(outputList.get(0).unit));
+
+        if (editIntervention != null) {
+            if (!editIntervention.harvests.isEmpty()) {
+                outputList.addAll(editIntervention.harvests);
+                harvestArrow.performClick();
+                harvestOutputType.setSelection(SpinnerLists.OUTPUT_LIST.indexOf(outputList.get(0).type));
+            }
+        }
 
         harvestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         harvestRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -501,10 +510,11 @@ public class InterventionActivity extends AppCompatActivity implements
 
         harvestAddLabel.setOnClickListener(view -> {
             outputList.add(new Harvest());
-            Log.e(TAG, "harvest number " + outputList.size() + " list " + outputList.toString());
+            if (BuildConfig.DEBUG) Log.e(TAG, "harvest number " + outputList.size() + " list " + outputList.toString());
             harvestAdapter.notifyDataSetChanged();
         });
 
+        harvestAdapter.notifyDataSetChanged();
 
 
         // ============================== MATERIALS EVENTS ===================================== //
@@ -770,7 +780,7 @@ public class InterventionActivity extends AppCompatActivity implements
             if (editIntervention != null) {
                 int count = 0;
                 float total = 0;
-                Log.e(TAG, plotList.toString());
+                if (BuildConfig.DEBUG) Log.e(TAG, plotList.toString());
                 for (PlotWithCrops plot : plotList) {
                     for (Crops culture : editIntervention.crops) {
                         for (Crop crop : plot.crops) {
@@ -817,7 +827,8 @@ public class InterventionActivity extends AppCompatActivity implements
                     intervention.setStatus(UPDATED);
                 // Deletes relations
                 database.dao().delete(editIntervention.workingDays.get(0));
-                database.dao().delete(editIntervention.weather.get(0));
+                Log.i(TAG, "weather " + editIntervention.weather);
+                if (!editIntervention.weather.isEmpty()) database.dao().delete(editIntervention.weather.get(0));
                 for (Crops crop : editIntervention.crops)
                     database.dao().delete(crop.inter);
                 for (Persons person : editIntervention.persons)
@@ -830,6 +841,8 @@ public class InterventionActivity extends AppCompatActivity implements
                     database.dao().delete(fertilizer.inter);
                 for (Equipments equipment : editIntervention.equipments)
                     database.dao().delete(equipment.inter);
+                for (Harvest harvest : editIntervention.harvests)
+                    database.dao().delete(harvest);
             } else {
                 // Creates a new intervention
                 intervention = new Intervention();
@@ -927,7 +940,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Object selection) {
         if (selection != null) {
 
-            Log.e(TAG, "onFragmentInteraction --> " + selection.toString());
+            if (BuildConfig.DEBUG) Log.e(TAG, "onFragmentInteraction --> " + selection.toString());
 
 //            if (selection instanceof Materials) {
 //                selectMaterialFragment.dismiss();
@@ -1010,6 +1023,7 @@ public class InterventionActivity extends AppCompatActivity implements
         equipmentList.clear();
         personList.clear();
         plotList.clear();
+        outputList.clear();
         //materialList.clear();
     }
 
@@ -1032,7 +1046,7 @@ public class InterventionActivity extends AppCompatActivity implements
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max = dose_max;
-            Log.e(TAG, "dose max = " + ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max);
+            if (BuildConfig.DEBUG) Log.e(TAG, "dose max = " + ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max);
         }
     }
 
@@ -1054,7 +1068,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 builder.setMessage("Etes-vous sûr de vouloir supprimer l'intervention ?");
                 builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
                 builder.setPositiveButton("oui", (dialog, i) -> {
-                    if (editIntervention.intervention.status.equals(CREATED)) {
+                    if (editIntervention.intervention.status.equals(CREATED) || editIntervention.intervention.status.equals(SYNCED)) {
                         new DeleteCurrentIntervention(this).execute();
                         clearDatasets();
                         finish();

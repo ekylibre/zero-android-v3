@@ -1,10 +1,8 @@
 package com.ekylibre.android;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,8 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectCropAdapter;
-import com.ekylibre.android.database.AppDatabase;
-import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.pojos.PlotWithCrops;
 
 import java.util.ArrayList;
@@ -82,7 +78,7 @@ public class SelectCropFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
 
-        Log.e(TAG, "onStart()");
+        if (BuildConfig.DEBUG) Log.e(TAG, "onStart()");
 
         Window window = getDialog().getWindow();
         if (window != null)

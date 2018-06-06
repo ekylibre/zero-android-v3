@@ -14,6 +14,7 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.ProfileQuery;
@@ -33,7 +34,6 @@ import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
-import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
@@ -52,30 +52,25 @@ import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.network.GraphQLClient;
 
-import com.ekylibre.android.type.ArticleAllUnit;
-import com.ekylibre.android.type.ArticleInputObject;
-import com.ekylibre.android.type.ArticleType;
-import com.ekylibre.android.type.ArticleVolumeUnit;
-import com.ekylibre.android.type.CreateHarvestLoadInputObject;
-import com.ekylibre.android.type.CreateInterventionInputInputObject;
-import com.ekylibre.android.type.CreateInterventionOperatorInputObject;
-import com.ekylibre.android.type.CreateInterventionOutputInputObject;
-import com.ekylibre.android.type.CreateInterventionTargetInputObject;
-import com.ekylibre.android.type.CreateInterventionToolInputObject;
-import com.ekylibre.android.type.CreateInterventionWorkingDayInputObject;
+import com.ekylibre.android.type.ArticleAllUnitEnum;
+import com.ekylibre.android.type.ArticleAttributes;
+import com.ekylibre.android.type.ArticleTypeEnum;
+import com.ekylibre.android.type.ArticleVolumeUnitEnum;
+import com.ekylibre.android.type.HarvestLoadAttributes;
+import com.ekylibre.android.type.HarvestLoadUnitEnum;
+import com.ekylibre.android.type.InterventionInputAttributes;
+import com.ekylibre.android.type.InterventionOperatorAttributes;
+import com.ekylibre.android.type.InterventionOutputAttributes;
+import com.ekylibre.android.type.InterventionOutputTypeEnum;
+import com.ekylibre.android.type.InterventionTargetAttributes;
+import com.ekylibre.android.type.InterventionToolAttributes;
+import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.EquipmentTypeEnum;
-import com.ekylibre.android.type.HarvestLoadUnit;
-import com.ekylibre.android.type.InterventionInputInputObject;
-import com.ekylibre.android.type.InterventionOperatorInputObject;
-import com.ekylibre.android.type.InterventionOutputType;
-import com.ekylibre.android.type.InterventionTargetInputObject;
-import com.ekylibre.android.type.InterventionToolInputObject;
 import com.ekylibre.android.type.InterventionTypeEnum;
-import com.ekylibre.android.type.InterventionWorkingDayInputObject;
-import com.ekylibre.android.type.OperatorRoles;
+import com.ekylibre.android.type.OperatorRoleEnum;
+import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
-import com.ekylibre.android.type.WeatherInputObjectType;
-import com.ekylibre.android.utils.SpinnerLists;
+import com.ekylibre.android.utils.App;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -112,6 +107,8 @@ public class SyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
+        if (BuildConfig.DEBUG) Log.i(TAG, "Starting SyncService");
+
         // Handle Handshake Errors
         try {
             ProviderInstaller.installIfNeeded(this);
@@ -129,7 +126,7 @@ public class SyncService extends IntentService {
         final ResultReceiver receiver = intent.getParcelableExtra("receiver");
 
         // Route action to function
-        switch (intent.getAction()) {
+        switch (Objects.requireNonNull(intent.getAction())) {
 
             case ACTION_SYNC_PULL:
                 handleActionSyncPull(receiver);
@@ -183,6 +180,9 @@ public class SyncService extends IntentService {
                     if (!farm.crops().isEmpty()) {
                         Log.i(TAG, "Fetching crops...");
 
+                        editor.putBoolean("no-crop", false);
+                        editor.apply();
+
                         for (PullQuery.Crop crop : farm.crops()) {
 
                             // Symplify crop name
@@ -190,7 +190,7 @@ public class SyncService extends IntentService {
 
                             // Saving crop
                             Crop newCrop = new Crop(
-                                    crop.uuid(), name, crop.specie(), crop.productionNature(),
+                                    crop.uuid(), name, crop.specie().rawValue(), null,
                                     crop.productionMode(), null, null, null,
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
                                     crop.startDate(), crop.stopDate(), crop.plot().uuid(),
@@ -203,6 +203,9 @@ public class SyncService extends IntentService {
                             database.dao().insert(newPlot);
                         }
                         // TODO: delete crop & plot if deleted on server
+                    } else {
+                        editor.putBoolean("no-crop", true);
+                        editor.apply();
                     }
 
                     // Processing people
@@ -241,18 +244,18 @@ public class SyncService extends IntentService {
                     }
 
                     // Processing storages
-                    if (!farm.storages().isEmpty()) {
-                        Log.i(TAG, "Fetching storages...");
-                        for (PullQuery.Storage storage : farm.storages()) {
-                            Log.i(TAG, "Creating storage #" + storage.id());
-                            database.dao().insert(new Storage(
-                                    Integer.valueOf(storage.id()),
-                                    storage.name(),
-                                    storage.type().rawValue()));
-                        }
-                        SpinnerLists.STORAGE_LIST = database.dao().getStorages();
-                        SpinnerLists.generateStorages();
-                    }
+//                    if (!farm.storages().isEmpty()) {
+//                        Log.i(TAG, "Fetching storages...");
+//                        for (PullQuery.Storage storage : farm.storages()) {
+//                            Log.i(TAG, "Creating storage #" + storage.id());
+//                            database.dao().insert(new Storage(
+//                                    Integer.valueOf(storage.id()),
+//                                    storage.name(),
+//                                    storage.type().rawValue()));
+//                        }
+//                        SpinnerLists.STORAGE_LIST = database.dao().getStorages();
+//                        SpinnerLists.generateStorages();
+//                    }
 
                     // Processing articles
                     if (!farm.articles().isEmpty()) {
@@ -260,7 +263,7 @@ public class SyncService extends IntentService {
 
                         for (PullQuery.Article article : farm.articles()) {
 
-                            if (article.type() == ArticleType.PHYTOSANITARY) {
+                            if (article.type() == ArticleTypeEnum.PHYTOSANITARY) {
                                 Log.e(TAG, "phyto " + article.name() + " eky_id " + article.id() + " product_id " + article.referenceId());
                                 long result = database.dao().setPhytoEkyId(Integer.valueOf(article.id()), article.referenceId(), article.name().split(" - ")[0]);
                                 Log.e(TAG, "result = " + result);
@@ -273,7 +276,7 @@ public class SyncService extends IntentService {
                                 //phytoEkyIdList.add(Integer.valueOf(article.id()));
                             }
 
-                            if (article.type() == ArticleType.SEED) {
+                            if (article.type() == ArticleTypeEnum.SEED) {
                                 long result = database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceId());
                                 if (result != 1) {
                                     Seed seed = new Seed(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), article.name(),
@@ -283,7 +286,7 @@ public class SyncService extends IntentService {
                                 //seedEkyIdList.add(Integer.valueOf(article.id()));
                             }
 
-                            if (article.type() == ArticleType.FERTILIZER) {
+                            if (article.type() == ArticleTypeEnum.FERTILIZER) {
                                 if (database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), article.referenceId()) != 1) {
                                     Fertilizer fertilizer = new Fertilizer(Integer.valueOf(article.referenceId()), Integer.valueOf(article.id()), null,
                                             article.name(), null, null, null, null, null,
@@ -348,7 +351,7 @@ public class SyncService extends IntentService {
                                 for (PullQuery.Operator operator : farm.interventions().get(index).operators()) {
 
                                     if (operator.person() != null) {
-                                        boolean isDiver = operator.role() == OperatorRoles.DRIVER;
+                                        boolean isDiver = operator.role() == OperatorRoleEnum.DRIVER;
                                         int personId = database.dao().getPersonId(Integer.valueOf(operator.person().id()));
                                         database.dao().insert(new InterventionPerson(newInterId, personId, isDiver));
                                     }
@@ -357,8 +360,8 @@ public class SyncService extends IntentService {
                                 // Saving Weather
                                 PullQuery.Weather weather = farm.interventions().get(index).weather();
                                 if ( weather != null) {
-                                    Float temp =  weather.temperature() != null ? weather.temperature().floatValue() : null;
-                                    Float wind =  weather.windSpeed() != null ? weather.windSpeed().floatValue() : null;
+                                    Float temp = weather.temperature() != null ? weather.temperature().floatValue() : null;
+                                    Float wind = weather.windSpeed() != null ? weather.windSpeed().floatValue() : null;
                                     String description =  weather.description() != null ? weather.description().rawValue() : null;
                                     database.dao().insert(new Weather(newInterId, temp, wind, description));
                                 }
@@ -376,20 +379,20 @@ public class SyncService extends IntentService {
 
                                     if (input.article() != null) {
 
-                                        if (input.article().type().equals(ArticleType.PHYTOSANITARY)) {
+                                        if (input.article().type().equals(ArticleTypeEnum.PHYTOSANITARY)) {
                                             int phytoId = database.dao().getPhytoId(Integer.valueOf(input.article().id()));
                                             Log.e(TAG, "PhytoId = " + phytoId);
                                             InterventionPhytosanitary interventionPhyto =
                                                     new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(), newInterId, phytoId);
                                             database.dao().insert(interventionPhyto);
 
-                                        } else if (input.article().type().equals(ArticleType.SEED)) {
+                                        } else if (input.article().type().equals(ArticleTypeEnum.SEED)) {
                                             int seedId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
                                             InterventionSeed interventionSeed =
                                                     new InterventionSeed(input.quantityValue(), input.unit().toString(), newInterId, seedId);
                                             database.dao().insert(interventionSeed);
 
-                                        } else if (input.article().type().equals(ArticleType.FERTILIZER)) {
+                                        } else if (input.article().type().equals(ArticleTypeEnum.FERTILIZER)) {
                                             int fertiId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
                                             InterventionFertilizer interventionFertilizer =
                                                     new InterventionFertilizer(input.quantityValue(), input.unit().toString(), newInterId, fertiId);
@@ -420,9 +423,7 @@ public class SyncService extends IntentService {
                             }
                         }
                     }
-                    MainActivity.lastSyncTime = new Date();
-//                    receiver.send(DONE, new Bundle());
-
+                    // Continue with push
                     handleActionSyncPush(receiver);
                 }
             }
@@ -468,10 +469,9 @@ public class SyncService extends IntentService {
 
         ApolloClient apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
 
-
         // Push new Equipments
         List<Equipment> newEquipments = database.dao().getEquipmentWithoutEkyId();
-        Log.i(TAG, "new Equipment list --> " + newEquipments.toString());
+        if (BuildConfig.DEBUG) Log.i(TAG, "new Equipment list --> " + newEquipments.toString());
 
         if (!newEquipments.isEmpty()) {
             for (Equipment equipment : newEquipments) {
@@ -487,8 +487,8 @@ public class SyncService extends IntentService {
                     @Override
                     public void onResponse(@Nonnull Response<PushEquipmentMutation.Data> response) {
                         if (!response.hasErrors()) {
-                            PushEquipmentMutation.CreateEquipmentMutation mutation = response.data().createEquipmentMutation();
-                            if (mutation.errors() == null) {
+                            PushEquipmentMutation.CreateEquipment mutation = response.data().createEquipment();
+                            if (!mutation.equipment().id().equals("")) {
                                 database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
                             }
                         }
@@ -504,7 +504,7 @@ public class SyncService extends IntentService {
 
         // Push new Persons
         List<Person> newPersons = database.dao().getPersonsWithoutEkyId();
-        Log.i(TAG, "new Persons list --> " + newPersons.toString());
+        if (BuildConfig.DEBUG) Log.i(TAG, "new Persons list --> " + newPersons.toString());
 
         if (!newPersons.isEmpty()) {
             for (Person person : newPersons) {
@@ -519,8 +519,8 @@ public class SyncService extends IntentService {
                     @Override
                     public void onResponse(@Nonnull Response<PushPersonMutation.Data> response) {
                         if (!response.hasErrors()) {
-                            PushPersonMutation.CreatePersonMutation mutation = response.data().createPersonMutation();
-                            if (mutation.errors() == null) {
+                            PushPersonMutation.CreatePerson mutation = response.data().createPerson();
+                            if (!mutation.person().id().equals("")) {
                                 database.dao().setPersonEkyId(person.id, Integer.valueOf(mutation.person().id()));
                             }
                         }
@@ -537,14 +537,14 @@ public class SyncService extends IntentService {
         // Get list and save interventions
         List<Interventions> interventions = database.dao().getSyncableInterventions();
 
-        // TODO --> InterventionOutputsInputObject
-        List<CreateInterventionTargetInputObject> targets;
-        List<CreateInterventionWorkingDayInputObject> workingDays;
-        List<CreateInterventionInputInputObject> inputs;
-        List<CreateInterventionOutputInputObject> outputs = new ArrayList<>();
-        List<CreateInterventionOperatorInputObject> operators;
-        List<CreateInterventionToolInputObject> tools;
-        WeatherInputObjectType weatherInput;
+        // TODO --> InterventionOutputsAttributes
+        List<InterventionTargetAttributes> targets;
+        List<InterventionWorkingDayAttributes> workingDays;
+        List<InterventionInputAttributes> inputs;
+        List<InterventionOutputAttributes> outputs = new ArrayList<>();
+        List<InterventionOperatorAttributes> operators;
+        List<InterventionToolAttributes> tools;
+        WeatherAttributes weatherInput;
 
         for (Interventions inter : interventions) {
 
@@ -556,112 +556,112 @@ public class SyncService extends IntentService {
             weatherInput = null;
 
             for (Crops crop : inter.crops) {
-                targets.add(CreateInterventionTargetInputObject.builder()
+                targets.add(InterventionTargetAttributes.builder()
                         .cropID(crop.inter.crop_id)
                         .workAreaPercentage(crop.inter.work_area_percentage)
                         .build());
             }
 
             for (InterventionWorkingDay wd : inter.workingDays) {
-                workingDays.add(CreateInterventionWorkingDayInputObject.builder()
+                workingDays.add(InterventionWorkingDayAttributes.builder()
                         .executionDate(wd.execution_date)
                         .hourDuration((long) wd.hour_duration)
                         .build());
             }
 
             for (Persons person : inter.persons) {
-                operators.add(CreateInterventionOperatorInputObject.builder()
+                operators.add(InterventionOperatorAttributes.builder()
                         .personId(String.valueOf(person.person.get(0).eky_id))
-                        .role((person.inter.is_driver) ? OperatorRoles.DRIVER : OperatorRoles.OPERATOR)
+                        .role((person.inter.is_driver) ? OperatorRoleEnum.DRIVER : OperatorRoleEnum.OPERATOR)
                         .build());
             }
 
             for (Equipments equipment : inter.equipments) {
-                tools.add(CreateInterventionToolInputObject.builder()
+                tools.add(InterventionToolAttributes.builder()
                         .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id))
                         .build());
             }
 
-//            if (inter.intervention.type.equals(MainActivity.HARVEST)) {
-//                List<CreateHarvestLoadInputObject> loads = new ArrayList<>();
-//                for (Harvest harvest : inter.harvests) {
-//                    loads.add(CreateHarvestLoadInputObject.builder()
-//                            .number(harvest.number)
-//                            .quantity(harvest.quantity)
-//                            .unit(HarvestLoadUnit.valueOf(harvest.unit))
-//                            .storageID(String.valueOf(harvest.id_storage))
-//                            .build());
-//                }
-//                outputs.add(CreateInterventionOutputInputObject.builder()
-//                        .type(InterventionOutputType.valueOf(inter.harvests.get(0).type))
-//                        .loads(loads)
-//                        .build());
-//            }
+            if (inter.intervention.type.equals(App.HARVEST)) {
+                List<HarvestLoadAttributes> loads = new ArrayList<>();
+                for (Harvest harvest : inter.harvests) {
+                    loads.add(HarvestLoadAttributes.builder()
+                            .number(harvest.number)
+                            .quantity(harvest.quantity)
+                            .unit(HarvestLoadUnitEnum.valueOf(harvest.unit))
+                            .storageID(String.valueOf(harvest.id_storage))
+                            .build());
+                }
+                outputs.add(InterventionOutputAttributes.builder()
+                        .nature(InterventionOutputTypeEnum.valueOf(inter.harvests.get(0).type))
+                        .loads(loads)
+                        .build());
+            }
 
 
             for (Phytos phyto : inter.phytos) {
                 if (phyto.phyto.get(0).eky_id == null) {
-                    inputs.add(CreateInterventionInputInputObject.builder()
+                    inputs.add(InterventionInputAttributes.builder()
                             // TODO warning ! may be one maaid for several products
                             .marketingAuthorizationNumber(phyto.phyto.get(0).maaid)
                             //.article(ArticleInputObject.builder()
                             //        .referenceID(phyto.phyto.get(0).maaid)
                             //        .nature(ArticleType.PHYTOSANITARY).build())
                             .quantity(phyto.inter.quantity)
-                            .unit(ArticleAllUnit.safeValueOf(phyto.inter.unit))
+                            .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit))
                             .build());
                 } else {
-                    inputs.add(CreateInterventionInputInputObject.builder()
-                            .article(ArticleInputObject.builder()
+                    inputs.add(InterventionInputAttributes.builder()
+                            .article(ArticleAttributes.builder()
                                     .id(String.valueOf(phyto.phyto.get(0).eky_id)).build())
                             .quantity(phyto.inter.quantity)
-                            .unit(ArticleAllUnit.safeValueOf(phyto.inter.unit))
+                            .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit))
                             .build());
                 }
             }
 
             for (Seeds seed : inter.seeds) {
                 if (seed.seed.get(0).eky_id == null) {
-                    inputs.add(CreateInterventionInputInputObject.builder()
+                    inputs.add(InterventionInputAttributes.builder()
                             //.marketingAuthorizationNumber(String.valueOf(seed.seed.get(0).id))
-                            .article(ArticleInputObject.builder()
+                            .article(ArticleAttributes.builder()
                                     .referenceID(String.valueOf(seed.seed.get(0).id))
-                                    .type(ArticleType.SEED).build())
+                                    .type(ArticleTypeEnum.SEED).build())
                             .quantity(seed.inter.quantity)
-                            .unit(ArticleAllUnit.safeValueOf(seed.inter.unit))
+                            .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit))
                             .build());
                 } else {
-                    inputs.add(CreateInterventionInputInputObject.builder()
-                            .article(ArticleInputObject.builder()
+                    inputs.add(InterventionInputAttributes.builder()
+                            .article(ArticleAttributes.builder()
                                     .id(String.valueOf(seed.seed.get(0).eky_id)).build())
                             .quantity(seed.inter.quantity)
-                            .unit(ArticleAllUnit.safeValueOf(seed.inter.unit))
+                            .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit))
                             .build());
                 }
             }
 
             for (Fertilizers fertilizer : inter.fertilizers) {
                 if (fertilizer.fertilizer.get(0).eky_id == null) {
-                    inputs.add(CreateInterventionInputInputObject.builder()
+                    inputs.add(InterventionInputAttributes.builder()
                             //.marketingAuthorizationNumber(String.valueOf(seed.seed.get(0).id))
-                            .article(ArticleInputObject.builder()
+                            .article(ArticleAttributes.builder()
                                     .referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
-                                    .type(ArticleType.FERTILIZER).build())
+                                    .type(ArticleTypeEnum.FERTILIZER).build())
                             .quantity(fertilizer.inter.quantity)
-                            .unit(ArticleAllUnit.safeValueOf(fertilizer.inter.unit))
+                            .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit))
                             .build());
                 } else {
-                    inputs.add(CreateInterventionInputInputObject.builder()
-                            .article(ArticleInputObject.builder()
+                    inputs.add(InterventionInputAttributes.builder()
+                            .article(ArticleAttributes.builder()
                                     .id(String.valueOf(fertilizer.fertilizer.get(0).eky_id)).build())
                             .quantity(fertilizer.inter.quantity)
-                            .unit(ArticleAllUnit.safeValueOf(fertilizer.inter.unit))
+                            .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit))
                             .build());
                 }
             }
 
             for (Weather weather : inter.weather) {
-                weatherInput = WeatherInputObjectType.builder()
+                weatherInput = WeatherAttributes.builder()
                         .description(WeatherEnum.valueOf(weather.description))
                         .temperature(Double.valueOf(weather.temperature))
                         .windSpeed(Double.valueOf(weather.wind_speed))
@@ -678,17 +678,19 @@ public class SyncService extends IntentService {
                     .operators(operators)
                     .weather(weatherInput)
                     .waterQuantity((inter.intervention.water_quantity != null) ? (long) inter.intervention.water_quantity : null)
-                    .waterUnit((inter.intervention.water_unit != null) ? ArticleVolumeUnit.safeValueOf(inter.intervention.water_unit) : null)
+                    .waterUnit((inter.intervention.water_unit != null) ? ArticleVolumeUnitEnum.safeValueOf(inter.intervention.water_unit) : null)
                     .build();
 
             apolloClient.mutate(pushIntervention).enqueue(new ApolloCall.Callback<PushInterMutation.Data>() {
                 @Override
                 public void onResponse(@Nonnull Response<PushInterMutation.Data> response) {
                     if (!response.hasErrors()) {
-                        PushInterMutation.CreateInterventionMutation mutation = response.data().createInterventionMutation();
-                        if (mutation.errors() == null) {
+                        PushInterMutation.CreateIntervention mutation = response.data().createIntervention();
+                        if (!mutation.intervention().id().equals("")) {
                             Log.e(TAG, "eky_id attributed");
                             database.dao().setInterventionEkyId(inter.intervention.id, Integer.valueOf(mutation.intervention().id()));
+                        } else {
+                            Log.e(TAG, "Error while attributing id");
                         }
                     }
                     receiver.send(DONE, new Bundle());
@@ -708,16 +710,16 @@ public class SyncService extends IntentService {
         List<Interventions> updatables = database.dao().getUpdatableInterventions();
 
         // TODO --> InterventionOutputsInputObject
-        List<InterventionTargetInputObject> targetUpdates;
-        List<InterventionWorkingDayInputObject> workingDayUpdates;
-        List<InterventionInputInputObject> inputUpdates;
-        List<InterventionOperatorInputObject> operatorUpdates;
-        List<InterventionToolInputObject> toolUpdates;
-        WeatherInputObjectType weatherUpdate;
+        List<InterventionTargetAttributes> targetUpdates;
+        List<InterventionWorkingDayAttributes> workingDayUpdates;
+        List<InterventionInputAttributes> inputUpdates;
+        List<InterventionOperatorAttributes> operatorUpdates;
+        List<InterventionToolAttributes> toolUpdates;
+        WeatherAttributes weatherUpdate;
 
         for (Interventions update : updatables) {
 
-            Log.i(TAG, "Updating intervention " + update.intervention.eky_id);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Updating intervention " + update.intervention.eky_id);
 
             targetUpdates = new ArrayList<>();
             workingDayUpdates = new ArrayList<>();
@@ -727,44 +729,44 @@ public class SyncService extends IntentService {
             weatherUpdate = null;
 
             for (Crops crop : update.crops)
-                targetUpdates.add(InterventionTargetInputObject.builder()
+                targetUpdates.add(InterventionTargetAttributes.builder()
                         .cropID(crop.inter.crop_id)
                         .workAreaPercentage(crop.inter.work_area_percentage).build());
 
             for (InterventionWorkingDay wd : update.workingDays)
-                workingDayUpdates.add(InterventionWorkingDayInputObject.builder()
+                workingDayUpdates.add(InterventionWorkingDayAttributes.builder()
                         .executionDate(wd.execution_date)
                         .hourDuration((long) wd.hour_duration).build());
 
             for (Persons person : update.persons)
-                operatorUpdates.add(InterventionOperatorInputObject.builder()
+                operatorUpdates.add(InterventionOperatorAttributes.builder()
                         .personId(String.valueOf(person.person.get(0).eky_id))
-                        .role((person.inter.is_driver) ? OperatorRoles.DRIVER : OperatorRoles.OPERATOR).build());
+                        .role((person.inter.is_driver) ? OperatorRoleEnum.DRIVER : OperatorRoleEnum.OPERATOR).build());
 
             for (Equipments equipment : update.equipments)
-                toolUpdates.add(InterventionToolInputObject.builder()
+                toolUpdates.add(InterventionToolAttributes.builder()
                         .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id)).build());
 
             for (Phytos phyto : update.phytos)
-                inputUpdates.add(InterventionInputInputObject.builder()
-                        .article(ArticleInputObject.builder().id(String.valueOf(phyto.phyto.get(0).eky_id)).build())
+                inputUpdates.add(InterventionInputAttributes.builder()
+                        .article(ArticleAttributes.builder().id(String.valueOf(phyto.phyto.get(0).eky_id)).build())
                         .quantity(phyto.inter.quantity)
-                        .unit(ArticleAllUnit.safeValueOf(phyto.inter.unit)).build());
+                        .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
 
             for (Seeds seed : update.seeds)
-                inputUpdates.add(InterventionInputInputObject.builder()
-                        .article(ArticleInputObject.builder().id(String.valueOf(seed.seed.get(0).eky_id)).build())
+                inputUpdates.add(InterventionInputAttributes.builder()
+                        .article(ArticleAttributes.builder().id(String.valueOf(seed.seed.get(0).eky_id)).build())
                         .quantity(seed.inter.quantity)
-                        .unit(ArticleAllUnit.safeValueOf(seed.inter.unit)).build());
+                        .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
 
             for (Fertilizers fertilizer : update.fertilizers)
-                inputUpdates.add(InterventionInputInputObject.builder()
-                        .article(ArticleInputObject.builder().id(String.valueOf(fertilizer.fertilizer.get(0).eky_id)).build())
+                inputUpdates.add(InterventionInputAttributes.builder()
+                        .article(ArticleAttributes.builder().id(String.valueOf(fertilizer.fertilizer.get(0).eky_id)).build())
                         .quantity(fertilizer.inter.quantity)
-                        .unit(ArticleAllUnit.safeValueOf(fertilizer.inter.unit)).build());
+                        .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
 
             for (Weather weather : update.weather)
-                weatherUpdate = WeatherInputObjectType.builder()
+                weatherUpdate = WeatherAttributes.builder()
                         .description(WeatherEnum.valueOf(weather.description))
                         .temperature(Double.valueOf(weather.temperature))
                         .windSpeed(Double.valueOf(weather.wind_speed)).build();
@@ -779,16 +781,16 @@ public class SyncService extends IntentService {
                     .operators(operatorUpdates)
                     .weather(weatherUpdate)
                     .waterQuantity((update.intervention.water_quantity != null) ? (long) update.intervention.water_quantity : null)
-                    .waterUnit((update.intervention.water_unit != null) ? ArticleVolumeUnit.safeValueOf(update.intervention.water_unit) : null)
+                    .waterUnit((update.intervention.water_unit != null) ? ArticleVolumeUnitEnum.safeValueOf(update.intervention.water_unit) : null)
                     .build();
 
             apolloClient.mutate(updateIntervention).enqueue(new ApolloCall.Callback<UpdateInterMutation.Data>() {
                 @Override
                 public void onResponse(@Nonnull Response<UpdateInterMutation.Data> response) {
                     if (!response.hasErrors()) {
-                        UpdateInterMutation.UpdateInterventionMutation mutation = Objects.requireNonNull(response.data()).updateInterventionMutation();
-                        if (mutation != null && mutation.errors() == null) {
-                            Log.e(TAG, "eky_id attributed");
+                        UpdateInterMutation.UpdateIntervention mutation = Objects.requireNonNull(response.data()).updateIntervention();
+                        if (mutation != null && mutation.errors().isEmpty()) {
+                            if (BuildConfig.DEBUG) Log.e(TAG, "eky_id attributed");
                             database.dao().setInterventionSynced(update.intervention.id);
                         }
                     }

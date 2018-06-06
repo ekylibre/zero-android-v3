@@ -7,6 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.util.Log;
 
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.models.Farm;
@@ -19,7 +20,6 @@ import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
-import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.relations.InterventionCrop;
@@ -144,7 +144,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
 
 
-            Log.e(TAG, "Reference data inserted !");
+            if (BuildConfig.DEBUG) Log.e(TAG, "Reference data inserted !");
 
         } catch (IOException ex) {
             ex.printStackTrace();

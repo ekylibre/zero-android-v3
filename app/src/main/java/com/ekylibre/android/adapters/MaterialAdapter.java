@@ -64,9 +64,9 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
             deleteImageView.setOnClickListener(view -> {
                 //Context context = itemView.getRootView().getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Etes-vous sûr de vouloir supprimer le matériau ?");
-                builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton("oui", (dialog, i) -> {
+                builder.setMessage(R.string.delete_material_prompt);
+                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
                     int position = getAdapterPosition();
                     dataset.remove(position);
                     //notifyItemRemoved(position);
@@ -119,7 +119,7 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
 
         void display(Materials item) {
 
-            String quantityAsString = String.format("%s", item.inter.quantity);
+            String quantityAsString = String.valueOf(item.inter.quantity);
             iconImageView.setImageResource(R.drawable.icon_fertilizer);
             nameTextView.setText(item.material.get(0).name);
             if (!item.material.get(0).description.isEmpty())

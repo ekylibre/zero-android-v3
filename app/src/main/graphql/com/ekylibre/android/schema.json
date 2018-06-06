@@ -544,7 +544,7 @@
               "deprecationReason": null
             },
             {
-              "name": "referenceId",
+              "name": "referenceID",
               "description": null,
               "args": [],
               "type": {
@@ -558,6 +558,22 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "referenceId",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": true,
+              "deprecationReason": "referenceId is deprecated, please use referenceID instead"
             },
             {
               "name": "species",
@@ -2789,11 +2805,11 @@
             },
             {
               "name": "temperature",
-              "description": null,
+              "description": "Measured in Celsius",
               "args": [],
               "type": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Float",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2801,11 +2817,11 @@
             },
             {
               "name": "windSpeed",
-              "description": null,
+              "description": "Measured in km/h",
               "args": [],
               "type": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Float",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2931,7 +2947,7 @@
               "args": [],
               "type": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Float",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3230,7 +3246,162 @@
               "deprecationReason": null
             },
             {
+              "name": "loads",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "HarvestLoad",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nature",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "InterventionOutputTypeEnum",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "quantity",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "unit",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "InterventionOutputUnitEnum",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "InterventionOutputTypeEnum",
+          "description": "InterventionOutputType",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "STRAW",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "GRAIN",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SILAGE",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "InterventionOutputUnitEnum",
+          "description": "InterventionOutputUnitEnum",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "QUINTAL_PER_HECTARE",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TON_PER_HECTARE",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "HarvestLoad",
+          "description": "HarvestLoad",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "netQuantity",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "number",
               "description": null,
               "args": [],
               "type": {
@@ -3246,12 +3417,40 @@
               "deprecationReason": null
             },
             {
+              "name": "quantity",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "storage",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Storage",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "unit",
               "description": null,
               "args": [],
               "type": {
                 "kind": "ENUM",
-                "name": "ArticleAllUnitEnum",
+                "name": "HarvestLoadUnitEnum",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3261,6 +3460,117 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "HarvestLoadUnitEnum",
+          "description": "HarvestLoadUnit",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "KILOGRAM",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "QUINTAL",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "TON",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Storage",
+          "description": "Storage",
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "StorageTypeEnum",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "StorageTypeEnum",
+          "description": "StorageType",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "HEAP",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SILO",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
           "possibleTypes": null
         },
         {
@@ -3967,7 +4277,7 @@
           "fields": [
             {
               "name": "createEquipment",
-              "description": "CreateEquipment",
+              "description": "CreateEquipmentMutation -- DEPRECATED Please use CreateEquipment instead.",
               "args": [
                 {
                   "name": "input",
@@ -3977,7 +4287,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "CreateEquipmentInput",
+                      "name": "CreateEquipmentMutationInput",
                       "ofType": null
                     }
                   },
@@ -3986,7 +4296,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "CreateEquipmentPayload",
+                "name": "CreateEquipmentMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -3994,7 +4304,7 @@
             },
             {
               "name": "createIntervention",
-              "description": "CreateInterventionMutation",
+              "description": "CreateInterventionMutation -- DEPRECATED Please use CreateIntervention instead.",
               "args": [
                 {
                   "name": "input",
@@ -4004,7 +4314,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "CreateInterventionInput",
+                      "name": "CreateInterventionMutationInput",
                       "ofType": null
                     }
                   },
@@ -4013,7 +4323,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "CreateInterventionPayload",
+                "name": "CreateInterventionMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4021,7 +4331,7 @@
             },
             {
               "name": "createPerson",
-              "description": "CreatePersonMutation : Nature field is set to 'contact'",
+              "description": "CreatePersonMutation -- DEPRECATED Please use CreatePerson instead.",
               "args": [
                 {
                   "name": "input",
@@ -4031,7 +4341,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "CreatePersonInput",
+                      "name": "CreatePersonMutationInput",
                       "ofType": null
                     }
                   },
@@ -4040,7 +4350,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "CreatePersonPayload",
+                "name": "CreatePersonMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4048,7 +4358,7 @@
             },
             {
               "name": "deleteIntervention",
-              "description": "DeleteInterventionMutation",
+              "description": "DeleteInterventionMutation -- DEPRECATED Please use DeleteIntervention instead.",
               "args": [
                 {
                   "name": "input",
@@ -4058,7 +4368,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "DeleteInterventionInput",
+                      "name": "DeleteInterventionMutationInput",
                       "ofType": null
                     }
                   },
@@ -4067,7 +4377,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "DeleteInterventionPayload",
+                "name": "DeleteInterventionMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4075,7 +4385,7 @@
             },
             {
               "name": "updateIntervention",
-              "description": "UpdateInterventionMutation",
+              "description": "UpdateInterventionMutation -- DEPRECATED Please use UpdateIntervention instead.",
               "args": [
                 {
                   "name": "input",
@@ -4085,7 +4395,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "UpdateInterventionInput",
+                      "name": "UpdateInterventionMutationInput",
                       "ofType": null
                     }
                   },
@@ -4094,7 +4404,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "UpdateInterventionPayload",
+                "name": "UpdateInterventionMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4102,7 +4412,7 @@
             },
             {
               "name": "updatePerson",
-              "description": "UpdatePersonMutation : Nature field is set to 'contact'",
+              "description": "UpdatePersonMutation -- DEPRECATED Please use UpdatePerson instead.",
               "args": [
                 {
                   "name": "input",
@@ -4112,7 +4422,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "INPUT_OBJECT",
-                      "name": "UpdatePersonInput",
+                      "name": "UpdatePersonMutationInput",
                       "ofType": null
                     }
                   },
@@ -4121,7 +4431,7 @@
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "UpdatePersonPayload",
+                "name": "UpdatePersonMutationPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4135,8 +4445,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "CreateInterventionPayload",
-          "description": "Autogenerated return type of CreateIntervention",
+          "name": "CreateInterventionMutationPayload",
+          "description": "Autogenerated return type of CreateInterventionMutation",
           "fields": [
             {
               "name": "clientMutationId",
@@ -4155,13 +4465,9 @@
               "description": null,
               "args": [],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -4186,12 +4492,12 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "CreateInterventionInput",
-          "description": "Autogenerated input type of CreateIntervention",
+          "name": "CreateInterventionMutationInput",
+          "description": "Autogenerated input type of CreateInterventionMutation",
           "fields": null,
           "inputFields": [
             {
-              "name": "interventionArgs",
+              "name": "intervention",
               "description": null,
               "type": {
                 "kind": "NON_NULL",
@@ -4451,13 +4757,19 @@
               "name": "cropID",
               "description": null,
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "cropId",
+              "description": "cropId is deprecated, please use cropID instead.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -4524,7 +4836,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "Int",
+                  "name": "Float",
                   "ofType": null
                 }
               },
@@ -4586,6 +4898,16 @@
               "defaultValue": null
             },
             {
+              "name": "referenceId",
+              "description": "referenceId is deprecated, please use referenceID instead.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "type",
               "description": null,
               "type": {
@@ -4611,7 +4933,17 @@
               "description": null,
               "type": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "Float",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "nature",
+              "description": null,
+              "type": {
+                "kind": "ENUM",
+                "name": "InterventionOutputTypeEnum",
                 "ofType": null
               },
               "defaultValue": null
@@ -4621,7 +4953,7 @@
               "description": null,
               "type": {
                 "kind": "ENUM",
-                "name": "ArticleAllUnitEnum",
+                "name": "InterventionOutputUnitEnum",
                 "ofType": null
               },
               "defaultValue": null
@@ -4726,39 +5058,20 @@
                 "ofType": null
               },
               "defaultValue": null
+            },
+            {
+              "name": "storageId",
+              "description": "storageId is deprecated, please use storageID instead.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
             }
           ],
           "interfaces": null,
           "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "ENUM",
-          "name": "HarvestLoadUnitEnum",
-          "description": "HarvestLoadUnit",
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "enumValues": [
-            {
-              "name": "KILOGRAM",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "QUINTAL",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "TON",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
           "possibleTypes": null
         },
         {
@@ -4768,16 +5081,22 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "equipmentId",
+              "name": "equipmentID",
               "description": null,
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "equipmentId",
+              "description": "equipmentId is deprecated, please use equipmentID instead.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
               },
               "defaultValue": null
             }
@@ -4793,16 +5112,22 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "personId",
+              "name": "personID",
               "description": null,
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "personId",
+              "description": "personId is deprecated, please use personID instead",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -4858,8 +5183,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "UpdateInterventionPayload",
-          "description": "Autogenerated return type of UpdateIntervention",
+          "name": "UpdateInterventionMutationPayload",
+          "description": "Autogenerated return type of UpdateInterventionMutation",
           "fields": [
             {
               "name": "clientMutationId",
@@ -4909,12 +5234,12 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "UpdateInterventionInput",
-          "description": "Autogenerated input type of UpdateIntervention",
+          "name": "UpdateInterventionMutationInput",
+          "description": "Autogenerated input type of UpdateInterventionMutation",
           "fields": null,
           "inputFields": [
             {
-              "name": "interventionArgs",
+              "name": "intervention",
               "description": null,
               "type": {
                 "kind": "NON_NULL",
@@ -4949,16 +5274,22 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "interventionId",
+              "name": "interventionID",
               "description": null,
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "interventionId",
+              "description": "interventionId is deprecated, please use interventionID instead.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -5131,8 +5462,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "DeleteInterventionPayload",
-          "description": "Autogenerated return type of DeleteIntervention",
+          "name": "DeleteInterventionMutationPayload",
+          "description": "Autogenerated return type of DeleteInterventionMutation",
           "fields": [
             {
               "name": "clientMutationId",
@@ -5151,19 +5482,15 @@
               "description": null,
               "args": [],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "String",
-                      "ofType": null
-                    }
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   }
                 }
               },
@@ -5190,8 +5517,8 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "DeleteInterventionInput",
-          "description": "Autogenerated input type of DeleteIntervention",
+          "name": "DeleteInterventionMutationInput",
+          "description": "Autogenerated input type of DeleteInterventionMutation",
           "fields": null,
           "inputFields": [
             {
@@ -5225,8 +5552,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "CreateEquipmentPayload",
-          "description": "Autogenerated return type of CreateEquipment",
+          "name": "CreateEquipmentMutationPayload",
+          "description": "Autogenerated return type of CreateEquipmentMutation",
           "fields": [
             {
               "name": "clientMutationId",
@@ -5257,13 +5584,9 @@
               "description": null,
               "args": [],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -5276,12 +5599,12 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "CreateEquipmentInput",
-          "description": "Autogenerated input type of CreateEquipment",
+          "name": "CreateEquipmentMutationInput",
+          "description": "Autogenerated input type of CreateEquipmentMutation",
           "fields": null,
           "inputFields": [
             {
-              "name": "argsEquipment",
+              "name": "equipment",
               "description": null,
               "type": {
                 "kind": "NON_NULL",
@@ -5370,8 +5693,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "CreatePersonPayload",
-          "description": "Autogenerated return type of CreatePerson",
+          "name": "CreatePersonMutationPayload",
+          "description": "Autogenerated return type of CreatePersonMutation",
           "fields": [
             {
               "name": "clientMutationId",
@@ -5390,12 +5713,16 @@
               "description": null,
               "args": [],
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
                 }
               },
               "isDeprecated": false,
@@ -5421,12 +5748,12 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "CreatePersonInput",
-          "description": "Autogenerated input type of CreatePerson",
+          "name": "CreatePersonMutationInput",
+          "description": "Autogenerated input type of CreatePersonMutation",
           "fields": null,
           "inputFields": [
             {
-              "name": "argsPerson",
+              "name": "person",
               "description": null,
               "type": {
                 "kind": "NON_NULL",
@@ -5505,8 +5832,8 @@
         },
         {
           "kind": "OBJECT",
-          "name": "UpdatePersonPayload",
-          "description": "Autogenerated return type of UpdatePerson",
+          "name": "UpdatePersonMutationPayload",
+          "description": "Autogenerated return type of UpdatePersonMutation",
           "fields": [
             {
               "name": "clientMutationId",
@@ -5525,13 +5852,9 @@
               "description": null,
               "args": [],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -5556,12 +5879,12 @@
         },
         {
           "kind": "INPUT_OBJECT",
-          "name": "UpdatePersonInput",
-          "description": "Autogenerated input type of UpdatePerson",
+          "name": "UpdatePersonMutationInput",
+          "description": "Autogenerated input type of UpdatePersonMutation",
           "fields": null,
           "inputFields": [
             {
-              "name": "argsPerson",
+              "name": "person",
               "description": null,
               "type": {
                 "kind": "NON_NULL",

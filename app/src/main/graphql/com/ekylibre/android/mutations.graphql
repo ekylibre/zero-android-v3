@@ -14,7 +14,7 @@ mutation pushInter(
   {
   createIntervention(
     input: {
-      interventionArgs: {
+      intervention: {
         farmID: $farmId
         type: $procedure
         targets: $cropList
@@ -53,7 +53,7 @@ mutation updateInter(
   {
   updateIntervention(
     input: {
-      interventionArgs: {
+      intervention: {
         interventionId: $interventionId
         farmID: $farmId
         type: $procedure
@@ -81,7 +81,7 @@ mutation pushEquipment(
 ) {
   createEquipment(
     input: {
-      argsEquipment: {
+      equipment: {
         farmID: $farmId
         type: $type
         name: $name
@@ -103,7 +103,7 @@ mutation pushPerson(
 ) {
   createPerson(
     input: {
-      argsPerson: {
+      person: {
         farmID: $farmId
         firstName: $firstName
         lastName: $lastName

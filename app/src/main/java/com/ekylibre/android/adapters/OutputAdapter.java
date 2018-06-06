@@ -54,9 +54,9 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
 
             deleteImageView.setOnClickListener(view -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Etes-vous sûr de vouloir supprimer le chargement ?");
-                builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton("oui", (dialog, i) -> {
+                builder.setMessage(R.string.delete_harvest_prompt);
+                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
                     dataset.remove(getAdapterPosition());
                     notifyDataSetChanged();  // notifyItemRemoved(position);
                 });
@@ -141,6 +141,7 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
                 unitSpinner.setAdapter(storageSpinnerAdapter);
                 unitSpinner.setSelection(SpinnerLists.STORAGE_LIST_L10N.indexOf(item.unit));
             }
+            numberEditText.setText(item.number);
         }
     }
 

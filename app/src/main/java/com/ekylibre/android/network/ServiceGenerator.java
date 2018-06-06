@@ -3,9 +3,7 @@ package com.ekylibre.android.network;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.ekylibre.android.LoginActivity;
 import com.ekylibre.android.network.pojos.AccessToken;
 import com.ekylibre.android.utils.App;
 
@@ -30,8 +28,6 @@ public class ServiceGenerator {
      * Class to retrive access_token for the first time
      */
     public static <S> S createService(Class<S> serviceClass) {
-
-        Log.e("Service Generator", "Service Generator");
 
         httpClient = new OkHttpClient.Builder();
 

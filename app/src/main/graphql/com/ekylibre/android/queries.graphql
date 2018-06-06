@@ -6,6 +6,7 @@ query Profile {
   farms {
     label
     id
+    platform
   }
 }
 

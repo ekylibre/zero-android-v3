@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -80,9 +81,9 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemDelete.setOnClickListener(view -> {
                 Context context = itemView.getRootView().getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Etes-vous sûr de vouloir supprimer l'intrant ?");
-                builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton("oui", (dialog, i) -> {
+                builder.setMessage(R.string.delete_input_prompt);
+                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
                     int position = getAdapterPosition();
                     inputList.remove(position);
                     notifyDataSetChanged();
@@ -137,7 +138,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                     Float dose_max = currentPhytos.phyto.get(0).dose_max;
                     if (dose_max != null) {
                         float dose;
-                        Log.e(TAG, "currentUnit" + currentUnit.name);
+                        if (BuildConfig.DEBUG) Log.e(TAG, "currentUnit" + currentUnit.name);
                         if (currentUnit.surface_factor == 0)
                             dose = quantity * currentUnit.quantity_factor / InterventionActivity.surface;
                         else
@@ -165,6 +166,8 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemQuantityEdit.setText(String.valueOf(quantity));
             itemDoseMax.setVisibility(displayDoseWarning);
 
+            if (getItemViewType() == FERTI)
+                itemNameMore.setVisibility(View.GONE);
             if (getItemViewType() == PHYTO) {
                 unitsLabel = Units.VOLUME_UNITS_L10N;
                 unitsKey = Units.VOLUME_UNITS;
@@ -240,7 +243,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
 
             case SEED:
                 Seeds seed = (Seeds) inputList.get(position);
-                String speciL10n = context.getString(context.getResources().getIdentifier(seed.seed.get(0).specie, "string", context.getPackageName()));
+                String speciL10n = context.getString(context.getResources().getIdentifier(seed.seed.get(0).specie.toUpperCase(), "string", context.getPackageName()));
                 holder.display(R.drawable.icon_seed, speciL10n, seed.seed.get(0).variety, seed.inter.quantity, seed.inter.unit);
                 break;
 

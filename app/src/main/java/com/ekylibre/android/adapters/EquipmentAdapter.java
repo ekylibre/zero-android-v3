@@ -50,9 +50,9 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
             deleteImageView.setOnClickListener(view -> {
                 Context context = itemView.getRootView().getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Etes-vous sûr de vouloir supprimer l'outil ?");
-                builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton("oui", (dialog, i) -> {
+                builder.setMessage(R.string.delete_equipment_prompt);
+                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
                     int position = getAdapterPosition();
                     dataset.remove(position);
                     //notifyItemRemoved(position);

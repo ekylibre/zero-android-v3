@@ -8,5 +8,6 @@
     <dimen name="input_label_vertical_spacing">8dp</dimen>
     <dimen name="input_label_horizontal_spacing">4dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="login_layout_margin">32dp</dimen>
 
 </resources>

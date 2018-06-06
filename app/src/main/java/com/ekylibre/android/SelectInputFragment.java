@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -160,7 +159,7 @@ public class SelectInputFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e(TAG, "OnViewCreated...");
+        if (BuildConfig.DEBUG) Log.e(TAG, "OnViewCreated...");
 
         TabLayout.Tab tab = tabLayout.getTabAt(currentTab);
         if (tab != null) {
@@ -368,7 +367,7 @@ public class SelectInputFragment extends DialogFragment {
 
                 case PHYTO:
 
-                    Log.i(TAG, "database queried");
+                    if (BuildConfig.DEBUG) Log.i(TAG, "database queried");
 
                     if (searchText.length() < MIN_SEARCH_SIZE)
                         selectedList.addAll(database.dao().selectPhytosanitary());
@@ -393,21 +392,23 @@ public class SelectInputFragment extends DialogFragment {
                         selectedList.addAll(database.dao().selectFertilizer());
                     else
                         selectedList.addAll(database.dao().searchFertilizer("%" + searchText + "%"));
+
+                    // Remove current items
+                    for (Object item : InterventionActivity.inputList) {
+                        if (item instanceof Fertilizers) {
+                            Fertilizer fertilizer = ((Fertilizers) item).fertilizer.get(0);
+                            for (Object object : selectedList) {
+                                if (((Fertilizer) object).id.equals(fertilizer.id)) {
+                                    selectedList.remove(object);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     break;
             }
 
-            // Remove current items
-            for (Object item : InterventionActivity.inputList) {
-                if (item instanceof Fertilizers) {
-                    Fertilizer fertilizer = ((Fertilizers) item).fertilizer.get(0);
-                    for (Object object : selectedList) {
-                        if (((Fertilizer) object).id.equals(fertilizer.id)) {
-                            selectedList.remove(object);
-                            break;
-                        }
-                    }
-                }
-            }
+
 
             return null;
         }
@@ -415,7 +416,7 @@ public class SelectInputFragment extends DialogFragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Log.e(TAG, "REQUESTDATABASE --> onPostExecute()");
+            if (BuildConfig.DEBUG) Log.e(TAG, "REQUESTDATABASE --> onPostExecute()");
             // inputAdapter.notifyItemRangeRemoved(0, currentSize);
             // inputAdapter = new SelectInputAdapter(selectedList);
             // inputRecyclerView.setAdapter(inputAdapter);

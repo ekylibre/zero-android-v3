@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public int TYPE;
     public static final int STARTING = 0;
     public static final int FINISHING = 1;
+    public static boolean NO_CROP = false;
 
     // Filters statics
     public static final String FILTER_MY_INTERVENTIONS = "filter_my_interventions";
@@ -69,12 +70,9 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     private RecyclerView.Adapter adapter;
     public static List<Interventions> interventionsList = new ArrayList<>();
 
-    // Activity variables
-    private AppDatabase database;
     private SharedPreferences sharedPreferences;
-    SyncResultReceiver resultReceiver;
+    private SyncResultReceiver resultReceiver;
 
-    // Farm id
     public static String FARM_ID;
     public static Date lastSyncTime;
     public static final SimpleDateFormat LAST_SYNC = new SimpleDateFormat( "yyyy-MM-dd HH:mm");
@@ -143,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         recyclerView.setAdapter(adapter);
 
-
         // All button events
         careButton.setOnClickListener(view -> onProcedureChoice(App.CARE));
         cropProtectionButton.setOnClickListener(view -> onProcedureChoice(App.CROP_PROTECTION));
@@ -166,12 +163,10 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             startService(intent);
         });
 
-        // First time sync on create
         Intent intent = new Intent(this, SyncService.class);
         intent.setAction(SyncService.ACTION_SYNC_PULL);
         intent.putExtra("receiver", resultReceiver);
         startService(intent);
-
 
         //        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
 //            SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -187,20 +182,18 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     protected void onResume() {
         super.onResume();
 
-        String date = sharedPreferences.getString("last-sync-time", "2018-01-01 12:00");
         try {
-            lastSyncTime = LAST_SYNC.parse(date);
+            lastSyncTime = LAST_SYNC.parse(sharedPreferences.getString("last-sync-time", "2018-01-01 12:00"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         // Set Farm name as page title
         setTitle(sharedPreferences.getString("current-farm-name", "Synchronisation..."));
+        FARM_ID = sharedPreferences.getString("current-farm-id", "");
 
-        // Get list filter
+        // Get list filter and update list
         String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
-
-        // Update main list
         new UpdateList(this, filter).execute();
 
     }
@@ -210,12 +203,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         if (!deployMenu(false))
             super.onBackPressed();
             AppDatabase.revokeInstance();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sharedPreferences.edit().putString("last-sync-time", MainActivity.LAST_SYNC.format(lastSyncTime)).apply();
     }
 
     @Override
@@ -254,10 +241,12 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         swipeRefreshLayout.setRefreshing(false);
 
         if (resultCode == SyncService.DONE) {
-            Log.e(TAG, "Synchronization done");
+            if (BuildConfig.DEBUG) Log.e(TAG, "Synchronization done");
+            lastSyncTime = new Date();
+            sharedPreferences.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
         } else if (resultCode == SyncService.FAILED) {
-            Toast toast = Toast.makeText(this, "Echec de la synchronisation...", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, R.string.sync_failure, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
         }
@@ -280,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Log.e(TAG, "Updating interventions recyclerView...");
-            database = AppDatabase.getInstance(context);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Updating interventions recyclerView...");
+            AppDatabase database = AppDatabase.getInstance(context);
             interventionsList.clear();
             switch (filter) {
 
@@ -304,12 +293,18 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     private void onInterventionTypeSelected(int type) {
-        TYPE = type;
-        if (type == STARTING)
-            menuTitle.setText(R.string.starting_intervention_text);
-        else if (type == FINISHING)
-            menuTitle.setText(R.string.finishing_intervention_text);
-        deployMenu(true);
+        if (sharedPreferences.getBoolean("no-crop", true)) {
+            Toast toast = Toast.makeText(this, "Vous n'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 200);
+            toast.show();
+        } else {
+            TYPE = type;
+            if (type == STARTING)
+                menuTitle.setText(R.string.starting_intervention_text);
+            else if (type == FINISHING)
+                menuTitle.setText(R.string.finishing_intervention_text);
+            deployMenu(true);
+        }
     }
 
     private void onProcedureChoice(String procedure) {

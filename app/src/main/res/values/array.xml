@@ -10,14 +10,14 @@
         <item>Mineral</item>
     </string-array>
 
-    <string-array name="output_keys">
-        <item>straw</item>
-        <item>grain</item>
-    </string-array>
+    <!--<string-array name="output_keys">-->
+        <!--<item>straw</item>-->
+        <!--<item>grain</item>-->
+    <!--</string-array>-->
 
-    <string-array name="output_values">
-        <item>Organic</item>
-        <item>Mineral</item>
-    </string-array>
+    <!--<string-array name="output_values">-->
+        <!--<item>Organic</item>-->
+        <!--<item>Mineral</item>-->
+    <!--</string-array>-->
 
 </resources>

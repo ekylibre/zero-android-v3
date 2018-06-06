@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloClient;
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.network.helpers.ISO8601Adapter;
 import com.ekylibre.android.type.CustomType;
 import com.ekylibre.android.utils.App;
@@ -89,7 +90,7 @@ public class GraphQLClient {
 
         @Override
         public Response intercept(@NonNull Chain chain) throws IOException {
-            Log.e("Interceptor", "Bearer " + authToken);
+            if (BuildConfig.DEBUG) Log.e("Interceptor", "Bearer " + authToken);
             Request request = chain.request();
             Request.Builder requestBuilder = request.newBuilder();
             requestBuilder.addHeader("Authorization", "Bearer " + authToken);

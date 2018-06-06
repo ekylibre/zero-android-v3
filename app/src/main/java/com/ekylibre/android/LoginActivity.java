@@ -5,37 +5,41 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.exception.ApolloException;
+import com.apollographql.apollo.api.Response;
+
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.network.EkylibreAPI;
 import com.ekylibre.android.network.GraphQLClient;
 import com.ekylibre.android.network.ServiceGenerator;
 import com.ekylibre.android.network.pojos.AccessToken;
+import com.ekylibre.android.utils.App;
 
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import retrofit2.Call;
 
-import com.apollographql.apollo.api.Response;
-
-import com.ekylibre.android.utils.App;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -57,8 +61,6 @@ public class LoginActivity extends AppCompatActivity {
 
     // UI references.
     private TextInputLayout emailView, passwordView;
-    private TextView welcomeText;
-    private Button signInButton;
     private ProgressDialog dialog;
 
     @Override
@@ -68,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         //Remove title bar
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        //Remove notification bar
+        // Remove notification bar
         //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
@@ -86,9 +88,15 @@ public class LoginActivity extends AppCompatActivity {
             setContentView(R.layout.activity_login);
 
             // Set up the login form.
-            welcomeText = findViewById(R.id.login_welcome_text);
             emailView = findViewById(R.id.login_email);
             passwordView = findViewById(R.id.login_password);
+
+            ConstraintLayout layout = findViewById(R.id.login_layout);
+            layout.setOnClickListener(v -> hideKeyboard());
+
+            // Display app version on page
+            AppCompatTextView appVersion = findViewById(R.id.app_version);
+            appVersion.setText(BuildConfig.VERSION_NAME + String.format("%s", BuildConfig.DEBUG ? " [debug]" : "" ));
 
             EditText passEditText = passwordView.getEditText();
             Objects.requireNonNull(passEditText).setOnEditorActionListener((textView, id, keyEvent) -> {
@@ -101,40 +109,48 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             });
 
-            signInButton = findViewById(R.id.sign_in_button);
+            Button signInButton = findViewById(R.id.sign_in_button);
             signInButton.setOnClickListener(view -> {
                 authTask = null;
                 hideKeyboard();
                 attemptLogin();
             });
-
-            dialog = new ProgressDialog(this);
-            dialog.setMessage("Tentative de connection, merci de patienter...");
         }
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if (BuildConfig.DEBUG) Log.i(TAG, "onResume ()");
+//        dialog = new ProgressDialog(this);
+//        dialog.setMessage(getString(R.string.authenticating));
+//    }
+
     private void startApp() {
+        showDialog(false);
         authTask = null;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
-    private void setFormDisplay(boolean setting){
-//        int visibility = setting ? View.VISIBLE : View.GONE;
-//        welcomeText.setVisibility(visibility);
-//        emailView.setVisibility(visibility);
-//        passwordView.setVisibility(visibility);
-//        signInButton.setVisibility(visibility);
-        if (setting) dialog.dismiss();
-        else dialog.show();
+    private void showDialog(boolean yes){
+        if (dialog == null) {
+            dialog = new ProgressDialog(this);
+            dialog.setMessage(getString(R.string.authenticating));
+        }
+        if (yes) {
+            dialog.show();
+        } else if (dialog.isShowing()) {
+            dialog.dismiss();
+        }
     }
 
     private void hideKeyboard() {
         View view = getCurrentFocus();
         if (view != null) {
             ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
@@ -177,7 +193,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            setFormDisplay(false);
+            showDialog(true);
         }
 
         @Override
@@ -196,7 +212,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
 
                         accessToken = response.body();
-                        Log.e(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
+                        if (BuildConfig.DEBUG) Log.e(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
 
                         ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
                         ProfileQuery profileQuery = ProfileQuery.builder().build();
@@ -208,8 +224,20 @@ public class LoginActivity extends AppCompatActivity {
 
                                 // We got an access_token
                                 ProfileQuery.Data data = response.data();
+                                if (BuildConfig.DEBUG) Log.e(TAG, data.toString());
 
-                                Log.e(TAG, data.toString());
+                                List<String> farmNameList = new ArrayList<>();
+
+                                for (ProfileQuery.Farm farm : data.farms)
+                                    farmNameList.add(farm.label);
+
+                                int farmPosition = 0;
+
+                                for (String str1 : farmNameList) {
+                                    for (String str2 : farmNameList)
+                                        if (str1.compareToIgnoreCase(str2) < 0)
+                                            farmPosition = farmNameList.indexOf(str1);
+                                }
 
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("firstName", data.profile.firstName);
@@ -218,8 +246,8 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.putString("access_token", accessToken.getAccess_token());
                                 editor.putString("refresh_token", accessToken.getRefresh_token());
                                 editor.putInt("token_created_at", accessToken.getCreated_at());
-                                editor.putString("current-farm-name", data.farms().get(0).label);
-                                editor.putString("current-farm-id", data.farms().get(0).id);
+                                editor.putString("current-farm-name", data.farms().get(farmPosition).label);
+                                editor.putString("current-farm-id", data.farms().get(farmPosition).id);
                                 editor.putBoolean("is_authenticated", true);
                                 editor.apply();
 
@@ -237,26 +265,25 @@ public class LoginActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(@Nonnull ApolloException e) {
-                                Log.e(TAG, "ApolloException --> " + e.getMessage());
+                                if (BuildConfig.DEBUG) Log.e(TAG, "ApolloException --> " + e.getMessage());
                                 authTask = null;
-                                setFormDisplay(true);
-                                Toast toast = Toast.makeText(getBaseContext(), "Erreur de connexion, votre smartphone n'est peut-être pas connecter. Veuillez réessayer plus tard.", Toast.LENGTH_LONG);
-                                toast.show();
-                                // TODO display toast error connection
+                                showDialog(false);
+                                Snackbar.make(findViewById(R.id.login_layout),
+                                        R.string.network_failure, Snackbar.LENGTH_LONG).show();
                             }
                         });
                     } else {
                         authTask = null;
-                        setFormDisplay(true);
-                        Toast toast = Toast.makeText(getBaseContext(), "Identifiant inconnu ou mot de passe incorrect. Veuillez réessayer.", Toast.LENGTH_LONG);
-                        toast.show();
+                        showDialog(false);
+                        Snackbar.make(findViewById(R.id.login_layout),
+                                R.string.login_failure, Snackbar.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<AccessToken> call, @NonNull Throwable t) {
                     authTask = null;
-                    setFormDisplay(true);
+                    showDialog(false);
                 }
             });
 
@@ -279,7 +306,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             authTask = null;
-            setFormDisplay(true);
+            showDialog(false);
         }
 
     }
@@ -287,7 +314,7 @@ public class LoginActivity extends AppCompatActivity {
     private Runnable changeMessage = new Runnable() {
         @Override
         public void run() {
-            dialog.setMessage("Chargement des données de référence...");
+            dialog.setMessage(getString(R.string.loading_initial_data));
         }
     };
 
@@ -314,21 +341,21 @@ public class LoginActivity extends AppCompatActivity {
 
     void fixHandShakeFailed() {
         try {
-            Log.e(TAG, "Updating Security Policy");
+            if (BuildConfig.DEBUG) Log.e(TAG, "Updating Security Policy");
             ProviderInstaller.installIfNeeded(this);
 
         } catch (GooglePlayServicesRepairableException e) {
             // Indicates that Google Play services is out of date, disabled, etc.
-            Log.e(TAG, "GooglePlayServicesRepairableException");
+            if (BuildConfig.DEBUG) Log.e(TAG, "GooglePlayServicesRepairableException");
             GoogleApiAvailability.getInstance()
                     .showErrorNotification(this, e.getConnectionStatusCode());
 
         } catch (GooglePlayServicesNotAvailableException e) {
             // Indicates a non-recoverable error; the ProviderInstaller is not able
             // to install an up-to-date Provider.
-            Log.e(TAG, "GooglePlayServicesNotAvailableException");
+            if (BuildConfig.DEBUG) Log.e(TAG, "GooglePlayServicesNotAvailableException");
         }
-        Log.e(TAG, "fixHandShake done");
+        if (BuildConfig.DEBUG) Log.e(TAG, "fixHandShake done");
     }
 }
 

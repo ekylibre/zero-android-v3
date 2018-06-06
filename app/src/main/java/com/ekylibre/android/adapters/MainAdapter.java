@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
@@ -72,7 +73,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             syncTime = (viewType == 1) ? itemView.findViewById(R.id.last_sync) : null;
 
             itemView.setOnClickListener(v -> {
-                Log.e(TAG, "clic");
                 Intent intent = new Intent(itemView.getContext(), InterventionActivity.class);
                 //intent.putExtra("nature", TYPE);
                 intent.putExtra("intervention_id", getAdapterPosition());
@@ -151,7 +151,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
             case App.IMPLANTATION:
                 for (Seeds s : current.seeds) {
-                    String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie, "string", context.getPackageName()));
+                    if (BuildConfig.DEBUG) Log.i(TAG, "Specie --> " + s.seed.get(0).specie);
+                    String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie.toUpperCase(), "string", context.getPackageName()));
                     sb.append(specie).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(s.inter.unit)).name);
