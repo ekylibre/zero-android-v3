@@ -96,45 +96,45 @@
     <string name="CROP_PROTECTION">Crop protection</string>
 
     <!-- Equipments -->
-    <string name="tractor">Tractor</string>
-    <string name="harrow">Harrow</string>
-    <string name="seedbed_preparator">Seedbed preparator</string>
-    <string name="grinder">Grinder</string>
-    <string name="hiller">Hiller</string>
-    <string name="hoe">Hoe</string>
-    <string name="plow">Plow</string>
-    <string name="roll">Roll</string>
-    <string name="soil_loosener">Soil loosener</string>
-    <string name="superficial_plow">Superficial plow</string>
-    <string name="subsoil_plow">Subsoil plow</string>
-    <string name="vibrocultivator">Vibrocultivator</string>
-    <string name="disc_harrow">Disc harrow</string>
-    <string name="sower">Sower</string>
-    <string name="implanter">Implanter</string>
-    <string name="airplanter">Airplanter</string>
-    <string name="spreader">Spreader</string>
-    <string name="liquid_manure_spreader">Liquid manure spreader</string>
-    <string name="spreader_trailer">Spreader trailer</string>
-    <string name="hoe_weeder">Hoe weeder</string>
-    <string name="rotary_hoe">Rotary hoe</string>
-    <string name="weeder">Weeder</string>
-    <string name="sprayer">Sprayer</string>
-    <string name="round_baler">Round baler</string>
-    <string name="cubic_baler">Cubic baler</string>
-    <string name="baler_wrapper">Baler wrapper</string>
-    <string name="trailer">Trailer</string>
-    <string name="corn_topper">Corn topper</string>
-    <string name="forager">Forager</string>
-    <string name="harvester">Harvester</string>
-    <string name="hay_rake">Hay rake</string>
-    <string name="mower">Mower</string>
-    <string name="reaper">Reaper</string>
-    <string name="topper">Topper</string>
-    <string name="trimmer">Trimmer</string>
-    <string name="mower_conditioner">Mower conditioner</string>
-    <string name="tedder">Tedder</string>
-    <string name="wrapper">Wrapper</string>
-    <string name="forage_platform">Forage platform</string>
+    <string name="TRACTOR">Tractor</string>
+    <string name="HARROW">Harrow</string>
+    <string name="SEEDBED_PREPARATOR">Seedbed preparator</string>
+    <string name="GRINDER">Grinder</string>
+    <string name="HILLER">Hiller</string>
+    <string name="HOE">Hoe</string>
+    <string name="PLOW">Plow</string>
+    <string name="ROLL">Roll</string>
+    <string name="SOIL_LOOSENER">Soil loosener</string>
+    <string name="SUPERFICIAL_PLOW">Superficial plow</string>
+    <string name="SUBSOIL_PLOW">Subsoil plow</string>
+    <string name="VIBROCULTIVATOR">Vibrocultivator</string>
+    <string name="DISC_HARROW">Disc harrow</string>
+    <string name="SOWER">Sower</string>
+    <string name="IMPLANTER">Implanter</string>
+    <string name="AIRPLANTER">Airplanter</string>
+    <string name="SPREADER">Spreader</string>
+    <string name="LIQUID_MANURE_SPREADER">Liquid manure spreader</string>
+    <string name="SPREADER_TRAILER">Spreader trailer</string>
+    <string name="HOE_WEEDER">Hoe weeder</string>
+    <string name="ROTARY_HOE">Rotary hoe</string>
+    <string name="WEEDER">Weeder</string>
+    <string name="SPRAYER">Sprayer</string>
+    <string name="ROUND_BALER">Round baler</string>
+    <string name="CUBIC_BALER">Cubic baler</string>
+    <string name="BALER_WRAPPER">Baler wrapper</string>
+    <string name="TRAILER">Trailer</string>
+    <string name="CORN_TOPPER">Corn topper</string>
+    <string name="FORAGER">Forager</string>
+    <string name="HARVESTER">Harvester</string>
+    <string name="HAY_RAKE">Hay rake</string>
+    <string name="MOWER">Mower</string>
+    <string name="REAPER">Reaper</string>
+    <string name="TOPPER">Topper</string>
+    <string name="TRIMMER">Trimmer</string>
+    <string name="MOWER_CONDITIONER">Mower conditioner</string>
+    <string name="TEDDER">Tedder</string>
+    <string name="WRAPPER">Wrapper</string>
+    <string name="FORAGE_PLATFORM">Forage platform</string>
 
     <!-- Plurals -->
     <string name="crop">%d crop</string>
@@ -291,6 +291,7 @@
     <string name="login_failure">Unknown E-mail or invalid password. Try again.</string>
     <string name="loading_initial_data">Loading initial data…</string>
     <string name="authenticating">Authenticating, please wait…</string>
+    <string name="create">Créer</string>
 
 
 </resources>
