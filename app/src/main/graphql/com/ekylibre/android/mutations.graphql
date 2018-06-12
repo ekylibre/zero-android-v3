@@ -116,3 +116,15 @@ mutation pushPerson(
     }
   }
 }
+
+mutation deleteInter($id: ID!) {
+  deleteIntervention(
+    input: {
+      id: $id
+    }
+  )
+  {
+    errors,
+    message
+  }
+}

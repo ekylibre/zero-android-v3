@@ -20,16 +20,23 @@ query Pull {
             name
             referenceId
         }
-        #storages {
-        #    id
-        #    name
-        #    type
-        #}
+        storages {
+           id
+           name
+           type
+        }
         crops {
             uuid
             name
             specie
-            #productionNature
+            productionNature {
+              name
+              specie
+              # outputs {
+              #   main
+              #   name
+              # }
+            }
             productionMode
             #centroid
             startDate
