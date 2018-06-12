@@ -24,6 +24,9 @@ public interface EkylibreAPI {
     @FormUrlEncoded
     @POST("/oauth/token")
     Call<AccessToken> getRefreshAccessToken(
-            @Field("refresh_token") String refreshToken);
+            @Field("client_id") String clientId,
+            @Field("client_secret") String clientSecret,
+            @Field("refresh_token") String refreshToken,
+            @Field("grant_type") String grantType);
 
 }

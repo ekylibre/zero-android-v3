@@ -22,7 +22,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class GraphQLClient {
 
-    private static final int TIME_OUT = 5000;
+    private static final int TIME_OUT = 10000;
     private static OkHttpClient okHttpClient;
 
     // get the instance of apollo client with all the headers and correct url
@@ -90,7 +90,7 @@ public class GraphQLClient {
 
         @Override
         public Response intercept(@NonNull Chain chain) throws IOException {
-            if (BuildConfig.DEBUG) Log.e("Interceptor", "Bearer " + authToken);
+            if (BuildConfig.DEBUG) Log.i("Interceptor", "Bearer " + authToken);
             Request request = chain.request();
             Request.Builder requestBuilder = request.newBuilder();
             requestBuilder.addHeader("Authorization", "Bearer " + authToken);

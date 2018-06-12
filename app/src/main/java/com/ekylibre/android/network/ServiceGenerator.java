@@ -62,7 +62,7 @@ public class ServiceGenerator {
     }
 
 
-    public static <S> S createService(Class<S> serviceClass, AccessToken accessToken, Context context) {
+    public static <S> S createService(Class<S> serviceClass, AccessToken accessToken) {
 
         httpClient = new OkHttpClient.Builder();
 
@@ -96,19 +96,19 @@ public class ServiceGenerator {
 
                 // We need a new client, since we don't want to make another call using our client with access token
                 EkylibreAPI ekylibreAPI = createService(EkylibreAPI.class);
-                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(mToken.getRefresh_token());
+                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, mToken.getRefresh_token(), "refresh_token");
                 try {
                     retrofit2.Response<AccessToken> tokenResponse = call.execute();
                     if (tokenResponse.code() == 200) {
                         AccessToken newToken = tokenResponse.body();
                         mToken = newToken;
-                        SharedPreferences sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("access_token", newToken.getAccess_token());
-                        editor.putString("refresh_token", newToken.getRefresh_token());
-                        editor.putInt("token_created_at", newToken.getCreated_at());
-                        editor.putBoolean("is_authenticated", true);
-                        editor.apply();
+//                        SharedPreferences sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+//                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                        editor.putString("access_token", newToken.getAccess_token());
+//                        editor.putString("refresh_token", newToken.getRefresh_token());
+//                        editor.putInt("token_created_at", newToken.getCreated_at());
+//                        editor.putBoolean("is_authenticated", true);
+//                        editor.apply();
 
                         return response.request().newBuilder()
                                 .header("Authorization", "Bearer " + newToken.getAccess_token())
