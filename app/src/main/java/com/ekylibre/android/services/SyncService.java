@@ -86,6 +86,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -145,13 +146,11 @@ public class SyncService extends IntentService {
         apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
         ACTION = Objects.requireNonNull(intent.getAction());
 
+        // Check the token is not expired and request for new one
         long tokenTime = (long) SHARED_PREFS.getInt("token_created_at", 0) * 1000;
-        Log.e(TAG, String.valueOf(tokenTime));
         long now = new Date().getTime();
-        Log.e(TAG, String.valueOf(now));
-        Log.e(TAG, String.valueOf(now - tokenTime));
-        if ( now - tokenTime >= 7200000) {
-            Log.e(TAG, "Last Token created " + (new Date().getTime() - tokenTime) + " seconds ago");
+        if ( now - tokenTime >= 7200000) {  // 7200000
+            if (BuildConfig.DEBUG) Log.i(TAG, "Last Token created " + (new Date().getTime() - tokenTime) + " seconds ago");
 
             AccessToken token = new AccessToken();
             token.setAccess_token(SHARED_PREFS.getString("access_token", ""));
@@ -159,46 +158,61 @@ public class SyncService extends IntentService {
             token.setToken_type("bearer");
 
             EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class, token);
-
             Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, token.getRefresh_token(), "refresh_token");
 
-            call.enqueue(new retrofit2.Callback<AccessToken>() {
-                @Override
-                public void onResponse(@NonNull Call<AccessToken> call, @NonNull retrofit2.Response<AccessToken> response) {
+            try {
 
-                    if (response.isSuccessful()) {
+                retrofit2.Response<AccessToken> response = call.execute();
 
-                        Log.e(TAG, "Token request done");
+                if (response.isSuccessful()) {
 
-                        AccessToken accessToken = response.body();
+                    AccessToken responseToken = response.body();
+                    ACCESS_TOKEN = responseToken.getAccess_token();
 
-                        ACCESS_TOKEN = accessToken.getAccess_token();
-
-                        SharedPreferences.Editor editor = SHARED_PREFS.edit();
-                        editor.putString("access_token", accessToken.getAccess_token());
-                        editor.putString("refresh_token", accessToken.getRefresh_token());
-                        editor.putInt("token_created_at", accessToken.getCreated_at());
-                        editor.apply();
-
-                        route();
-                    }
-                    else {
-                        Log.e(TAG, "Token request error " + response);
-                    }
+                    SharedPreferences.Editor editor = SHARED_PREFS.edit();
+                    editor.putString("access_token", responseToken.getAccess_token());
+                    editor.putString("refresh_token", responseToken.getRefresh_token());
+                    editor.putInt("token_created_at", responseToken.getCreated_at());
+                    editor.apply();
                 }
 
-                @Override
-                public void onFailure(Call<AccessToken> call, Throwable t) {
-                    Log.e(TAG, "Request failure");
-                }
-            });
-        }
-        else
-            route();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-    }
+//            call.enqueue(new retrofit2.Callback<AccessToken>() {
+//                @Override
+//                public void onResponse(@NonNull Call<AccessToken> call, @NonNull retrofit2.Response<AccessToken> response) {
+//
+//                    if (response.isSuccessful()) {
+//
+//                        Log.e(TAG, "Token request done");
+//
+//                        AccessToken accessToken = response.body();
+//
+//                        ACCESS_TOKEN = accessToken.getAccess_token();
+//
+//                        SharedPreferences.Editor editor = SHARED_PREFS.edit();
+//                        editor.putString("access_token", accessToken.getAccess_token());
+//                        editor.putString("refresh_token", accessToken.getRefresh_token());
+//                        editor.putInt("token_created_at", accessToken.getCreated_at());
+//                        editor.apply();
+//
+//                        continueAction();
+//                    }
+//                    else {
+//                        Log.e(TAG, "Token request error " + response);
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<AccessToken> call, Throwable t) {
+//                    Log.e(TAG, "Request failure");
+//                }
+//            });
+        } else if (BuildConfig.DEBUG) Log.i(TAG, "Token is up to date");
 
-    private void route() {
+
         // Route action to function
         switch (ACTION) {
 
@@ -229,6 +243,7 @@ public class SyncService extends IntentService {
 //                handleActionVerifyToken();
 //                break;
         }
+
     }
 
 
@@ -952,6 +967,7 @@ public class SyncService extends IntentService {
                                         }
 
                                     } else {
+
                                         // Update existing intervention
                                         if (BuildConfig.DEBUG) Log.d(TAG, "|-- update intervention #" + inter.id());
                                         Interventions existingInter = database.dao().getIntervention(Integer.valueOf(inter.id()));

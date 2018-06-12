@@ -8,8 +8,8 @@ android {
         applicationId "com.ekylibre.android"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 1
-        versionName "0.9.0 bêta"
+        versionCode 2
+        versionName "0.9.1 bêta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
