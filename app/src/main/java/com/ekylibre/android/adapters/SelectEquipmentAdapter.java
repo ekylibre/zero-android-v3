@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +14,17 @@ import com.ekylibre.android.SelectEquipmentFragment;
 import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.relations.InterventionEquipment;
+import com.ekylibre.android.utils.Enums;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 
 public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipmentAdapter.ViewHolder> {
 
-    private static final String TAG = SelectEquipmentAdapter.class.getName();
+    private static final String TAG = "SelectEquipmentAdapter";
 
     private List<Equipment> dataset;
-    private List equipmentValues;
-    private List equipmentKeys;
     private Context context;
 
     private SelectEquipmentFragment.OnFragmentInteractionListener fragmentListener;
@@ -37,8 +34,6 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         this.dataset = dataset;
         this.context = context;
         this.fragmentListener = fragmentListener;
-        this.equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
-        this.equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -65,8 +60,7 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         void display(Equipment item) {
             equipment = item;
             nameTextView.setText(item.name);
-            String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.type.toLowerCase()));
-            typeTextView.setText(equipment_type);
+            typeTextView.setText(Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.type)));
             typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName()));
 
         }

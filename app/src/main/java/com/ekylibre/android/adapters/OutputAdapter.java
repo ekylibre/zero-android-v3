@@ -18,10 +18,12 @@ import android.widget.ImageView;
 
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.models.Harvest;
-import com.ekylibre.android.utils.SpinnerLists;
-import com.ekylibre.android.utils.Unit;
+import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Units;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -48,7 +50,7 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
 
             quantityEditText = itemView.findViewById(R.id.harvest_quantity_edit);
             unitSpinner = itemView.findViewById(R.id.harvest_unit_spinner);
-            storageSpinner = itemView.findViewById(R.id.storage_spinner);
+            storageSpinner = itemView.findViewById(R.id.harvest_storage_spinner);
             deleteImageView = itemView.findViewById(R.id.harvest_delete);
             numberEditText = itemView.findViewById(R.id.harvest_number_edit);
 
@@ -65,16 +67,9 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
             });
 
             quantityEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override public void afterTextChanged(Editable editable) {
                     if (!editable.toString().equals("0") && editable.length() != 0) {
                         dataset.get(getAdapterPosition()).quantity = Float.valueOf(editable.toString());
                     }
@@ -82,39 +77,25 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
             });
 
             unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                @Override public void onNothingSelected(AdapterView<?> parent) {}
+                @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     dataset.get(getAdapterPosition()).unit = Units.OUTPUT_UNITS.get(position).key;
                 }
             });
 
-            if (!SpinnerLists.STORAGE_LIST.isEmpty()) {
+            if (!Enums.STORAGE_LIST_NAMES.isEmpty()) {
                 storageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        dataset.get(getAdapterPosition()).id_storage = SpinnerLists.STORAGE_LIST.get(position).id;
+                    @Override public void onNothingSelected(AdapterView<?> parent) {}
+                    @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        dataset.get(getAdapterPosition()).id_storage = Enums.STORAGE_LIST.get(position).id;
                     }
                 });
             }
 
             numberEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override public void afterTextChanged(Editable editable) {
                     if (editable.length() > 0) {
                         dataset.get(getAdapterPosition()).number = editable.toString();
                     }
@@ -135,12 +116,17 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
             unitSpinner.setSelection(Units.OUTPUT_UNITS.indexOf(Units.getUnit(item.unit)));
 
             // Storage selector
-            if (!SpinnerLists.STORAGE_LIST_L10N.isEmpty()) {
-                ArrayAdapter storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, SpinnerLists.STORAGE_LIST_L10N);
-                storageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                unitSpinner.setAdapter(storageSpinnerAdapter);
-                unitSpinner.setSelection(SpinnerLists.STORAGE_LIST_L10N.indexOf(item.unit));
-            }
+            ArrayAdapter storageSpinnerAdapter;
+            if (Enums.STORAGE_LIST_NAMES.isEmpty()) {
+                storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Collections.singletonList("Non défini"));
+                storageSpinner.setEnabled(false);
+            } else
+                storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.STORAGE_LIST_NAMES);
+            storageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+            storageSpinner.setAdapter(storageSpinnerAdapter);
+            if (item.id_storage != null)
+                storageSpinner.setSelection(Enums.STORAGE_LIST_NAMES.indexOf(item.unit));
+
             numberEditText.setText(item.number);
         }
     }

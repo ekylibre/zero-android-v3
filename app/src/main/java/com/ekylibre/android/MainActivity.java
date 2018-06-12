@@ -29,7 +29,7 @@ import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
-import com.ekylibre.android.utils.SpinnerLists;
+import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public int TYPE;
     public static final int STARTING = 0;
     public static final int FINISHING = 1;
-    public static boolean NO_CROP = false;
+    public static boolean ITEMS_TO_SYNC = false;
 
     // Filters statics
     public static final String FILTER_MY_INTERVENTIONS = "filter_my_interventions";
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         // Generates localized string lists for spinners
         generateUnitLists();
-        SpinnerLists.generate(this);
+        Enums.buildEnumsTranslation(this);
 
         // Get shared preferences and set title
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
@@ -158,13 +158,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Intent intent = new Intent(this, SyncService.class);
-            intent.setAction(SyncService.ACTION_SYNC_PULL);
+            intent.setAction(SyncService.ACTION_SYNC_ALL);
             intent.putExtra("receiver", resultReceiver);
             startService(intent);
         });
 
         Intent intent = new Intent(this, SyncService.class);
-        intent.setAction(SyncService.ACTION_SYNC_PULL);
+        intent.setAction(SyncService.FIRST_TIME_SYNC);
         intent.putExtra("receiver", resultReceiver);
         startService(intent);
 
@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        // TODO auto sync if lastSyncTime < now - 10min
 
         // Set Farm name as page title
         setTitle(sharedPreferences.getString("current-farm-name", "Synchronisation..."));
@@ -236,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
+    public void onReceiveResult(int resultCode, Bundle bundle) {
 
         swipeRefreshLayout.setRefreshing(false);
 
@@ -245,8 +246,9 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             lastSyncTime = new Date();
             sharedPreferences.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
-        } else if (resultCode == SyncService.FAILED) {
-            Toast toast = Toast.makeText(this, R.string.sync_failure, Toast.LENGTH_LONG);
+        } else if (resultCode == SyncService.FAILED) { //R.string.sync_failure
+            String message = bundle.getString("message");
+            Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
         }

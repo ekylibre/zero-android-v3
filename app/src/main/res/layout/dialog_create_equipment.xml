@@ -54,7 +54,6 @@
         android:id="@+id/create_equipment_type_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:prompt="@string/chose_type"
-        android:entries="@array/equipment_values"/>
+        android:prompt="@string/chose_type" />
 
 </LinearLayout>

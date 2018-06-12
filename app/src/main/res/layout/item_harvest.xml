@@ -48,10 +48,11 @@
         android:layout_height="0dp"
         android:background="@drawable/field_part_two"
         android:gravity="start"
+        android:ems="2"
         app:layout_constraintStart_toEndOf="@id/harvest_quantity_edit"
         app:layout_constraintTop_toTopOf="@id/harvest_quantity_edit"
         app:layout_constraintBottom_toBottomOf="@id/harvest_quantity_edit"
-        android:entries="@array/mass_unit_values" />
+        android:entries="@array/default_entries" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/storage_label"
@@ -59,10 +60,10 @@
         android:layout_height="wrap_content"
         android:text="@string/stock_place"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/storage_spinner" />
+        app:layout_constraintBaseline_toBaselineOf="@id/harvest_storage_spinner" />
 
     <android.support.v7.widget.AppCompatSpinner
-        android:id="@+id/storage_spinner"
+        android:id="@+id/harvest_storage_spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/field_rounded_white"
@@ -98,8 +99,8 @@
         android:paddingBottom="4dp"
         android:hint="Fourni par le collecteur"
         app:layout_constraintStart_toEndOf="@id/harvest_barrier"
-        app:layout_constraintEnd_toEndOf="@id/storage_spinner"
-        app:layout_constraintTop_toBottomOf="@id/storage_spinner"
+        app:layout_constraintEnd_toEndOf="@id/harvest_storage_spinner"
+        app:layout_constraintTop_toBottomOf="@id/harvest_storage_spinner"
         android:selectAllOnFocus="true" />
 
     <android.support.v7.widget.AppCompatImageView

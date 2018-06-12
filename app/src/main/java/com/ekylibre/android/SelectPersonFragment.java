@@ -1,6 +1,7 @@
 package com.ekylibre.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectPersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
+import com.ekylibre.android.services.SyncService;
 
 import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
@@ -171,6 +173,9 @@ public class SelectPersonFragment extends DialogFragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
+            Intent intent = new Intent(context, SyncService.class);
+            intent.setAction(SyncService.ACTION_CREATE_ARTICLES);
+            context.startService(intent);
         }
     }
 

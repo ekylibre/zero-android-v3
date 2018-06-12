@@ -21,7 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_arrow_down"
-        android:animateLayoutChanges="true"/>
+        android:animateLayoutChanges="true" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/weather_label"

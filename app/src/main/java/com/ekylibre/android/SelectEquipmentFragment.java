@@ -1,6 +1,7 @@
 package com.ekylibre.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,12 +16,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.Enums;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -28,7 +32,7 @@ import java.util.Objects;
 
 public class SelectEquipmentFragment extends DialogFragment {
 
-    private static final String TAG = SelectEquipmentFragment.class.getName();
+    private static final String TAG = "SelectEquipmentFragment";
 
     private static final int MIN_SEARCH_SIZE = 2;
 
@@ -123,8 +127,8 @@ public class SelectEquipmentFragment extends DialogFragment {
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_equipment, null);
 
         builder.setView(dialogView);
-        builder.setNegativeButton("Annuler", (dialog, i) -> dialog.cancel());
-        builder.setPositiveButton("Créer", (dialog, i) -> {
+        builder.setNegativeButton(R.string.cancel, (dialog, i) -> dialog.cancel());
+        builder.setPositiveButton(R.string.create, (dialog, i) -> {
             new CreateNewEquipment(context, dialogView).execute();
             dialog.dismiss();
         });
@@ -137,6 +141,9 @@ public class SelectEquipmentFragment extends DialogFragment {
         if (window != null)
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
+        AppCompatSpinner spinner = dialogView.findViewById(R.id.create_equipment_type_spinner);
+        ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.EQUIMPMENT_NAMES);
+        spinner.setAdapter(spinnerAdapter);
     }
 
     class CreateNewEquipment extends AsyncTask<Void, Void, Void> {
@@ -154,8 +161,7 @@ public class SelectEquipmentFragment extends DialogFragment {
 
 
             AppCompatSpinner typeSpinner = dialogView.findViewById(R.id.create_equipment_type_spinner);
-            int spinner_pos = typeSpinner.getSelectedItemPosition();
-            String type = getResources().getStringArray(R.array.equipment_keys)[spinner_pos];
+            String type = Enums.EQUIMPMENT_TYPES.get(typeSpinner.getSelectedItemPosition());
 
             TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_equipment_name);
             String name = nameTextInput.getEditText().getText().toString();
@@ -164,7 +170,7 @@ public class SelectEquipmentFragment extends DialogFragment {
             String number = numberTextInput.getEditText().getText().toString();
 
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Equipment(null, name, type.toUpperCase(), number, MainActivity.FARM_ID));
+            database.dao().insert(new Equipment(null, name, type, number, MainActivity.FARM_ID));
 
             return null;
         }
@@ -173,6 +179,9 @@ public class SelectEquipmentFragment extends DialogFragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
+            Intent intent = new Intent(context, SyncService.class);
+            intent.setAction(SyncService.ACTION_CREATE_ARTICLES);
+            context.startService(intent);
         }
     }
 

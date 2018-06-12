@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="@string/none"
+        android:text="@string/not_provided"
         app:layout_constraintBaseline_toBaselineOf="@id/irrigation_label"
         app:layout_constraintStart_toEndOf="@+id/irrigation_label" />
 
@@ -60,7 +60,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/quantity"
+        android:text="@string/volume"
         app:layout_constraintBaseline_toBaselineOf="@id/irrigation_quantity_edit" />
 
     <android.support.v7.widget.AppCompatEditText
@@ -73,7 +73,7 @@
         android:ems="4"
         android:gravity="end"
         android:imeOptions="actionDone"
-        android:inputType="numberDecimal"
+        android:inputType="number"
         android:paddingBottom="4dp"
         android:paddingEnd="@dimen/regular_margin"
         android:paddingStart="@dimen/regular_margin"
@@ -89,6 +89,7 @@
         android:layout_height="0dp"
         android:background="@drawable/field_part_two_grey"
         android:gravity="start"
+        android:entries="@array/default_entries"
         app:layout_constraintStart_toEndOf="@id/irrigation_quantity_edit"
         app:layout_constraintTop_toTopOf="@id/irrigation_quantity_edit"
         app:layout_constraintBottom_toBottomOf="@id/irrigation_quantity_edit" />
@@ -98,7 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/quantity_cannot_be_null"
+        android:text="@string/volume_cannot_be_null"
         android:textColor="@color/warning"
         app:layout_constraintTop_toBottomOf="@id/irrigation_quantity_label"
         app:layout_constraintStart_toStartOf="@id/irrigation_quantity_edit"/>

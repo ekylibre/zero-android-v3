@@ -156,7 +156,7 @@
     <string name="x_hours">%d heures</string>
 
     <!-- Volume units -->
-    <string name="LITER">litres</string>
+    <string name="LITER">l</string>
     <string name="LITER_PER_HECTARE">l/ha</string>
     <string name="LITER_PER_SQUARE_METER">l/m²</string>
     <string name="HECTOLITER">hl</string>
@@ -167,16 +167,16 @@
     <string name="CUBIC_METER_PER_SQUARE_METER">m³/m²</string>
 
     <!-- Mass units -->
-    <string name="GRAM">grammes</string>
+    <string name="GRAM">g</string>
     <string name="GRAM_PER_HECTARE">g/ha</string>
     <string name="GRAM_PER_SQUARE_METER">g/m²</string>
     <string name="KILOGRAM">kg</string>
     <string name="KILOGRAM_PER_HECTARE">kg/ha</string>
     <string name="KILOGRAM_PER_SQUARE_METER">kg/m²</string>
-    <string name="QUINTAL">quintaux</string>
+    <string name="QUINTAL">q</string>
     <string name="QUINTAL_PER_HECTARE">q/ha</string>
     <string name="QUINTAL_PER_SQUARE_METER">q/m²</string>
-    <string name="TON">tonnes</string>
+    <string name="TON">t</string>
     <string name="TON_PER_HECTARE">t/ha</string>
     <string name="TON_PER_SQUARE_METER">t/m²</string>
 
@@ -184,6 +184,10 @@
     <string name="STRAW">paille</string>
     <string name="GRAIN">grain</string>
     <string name="SILAGE">ensilage</string>
+
+    <!-- Storage types -->
+    <string name="HEAP">tas</string>
+    <string name="SILO">silo</string>
 
     <string name="organic">Organique</string>
     <string name="mineral">Minéral</string>
@@ -280,7 +284,7 @@
     <string name="not_provided">Non renseignée</string>
     <string name="wind_speed">Vitesse du vent</string>
     <string name="quantity_cannot_be_null">Quantité ne peut être nulle</string>
-    <string name="stock_place">Lieu de stockage</string>
+    <string name="stock_place">Stockage</string>
     <string name="number">Numéro</string>
     <string name="name">Nom</string>
     <string name="welcome_text"><![CDATA[Bienvenue dans l\'application mobile Clic&Farm ! \nPour commencer, identifiez-vous avec votre compte Ekylibre…]]></string>
@@ -291,7 +295,9 @@
     <string name="network_failure">Erreur de connexion, votre smartphone n\'est peut-être pas connecté. Veuillez réessayer plus tard.</string>
     <string name="login_failure">Identifiant inconnu ou mot de passe incorrect. Veuillez réessayer.</string>
     <string name="loading_initial_data">Chargement des données de référence…</string>
-    <string name="authenticating">Tentative de connection, merci de patienter...</string>
+    <string name="authenticating">Tentative de connection, merci de patienter…</string>
     <string name="create">Créer</string>
+    <string name="volume">Volume</string>
+    <string name="volume_cannot_be_null">Le volume ne peut être nul</string>
 
 </resources>

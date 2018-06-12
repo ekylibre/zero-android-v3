@@ -13,25 +13,21 @@ import android.widget.TextView;
 
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Equipments;
+import com.ekylibre.android.utils.Enums;
 
-import java.util.Arrays;
 import java.util.List;
 
 
 public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.ViewHolder> {
 
-    private static final String TAG = EquipmentAdapter.class.getName();
+    private static final String TAG = "EquipmentAdapter";
 
     private List<Equipments> dataset;
-    private List equipmentValues;
-    private List equipmentKeys;
     private Context context;
 
     public EquipmentAdapter(Context context, List<Equipments> dataset) {
         this.dataset = dataset;
         this.context = context;
-        this.equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
-        this.equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -53,10 +49,8 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
                 builder.setMessage(R.string.delete_equipment_prompt);
                 builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
                 builder.setPositiveButton(R.string.yes, (dialog, i) -> {
-                    int position = getAdapterPosition();
-                    dataset.remove(position);
-                    //notifyItemRemoved(position);
-                    notifyDataSetChanged();
+                    dataset.remove(getAdapterPosition());
+                    notifyDataSetChanged();  //notifyItemRemoved(position);
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
@@ -64,14 +58,9 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
         }
 
         void display(Equipments item) {
-            //iconImageView.setImageResource(R.drawable.ic_launcher_foreground);
             nameTextView.setText(item.equipment.get(0).name);
-            if (!item.equipment.get(0).type.isEmpty()) {
-                String equipment_type = (String) equipmentValues.get(equipmentKeys.indexOf(item.equipment.get(0).type.toLowerCase()));
-                typeTextView.setText(equipment_type);
-            }
+            typeTextView.setText(Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.equipment.get(0).type)));
             iconImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.equipment.get(0).type.toLowerCase(), "drawable", context.getPackageName()));
-
         }
     }
 

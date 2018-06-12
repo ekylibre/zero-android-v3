@@ -78,8 +78,7 @@
         android:layout_marginStart="16dp"
         android:padding="6dp"
         app:layout_constraintStart_toEndOf="@id/harvest_output_label"
-        app:layout_constraintTop_toBottomOf="@id/harvest_label"
-        android:entries="@array/species_values" />
+        app:layout_constraintTop_toBottomOf="@id/harvest_label" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/harvest_recycler"

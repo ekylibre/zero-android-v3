@@ -99,6 +99,14 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                     if (string.isEmpty())
                         return true;
                     else {
+                        switch (getItemViewType()) {
+                            case PHYTO:
+                                ((Phytos) inputList.get(getLayoutPosition())).inter.quantity = Float.valueOf(string); break;
+                            case SEED:
+                                ((Seeds) inputList.get(getLayoutPosition())).inter.quantity = Float.valueOf(string); break;
+                            case FERTI:
+                                ((Fertilizers) inputList.get(getLayoutPosition())).inter.quantity = Float.valueOf(string); break;
+                        }
                         updateTotal();
                         itemTotal.setTextColor(context.getResources().getColor(R.color.secondary_text));
                         keyboardManager.hideSoftInputFromWindow(itemQuantityEdit.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -124,9 +132,16 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override  public void onNothingSelected(AdapterView<?> parentView) {}
                 @Override public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    switch (getItemViewType()) {
+                        case PHYTO:
+                            displayDoseWarning(Float.valueOf(itemQuantityEdit.getText().toString()));
+                            ((Phytos) inputList.get(getLayoutPosition())).inter.unit = Units.VOLUME_UNITS.get(position).key; break;
+                        case SEED:
+                            ((Seeds) inputList.get(getLayoutPosition())).inter.unit = Units.MASS_UNITS.get(position).key; break;
+                        case FERTI:
+                            ((Fertilizers) inputList.get(getLayoutPosition())).inter.unit = Units.MASS_UNITS.get(position).key; break;
+                    }
                     updateTotal();
-                    if (getItemViewType() == PHYTO)
-                        displayDoseWarning(Float.valueOf(itemQuantityEdit.getText().toString()));
                 }
             });
         }

@@ -151,7 +151,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
             case App.IMPLANTATION:
                 for (Seeds s : current.seeds) {
-                    if (BuildConfig.DEBUG) Log.i(TAG, "Specie --> " + s.seed.get(0).specie);
                     String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie.toUpperCase(), "string", context.getPackageName()));
                     sb.append(specie).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");

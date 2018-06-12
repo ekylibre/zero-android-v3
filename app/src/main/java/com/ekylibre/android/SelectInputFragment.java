@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.App;
+import com.ekylibre.android.utils.Enums;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -159,7 +161,6 @@ public class SelectInputFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (BuildConfig.DEBUG) Log.e(TAG, "OnViewCreated...");
 
         TabLayout.Tab tab = tabLayout.getTabAt(currentTab);
         if (tab != null) {
@@ -170,7 +171,6 @@ public class SelectInputFragment extends DialogFragment {
             }
             tab.select();
         }
-
         new RequestDatabase(context).execute();
     }
 
@@ -201,8 +201,8 @@ public class SelectInputFragment extends DialogFragment {
 //        typeSpinner.setAdapter(inputAdapter);
 
         builder.setView(dialogView);
-        builder.setNegativeButton("Annuler", (dialog, i) -> dialog.cancel());
-        builder.setPositiveButton("Créer", (dialog, i) -> {
+        builder.setNegativeButton(R.string.cancel, (dialog, i) -> dialog.cancel());
+        builder.setPositiveButton(R.string.create, (dialog, i) -> {
             new CreateInput(context, dialogView).execute();
             dialog.dismiss();
         });
@@ -214,6 +214,12 @@ public class SelectInputFragment extends DialogFragment {
         Window window = dialog.getWindow();
         if (window != null)
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        if (currentTab == SEED) {
+            AppCompatSpinner spinner = dialogView.findViewById(R.id.create_seed_spinner);
+            ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.SPECIE_NAMES);
+            spinner.setAdapter(spinnerAdapter);
+        }
 
 //        LayoutInflater dialogInflater = LayoutInflater.from(finalContext);
 //        View dialogView = dialogInflater.inflate(R.layout.dialog_create_seed, null);
@@ -261,8 +267,7 @@ public class SelectInputFragment extends DialogFragment {
                 case SEED:
 
                     AppCompatSpinner specieSpinner = dialogView.findViewById(R.id.create_seed_spinner);
-                    int spinner_pos = specieSpinner.getSelectedItemPosition();
-                    String specie = getResources().getStringArray(R.array.species_keys)[spinner_pos];
+                    String specie = Enums.SPECIE_TYPES.get(specieSpinner.getSelectedItemPosition());
 
                     TextInputLayout varietyWrapper = dialogView.findViewById(R.id.create_seed_variety);
                     String variety = varietyWrapper.getEditText().getText().toString();
@@ -352,6 +357,7 @@ public class SelectInputFragment extends DialogFragment {
                     else
                         selectedList.addAll(database.dao().searchSeedVariety("%" + searchText + "%"));
 
+                    // Remove current items
                     for (Object item : InterventionActivity.inputList) {
                         if (item instanceof Seeds) {
                             Seed seed = ((Seeds) item).seed.get(0);
@@ -366,14 +372,12 @@ public class SelectInputFragment extends DialogFragment {
                     break;
 
                 case PHYTO:
-
-                    if (BuildConfig.DEBUG) Log.i(TAG, "database queried");
-
                     if (searchText.length() < MIN_SEARCH_SIZE)
                         selectedList.addAll(database.dao().selectPhytosanitary());
                     else
                         selectedList.addAll(database.dao().searchPhytosanitary("%" + searchText + "%"));
 
+                    // Remove current items
                     for (Object item : InterventionActivity.inputList) {
                         if (item instanceof Phytos) {
                             Phyto phyto = ((Phytos) item).phyto.get(0);

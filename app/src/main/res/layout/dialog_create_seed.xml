@@ -27,7 +27,6 @@
         android:id="@+id/create_seed_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/species_values"
         android:prompt="@string/chose_specie" />
 
     <android.support.design.widget.TextInputLayout

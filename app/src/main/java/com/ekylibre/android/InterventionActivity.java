@@ -3,8 +3,6 @@ package com.ekylibre.android;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
@@ -61,7 +59,7 @@ import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
-import com.ekylibre.android.utils.SpinnerLists;
+import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
@@ -69,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
@@ -107,14 +106,16 @@ public class InterventionActivity extends AppCompatActivity implements
     private EditText workingPeriodEditDate, workingPeriodEditDuration;
 
     // Input layout
+    private Group inputRecyclerGroup;
+    private Group phytoMixWarning;
     private ImageView inputArrow;
     private TextView inputSummary, inputAddLabel;
     private DialogFragment selectInputFragment;
     private RecyclerView inputRecyclerView;
     private RecyclerView.Adapter inputAdapter;
-    private Group phytoMixWarning;
 
     // Harvest layout
+    private Group harvestRecyclerGroup;
     private RecyclerView.Adapter harvestAdapter;
     private Group harvestDetail;
     private AppCompatSpinner harvestOutputType;
@@ -126,17 +127,17 @@ public class InterventionActivity extends AppCompatActivity implements
 //    private RecyclerView.Adapter materialAdapter;
 
     // Equipment layout
+    private Group equipmentRecyclerGroup;
     private ImageView equipmentArrow;
     private TextView equipmentSummary, equipmentAddLabel;
     private DialogFragment selectEquipmentFragment;
-    private RecyclerView equipmentRecyclerView;
     private RecyclerView.Adapter equipmentAdapter;
 
     // Person layout
+    private Group personRecyclerGroup;
     private ImageView personArrow;
     private TextView personSummary, personAddLabel;
     private DialogFragment selectPersonFragment;
-    private RecyclerView personRecyclerView;
     private RecyclerView.Adapter personAdapter;
 
     // Weather layout
@@ -152,7 +153,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
     public static List<PlotWithCrops> plotList = new ArrayList<>();
-    public static List<Harvest> outputList = new ArrayList<>();
+    private static List<Harvest> outputList = new ArrayList<>();
     //public static List<Materials> materialList = new ArrayList<>();
 
     public static float surface = 0f;
@@ -210,12 +211,14 @@ public class InterventionActivity extends AppCompatActivity implements
         workingPeriodDurationUnit = findViewById(R.id.working_period_duration_unit);
 
         // Inputs
+        ConstraintLayout inputZone = findViewById(R.id.input_zone);
+        inputRecyclerGroup = findViewById(R.id.input_recycler_group);
         ConstraintLayout inputLayout = findViewById(R.id.input_layout);
         inputArrow = findViewById(R.id.input_arrow);
         inputSummary = findViewById(R.id.input_summary);
         inputAddLabel = findViewById(R.id.input_add_label);
         inputRecyclerView = findViewById(R.id.input_recycler);
-        phytoMixWarning = findViewById(R.id.phyto_mix_warning);
+        phytoMixWarning = findViewById(R.id.phyto_mix_warning_group);
 
         // Harvest layout
         ConstraintLayout harvestLayout = findViewById(R.id.harvest_layout);
@@ -233,16 +236,20 @@ public class InterventionActivity extends AppCompatActivity implements
 //        materialRecyclerView = findViewById(R.id.material_recycler);
 
         // Equipments
+        ConstraintLayout equipmentZone = findViewById(R.id.equipment_zone);
+        equipmentRecyclerGroup = findViewById(R.id.equipment_recycler_group);
         equipmentArrow = findViewById(R.id.equipment_arrow);
         equipmentSummary = findViewById(R.id.equipment_summary);
         equipmentAddLabel = findViewById(R.id.equipment_add_label);
-        equipmentRecyclerView = findViewById(R.id.equipment_recycler);
+        RecyclerView equipmentRecyclerView = findViewById(R.id.equipment_recycler);
 
         // Persons
+        ConstraintLayout personZone = findViewById(R.id.person_zone);
+        personRecyclerGroup = findViewById(R.id.person_recycler_group);
         personArrow = findViewById(R.id.person_arrow);
         personSummary = findViewById(R.id.person_summary);
         personAddLabel = findViewById(R.id.person_add_label);
-        personRecyclerView = findViewById(R.id.person_recycler);
+        RecyclerView personRecyclerView = findViewById(R.id.person_recycler);
 
         // Weather
         ConstraintLayout weatherLayout = findViewById(R.id.weather_layout);
@@ -277,6 +284,7 @@ public class InterventionActivity extends AppCompatActivity implements
         switch (procedure) {
             case App.IRRIGATION:
                 irrigationLayout.setVisibility(View.VISIBLE);
+                irrigationDetail.setVisibility(View.VISIBLE);
                 break;
             case App.GROUND_WORK:
                 inputLayout.setVisibility(View.GONE);
@@ -417,24 +425,27 @@ public class InterventionActivity extends AppCompatActivity implements
         });
 
         View.OnClickListener inputListener = view -> {
-            if (inputRecyclerView.getVisibility() == View.GONE) {
-                inputArrow.setVisibility(View.VISIBLE);
-                inputArrow.setRotation(180);
-                inputSummary.setVisibility(View.GONE);
-                inputAddLabel.setVisibility(View.VISIBLE);
-                inputRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                int count = inputList.size();
-                inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
-                inputArrow.setRotation(0);
-                inputSummary.setVisibility(View.VISIBLE);
-                inputAddLabel.setVisibility(View.GONE);
-                inputRecyclerView.setVisibility(View.GONE);
+            int count = inputList.size();
+            if (count > 0) {
+                if (inputRecyclerGroup.getVisibility() == View.GONE) {
+                    inputArrow.setVisibility(View.VISIBLE);
+                    inputArrow.setRotation(180);
+                    inputSummary.setVisibility(View.GONE);
+                    inputAddLabel.setVisibility(View.VISIBLE);
+                    inputRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
+                    inputArrow.setRotation(0);
+                    inputSummary.setVisibility(View.VISIBLE);
+                    inputAddLabel.setVisibility(View.GONE);
+                    inputRecyclerGroup.setVisibility(View.GONE);
+                }
             }
         };
 
         inputArrow.setOnClickListener(inputListener);
         inputSummary.setOnClickListener(inputListener);
+        inputZone.setOnClickListener(inputListener);
 
         // Fill data if editing
         if (editIntervention != null) {
@@ -451,14 +462,11 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override
             public void onChanged() {
                 phytoMixWarning.setVisibility(View.GONE);
-                if (inputAdapter.getItemCount() == 0) {
-                    inputArrow.performClick();
+                if (inputList.size() == 0) {
                     inputArrow.setVisibility(View.GONE);
-                    inputSummary.setVisibility(View.GONE);
-                    inputAddLabel.setVisibility(View.VISIBLE);
-                    inputRecyclerView.setVisibility(View.GONE);
+                    inputRecyclerGroup.setVisibility(View.GONE);
                 }
-                else if (inputAdapter.getItemCount() >= 2) {
+                else if (inputList.size() >= 2) {
                     // Phyto warnings
                     List<Integer> codes = new ArrayList<>();
                     for (Object input : inputList) {
@@ -476,12 +484,13 @@ public class InterventionActivity extends AppCompatActivity implements
         });
         inputRecyclerView.setAdapter(inputAdapter);
         inputAdapter.notifyDataSetChanged();
+        if (inputList.size() == 0)
+            inputRecyclerGroup.setVisibility(View.GONE);
+
 
         // ================================ HARVEST EVENTS ===================================== //
 
-
-
-        ArrayAdapter outputTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, SpinnerLists.OUTPUT_LIST_L10N);
+        ArrayAdapter outputTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Enums.OUTPUT_NAMES);
         outputTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         harvestOutputType.setAdapter(outputTypeAdapter);
 
@@ -489,7 +498,7 @@ public class InterventionActivity extends AppCompatActivity implements
             if (!editIntervention.harvests.isEmpty()) {
                 outputList.addAll(editIntervention.harvests);
                 harvestArrow.performClick();
-                harvestOutputType.setSelection(SpinnerLists.OUTPUT_LIST.indexOf(outputList.get(0).type));
+                harvestOutputType.setSelection(Enums.OUTPUT_TYPES.indexOf(outputList.get(0).type));
             }
         }
 
@@ -510,7 +519,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         harvestAddLabel.setOnClickListener(view -> {
             outputList.add(new Harvest());
-            if (BuildConfig.DEBUG) Log.e(TAG, "harvest number " + outputList.size() + " list " + outputList.toString());
+            if (BuildConfig.DEBUG) Log.e(TAG, "outputList.size() " + outputList.size() + " adapter.getItemCount() " + harvestAdapter.getItemCount());
             harvestAdapter.notifyDataSetChanged();
         });
 
@@ -570,24 +579,27 @@ public class InterventionActivity extends AppCompatActivity implements
         });
 
         View.OnClickListener equipmentListener = view -> {
-            if (equipmentRecyclerView.getVisibility() == View.GONE) {
-                equipmentArrow.setVisibility(View.VISIBLE);
-                equipmentArrow.setRotation(180);
-                equipmentSummary.setVisibility(View.GONE);
-                equipmentAddLabel.setVisibility(View.VISIBLE);
-                equipmentRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                int count = equipmentList.size();
-                equipmentSummary.setText(getResources().getQuantityString(R.plurals.equipments, count, count));
-                equipmentArrow.setRotation(0);
-                equipmentSummary.setVisibility(View.VISIBLE);
-                equipmentAddLabel.setVisibility(View.GONE);
-                equipmentRecyclerView.setVisibility(View.GONE);
+            int count = equipmentList.size();
+            if (count > 0) {
+                if (equipmentRecyclerGroup.getVisibility() == View.GONE) {
+                    equipmentArrow.setVisibility(View.VISIBLE);
+                    equipmentArrow.setRotation(180);
+                    equipmentSummary.setVisibility(View.GONE);
+                    equipmentAddLabel.setVisibility(View.VISIBLE);
+                    equipmentRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    equipmentSummary.setText(getResources().getQuantityString(R.plurals.equipments, count, count));
+                    equipmentArrow.setRotation(0);
+                    equipmentSummary.setVisibility(View.VISIBLE);
+                    equipmentAddLabel.setVisibility(View.GONE);
+                    equipmentRecyclerGroup.setVisibility(View.GONE);
+                }
             }
         };
 
         equipmentArrow.setOnClickListener(equipmentListener);
         equipmentSummary.setOnClickListener(equipmentListener);
+        equipmentZone.setOnClickListener(equipmentListener);
 
         if (editIntervention != null) {
             equipmentList.addAll(editIntervention.equipments);
@@ -598,19 +610,18 @@ public class InterventionActivity extends AppCompatActivity implements
         equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         equipmentAdapter = new EquipmentAdapter(this, equipmentList);
         equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                if (equipmentAdapter.getItemCount() == 0) {
-                    equipmentArrow.performClick();
+            @Override public void onChanged() {
+                if (equipmentList.size() == 0) {
                     equipmentArrow.setVisibility(View.GONE);
-                    equipmentSummary.setVisibility(View.GONE);
-                    equipmentAddLabel.setVisibility(View.VISIBLE);
-                    equipmentRecyclerView.setVisibility(View.GONE);
+                    equipmentRecyclerGroup.setVisibility(View.GONE);
                 }
             }
         });
         equipmentRecyclerView.setAdapter(equipmentAdapter);
         equipmentAdapter.notifyDataSetChanged();
+        if (equipmentList.size() == 0)
+            equipmentRecyclerGroup.setVisibility(View.GONE);
+
 
 
         // =============================== PERSONS EVENTS ====================================== //
@@ -621,24 +632,28 @@ public class InterventionActivity extends AppCompatActivity implements
         });
 
         View.OnClickListener personListener = view -> {
-            if (personRecyclerView.getVisibility() == View.GONE) {
-                personArrow.setVisibility(View.VISIBLE);
-                personArrow.setRotation(180);
-                personSummary.setVisibility(View.GONE);
-                personAddLabel.setVisibility(View.VISIBLE);
-                personRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                int count = personList.size();
-                personSummary.setText(getResources().getQuantityString(R.plurals.persons, count, count));
-                personArrow.setRotation(0);
-                personSummary.setVisibility(View.VISIBLE);
-                personAddLabel.setVisibility(View.GONE);
-                personRecyclerView.setVisibility(View.GONE);
+            int count = personList.size();
+            if (count > 0) {
+                if (personRecyclerGroup.getVisibility() == View.GONE) {
+                    personArrow.setVisibility(View.VISIBLE);
+                    personArrow.setRotation(180);
+                    personSummary.setVisibility(View.GONE);
+                    personAddLabel.setVisibility(View.VISIBLE);
+                    personRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    personSummary.setText(getResources().getQuantityString(R.plurals.persons, count, count));
+                    personArrow.setRotation(0);
+                    personSummary.setVisibility(View.VISIBLE);
+                    personAddLabel.setVisibility(View.GONE);
+                    personRecyclerGroup.setVisibility(View.GONE);
+                }
             }
         };
 
         personArrow.setOnClickListener(personListener);
         personSummary.setOnClickListener(personListener);
+        personZone.setOnClickListener(personListener);
+
 
         if (editIntervention != null) {
             personList.addAll(editIntervention.persons);
@@ -651,17 +666,17 @@ public class InterventionActivity extends AppCompatActivity implements
         personAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                if (personAdapter.getItemCount() == 0) {
-                    personArrow.performClick();
+                if (personList.size() == 0) {
                     personArrow.setVisibility(View.GONE);
-                    personSummary.setVisibility(View.GONE);
-                    personAddLabel.setVisibility(View.VISIBLE);
-                    personRecyclerView.setVisibility(View.GONE);
+                    personRecyclerGroup.setVisibility(View.GONE);
                 }
             }
         });
         personRecyclerView.setAdapter(personAdapter);
         personAdapter.notifyDataSetChanged();
+        if (personList.size() == 0)
+            personRecyclerGroup.setVisibility(View.GONE);
+
 
         // =============================== WEATHER EVENTS ====================================== //
 
@@ -814,6 +829,81 @@ public class InterventionActivity extends AppCompatActivity implements
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // Check at least one crop is selected
+            int cropCount = 0;
+            countCropLoop:
+            for (PlotWithCrops plotWithCrops : plotList) {
+                for (Crop culture : plotWithCrops.crops) {
+                    if (culture.is_checked) {
+                        ++cropCount;
+                        break countCropLoop;
+                    }
+                }
+            }
+            if (cropCount == 0) {
+                cancel(true);
+                Toast toast = Toast.makeText(context, "Vous devez sélectionner au moins une culture !", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                toast.show();
+            }
+
+            switch (procedure) {
+
+                case App.IMPLANTATION:
+                    if (BuildConfig.DEBUG) Log.i(TAG, "Verify crop integrity for IMPLANTATION");
+                    HashSet<String> productionNature = new HashSet<>();
+                    outerLoop:
+                    for (PlotWithCrops plot : plotList) {
+                        for (Crop crop : plot.crops) {
+                            if (crop.is_checked) {
+                                Log.i(TAG, "Crop checked " + crop.name + " | productionNature " + crop.specie);
+                                if (productionNature.isEmpty() || productionNature.contains(crop.specie)) {
+                                    productionNature.add(crop.specie);
+                                } else {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, "Vous ne pouvez pas semer sur des productions de natures différentes !", Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                    break outerLoop;
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case App.IRRIGATION:
+                    if (irrigationQuantityEdit.getText().toString().equals("0") || irrigationQuantityEdit.getText().toString().isEmpty()) {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, "Vous devez rentrer le volume d'eau utilisé !", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
+                case App.HARVEST:
+                    if (!outputList.isEmpty()) {
+                        for (Harvest harvest : outputList) {
+                            if (harvest.quantity == null || harvest.quantity == 0) {
+                                cancel(true);
+                                Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour la récolte !", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                toast.show();
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, "Vous devez ajouter un chargement pour créer une récolte !", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+            }
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
 
             AppDatabase database = AppDatabase.getInstance(context);
@@ -822,13 +912,17 @@ public class InterventionActivity extends AppCompatActivity implements
 
             if (editIntervention != null) {
                 // We are editing an existing intervention
+                if (BuildConfig.DEBUG) Log.i(TAG, "Intervention edition");
+
+                // Symplify intervention object
                 intervention = editIntervention.intervention;
-                if (intervention.status.equals(SYNCED))
-                    intervention.setStatus(UPDATED);
+
                 // Deletes relations
                 database.dao().delete(editIntervention.workingDays.get(0));
-                Log.i(TAG, "weather " + editIntervention.weather);
+
+                // Deletes weather relation if exists
                 if (!editIntervention.weather.isEmpty()) database.dao().delete(editIntervention.weather.get(0));
+
                 for (Crops crop : editIntervention.crops)
                     database.dao().delete(crop.inter);
                 for (Persons person : editIntervention.persons)
@@ -843,6 +937,11 @@ public class InterventionActivity extends AppCompatActivity implements
                     database.dao().delete(equipment.inter);
                 for (Harvest harvest : editIntervention.harvests)
                     database.dao().delete(harvest);
+
+                // Set status to updated
+                if (intervention.status.equals(SYNCED))
+                    intervention.setStatus(UPDATED);
+
             } else {
                 // Creates a new intervention
                 intervention = new Intervention();
@@ -856,11 +955,12 @@ public class InterventionActivity extends AppCompatActivity implements
                 intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
             }
 
-            // Save intervention and get returning id
+            // Save/update intervention and get returning id
             int intervention_id = (int) (long) database.dao().insert(intervention);
 
-            InterventionWorkingDay workingDay = new InterventionWorkingDay(intervention_id, date, duration);
-            database.dao().insert(workingDay);
+            Log.e(TAG, "Editing intervention id " + intervention_id);
+
+            database.dao().insert(new InterventionWorkingDay(intervention_id, date, duration));
 
             Float temperature = null;
             if (!temperatureEditText.getText().toString().isEmpty())
@@ -870,11 +970,10 @@ public class InterventionActivity extends AppCompatActivity implements
             if (!windSpeedEditText.getText().toString().isEmpty())
                 windSpeed = Float.valueOf(windSpeedEditText.getText().toString());
 
-            if (temperature != null || windSpeed != null || weatherDescription != null) {
-                Weather weather = new Weather(intervention_id, temperature, windSpeed, weatherDescription);
-                database.dao().insert(weather);
-            }
+            if (temperature != null || windSpeed != null || weatherDescription != null)
+                database.dao().insert(new Weather(intervention_id, temperature, windSpeed, weatherDescription));
 
+            Log.e(TAG, " Number of inputs: " + inputList.size());
             for (Object item : inputList) {
                 if (item instanceof Seeds) {
                     Seeds seed = (Seeds) item;
@@ -884,7 +983,9 @@ public class InterventionActivity extends AppCompatActivity implements
                 else if (item instanceof Phytos) {
                     Phytos phyto = (Phytos) item;
                     phyto.inter.intervention_id = intervention_id;
+                    Log.e(TAG, "Phyto params: "+phyto.inter.quantity+phyto.inter.unit+"interid: "+phyto.inter.intervention_id+"phytoid: "+phyto.inter.phyto_id);
                     database.dao().insert(phyto.inter);
+                    Log.e(TAG, "PhytoInter quantity--> " + database.dao().getPhytoInter(intervention_id, phyto.inter.phyto_id).quantity);
                 }
                 else if (item instanceof Fertilizers) {
                     Fertilizers ferti = (Fertilizers) item;
@@ -909,14 +1010,14 @@ public class InterventionActivity extends AppCompatActivity implements
                             database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
 
-            if (procedure.equals(App.HARVEST)) {
-                for (Harvest harvest : outputList) {
-                    String type = SpinnerLists.OUTPUT_LIST.get(harvestOutputType.getSelectedItemPosition());
-                    harvest.intervention_id = intervention_id;
-                    harvest.type = type;
-                    database.dao().insert(harvest);
-                }
+            Log.e(TAG, "outputList = " + outputList);
+            for (Harvest harvest : outputList) {
+                Log.e(TAG, "Insert Harvest");
+                harvest.type = Enums.OUTPUT_TYPES.get(harvestOutputType.getSelectedItemPosition());
+                harvest.intervention_id = intervention_id;
+                database.dao().insert(harvest);
             }
+            //database.dao().insert(outputList.toArray(new Harvest[outputList.size()]));  // Bulk insert
 
 
 //            for (Materials item : materialList) {
@@ -953,21 +1054,21 @@ public class InterventionActivity extends AppCompatActivity implements
                 selectEquipmentFragment.dismiss();
                 equipmentList.add((Equipments) selection);
                 equipmentAdapter.notifyDataSetChanged();
-                if (equipmentRecyclerView.getVisibility() == View.GONE)
+                if (equipmentRecyclerGroup.getVisibility() == View.GONE)
                     equipmentArrow.performClick();
 
             } else if (selection instanceof Persons) {
                 selectPersonFragment.dismiss();
                 personList.add((Persons) selection);
                 personAdapter.notifyDataSetChanged();
-                if (personRecyclerView.getVisibility() == View.GONE)
+                if (personRecyclerGroup.getVisibility() == View.GONE)
                     personArrow.performClick();
 
             } else if (selection instanceof Seeds || selection instanceof Phytos || selection instanceof Fertilizers) {
                 selectInputFragment.dismiss();
                 inputList.add(selection);
                 inputAdapter.notifyDataSetChanged();
-                if (inputRecyclerView.getVisibility() == View.GONE)
+                if (inputRecyclerGroup.getVisibility() == View.GONE)
                     inputArrow.performClick();
                 if (selection instanceof Phytos) {
                     new GetMaxDose((Phytos) selection).execute();
@@ -1052,7 +1153,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (editIntervention != null) {
+        if (editIntervention != null && !editIntervention.intervention.status.equals(VALIDATED)) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.intervention, menu);
         }
@@ -1068,7 +1169,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 builder.setMessage("Etes-vous sûr de vouloir supprimer l'intervention ?");
                 builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
                 builder.setPositiveButton("oui", (dialog, i) -> {
-                    if (editIntervention.intervention.status.equals(CREATED) || editIntervention.intervention.status.equals(SYNCED)) {
+                    if (!editIntervention.intervention.status.equals(VALIDATED)) {
                         new DeleteCurrentIntervention(this).execute();
                         clearDatasets();
                         finish();

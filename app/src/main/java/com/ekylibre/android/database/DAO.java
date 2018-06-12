@@ -45,14 +45,13 @@ public interface DAO {
     @Insert void insert(Equipment... equipments);
     @Insert void insert(Material... materials);
 
-    @Transaction @Insert void insert(Phyto... phytos);
-    @Transaction @Insert void insert(PhytoDose... doses);
-    @Transaction @Insert void insert(Seed... seeds);
-    @Transaction @Insert void insert(Fertilizer... fertilizers);
-    @Transaction @Insert void insert(Weather... weather);
-    @Transaction @Insert void insert(Harvest... harvests);
-    @Transaction @Insert void insert(Storage... storages);
+    @Insert void insert(Phyto... phytos);
+    @Insert void insert(PhytoDose... doses);
+    @Insert void insert(Seed... seeds);
+    @Insert void insert(Fertilizer... fertilizers);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Weather... weather);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Storage... storages);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... persons);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... crops);
@@ -67,6 +66,8 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionEquipment interventionEquipments);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPerson interventionPerson);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Harvest harvests);
+
 
     @Delete void delete(InterventionWorkingDay... workingDays);
     @Delete void delete(InterventionSeed... seeds);
@@ -113,7 +114,11 @@ public interface DAO {
     List<Interventions> getSyncableInterventions();
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE status = 'updated'")
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " NOT NULL AND status = 'deleted'")
+    List<Interventions> getDeletableInterventions();
+
+    @Transaction
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE status = 'updated' AND " + Intervention.COLUMN_ID_EKY + " NOT NULL")
     List<Interventions> getUpdatableInterventions();
 
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId, " +
@@ -131,6 +136,9 @@ public interface DAO {
 
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET status = 'deleted' WHERE " + Intervention.COLUMN_ID + " = :id")
     void setDeleted(int id);
+
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " = :id")
+    Interventions getIntervention(int id);
 
 
     /**
@@ -242,6 +250,9 @@ public interface DAO {
 
     @Query("SELECT dose FROM " + PhytoDose.TABLE_NAME + " WHERE product_id = :product_id")
     Float getMaxDose(int product_id);
+
+    @Query("SELECT * FROM " + InterventionPhytosanitary.TABLE_NAME + " WHERE intervention_id = :inter_id AND phytosanitary_id = :phyto_id")
+    InterventionPhytosanitary getPhytoInter(int inter_id, int phyto_id);
 
 
     /**

@@ -70,6 +70,19 @@ query Pull {
                 windSpeed
                 description
             }
+            outputs {
+              id
+              nature
+              loads {
+                number
+                quantity
+                netQuantity
+                unit
+                storage {
+                  id
+                }
+              }
+            }
             inputs {
                 article {
                   id

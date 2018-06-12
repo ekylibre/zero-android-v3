@@ -184,6 +184,10 @@
     <string name="GRAIN">grain</string>
     <string name="SILAGE">silage</string>
 
+    <!-- Storage types -->
+    <string name="HEAP">heap</string>
+    <string name="SILO">silo</string>
+
     <string name="organic">Organic</string>
     <string name="mineral">Mineral</string>
 
@@ -292,6 +296,8 @@
     <string name="loading_initial_data">Loading initial data…</string>
     <string name="authenticating">Authenticating, please wait…</string>
     <string name="create">Créer</string>
+    <string name="volume">Volume</string>
+    <string name="volume_cannot_be_null">Le volume ne peut être nul</string>
 
 
 </resources>

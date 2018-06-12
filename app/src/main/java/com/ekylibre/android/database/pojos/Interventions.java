@@ -49,7 +49,7 @@ public class Interventions {
     @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = InterventionCrop.COLUMN_INTERVENTION_ID, entity = InterventionCrop.class)
     public List<Crops> crops;
 
-    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = Harvest.COLUMN_INTERVENTION_ID, entity = Harvest.class)
+    @Relation(parentColumn = Intervention.COLUMN_ID, entityColumn = Harvest.COLUMN_INTERVENTION_ID)
     public List<Harvest> harvests;
 
     public Interventions() {}

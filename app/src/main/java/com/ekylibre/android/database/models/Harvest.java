@@ -5,9 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
-import com.ekylibre.android.utils.SpinnerLists;
+import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Units;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -55,7 +54,7 @@ public class Harvest {
     @Ignore
     public Harvest() {
         this.unit = Units.QUINTAL_PER_HECTARE.toString();
-        this.type = SpinnerLists.OUTPUT_LIST.get(0);
+        this.type = Enums.OUTPUT_ENUMS.get(0).toString();
         this.number = "";
     }
 }
