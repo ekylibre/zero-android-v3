@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.database.pojos.Equipments;
+import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.Enums;
 
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectEquipmentFragment extends DialogFragment {
+public class SelectEquipmentFragment extends DialogFragment implements SyncResultReceiver.Receiver{
 
     private static final String TAG = "SelectEquipmentFragment";
 
@@ -41,6 +44,7 @@ public class SelectEquipmentFragment extends DialogFragment {
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
     private TextView createEquipment;
+    private SyncResultReceiver resultReceiver;
 
     private String searchText;
     private ArrayList<Equipment> dataset;
@@ -112,6 +116,9 @@ public class SelectEquipmentFragment extends DialogFragment {
         Window window = getDialog().getWindow();
         if (window != null)
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver.setReceiver(this);
     }
 
     @Override
@@ -144,6 +151,51 @@ public class SelectEquipmentFragment extends DialogFragment {
         AppCompatSpinner spinner = dialogView.findViewById(R.id.create_equipment_type_spinner);
         ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.EQUIMPMENT_NAMES);
         spinner.setAdapter(spinnerAdapter);
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+
+        if (resultCode == SyncService.DONE) {
+            String name = resultData.getString("name", null);
+            int remote_id = resultData.getInt("remote_id", 0);
+
+            new SetEquipmentId(context, name, remote_id).execute();
+
+            for (Equipment equipment : dataset) {
+                if (equipment.name.equals(name)) {
+                    equipment.eky_id = remote_id;
+                    break;
+                }
+            }
+        }
+    }
+
+    class SetEquipmentId extends AsyncTask<Void, Void, Void> {
+
+        Context context;
+        String name;
+        int id;
+
+        SetEquipmentId(Context context, String name, int id) {
+            this.context = context;
+            this.name = name;
+            this.id = id;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            AppDatabase database = AppDatabase.getInstance(context);
+            database.dao().setEquipmentEkyId(id, name);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     class CreateNewEquipment extends AsyncTask<Void, Void, Void> {
@@ -181,6 +233,7 @@ public class SelectEquipmentFragment extends DialogFragment {
             new RequestDatabase(context).execute();
             Intent intent = new Intent(context, SyncService.class);
             intent.setAction(SyncService.ACTION_CREATE_ARTICLES);
+            intent.putExtra("receiver", resultReceiver);
             context.startService(intent);
         }
     }

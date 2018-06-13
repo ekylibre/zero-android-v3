@@ -111,7 +111,6 @@ public class InterventionActivity extends AppCompatActivity implements
     private ImageView inputArrow;
     private TextView inputSummary, inputAddLabel;
     private DialogFragment selectInputFragment;
-    private RecyclerView inputRecyclerView;
     private RecyclerView.Adapter inputAdapter;
 
     // Harvest layout
@@ -217,7 +216,7 @@ public class InterventionActivity extends AppCompatActivity implements
         inputArrow = findViewById(R.id.input_arrow);
         inputSummary = findViewById(R.id.input_summary);
         inputAddLabel = findViewById(R.id.input_add_label);
-        inputRecyclerView = findViewById(R.id.input_recycler);
+        RecyclerView inputRecyclerView = findViewById(R.id.input_recycler);
         phytoMixWarning = findViewById(R.id.phyto_mix_warning_group);
 
         // Harvest layout
@@ -852,6 +851,26 @@ public class InterventionActivity extends AppCompatActivity implements
 
             switch (procedure) {
 
+                case App.CROP_PROTECTION:
+                    if (!inputList.isEmpty()) {
+                        for (Object input : inputList) {
+                            if (input instanceof Phytos) {
+                                if (((Phytos) input).inter.quantity <= 0) {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour le produit !", Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, "Vous devez ajouter au moins un produit phytosanitaire !", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
                 case App.IMPLANTATION:
                     if (BuildConfig.DEBUG) Log.i(TAG, "Verify crop integrity for IMPLANTATION");
                     HashSet<String> productionNature = new HashSet<>();
@@ -872,6 +891,44 @@ public class InterventionActivity extends AppCompatActivity implements
                             }
                         }
                     }
+
+                    if (!inputList.isEmpty()) {
+                        for (Object input : inputList) {
+                            if (input instanceof Seeds) {
+                                if (((Seeds) input).inter.quantity <= 0) {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour la semence !", Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, "Vous devez ajouter au moins une semence !", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
+                case App.FERTILIZATION:
+                    if (!inputList.isEmpty()) {
+                        for (Object input : inputList) {
+                            if (input instanceof Fertilizers) {
+                                if (((Fertilizers) input).inter.quantity <= 0) {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour le produit !", Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, "Vous devez ajouter au moins un produit phytosanitaire !", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
                     break;
 
                 case App.IRRIGATION:
@@ -886,7 +943,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 case App.HARVEST:
                     if (!outputList.isEmpty()) {
                         for (Harvest harvest : outputList) {
-                            if (harvest.quantity == null || harvest.quantity == 0) {
+                            if (harvest.quantity == null || harvest.quantity <= 0) {
                                 cancel(true);
                                 Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour la récolte !", Toast.LENGTH_LONG);
                                 toast.setGravity(Gravity.BOTTOM, 0, 200);

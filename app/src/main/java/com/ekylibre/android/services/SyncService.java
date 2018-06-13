@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
@@ -19,7 +18,6 @@ import com.apollographql.apollo.exception.ApolloException;
 import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.DeleteInterMutation;
 import com.ekylibre.android.InterventionActivity;
-import com.ekylibre.android.LoginActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.ProfileQuery;
 import com.ekylibre.android.PullQuery;
@@ -146,73 +144,6 @@ public class SyncService extends IntentService {
         apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
         ACTION = Objects.requireNonNull(intent.getAction());
 
-        // Check the token is not expired and request for new one
-        long tokenTime = (long) SHARED_PREFS.getInt("token_created_at", 0) * 1000;
-        long now = new Date().getTime();
-        if ( now - tokenTime >= 7200000) {  // 7200000
-            if (BuildConfig.DEBUG) Log.i(TAG, "Last Token created " + (new Date().getTime() - tokenTime) + " seconds ago");
-
-            AccessToken token = new AccessToken();
-            token.setAccess_token(SHARED_PREFS.getString("access_token", ""));
-            token.setRefresh_token(SHARED_PREFS.getString("refresh_token", ""));
-            token.setToken_type("bearer");
-
-            EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class, token);
-            Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, token.getRefresh_token(), "refresh_token");
-
-            try {
-
-                retrofit2.Response<AccessToken> response = call.execute();
-
-                if (response.isSuccessful()) {
-
-                    AccessToken responseToken = response.body();
-                    ACCESS_TOKEN = responseToken.getAccess_token();
-
-                    SharedPreferences.Editor editor = SHARED_PREFS.edit();
-                    editor.putString("access_token", responseToken.getAccess_token());
-                    editor.putString("refresh_token", responseToken.getRefresh_token());
-                    editor.putInt("token_created_at", responseToken.getCreated_at());
-                    editor.apply();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-//            call.enqueue(new retrofit2.Callback<AccessToken>() {
-//                @Override
-//                public void onResponse(@NonNull Call<AccessToken> call, @NonNull retrofit2.Response<AccessToken> response) {
-//
-//                    if (response.isSuccessful()) {
-//
-//                        Log.e(TAG, "Token request done");
-//
-//                        AccessToken accessToken = response.body();
-//
-//                        ACCESS_TOKEN = accessToken.getAccess_token();
-//
-//                        SharedPreferences.Editor editor = SHARED_PREFS.edit();
-//                        editor.putString("access_token", accessToken.getAccess_token());
-//                        editor.putString("refresh_token", accessToken.getRefresh_token());
-//                        editor.putInt("token_created_at", accessToken.getCreated_at());
-//                        editor.apply();
-//
-//                        continueAction();
-//                    }
-//                    else {
-//                        Log.e(TAG, "Token request error " + response);
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<AccessToken> call, Throwable t) {
-//                    Log.e(TAG, "Request failure");
-//                }
-//            });
-        } else if (BuildConfig.DEBUG) Log.i(TAG, "Token is up to date");
-
-
         // Route action to function
         switch (ACTION) {
 
@@ -227,23 +158,18 @@ public class SyncService extends IntentService {
             case ACTION_SYNC_ALL:
 
                 // Mutations (order is important)
+                pushCreatePersonsAndEquipments();
                 pushDeleteIntervention();
                 pushUpdateIntervention();
-                if (MainActivity.ITEMS_TO_SYNC) pushCreatePersonsAndEquipments();
                 pushCreateIntervention();
 
                 // Queries
-                //getAllData();
+                //getAllData();   is call in code
 
                 // Action done
-                //receiver.send(DONE, new Bundle());
+                //receiver.send(DONE, new Bundle());  called in code
                 break;
-
-//            case ACTION_VERIFY_TOKEN:
-//                handleActionVerifyToken();
-//                break;
         }
-
     }
 
 
@@ -481,9 +407,15 @@ public class SyncService extends IntentService {
                                 database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
                                 if (BuildConfig.DEBUG)
                                     Log.i(TAG, "Equipment #" + mutation.equipment().id() + " successfully created");
+                                if (ACTION.equals(ACTION_CREATE_ARTICLES)) {
+                                    Log.e(TAG, "Return Equipment id " + mutation.equipment().id());
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("name", equipment.name);
+                                    bundle.putInt("remote_id", Integer.valueOf(mutation.equipment().id()));
+                                    receiver.send(DONE, bundle);
+                                }
                             }
-                            if (ACTION.equals(ACTION_CREATE_ARTICLES))
-                                receiver.send(DONE, new Bundle());
+
                         }
                     }
 
@@ -494,7 +426,9 @@ public class SyncService extends IntentService {
                     }
                 });
             }
-        } else if (BuildConfig.DEBUG) Log.i(TAG, "No new Equipment to push");
+        } else {
+            if (BuildConfig.DEBUG) Log.i(TAG, "No new Equipment to push");
+        }
 
         if (ERROR) {
             MainActivity.ITEMS_TO_SYNC = true;
@@ -524,7 +458,7 @@ public class SyncService extends IntentService {
             for (Interventions createInter : interventions) {
 
                 if (BuildConfig.DEBUG)
-                    Log.i(TAG, "Create remote intervention #" + createInter.intervention.eky_id);
+                    Log.i(TAG, "Create remote intervention");
 
                 targets = new ArrayList<>();
                 workingDays = new ArrayList<>();
@@ -645,12 +579,18 @@ public class SyncService extends IntentService {
                         if (!response.hasErrors()) {
                             PushInterMutation.CreateIntervention mutation = response.data().createIntervention();
                             if (!mutation.intervention().id().equals("")) {
-                                Log.e(TAG, "eky_id attributed");
+                                if (BuildConfig.DEBUG) Log.e(TAG, "eky_id attributed");
                                 database.dao().setInterventionEkyId(createInter.intervention.id, Integer.valueOf(mutation.intervention().id()));
                             } else {
                                 Log.e(TAG, "Error while attributing id");
                             }
+                            // Continue to global sync
                             getAllData();
+
+                        } else {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("message", response.errors().get(0).message());
+                            receiver.send(FAILED, bundle);
                         }
 
                     }
@@ -663,6 +603,7 @@ public class SyncService extends IntentService {
                 });
             }
         } else {
+            // Continue to global sync
             getAllData();
         }
     }
@@ -935,19 +876,19 @@ public class SyncService extends IntentService {
                                                 if (input.article().type().equals(ArticleTypeEnum.PHYTOSANITARY)) {
                                                     int phytoId = database.dao().getPhytoId(Integer.valueOf(input.article().id()));
                                                     InterventionPhytosanitary interventionPhyto =
-                                                            new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(), newInterId, phytoId);
+                                                            new InterventionPhytosanitary(input.quantity().floatValue(), input.unit().toString(), newInterId, phytoId);
                                                     database.dao().insert(interventionPhyto);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.SEED)) {
                                                     int seedId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
                                                     InterventionSeed interventionSeed =
-                                                            new InterventionSeed(input.quantityValue(), input.unit().toString(), newInterId, seedId);
+                                                            new InterventionSeed(input.quantity().floatValue(), input.unit().toString(), newInterId, seedId);
                                                     database.dao().insert(interventionSeed);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.FERTILIZER)) {
                                                     int fertiId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
                                                     InterventionFertilizer interventionFertilizer =
-                                                            new InterventionFertilizer(input.quantityValue(), input.unit().toString(), newInterId, fertiId);
+                                                            new InterventionFertilizer(input.quantity().floatValue(), input.unit().toString(), newInterId, fertiId);
                                                     database.dao().insert(interventionFertilizer);
                                                 }
                                             }
@@ -1050,19 +991,19 @@ public class SyncService extends IntentService {
                                                 if (input.article().type().equals(ArticleTypeEnum.PHYTOSANITARY)) {
                                                     int phytoId = database.dao().getPhytoId(Integer.valueOf(input.article().id()));
                                                     InterventionPhytosanitary interventionPhyto =
-                                                            new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(), existingInter.intervention.id, phytoId);
+                                                            new InterventionPhytosanitary(input.quantity().floatValue(), input.unit().toString(), existingInter.intervention.id, phytoId);
                                                     database.dao().insert(interventionPhyto);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.SEED)) {
                                                     int seedId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
                                                     InterventionSeed interventionSeed =
-                                                            new InterventionSeed(input.quantityValue(), input.unit().toString(), existingInter.intervention.id, seedId);
+                                                            new InterventionSeed(input.quantity().floatValue(), input.unit().toString(), existingInter.intervention.id, seedId);
                                                     database.dao().insert(interventionSeed);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.FERTILIZER)) {
                                                     int fertiId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
                                                     InterventionFertilizer interventionFertilizer =
-                                                            new InterventionFertilizer(input.quantityValue(), input.unit().toString(), existingInter.intervention.id, fertiId);
+                                                            new InterventionFertilizer(input.quantity().floatValue(), input.unit().toString(), existingInter.intervention.id, fertiId);
                                                     database.dao().insert(interventionFertilizer);
                                                 }
                                             }

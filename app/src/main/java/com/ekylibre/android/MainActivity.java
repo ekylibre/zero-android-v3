@@ -26,19 +26,29 @@ import android.widget.Toast;
 import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.network.EkylibreAPI;
+import com.ekylibre.android.network.ServiceGenerator;
+import com.ekylibre.android.network.pojos.AccessToken;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
 
 
 public class MainActivity extends AppCompatActivity implements SyncResultReceiver.Receiver {
@@ -178,9 +188,71 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 //                    .disableFocusAnimation().build().show();}
     }
 
+
+    public class RefreshToken extends AsyncTask<Void, Void, Void> {
+
+        RefreshToken() {}
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            try {
+                ProviderInstaller.installIfNeeded(getBaseContext());
+            } catch (GooglePlayServicesRepairableException e) {
+                GoogleApiAvailability.getInstance()
+                        .showErrorNotification(getBaseContext(), e.getConnectionStatusCode());
+            } catch (GooglePlayServicesNotAvailableException e) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "GooglePlayServicesNotAvailableException");
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            if (BuildConfig.DEBUG) Log.i(TAG, "Refresh token request...");
+
+            AccessToken token = new AccessToken();
+            token.setAccess_token(sharedPreferences.getString("access_token", ""));
+            token.setRefresh_token(sharedPreferences.getString("refresh_token", ""));
+            token.setToken_type("bearer");
+
+            EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class, token);
+            Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, token.getRefresh_token(), "refresh_token");
+
+            try {
+                retrofit2.Response<AccessToken> response = call.execute();
+                if (response.isSuccessful()) {
+                    AccessToken responseToken = response.body();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("access_token", responseToken.getAccess_token());
+                    editor.putString("refresh_token", responseToken.getRefresh_token());
+                    editor.putInt("token_created_at", responseToken.getCreated_at());
+                    editor.apply();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (BuildConfig.DEBUG) Log.i(TAG, "Resuming MainActivity...");
+
+        // Check the token is not expired and request for new one
+        long tokenTime = (long) sharedPreferences.getInt("token_created_at", 0) * 1000;
+        long now = new Date().getTime();
+
+        Log.i(TAG, "Time diff = " + (now - tokenTime));
+
+        if ( now - tokenTime >= 7000000)  // 7200000
+            new RefreshToken().execute();
+        else
+            if (BuildConfig.DEBUG) Log.i(TAG, "Token is up to date");
 
         try {
             lastSyncTime = LAST_SYNC.parse(sharedPreferences.getString("last-sync-time", "2018-01-01 12:00"));
@@ -189,14 +261,9 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         }
         // TODO auto sync if lastSyncTime < now - 10min
 
-        // Set Farm name as page title
-        setTitle(sharedPreferences.getString("current-farm-name", "Synchronisation..."));
-        FARM_ID = sharedPreferences.getString("current-farm-id", "");
-
         // Get list filter and update list
-        String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
-        new UpdateList(this, filter).execute();
-
+        // String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
+        new UpdateList(getBaseContext(), FILTER_ALL_INTERVENTIONS).execute();
     }
 
     @Override
@@ -242,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         swipeRefreshLayout.setRefreshing(false);
 
         if (resultCode == SyncService.DONE) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "Synchronization done");
+            if (BuildConfig.DEBUG) Log.i(TAG, "Synchronization done");
             lastSyncTime = new Date();
             sharedPreferences.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
@@ -271,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "Updating interventions recyclerView...");
+            if (BuildConfig.DEBUG) Log.i(TAG, "Updating interventions recyclerView...");
             AppDatabase database = AppDatabase.getInstance(context);
             interventionsList.clear();
             switch (filter) {

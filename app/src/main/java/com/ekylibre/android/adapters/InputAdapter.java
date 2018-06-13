@@ -25,12 +25,10 @@ import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
-import com.ekylibre.android.utils.QuantityCalcul;
 import com.ekylibre.android.utils.QuantityConverter;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
-import java.util.Arrays;
 import java.util.List;
 
 

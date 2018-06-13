@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask authTask = null;
+    private boolean startingApp = false;
     private AccessToken accessToken = null;
     private SharedPreferences sharedPreferences;
 
@@ -80,9 +81,10 @@ public class LoginActivity extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
         if (sharedPreferences.getBoolean("is_authenticated", false)) {
-            Log.e(TAG, "Already authenticated. Redirect to MainActivity...");
-            startApp();
-
+            if (BuildConfig.DEBUG) Log.i(TAG, "Already authenticated. Redirect to MainActivity...");
+            Log.e(TAG, "=========== IS AUTHENTICATED ===========");
+            if (!startingApp)
+                startApp();
         } else {
 
             setContentView(R.layout.activity_login);
@@ -127,11 +129,13 @@ public class LoginActivity extends AppCompatActivity {
 //    }
 
     private void startApp() {
+        startingApp = true;
+        Log.e(TAG, "=========== START MAIN ACTIVITY ===========");
         showDialog(false);
         authTask = null;
         Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
         finish();
+        startActivity(intent);
     }
 
     private void showDialog(boolean yes){
@@ -212,7 +216,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
 
                         accessToken = response.body();
-                        if (BuildConfig.DEBUG) Log.e(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
+                        if (BuildConfig.DEBUG) Log.i(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
 
                         ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
                         ProfileQuery profileQuery = ProfileQuery.builder().build();
@@ -224,7 +228,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 // We got an access_token
                                 ProfileQuery.Data data = response.data();
-                                if (BuildConfig.DEBUG) Log.e(TAG, data.toString());
+                                if (BuildConfig.DEBUG) Log.i(TAG, data.toString());
 
                                 List<String> farmNameList = new ArrayList<>();
 
@@ -251,14 +255,16 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.putBoolean("is_authenticated", true);
                                 editor.apply();
 
-                                // Finish th login activity
+                                // Finish the login activity
                                 if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
                                     runOnUiThread(changeMessage);
                                     new LoadInitialData(getBaseContext()).execute();
                                     editor.putBoolean("initial_data_loaded", true);
                                     editor.apply();
                                 } else {
-                                    startApp();
+                                    Log.e(TAG, "=========== INITIAL DATA ALREADY LOADED ===========");
+                                    if (!startingApp)
+                                        startApp();
                                 }
 
                             }
@@ -335,7 +341,9 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            startApp();
+            Log.e(TAG, "=========== AFTER INITIAL DATA ===========");
+            if (!startingApp)
+                startApp();
         }
     }
 
