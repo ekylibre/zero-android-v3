@@ -26,19 +26,29 @@ import android.widget.Toast;
 import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.network.EkylibreAPI;
+import com.ekylibre.android.network.ServiceGenerator;
+import com.ekylibre.android.network.pojos.AccessToken;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
 
 
 public class MainActivity extends AppCompatActivity implements SyncResultReceiver.Receiver {
@@ -70,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     private RecyclerView.Adapter adapter;
     public static List<Interventions> interventionsList = new ArrayList<>();
 
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences prefs;
     private SyncResultReceiver resultReceiver;
 
     public static String FARM_ID;
@@ -88,11 +98,11 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         Enums.buildEnumsTranslation(this);
 
         // Get shared preferences and set title
-        sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        setTitle(sharedPreferences.getString("current-farm-name", "No name"));
+        prefs = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        setTitle(prefs.getString("current-farm-name", "No name"));
 
         // Get current farm_id
-        FARM_ID = sharedPreferences.getString("current-farm-id", "");
+        FARM_ID = prefs.getString("current-farm-id", "");
 
         // Get locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
@@ -125,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         adapter = new MainAdapter(this, interventionsList);
-
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -138,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
                 }
             }
         });
-
         recyclerView.setAdapter(adapter);
 
         // All button events
@@ -156,20 +164,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             toast.show();
         });
 
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            Intent intent = new Intent(this, SyncService.class);
-            intent.setAction(SyncService.ACTION_SYNC_ALL);
-            intent.putExtra("receiver", resultReceiver);
-            startService(intent);
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> new StartSync(SyncService.ACTION_SYNC_ALL).execute());
 
-        Intent intent = new Intent(this, SyncService.class);
-        intent.setAction(SyncService.FIRST_TIME_SYNC);
-        intent.putExtra("receiver", resultReceiver);
-        startService(intent);
+        // Run a get Sync on startup
+        new StartSync(SyncService.FIRST_TIME_SYNC).execute();
 
-        //        if (!sharedPreferences.getBoolean("showcase-passed", false)) {
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//        if (!prefs.getBoolean("showcase-passed", false)) {
+//            SharedPreferences.Editor editor = prefs.edit();
 //            editor.putBoolean("showcase-passed", true);
 //            editor.apply();
 //            new FancyShowCaseView.Builder(this)
@@ -178,23 +179,37 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 //                    .disableFocusAnimation().build().show();}
     }
 
+//    private void startSync(String action) {
+//        if (!swipeRefreshLayout.isRefreshing())
+//            swipeRefreshLayout.setRefreshing(true);
+//        if (new StartSync().execute()) {
+//            Intent intent = new Intent(this, SyncService.class);
+//            intent.setAction(action);
+//            intent.putExtra("receiver", resultReceiver);
+//            startService(intent);
+//        } else {
+//            if (swipeRefreshLayout.isRefreshing())
+//                swipeRefreshLayout.setRefreshing(false);
+//        }
+//    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
         try {
-            lastSyncTime = LAST_SYNC.parse(sharedPreferences.getString("last-sync-time", "2018-01-01 12:00"));
+            lastSyncTime = LAST_SYNC.parse(prefs.getString("last-sync-time", "2018-01-01 12:00"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
         // TODO auto sync if lastSyncTime < now - 10min
 
         // Set Farm name as page title
-        setTitle(sharedPreferences.getString("current-farm-name", "Synchronisation..."));
-        FARM_ID = sharedPreferences.getString("current-farm-id", "");
+        setTitle(prefs.getString("current-farm-name", "Synchronisation..."));
+        FARM_ID = prefs.getString("current-farm-id", "");
 
         // Get list filter and update list
-        String filter = sharedPreferences.getString("filter", FILTER_ALL_INTERVENTIONS);
+        String filter = prefs.getString("filter", FILTER_ALL_INTERVENTIONS);
         new UpdateList(this, filter).execute();
 
     }
@@ -203,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public void onBackPressed() {
         if (!deployMenu(false))
             super.onBackPressed();
-            AppDatabase.revokeInstance();
+            //AppDatabase.revokeInstance();
     }
 
     @Override
@@ -219,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_logout:
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = prefs.edit();
                 editor.remove("is_authenticated");
                 editor.remove("access_token");
                 editor.remove("refresh_token");
@@ -244,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         if (resultCode == SyncService.DONE) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Synchronization done");
             lastSyncTime = new Date();
-            sharedPreferences.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
+            prefs.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
         } else if (resultCode == SyncService.FAILED) { //R.string.sync_failure
             String message = bundle.getString("message");
@@ -295,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     }
 
     private void onInterventionTypeSelected(int type) {
-        if (sharedPreferences.getBoolean("no-crop", true)) {
+        if (prefs.getBoolean("no-crop", true)) {
             Toast toast = Toast.makeText(this, "Vous n'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !", Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
@@ -353,6 +368,92 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             String quantity_name_only = (unit.surface_factor != 0) ? getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName())) : null;
             unitListString.add(name);
             unit.setName(name, quantity_name_only);
+        }
+    }
+
+    /**
+     * Verify token validity. Ask for new one if expired.
+     */
+
+    public class StartSync extends AsyncTask<Void, Void, Boolean> {
+
+        String action;
+
+        StartSync(String action) {
+            this.action = action;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (!swipeRefreshLayout.isRefreshing())
+                swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+
+            long tokenTime = (long) prefs.getInt("token_created_at", 0) * 1000;
+            long now = new Date().getTime();
+
+            if (now - tokenTime >= 7000000) {
+
+                // Handle Handshake Errors
+                try {
+                    ProviderInstaller.installIfNeeded(getBaseContext());
+                } catch (GooglePlayServicesRepairableException e) {
+                    Log.e(TAG, "GooglePlayServicesRepairableException");
+                    GoogleApiAvailability.getInstance().showErrorNotification(getBaseContext(), e.getConnectionStatusCode());
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.e(TAG, "GooglePlayServicesNotAvailableException");
+                }
+
+                if (BuildConfig.DEBUG) Log.i(TAG, "Last Token created " + (new Date().getTime() - tokenTime) / 1000 + " seconds ago");
+
+                AccessToken token = new AccessToken();
+                token.setAccess_token(prefs.getString("access_token", ""));
+                token.setRefresh_token(prefs.getString("refresh_token", ""));
+                token.setToken_type("bearer");
+
+                EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class, token);
+                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, token.getRefresh_token(), "refresh_token");
+
+                try {
+                    retrofit2.Response<AccessToken> response = call.execute();
+                    if (response.isSuccessful()) {
+                        AccessToken responseToken = response.body();
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("access_token", responseToken.getAccess_token());
+                        editor.putString("refresh_token", responseToken.getRefresh_token());
+                        editor.putInt("token_created_at", responseToken.getCreated_at());
+                        editor.apply();
+                        return true;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                if (BuildConfig.DEBUG) Log.i(TAG, "Token is up to date");
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+
+            if (aBoolean) {
+                Intent intent = new Intent(getBaseContext(), SyncService.class);
+                intent.setAction(action);
+                intent.putExtra("receiver", resultReceiver);
+                startService(intent);
+            } else {
+                if (swipeRefreshLayout.isRefreshing())
+                    swipeRefreshLayout.setRefreshing(false);
+            }
         }
     }
 }

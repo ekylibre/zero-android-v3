@@ -86,6 +86,7 @@ query Pull {
             inputs {
                 article {
                   id
+                  referenceID
                   type
                 }
                 quantity

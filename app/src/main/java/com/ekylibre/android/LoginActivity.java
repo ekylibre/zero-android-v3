@@ -103,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                     authTask = null;
                     hideKeyboard();
-                    attemptLogin();
+                    //attemptLogin();
                     return true;
                 }
                 return false;
@@ -251,7 +251,7 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.putBoolean("is_authenticated", true);
                                 editor.apply();
 
-                                // Finish th login activity
+                                // Finish the login activity
                                 if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
                                     runOnUiThread(changeMessage);
                                     new LoadInitialData(getBaseContext()).execute();
