@@ -36,7 +36,6 @@ public class GraphQLClient {
                 .serverUrl(App.API_URL + "/v1/graphql")
                 .okHttpClient(okHttpClient)
                 .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
-                //.addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
                 .build();
     }
 

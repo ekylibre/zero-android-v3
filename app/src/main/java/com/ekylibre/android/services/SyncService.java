@@ -73,6 +73,7 @@ import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoleEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -128,6 +129,12 @@ public class SyncService extends IntentService {
 
         prefs = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         ACCESS_TOKEN = prefs.getString("access_token", null);
+
+        if (App.API_URL == null) {
+            App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
+            App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
+            App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
+        }
 
         // Get ResultReceiver from intent
         receiver = intent.getParcelableExtra("receiver");
