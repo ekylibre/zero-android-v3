@@ -864,19 +864,19 @@ public class SyncService extends IntentService {
                                                 if (input.article().type().equals(ArticleTypeEnum.PHYTOSANITARY)) {
                                                     //int phytoId = database.dao().getPhytoId(Integer.valueOf(input.article().id()));
                                                     InterventionPhytosanitary interventionPhyto =
-                                                            new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(), newInterId, Integer.valueOf(input.article().referenceID()));
+                                                            new InterventionPhytosanitary(input.quantity().floatValue(), input.unit().toString(), newInterId, Integer.valueOf(input.article().referenceID()));
                                                     database.dao().insert(interventionPhyto);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.SEED)) {
                                                     //int seedId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
                                                     InterventionSeed interventionSeed =
-                                                            new InterventionSeed(input.quantityValue(), input.unit().toString(), newInterId, Integer.valueOf(input.article().referenceID()));
+                                                            new InterventionSeed(input.quantity().floatValue(), input.unit().toString(), newInterId, Integer.valueOf(input.article().referenceID()));
                                                     database.dao().insert(interventionSeed);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.FERTILIZER)) {
                                                     //int fertiId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
                                                     InterventionFertilizer interventionFertilizer =
-                                                            new InterventionFertilizer(input.quantityValue(), input.unit().toString(), newInterId, Integer.valueOf(input.article().referenceID()));
+                                                            new InterventionFertilizer(input.quantity().floatValue(), input.unit().toString(), newInterId, Integer.valueOf(input.article().referenceID()));
                                                     database.dao().insert(interventionFertilizer);
                                                 }
                                             }
@@ -912,7 +912,9 @@ public class SyncService extends IntentService {
                                         database.dao().insert(existingInter.intervention);
 
                                         // Cleaning non unique primary key relations
-                                        database.dao().delete(existingInter.workingDays.get(0));
+                                        if (!existingInter.workingDays.isEmpty())
+                                            database.dao().delete(existingInter.workingDays.get(0));
+
                                         for (Crops crop : existingInter.crops)
                                             database.dao().delete(crop.inter);
                                         for (Persons person : existingInter.persons)
@@ -979,20 +981,20 @@ public class SyncService extends IntentService {
                                                 if (input.article().type().equals(ArticleTypeEnum.PHYTOSANITARY)) {
                                                     //int phytoId = database.dao().getPhytoId(Integer.valueOf(input.article().id()));
                                                     InterventionPhytosanitary interventionPhyto =
-                                                            new InterventionPhytosanitary(input.quantityValue(), input.unit().toString(),
+                                                            new InterventionPhytosanitary(input.quantity().floatValue(), input.unit().toString(),
                                                                     existingInter.intervention.id, Integer.valueOf(input.article().referenceID()));
                                                     database.dao().insert(interventionPhyto);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.SEED)) {
                                                     //int seedId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
                                                     InterventionSeed interventionSeed =
-                                                            new InterventionSeed(input.quantityValue(), input.unit().toString(), existingInter.intervention.id, Integer.valueOf(input.article().referenceID()));
+                                                            new InterventionSeed(input.quantity().floatValue(), input.unit().toString(), existingInter.intervention.id, Integer.valueOf(input.article().referenceID()));
                                                     database.dao().insert(interventionSeed);
 
                                                 } else if (input.article().type().equals(ArticleTypeEnum.FERTILIZER)) {
                                                     //int fertiId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
                                                     InterventionFertilizer interventionFertilizer =
-                                                            new InterventionFertilizer(input.quantityValue(), input.unit().toString(), existingInter.intervention.id, Integer.valueOf(input.article().referenceID()));
+                                                            new InterventionFertilizer(input.quantity().floatValue(), input.unit().toString(), existingInter.intervention.id, Integer.valueOf(input.article().referenceID()));
                                                     database.dao().insert(interventionFertilizer);
                                                 }
                                             }
@@ -1010,7 +1012,6 @@ public class SyncService extends IntentService {
                                                 ++outputIndex;
                                             }
                                         }
-
                                     }
                                     ++index;
                                 }
