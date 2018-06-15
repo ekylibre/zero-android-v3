@@ -90,7 +90,6 @@ query Pull {
                   type
                 }
                 quantity
-                quantityValue
                 unit
             }
             operators {
