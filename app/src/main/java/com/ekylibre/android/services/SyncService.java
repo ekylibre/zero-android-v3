@@ -19,7 +19,6 @@ import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.DeleteInterMutation;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
-import com.ekylibre.android.ProfileQuery;
 import com.ekylibre.android.PullQuery;
 import com.ekylibre.android.PushEquipmentMutation;
 import com.ekylibre.android.PushInterMutation;
