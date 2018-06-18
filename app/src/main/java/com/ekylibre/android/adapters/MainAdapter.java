@@ -9,13 +9,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
@@ -28,7 +26,6 @@ import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.DateTools;
-import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
 import java.text.SimpleDateFormat;
@@ -41,8 +38,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     private static final String TAG = MainAdapter.class.getName();
     private List<Interventions> interventionsList;
     private Context context;
-//    private List equipmentValues;
-//    private List equipmentKeys;
 
     private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("HH:mm", MainActivity.LOCALE);
 
@@ -50,8 +45,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     public MainAdapter(Context context, List<Interventions> interventionsList) {
         this.interventionsList = interventionsList;
         this.context = context;
-//        equipmentValues = Arrays.asList(context.getResources().getStringArray(R.array.equipment_values));
-//        equipmentKeys = Arrays.asList(context.getResources().getStringArray(R.array.equipment_keys));
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

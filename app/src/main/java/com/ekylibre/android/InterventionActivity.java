@@ -431,13 +431,14 @@ public class InterventionActivity extends AppCompatActivity implements
                     inputArrow.setRotation(180);
                     inputSummary.setVisibility(View.GONE);
                     inputAddLabel.setVisibility(View.VISIBLE);
-                    inputRecyclerGroup.setVisibility(View.VISIBLE);
+                    inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
                 } else {
                     inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
                     inputArrow.setRotation(0);
                     inputSummary.setVisibility(View.VISIBLE);
                     inputAddLabel.setVisibility(View.GONE);
                     inputRecyclerGroup.setVisibility(View.GONE);
+                    phytoMixWarning.setVisibility(View.VISIBLE);
                 }
             }
         };

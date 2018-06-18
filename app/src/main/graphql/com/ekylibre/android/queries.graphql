@@ -86,10 +86,10 @@ query Pull {
             inputs {
                 article {
                   id
+                  referenceID
                   type
                 }
                 quantity
-                quantityValue
                 unit
             }
             operators {

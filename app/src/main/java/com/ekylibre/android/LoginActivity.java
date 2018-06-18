@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                     authTask = null;
                     hideKeyboard();
-                    attemptLogin();
+                    //attemptLogin();
                     return true;
                 }
                 return false;
