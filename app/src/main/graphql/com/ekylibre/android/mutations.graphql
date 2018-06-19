@@ -7,6 +7,7 @@ mutation pushInter(
   $waterUnit: ArticleVolumeUnitEnum
   $inputs: [InterventionInputAttributes!]
   $outputs: [InterventionOutputAttributes!]
+  $globalOutputs: Boolean
   $tools: [InterventionToolAttributes!]
   $operators: [InterventionOperatorAttributes!]
   $weather: WeatherAttributes
@@ -23,6 +24,7 @@ mutation pushInter(
         waterUnit: $waterUnit
         inputs: $inputs
         outputs: $outputs
+        globalOutputs: $globalOutputs
         tools: $tools
         operators: $operators
         weather: $weather

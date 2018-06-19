@@ -3,6 +3,49 @@
     <!-- All uppercase strings are reference key, do not change them -->
 
     <!-- Vegetal species -->
+    <string name="ANETHUM_GRAVEOLENS">ANETHUM_GRAVEOLENS</string>
+    <string name="ARTEMISIA_DRACUNCULUS">ARTEMISIA_DRACUNCULUS</string>
+    <string name="BETA_VULGARIS_CICLA">BETA_VULGARIS_CICLA</string>
+    <string name="BRASSICA_NAPUS_ANNUA">BRASSICA_NAPUS_ANNUA</string>
+    <string name="BRASSICA_NAPUS_NAPUS">BRASSICA_NAPUS_NAPUS</string>
+    <string name="BRASSICA_NAPUS_RAPIFERA">BRASSICA_NAPUS_RAPIFERA</string>
+    <string name="BRASSICA_OLERACEA_BOTRYTIS">BRASSICA_OLERACEA_BOTRYTIS</string>
+    <string name="BRASSICA_OLERACEA_CAPITATA">BRASSICA_OLERACEA_CAPITATA</string>
+    <string name="BRASSICA_OLERACEA_ITALICA">BRASSICA_OLERACEA_ITALICA</string>
+    <string name="BRASSICA_RAPA_RAPA">BRASSICA_RAPA_RAPA</string>
+    <string name="CAPSICUM">CAPSICUM</string>
+    <string name="CHAMAEMELUM">CHAMAEMELUM</string>
+
+    <string name="CORIANDRUM_SATIVUM">CORIANDRUM_SATIVUM</string>
+    <string name="CUCUMIS_SATIVUS_GHERKIN">CUCUMIS_SATIVUS_GHERKIN</string>
+    <string name="CUCURBITA_MAXIMA_POTIMARRON">CUCURBITA_MAXIMA_POTIMARRON</string>
+    <string name="CUCURBITA_PEPO_PEPO">CUCURBITA_PEPO_PEPO</string>
+    <string name="CUCURBITA_MOSCHATA">CUCURBITA_MOSCHATA</string>
+    <string name="CUCURBITA_MOSCHATA_BUTTERNUT">CUCURBITA_MOSCHATA_BUTTERNUT</string>
+    <string name="CICHORIUM">CICHORIUM</string>
+    <string name="DACTYLIS">DACTYLIS</string>
+    <string name="ERUCA_VESICARIA">ERUCA_VESICARIA</string>
+    <string name="FAGOPYRUM_ESCULENTUM">FAGOPYRUM_ESCULENTUM</string>
+    <string name="FOENICULUM">FOENICULUM</string>
+    <string name="FRAGARIA">FRAGARIA</string>
+    <string name="HELIANTHUS_TUBEROSUS">HELIANTHUS_TUBEROSUS</string>
+    <string name="HORDEUM_DISTICHUM">HORDEUM_DISTICHUM</string>
+    <string name="HORDEUM_HEXASTICHUM">HORDEUM_HEXASTICHUM</string>
+    <string name="HUMULUS_LUPULUS">HUMULUS_LUPULUS</string>
+    <string name="LUPINUS">LUPINUS</string>
+    <string name="MELILOTUS">MELILOTUS</string>
+    <string name="NICOTIANA_TABACUM">NICOTIANA_TABACUM</string>
+    <string name="OCIMUM_BASILICUM">OCIMUM_BASILICUM</string>
+    <string name="PASTINACA_SATIVA">PASTINACA_SATIVA</string>
+    <string name="PIMPINELLA_ANISUM">PIMPINELLA_ANISUM</string>
+    <string name="PLANT">PLANT</string>
+    <string name="POACEAE">POACEAE</string>
+    <string name="SECALE_CEREALE">SECALE_CEREALE</string>
+    <string name="SORGHUM">SORGHUM</string>
+    <string name="TRAGOPOGON">TRAGOPOGON</string>
+    <string name="TRIFOLIUM">TRIFOLIUM</string>
+    <string name="TRITICUM_SPELTA">TRITICUM_SPELTA</string>
+    <string name="ZEA_MAYS_SACCHARATA">ZEA_MAYS_SACCHARATA</string>
     <string name="PRUNUS_ARMENIACA">Prunus armeniaca</string>
     <string name="ALLIUM_SATIVUM">Allium sativum</string>
     <string name="CYNARA_SCOLYMUS">Cynara scolymus</string>
