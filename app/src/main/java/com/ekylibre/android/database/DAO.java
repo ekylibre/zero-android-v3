@@ -24,6 +24,7 @@ import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.database.pojos.Plots;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
@@ -96,8 +97,9 @@ public interface DAO {
     /**
      *    Plot list
      */
-    @Query("SELECT * FROM " + Plot.TABLE_NAME + " ORDER BY name")
-    List<Plot> plotList();
+    @Transaction
+    @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
+    List<Plots> plotList(String farmId);
 
 
     /**
@@ -110,16 +112,16 @@ public interface DAO {
     List<Interventions> selectInterventions(String farmId);
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL AND status != 'deleted'")
-    List<Interventions> getSyncableInterventions();
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL AND status != 'deleted' AND farm = :farmId")
+    List<Interventions> getSyncableInterventions(String farmId);
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " NOT NULL AND status = 'deleted'")
-    List<Interventions> getDeletableInterventions();
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " NOT NULL AND status = 'deleted' AND farm = :farmId")
+    List<Interventions> getDeletableInterventions(String farmId);
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE status = 'updated' AND " + Intervention.COLUMN_ID_EKY + " NOT NULL")
-    List<Interventions> getUpdatableInterventions();
+    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE status = 'updated' AND " + Intervention.COLUMN_ID_EKY + " NOT NULL AND farm = :farmId")
+    List<Interventions> getUpdatableInterventions(String farmId);
 
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET " + Intervention.COLUMN_ID_EKY + " = :ekyId, " +
             "status = '" + InterventionActivity.SYNCED + "' WHERE " + Intervention.COLUMN_ID + " = :id")
@@ -137,6 +139,7 @@ public interface DAO {
     @Query("UPDATE " + Intervention.TABLE_NAME + " SET status = 'deleted' WHERE " + Intervention.COLUMN_ID + " = :id")
     void setDeleted(int id);
 
+    @Transaction
     @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " = :id")
     Interventions getIntervention(int id);
 

@@ -9,7 +9,7 @@ import com.ekylibre.android.database.models.Plot;
 import java.util.List;
 
 
-public class PlotWithCrops {
+public class Plots {
 
     @Embedded
     public Plot plot;
@@ -17,7 +17,7 @@ public class PlotWithCrops {
     @Relation(parentColumn = Plot.COLUMN_UUID, entityColumn = Crop.COLUMN_PLOT)
     public List<Crop> crops;
 
-    public PlotWithCrops(Plot plot) {
+    public Plots(Plot plot) {
         this.plot = plot;
     }
 

@@ -186,10 +186,15 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
 
             case App.HARVEST:
-                for (Harvest harvest : current.harvests) {
-                    sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
-                    sb.append(harvest.quantity).append(" ").append(Objects.requireNonNull(Units.getUnit(harvest.unit)).name);
-                    sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+                if (current.harvests.size() > 0) {
+                    for (Harvest harvest : current.harvests) {
+                        sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
+                        sb.append(harvest.quantity).append(" ").append(Objects.requireNonNull(Units.getUnit(harvest.unit)).name);
+                        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+                        if (current.harvests.indexOf(harvest) + 1 != current.harvests.size()) sb.append("\n");
+                    }
+                } else {
+                    sb.append("Gestion globale en ligne");
                 }
                 break;
         }

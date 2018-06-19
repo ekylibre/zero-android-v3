@@ -158,7 +158,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 SeedViewHolder seedViewHolder = (SeedViewHolder) holder;
                 Seed seed = (Seed) inputList.get(position);
                 int res = context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName());
-                seedViewHolder.seedSpecie.setText(context.getString(res));
+                seedViewHolder.seedSpecie.setText(res != 0 ? context.getString(res) : seed.specie);
                 seedViewHolder.seedVariety.setText(seed.variety);
                 seedViewHolder.seedFavorite.setVisibility((seed.eky_id != null) ? View.VISIBLE : View.GONE);
                 seedViewHolder.seed = seed;

@@ -17,7 +17,7 @@ import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.SelectCropFragment;
 import com.ekylibre.android.database.models.Crop;
-import com.ekylibre.android.database.pojos.PlotWithCrops;
+import com.ekylibre.android.database.pojos.Plots;
 
 import java.util.List;
 
@@ -27,9 +27,9 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
     private static final String TAG = "CropAdapter";
 
     private Context context;
-    private List<PlotWithCrops> dataset;
+    private List<Plots> dataset;
 
-    public SelectCropAdapter(Context context, List<PlotWithCrops> dataset, SelectCropFragment.OnFragmentInteractionListener fragmentListener) {
+    public SelectCropAdapter(Context context, List<Plots> dataset, SelectCropFragment.OnFragmentInteractionListener fragmentListener) {
         this.context = context;
         this.dataset = dataset;
     }
@@ -54,7 +54,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
 
         }
 
-        void display(PlotWithCrops item) {
+        void display(Plots item) {
 
             plotCheckBox.setText(item.plot.name);
             plotCheckBox.setChecked(item.plot.is_checked);
@@ -94,7 +94,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
             });
         }
 
-        void displayCrops(PlotWithCrops item) {
+        void displayCrops(Plots item) {
 
             // First remove all childs view
             cropContainer.removeAllViews();
@@ -154,8 +154,8 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
             float total = 0;
             int count = 0;
 
-            for (PlotWithCrops pwc : dataset)
-                for (Crop crop : pwc.crops)
+            for (Plots plot : dataset)
+                for (Crop crop : plot.crops)
                     if (crop.is_checked) {
                         total += crop.surface_area;
                         ++count;

@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     private View darkMask;
     private ConstraintLayout procedureChoiceLayout;
     private TextView menuTitle;
-    private Button startingButton;
+    //private Button startingButton;
     private Button finishingButton;
     private TextView filterAll;
     private TextView filterMine;
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         darkMask = findViewById(R.id.dark_mask);
         procedureChoiceLayout = findViewById(R.id.nav_procedure_choice);
         menuTitle = findViewById(R.id.nav_message);
-        startingButton = findViewById(R.id.button_starting);
+        //startingButton = findViewById(R.id.button_starting);
         finishingButton = findViewById(R.id.button_finishing);
         ImageButton careButton = findViewById(R.id.button_care);
         ImageButton cropProtectionButton = findViewById(R.id.button_crop_protection);
@@ -158,11 +158,11 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         implantationButton.setOnClickListener(view -> onProcedureChoice(App.IMPLANTATION));
         irrigationButton.setOnClickListener(view -> onProcedureChoice(App.IRRIGATION));
         finishingButton.setOnClickListener(view -> onInterventionTypeSelected(FINISHING));
-        startingButton.setOnClickListener(view -> {
-            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.BOTTOM, 0, 200);
-            toast.show();
-        });
+//        startingButton.setOnClickListener(view -> {
+//            Toast toast = Toast.makeText(this, "Fonctionnalité bientôt disponible !", Toast.LENGTH_LONG);
+//            toast.setGravity(Gravity.BOTTOM, 0, 200);
+//            toast.show();
+//        });
 
         swipeRefreshLayout.setOnRefreshListener(() -> new StartSync(SyncService.ACTION_SYNC_ALL).execute());
 
@@ -224,8 +224,10 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Add the menubar (top right) with disconnect option
+        String ver = "Version " + BuildConfig.VERSION_NAME + (BuildConfig.DEBUG ? " [debug]" : null);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.appbar, menu);
+        menu.add(0, Menu.FIRST, Menu.NONE, ver);
         return true;
     }
 
@@ -234,13 +236,17 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_logout:
+                AppDatabase.revokeInstance();
+                deleteDatabase("db");
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.remove("is_authenticated");
-                editor.remove("access_token");
-                editor.remove("refresh_token");
-                editor.remove("current-farm-name");
-                editor.remove("current-farm-id");
+                editor.clear();
                 editor.apply();
+//                editor.remove("is_authenticated");
+//                editor.remove("access_token");
+//                editor.remove("refresh_token");
+//                editor.remove("current-farm-name");
+//                editor.remove("current-farm-id");
+//                editor.apply();
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -316,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             toast.show();
         } else {
             TYPE = type;
+            menuTitle.setVisibility(View.VISIBLE);
             if (type == STARTING)
                 menuTitle.setText(R.string.starting_intervention_text);
             else if (type == FINISHING)
@@ -337,12 +344,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         if (!state && procedureChoiceLayout.getVisibility() == View.VISIBLE) {
             darkMask.setVisibility(View.GONE);
             procedureChoiceLayout.setVisibility(View.GONE);
-            menuTitle.setText(R.string.register_an_intervention);
-            startingButton.setVisibility(View.VISIBLE);
+            menuTitle.setVisibility(View.GONE);
+            //menuTitle.setText(R.string.register_an_intervention);
+            //startingButton.setVisibility(View.VISIBLE);
             finishingButton.setVisibility(View.VISIBLE);
             return true;
         } else if (state && procedureChoiceLayout.getVisibility() == View.GONE) {
-            startingButton.setVisibility(View.GONE);
+            //startingButton.setVisibility(View.GONE);
             finishingButton.setVisibility(View.GONE);
             darkMask.setVisibility(View.VISIBLE);
             darkMask.bringToFront();

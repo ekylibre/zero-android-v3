@@ -43,7 +43,6 @@ import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Phyto;
-import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
@@ -51,7 +50,7 @@ import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.pojos.Phytos;
-import com.ekylibre.android.database.pojos.PlotWithCrops;
+import com.ekylibre.android.database.pojos.Plots;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
@@ -151,7 +150,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Object> inputList = new ArrayList<>();
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
-    public static List<PlotWithCrops> plotList = new ArrayList<>();
+    public static List<Plots> plotList = new ArrayList<>();
     private static List<Harvest> outputList = new ArrayList<>();
     //public static List<Materials> materialList = new ArrayList<>();
 
@@ -210,14 +209,14 @@ public class InterventionActivity extends AppCompatActivity implements
         workingPeriodDurationUnit = findViewById(R.id.working_period_duration_unit);
 
         // Inputs
+        ConstraintLayout inputLayout = findViewById(R.id.input_layout);
         ConstraintLayout inputZone = findViewById(R.id.input_zone);
         inputRecyclerGroup = findViewById(R.id.input_recycler_group);
-        ConstraintLayout inputLayout = findViewById(R.id.input_layout);
         inputArrow = findViewById(R.id.input_arrow);
         inputSummary = findViewById(R.id.input_summary);
         inputAddLabel = findViewById(R.id.input_add_label);
-        RecyclerView inputRecyclerView = findViewById(R.id.input_recycler);
         phytoMixWarning = findViewById(R.id.phyto_mix_warning_group);
+        RecyclerView inputRecyclerView = findViewById(R.id.input_recycler);
 
         // Harvest layout
         ConstraintLayout harvestLayout = findViewById(R.id.harvest_layout);
@@ -291,6 +290,7 @@ public class InterventionActivity extends AppCompatActivity implements
             case App.HARVEST:
                 harvestLayout.setVisibility(View.VISIBLE);
                 inputLayout.setVisibility(View.GONE);
+                break;
 //            case MainActivity.CARE:
 //                materialLayout.setVisibility(View.VISIBLE);
 //                break;
@@ -299,7 +299,8 @@ public class InterventionActivity extends AppCompatActivity implements
         // =============================== CROPS EVENTS ======================================== //
 
         // Feed plotList with all available plots
-        new RequestPlotList(this).execute();
+        if (plotList.isEmpty())
+            new RequestPlotList(this).execute();
 
         includeCropLayout.setOnClickListener(view -> {
             selectCropFragment = SelectCropFragment.newInstance();
@@ -777,14 +778,12 @@ public class InterventionActivity extends AppCompatActivity implements
         protected Void doInBackground(Void... voids) {
 
             AppDatabase database = AppDatabase.getInstance(this.context);
+            List<Plots> plots = database.dao().plotList(MainActivity.FARM_ID);
 
-            List<Plot> plots = database.dao().plotList();
+            for (Plots plot : plots)
+                if (!plot.crops.isEmpty())
+                    plotList.add(plot);
 
-            for (Plot plot : plots) {
-                PlotWithCrops plotWithCrops = new PlotWithCrops(plot);
-                plotWithCrops.crops = database.dao().cropsByPlotUuid(plot.uuid);  //new Date().getTime()
-                plotList.add(plotWithCrops);
-            }
             return null;
         }
 
@@ -796,7 +795,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 int count = 0;
                 float total = 0;
                 if (BuildConfig.DEBUG) Log.e(TAG, plotList.toString());
-                for (PlotWithCrops plot : plotList) {
+                for (Plots plot : plotList) {
                     for (Crops culture : editIntervention.crops) {
                         for (Crop crop : plot.crops) {
                             if (culture.crop.get(0).uuid.equals(crop.uuid)) {
@@ -835,7 +834,7 @@ public class InterventionActivity extends AppCompatActivity implements
             // Check at least one crop is selected
             int cropCount = 0;
             countCropLoop:
-            for (PlotWithCrops plotWithCrops : plotList) {
+            for (Plots plotWithCrops : plotList) {
                 for (Crop culture : plotWithCrops.crops) {
                     if (culture.is_checked) {
                         ++cropCount;
@@ -876,7 +875,7 @@ public class InterventionActivity extends AppCompatActivity implements
                     if (BuildConfig.DEBUG) Log.i(TAG, "Verify crop integrity for IMPLANTATION");
                     HashSet<String> productionNature = new HashSet<>();
                     outerLoop:
-                    for (PlotWithCrops plot : plotList) {
+                    for (Plots plot : plotList) {
                         for (Crop crop : plot.crops) {
                             if (crop.is_checked) {
                                 Log.i(TAG, "Crop checked " + crop.name + " | productionNature " + crop.specie);
@@ -1062,7 +1061,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 database.dao().insert(item.inter);
             }
 
-            for (PlotWithCrops plot : plotList) {
+            for (Plots plot : plotList) {
                     for (Crop crop : plot.crops)
                         if (crop.is_checked)
                             database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
@@ -1134,8 +1133,8 @@ public class InterventionActivity extends AppCompatActivity implements
 
             } else if (selectCropFragment.isVisible()){
                 selectCropFragment.dismiss();
-                List<PlotWithCrops> plotWithCropsList = (List<PlotWithCrops>) selection;
-                if (!plotWithCropsList.isEmpty()) {
+                List<Plots> plots = (List<Plots>) selection;
+                if (!plots.isEmpty()) {
                     if (cropSummaryText.equals(this.getString(R.string.no_crop_selected))) {
                         cropSummary.setVisibility(View.GONE);
                         cropAddLabel.setVisibility(View.VISIBLE);
@@ -1145,7 +1144,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         cropSummary.setVisibility(View.VISIBLE);
                     }
                     // Erase plotList with new one from selection
-                    plotList = plotWithCropsList;
+                    plotList = plots;
                 }
             }
         }
