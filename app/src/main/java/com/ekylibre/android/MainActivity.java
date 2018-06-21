@@ -397,6 +397,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
             if (!swipeRefreshLayout.isRefreshing())
                 swipeRefreshLayout.setRefreshing(true);
+
+            if (App.API_URL == null) {
+                App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
+                App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
+                App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
+            }
+
         }
 
         @Override

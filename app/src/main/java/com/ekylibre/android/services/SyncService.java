@@ -729,8 +729,7 @@ public class SyncService extends IntentService {
                             int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
 
                             if (result != 1) {
-                                if (BuildConfig.DEBUG)
-                                    Log.i(TAG, "\tCreate equipment #" + equipment.id());
+                                if (BuildConfig.DEBUG) Log.i(TAG, "\tCreate equipment #" + equipment.id());
                                 database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
                                         equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
                             }
@@ -743,8 +742,7 @@ public class SyncService extends IntentService {
                         Log.i(TAG, "Fetching storages...");
 
                         for (FarmQuery.Storage storage : storages) {
-                            if (BuildConfig.DEBUG)
-                                Log.d(TAG, "\tCreate/update storage #" + storage.id());
+                            if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate/update storage #" + storage.id());
                             database.dao().insert(new Storage(
                                     Integer.valueOf(storage.id()),
                                     storage.name(),
@@ -764,8 +762,7 @@ public class SyncService extends IntentService {
                             if (article.type() == ArticleTypeEnum.CHEMICAL) {
                                 long result = database.dao().setPhytoEkyId(Integer.valueOf(article.id()), article.referenceID(), article.name().split(" - ")[0] + "%");
                                 if (result != 1) {
-                                    if (BuildConfig.DEBUG)
-                                        Log.d(TAG, "\tCreate phyto #" + article.id());
+                                    if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate phyto #" + article.id());
                                     database.dao().insert(new Phyto(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), article.name(),
                                             null, article.referenceID(), null,
                                             null, null, false, true, "LITER"));
@@ -775,8 +772,7 @@ public class SyncService extends IntentService {
                             if (article.type() == ArticleTypeEnum.SEED) {
                                 long result = database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceID());
                                 if (result != 1) {
-                                    if (BuildConfig.DEBUG)
-                                        Log.d(TAG, "\tCreate seed #" + article.id());
+                                    if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate seed #" + article.id());
                                     database.dao().insert(new Seed(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), article.name(),
                                             null, false, true, "KILOGRAM"));
                                 }

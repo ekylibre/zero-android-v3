@@ -68,12 +68,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Remove title bar
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        // Remove notification bar
-        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
         App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
         App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
@@ -86,6 +80,12 @@ public class LoginActivity extends AppCompatActivity {
             if (!startingApp)
                 startApp();
         } else {
+
+            //Remove title bar
+            supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            // Remove notification bar
+            //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
             setContentView(R.layout.activity_login);
 
