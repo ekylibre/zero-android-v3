@@ -3,7 +3,6 @@ package com.ekylibre.android.database.models;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 
 
