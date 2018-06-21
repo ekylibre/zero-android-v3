@@ -1,10 +1,13 @@
 package com.ekylibre.android.database;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.ekylibre.android.BuildConfig;
@@ -43,7 +46,7 @@ import java.util.List;
 
 
 @Database(entities = {
-        Intervention.class,
+        Farm.class, Intervention.class,
         InterventionWorkingDay.class,
         Phyto.class, InterventionPhytosanitary.class, PhytoDose.class,
         Seed.class, InterventionSeed.class,
@@ -53,9 +56,7 @@ import java.util.List;
         Person.class, InterventionPerson.class,
         Weather.class,
         Harvest.class, Storage.class,
-        Crop.class, InterventionCrop.class,
-        Plot.class,
-        Farm.class
+        Crop.class, InterventionCrop.class, Plot.class
 }, exportSchema = false, version = 1)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -78,6 +79,18 @@ public abstract class AppDatabase extends RoomDatabase {
     public static synchronized void revokeInstance() {
         database = null;
     }
+
+
+//    /**
+//     * Manage migrations
+//     */
+//    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+//        @Override
+//        public void migrate(@NonNull SupportSQLiteDatabase database) {
+//            //database.execSQL("ALTER TABLE Book ADD COLUMN pub_year INTEGER");
+//            database.execSQL("UPDATE TABLE Book ADD COLUMN pub_year INTEGER");
+//        }
+//    };
 
 
     /**
@@ -154,7 +167,6 @@ public abstract class AppDatabase extends RoomDatabase {
     private String readJsonFromAssets(Context context, String fileName) {
 
         try {
-
             InputStream inputStream = context.getAssets().open(fileName);
             byte[] buffer = new byte[inputStream.available()];
             int bytesRead = inputStream.read(buffer);
@@ -192,12 +204,6 @@ public abstract class AppDatabase extends RoomDatabase {
 //        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
 //    }
 
-    // Manage migrations
-//    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-//        @Override
-//        public void migrate(@NonNull SupportSQLiteDatabase database) {
-//            // Since we didn't alter the table, there's nothing else to do here.
-//        }
-//    };
+
 
 

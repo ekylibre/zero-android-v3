@@ -51,13 +51,15 @@ public interface DAO {
     @Insert void insert(Seed... seeds);
     @Insert void insert(Fertilizer... fertilizers);
 
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Intervention intervention);  // return id as long
+
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Weather... weather);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Storage... storages);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... persons);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... crops);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Farm... farms);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Intervention intervention);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay interventionWorkingDay);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed interventionSeeds);
