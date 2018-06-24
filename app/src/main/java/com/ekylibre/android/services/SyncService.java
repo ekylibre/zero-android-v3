@@ -132,11 +132,11 @@ public class SyncService extends IntentService {
         prefs = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         ACCESS_TOKEN = prefs.getString("access_token", null);
 
-        if (App.API_URL == null) {
-            App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
-            App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
-            App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
-        }
+//        if (App.API_URL == null) {
+//            App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
+//            App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
+//            App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
+//        }
 
         // Get ResultReceiver from intent
         receiver = intent.getParcelableExtra("receiver");
@@ -267,23 +267,77 @@ public class SyncService extends IntentService {
                             .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id)).build());
 
                 for (Phytos phyto : updatableInter.phytos) {
+                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+
+                    if (phyto.phyto.get(0).eky_id == null) { // Create new article
+                        if (phyto.phyto.get(0).registered)
+                            articleBuilder.referenceID(String.valueOf(phyto.phyto.get(0).id))
+                                    .type(ArticleTypeEnum.CHEMICAL);
+
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(phyto.phyto.get(0).eky_id));
+                    }
+
                     inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(ArticleAttributes.builder().id(String.valueOf(phyto.phyto.get(0).eky_id)).build())
+                            .article(articleBuilder.build())
                             .quantity(phyto.inter.quantity)
                             .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
                 }
 
-                for (Seeds seed : updatableInter.seeds)
+                for (Seeds seed : updatableInter.seeds) {
+                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+
+                    if (seed.seed.get(0).eky_id == null) { // Create new article
+                        if (seed.seed.get(0).registered)
+                            articleBuilder.referenceID(String.valueOf(seed.seed.get(0).id))
+                                    .type(ArticleTypeEnum.SEED);
+
+                    } else {  // Use existing article
+                        articleBuilder.id(String.valueOf(seed.seed.get(0).eky_id));
+                    }
+
                     inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(ArticleAttributes.builder().id(String.valueOf(seed.seed.get(0).eky_id)).build())
+                            .article(articleBuilder.build())
                             .quantity(seed.inter.quantity)
                             .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
+                }
 
-                for (Fertilizers fertilizer : updatableInter.fertilizers)
+                for (Fertilizers fertilizer : updatableInter.fertilizers) {
+                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+
+                    if (fertilizer.fertilizer.get(0).eky_id == null) { // Create new article
+                        if (fertilizer.fertilizer.get(0).registered)
+                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
+                                    .type(ArticleTypeEnum.FERTILIZER);
+
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
+                    }
+
                     inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(ArticleAttributes.builder().id(String.valueOf(fertilizer.fertilizer.get(0).eky_id)).build())
+                            .article(articleBuilder.build())
                             .quantity(fertilizer.inter.quantity)
                             .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
+                }
+
+//                for (Phytos phyto : updatableInter.phytos) {
+//                    inputUpdates.add(InterventionInputAttributes.builder()
+//                            .article(ArticleAttributes.builder().id(String.valueOf(phyto.phyto.get(0).eky_id)).build())
+//                            .quantity(phyto.inter.quantity)
+//                            .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
+//                }
+//
+//                for (Seeds seed : updatableInter.seeds)
+//                    inputUpdates.add(InterventionInputAttributes.builder()
+//                            .article(ArticleAttributes.builder().id(String.valueOf(seed.seed.get(0).eky_id)).build())
+//                            .quantity(seed.inter.quantity)
+//                            .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
+//
+//                for (Fertilizers fertilizer : updatableInter.fertilizers)
+//                    inputUpdates.add(InterventionInputAttributes.builder()
+//                            .article(ArticleAttributes.builder().id(String.valueOf(fertilizer.fertilizer.get(0).eky_id)).build())
+//                            .quantity(fertilizer.inter.quantity)
+//                            .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
 
                 for (Weather weather : updatableInter.weather)
                     weatherUpdate = WeatherAttributes.builder()
@@ -463,8 +517,7 @@ public class SyncService extends IntentService {
 
             for (Interventions createInter : interventions) {
 
-                if (BuildConfig.DEBUG)
-                    Log.i(TAG, "Create remote intervention");
+                if (BuildConfig.DEBUG) Log.i(TAG, "Create remote intervention");
 
                 targets = new ArrayList<>();
                 workingDays = new ArrayList<>();
@@ -512,14 +565,15 @@ public class SyncService extends IntentService {
                 }
 
                 for (Phytos phyto : createInter.phytos) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder().type(ArticleTypeEnum.CHEMICAL);
+                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
 
-                    if (phyto.phyto.get(0).eky_id == null)  // Create new article
+                    if (phyto.phyto.get(0).eky_id == null) {  // Create new article
                         if (phyto.phyto.get(0).registered)
-                            articleBuilder.referenceID(String.valueOf(phyto.phyto.get(0).id));
-
-                        else  // Use existing article
-                            articleBuilder.id(String.valueOf(phyto.phyto.get(0).eky_id));
+                            articleBuilder.referenceID(String.valueOf(phyto.phyto.get(0).id))
+                                    .type(ArticleTypeEnum.CHEMICAL);
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(phyto.phyto.get(0).eky_id));
+                    }
 
                     inputs.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
@@ -528,14 +582,16 @@ public class SyncService extends IntentService {
                 }
 
                 for (Seeds seed : createInter.seeds) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder().type(ArticleTypeEnum.SEED);
+                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
 
-                    if (seed.seed.get(0).eky_id == null)  // Create new article
+                    if (seed.seed.get(0).eky_id == null) { // Create new article
                         if (seed.seed.get(0).registered)
-                            articleBuilder.referenceID(String.valueOf(seed.seed.get(0).id));
+                            articleBuilder.referenceID(String.valueOf(seed.seed.get(0).id))
+                                    .type(ArticleTypeEnum.SEED);
 
-                        else  // Use existing article
-                            articleBuilder.id(String.valueOf(seed.seed.get(0).eky_id));
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(seed.seed.get(0).eky_id));
+                    }
 
                     inputs.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
@@ -544,14 +600,16 @@ public class SyncService extends IntentService {
                 }
 
                 for (Fertilizers fertilizer : createInter.fertilizers) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder().type(ArticleTypeEnum.FERTILIZER);
+                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
 
-                    if (fertilizer.fertilizer.get(0).eky_id == null)  // Create new article
+                    if (fertilizer.fertilizer.get(0).eky_id == null) {  // Create new article
                         if (fertilizer.fertilizer.get(0).registered)
-                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id));
+                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
+                                    .type(ArticleTypeEnum.FERTILIZER);
 
-                        else  // Use existing article
-                            articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
+                    }
 
                     inputs.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())

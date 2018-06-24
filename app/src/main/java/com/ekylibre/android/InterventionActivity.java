@@ -433,8 +433,6 @@ public class InterventionActivity extends AppCompatActivity implements
                     inputSummary.setVisibility(View.GONE);
                     inputAddLabel.setVisibility(View.VISIBLE);
                     inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
-                    inputAdapter.notifyDataSetChanged();
-
                 } else {
                     inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
                     inputArrow.setRotation(0);
@@ -970,6 +968,7 @@ public class InterventionActivity extends AppCompatActivity implements
             Intervention intervention;
 
             if (editIntervention != null) {
+
                 // We are editing an existing intervention
                 if (BuildConfig.DEBUG) Log.i(TAG, "Intervention edition");
 
