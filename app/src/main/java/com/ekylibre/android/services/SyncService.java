@@ -65,6 +65,7 @@ import com.ekylibre.android.type.InterventionInputAttributes;
 import com.ekylibre.android.type.InterventionOperatorAttributes;
 import com.ekylibre.android.type.InterventionOutputAttributes;
 import com.ekylibre.android.type.InterventionOutputTypeEnum;
+import com.ekylibre.android.type.InterventionOutputUnitEnum;
 import com.ekylibre.android.type.InterventionTargetAttributes;
 import com.ekylibre.android.type.InterventionToolAttributes;
 import com.ekylibre.android.type.InterventionWorkingDayAttributes;
@@ -73,7 +74,6 @@ import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoleEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
-import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -88,6 +88,8 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
+
+import timber.log.Timber;
 
 
 public class SyncService extends IntentService {
@@ -117,16 +119,16 @@ public class SyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        if (BuildConfig.DEBUG) Log.i(TAG, "Starting SyncService");
+        Timber.i("Starting SyncService");
 
         // Handle Handshake Errors
         try {
             ProviderInstaller.installIfNeeded(this);
         } catch (GooglePlayServicesRepairableException e) {
-            Log.e(TAG, "GooglePlayServicesRepairableException");
+            Timber.e("GooglePlayServicesRepairableException");
             GoogleApiAvailability.getInstance().showErrorNotification(this, e.getConnectionStatusCode());
         } catch (GooglePlayServicesNotAvailableException e) {
-            Log.e(TAG, "GooglePlayServicesNotAvailableException");
+            Timber.e("GooglePlayServicesNotAvailableException");
         }
 
         prefs = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
@@ -160,7 +162,7 @@ public class SyncService extends IntentService {
                 // Mutations (order is important)
                 pushCreatePersonsAndEquipments();
                 pushDeleteIntervention();
-                pushUpdateIntervention();
+                pushUpdateIntervention();  // TODO: merge update and create in one method
                 pushCreateIntervention();
 
                 // Queries
@@ -200,18 +202,18 @@ public class SyncService extends IntentService {
                         }
 
                         if (!response.hasErrors() || alreadyDeleted) {
-                            Log.i(TAG, String.format("Intervention #%s deleted", deletableInter.intervention.id));
+                            Timber.i("Intervention #%s deleted", deletableInter.intervention.id);
                             database.dao().delete(deletableInter.intervention);
                         }
                     }
 
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        Timber.e(e.getLocalizedMessage());
                     }
                 });
             }
-        } else if (BuildConfig.DEBUG) Log.d(TAG, "No intervention to delete");
+        } else Timber.d("No intervention to delete");
     }
 
 
@@ -235,8 +237,7 @@ public class SyncService extends IntentService {
 
             for (Interventions updatableInter : updatableInterventions) {
 
-                if (BuildConfig.DEBUG)
-                    Log.i(TAG, "Updating remote intervention #" + updatableInter.intervention.eky_id);
+                Timber.i("Updating remote intervention #%s", updatableInter.intervention.eky_id);
 
                 targetUpdates = new ArrayList<>();
                 workingDayUpdate = new ArrayList<>();
@@ -386,16 +387,15 @@ public class SyncService extends IntentService {
                     public void onResponse(@Nonnull Response<UpdateInterMutation.Data> response) {
                         if (!response.hasErrors()) {
                             database.dao().setInterventionSynced(updatableInter.intervention.id);
-                            if (BuildConfig.DEBUG)
-                                Log.d(TAG, "\tIntervention #" + updatableInter.intervention.eky_id + " successfully updated !");
+                            Timber.d("\tIntervention #%s successfully updated !", updatableInter.intervention.eky_id);
                         } else {
-                            Log.e(TAG, "Error while updating intervention #" + updatableInter.intervention.id);
+                            Timber.e("Error while updating intervention #%s", updatableInter.intervention.id);
                         }
                     }
 
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
-                        Log.e(TAG, "Error on update " + e.getLocalizedMessage());
+                        Timber.e("Error on update %s", e.getLocalizedMessage());
                         //receiver.send(FAILED, new Bundle());
                     }
                 });
@@ -433,7 +433,7 @@ public class SyncService extends IntentService {
                                     PushPersonMutation.Person pers = mutation.person();
                                     if (pers != null && !pers.id().equals("")) {
                                         database.dao().setPersonEkyId(person.id, Integer.valueOf(pers.id()));
-                                        if (BuildConfig.DEBUG) Log.i(TAG, "Person #" + pers.id() + " successfully created !");
+                                        Timber.i("Person #%s successfully created !", pers.id());
                                     }
                                 }
                             }
@@ -442,12 +442,12 @@ public class SyncService extends IntentService {
 
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        Timber.e(e.getLocalizedMessage());
                         ERROR = true;
                     }
                 });
             }
-        } else if (BuildConfig.DEBUG) Log.i(TAG, "No new Person to push");
+        } else Timber.i("No new Person to push");
 
         if (!newEquipments.isEmpty()) {
             for (Equipment equipment : newEquipments) {
@@ -465,10 +465,8 @@ public class SyncService extends IntentService {
                             PushEquipmentMutation.CreateEquipment mutation = response.data().createEquipment();
                             if (!mutation.equipment().id().equals("")) {
                                 database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
-                                if (BuildConfig.DEBUG)
-                                    Log.i(TAG, "Equipment #" + mutation.equipment().id() + " successfully created");
+                                Timber.i("Equipment #%s successfully created", mutation.equipment().id());
                                 if (ACTION.equals(ACTION_CREATE_ARTICLES)) {
-                                    Log.e(TAG, "Return Equipment id " + mutation.equipment().id());
                                     Bundle bundle = new Bundle();
                                     bundle.putString("name", equipment.name);
                                     bundle.putInt("remote_id", Integer.valueOf(mutation.equipment().id()));
@@ -481,13 +479,13 @@ public class SyncService extends IntentService {
 
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        Timber.e(e.getLocalizedMessage());
                         ERROR = true;
                     }
                 });
             }
         } else {
-            if (BuildConfig.DEBUG) Log.i(TAG, "No new Equipment to push");
+            Timber.i("No new Equipment to push");
         }
 
         if (ERROR) {
@@ -517,7 +515,7 @@ public class SyncService extends IntentService {
 
             for (Interventions createInter : interventions) {
 
-                if (BuildConfig.DEBUG) Log.i(TAG, "Create remote intervention");
+                Timber.i("Create remote intervention");
 
                 targets = new ArrayList<>();
                 workingDays = new ArrayList<>();
@@ -648,10 +646,10 @@ public class SyncService extends IntentService {
                         if (!response.hasErrors()) {
                             PushInterMutation.CreateIntervention mutation = response.data().createIntervention();
                             if (!mutation.intervention().id().equals("")) {
-                                if (BuildConfig.DEBUG) Log.i(TAG, "|--> eky_id #" + mutation.intervention().id() + " attributed");
+                                Timber.i("|--> eky_id #%s attributed", mutation.intervention().id());
                                 database.dao().setInterventionEkyId(createInter.intervention.id, Integer.valueOf(mutation.intervention().id()));
                             } else {
-                                Log.e(TAG, "Error while attributing id");
+                                Timber.e("Error while attributing id");
                             }
                             // Continue to global sync
                             getFarm();
@@ -666,7 +664,7 @@ public class SyncService extends IntentService {
 
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
-                        Log.e(TAG, e.getLocalizedMessage());
+                        Timber.e(e.getLocalizedMessage());
                         receiver.send(FAILED, new Bundle());
                     }
                 });
@@ -689,7 +687,7 @@ public class SyncService extends IntentService {
 
             @Override
             public void onFailure(@Nonnull ApolloException e) {
-                Log.e(TAG, e.getMessage(), e);
+                Timber.e(e);
                 Bundle bundle = new Bundle();
                 bundle.putString("message", e.getLocalizedMessage());
                 receiver.send(FAILED, bundle);
@@ -719,7 +717,7 @@ public class SyncService extends IntentService {
                     // Processing plots
                     List<FarmQuery.Plot> plots = farm.plots();
                     if (plots != null) {
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Fetching plots...");
+                        Timber.i("Fetching plots...");
                         for (FarmQuery.Plot plot : plots) {
                             Plot newPlot = new Plot(plot.uuid(), plot.name(), null,
                                     Float.valueOf(plot.surfaceArea().split(" ")[0]), null, null, null, farm.id());
@@ -730,7 +728,7 @@ public class SyncService extends IntentService {
                     // Processing crops and associated plots
                     List<FarmQuery.Crop> crops = farm.crops();
                     if (crops != null) {
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Fetching crops...");
+                        Timber.i("Fetching crops...");
 
                         editor.putBoolean("no-crop", false);
                         editor.apply();
@@ -760,7 +758,7 @@ public class SyncService extends IntentService {
                     // Processing people
                     List<FarmQuery.person> people = farm.people();
                     if (people != null) {
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Fetching people...");
+                        Timber.i("Fetching people...");
 
                         for (FarmQuery.person person : people) {
 
@@ -770,8 +768,7 @@ public class SyncService extends IntentService {
                             if (personEkyIdList.contains(Integer.valueOf(person.id()))) {
                                 database.dao().updatePerson(firstName, person.lastName(), person.id());
                             } else {
-                                if (BuildConfig.DEBUG)
-                                    Log.d(TAG, "\tCreate person #" + person.id());
+                                Timber.d("	Create person #%s", person.id());
                                 database.dao().insert(new Person(Integer.valueOf(person.id()), firstName, person.lastName(), farm.id()));
                             }
                         }
@@ -781,13 +778,13 @@ public class SyncService extends IntentService {
                     // Processing equipments
                     List<FarmQuery.Equipment> equipments = farm.equipments();
                     if (equipments != null) {
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Fetching equipments...");
+                        Timber.i("Fetching equipments...");
                         for (FarmQuery.Equipment equipment : equipments) {
 
                             int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
 
                             if (result != 1) {
-                                if (BuildConfig.DEBUG) Log.i(TAG, "\tCreate equipment #" + equipment.id());
+                                Timber.i("	Create equipment #%s", equipment.id());
                                 database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
                                         equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
                             }
@@ -797,10 +794,10 @@ public class SyncService extends IntentService {
                     // Processing storages
                     List<FarmQuery.Storage> storages = farm.storages();
                     if (storages != null) {
-                        Log.i(TAG, "Fetching storages...");
+                        Timber.i("Fetching storages...");
 
                         for (FarmQuery.Storage storage : storages) {
-                            if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate/update storage #" + storage.id());
+                            Timber.d("	Create/update storage #%s", storage.id());
                             database.dao().insert(new Storage(
                                     Integer.valueOf(storage.id()),
                                     storage.name(),
@@ -813,14 +810,14 @@ public class SyncService extends IntentService {
                     // Processing articles
                     List<FarmQuery.Article> articles = farm.articles();
                     if (articles != null) {
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Fetching articles...");
+                        Timber.i("Fetching articles...");
 
                         for (FarmQuery.Article article : articles) {
 
                             if (article.type() == ArticleTypeEnum.CHEMICAL) {
                                 long result = database.dao().setPhytoEkyId(Integer.valueOf(article.id()), article.referenceID(), article.name().split(" - ")[0] + "%");
                                 if (result != 1) {
-                                    if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate phyto #" + article.id());
+                                    Timber.d("	Create phyto #%s", article.id());
                                     database.dao().insert(new Phyto(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), article.name(),
                                             null, article.referenceID(), null,
                                             null, null, false, true, "LITER"));
@@ -830,7 +827,7 @@ public class SyncService extends IntentService {
                             if (article.type() == ArticleTypeEnum.SEED) {
                                 long result = database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceID());
                                 if (result != 1) {
-                                    if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate seed #" + article.id());
+                                    Timber.d("	Create seed #%s", article.id());
                                     database.dao().insert(new Seed(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), article.name(),
                                             null, false, true, "KILOGRAM"));
                                 }
@@ -838,7 +835,7 @@ public class SyncService extends IntentService {
 
                             if (article.type() == ArticleTypeEnum.FERTILIZER) {
                                 if (database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), article.referenceID()) != 1) {
-                                    if (BuildConfig.DEBUG) Log.d(TAG, "\tCreate fertilizer #" + article.id());
+                                    Timber.d("	Create fertilizer #%s", article.id());
                                     database.dao().insert(new Fertilizer(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), null,
                                             article.name(), null, null, null, null, null,
                                             null, null, null, null, true, "KILOGRAM"));
@@ -866,7 +863,7 @@ public class SyncService extends IntentService {
 
             @Override
             public void onFailure(@Nonnull ApolloException e) {
-                Log.e(TAG, e.getMessage(), e);
+                Timber.e(e, e.getMessage());
                 Bundle bundle = new Bundle();
                 bundle.putString("message", e.getLocalizedMessage());
                 receiver.send(FAILED, bundle);
@@ -884,7 +881,7 @@ public class SyncService extends IntentService {
 
                     if (interventions != null) {
 
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Fetching interventions...");
+                        Timber.i("Fetching interventions...");
 
                         // Building list of remote intervention IDs
                         for (InterventionQuery.Intervention inter : interventions)
@@ -902,7 +899,7 @@ public class SyncService extends IntentService {
                             // Check intervention doesn't exists locally
                             if (!interventionEkyIdList.contains(Integer.valueOf(inter.id()))) {
 
-                                if (BuildConfig.DEBUG) Log.d(TAG, "|-- save new intervention #" + inter.id());
+                                Timber.d("|-- save new intervention #%s", inter.id());
 
                                 Intervention newInter = new Intervention();
 
@@ -928,7 +925,7 @@ public class SyncService extends IntentService {
 
                             } else {
 
-                                if (BuildConfig.DEBUG) Log.d(TAG, "|-- update intervention #" + inter.id());
+                                Timber.d("|-- update intervention #%s", inter.id());
 
                                 // Get actual local Intervention and proceed update
                                 Interventions existingInter = database.dao().getIntervention(Integer.parseInt(inter.id()));
@@ -1039,7 +1036,7 @@ public class SyncService extends IntentService {
                                     InterventionQuery.Article article = input.article();
                                     if (article != null) {
 
-                                        Log.i(TAG, "article " + article.id());
+                                        Timber.i("article %s", article.id());
 
                                         String referenceId = article.referenceID();
                                         int articleId;
@@ -1074,8 +1071,8 @@ public class SyncService extends IntentService {
                             List<InterventionQuery.Output> outputs = inter.outputs();
                             Boolean globalOutputs = inter.globalOutputs();
                             if (outputs != null) {
-                                if (globalOutputs != null && !globalOutputs) {
-                                    for (InterventionQuery.Output output : outputs) {
+                                for (InterventionQuery.Output output : outputs) {
+                                    if (globalOutputs != null && !globalOutputs) {
                                         List<InterventionQuery.Load> loads = output.loads();
                                         if (loads != null) {
                                             for (InterventionQuery.Load load : loads) {
@@ -1088,6 +1085,12 @@ public class SyncService extends IntentService {
                                                 }
                                             }
                                         }
+                                    } else {
+                                        InterventionOutputUnitEnum globalUnit = output.unit();
+                                        String quantityUnit = globalUnit != null ? globalUnit.toString() : null;
+                                        Double quantity = output.quantity();
+                                        float qtt = quantity != null ? quantity.floatValue() : 0;
+                                        database.dao().insert(new Harvest(id, qtt, quantityUnit, null, null, output.nature().toString()));
                                     }
                                 }
                             }
