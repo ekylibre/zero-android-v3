@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Guidelines -->
+    <android.support.constraint.Guideline
+        android:id="@+id/live_top_guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/live_top_guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66"/>
+
+    <!-- Background color -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/primary"
+        app:layout_constraintBottom_toBottomOf="@id/live_speed_value"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <!--
+    Top data
+    -->
+    <TextView
+        android:id="@+id/live_label_speed"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/speed"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_1"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+    <TextView
+        android:id="@+id/live_speed_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25 km/h"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:layout_gravity="center"
+        app:layout_constraintBaseline_toBaselineOf="@id/live_worked_area_value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_1"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:paddingBottom="6dp"/>
+
+    <TextView
+        android:id="@+id/live_label_width"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/working_width"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_1"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_2"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+    <TextView
+        android:id="@+id/live_width_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3,4 m"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_1"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_2"
+        app:layout_constraintBaseline_toBaselineOf="@id/live_worked_area_value"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+
+    <TextView
+        android:id="@+id/live_label_worked_area"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/worked_area"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+    <TextView
+        android:id="@+id/live_worked_area_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="27,3 ha"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/live_label_worked_area"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+
+    <!--
+        General timer
+    -->
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/recording_dot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/icon_dot"
+        android:tint="@color/warning"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/live_main_time"
+        app:layout_constraintTop_toTopOf="@id/live_main_time"
+        app:layout_constraintBottom_toBottomOf="@id/live_main_time"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/live_main_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="4 h 35 min"
+        android:textStyle="bold"
+        android:textSize="40sp"
+        android:textColor="@color/black"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/live_speed_value"
+        app:layout_constraintStart_toEndOf="@id/recording_dot"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"/>
+
+
+    <!--
+        Periods timers
+    -->
+
+    <!-- Background color -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/light_grey"
+        app:layout_constraintTop_toTopOf="@id/live_label_preparation"
+        app:layout_constraintBottom_toBottomOf="@id/live_preparation_value" />
+
+    <TextView
+        android:id="@+id/live_label_preparation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/preparation"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_1"
+        app:layout_constraintTop_toBottomOf="@id/live_main_time"
+        android:paddingTop="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+    <TextView
+        android:id="@+id/live_preparation_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0h13"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        app:layout_constraintBaseline_toBaselineOf="@id/live_working_value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_1"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:paddingBottom="6dp"/>
+
+
+    <TextView
+        android:id="@+id/live_label_moov"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/mooving"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_1"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_2"
+        app:layout_constraintTop_toBottomOf="@id/live_main_time"
+        android:paddingTop="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+    <TextView
+        android:id="@+id/live_moov_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0h35"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_1"
+        app:layout_constraintEnd_toStartOf="@id/live_top_guideline_2"
+        app:layout_constraintBaseline_toBaselineOf="@id/live_working_value"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:paddingBottom="6dp"/>
+
+    <TextView
+        android:id="@+id/live_label_working"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/intervention"
+        android:textAllCaps="true"
+        android:textSize="10sp"
+        android:gravity="center_horizontal"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_2"
+        app:layout_constraintTop_toBottomOf="@id/live_main_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingTop="6dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"/>
+
+    <TextView
+        android:id="@+id/live_working_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3h47"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@id/live_label_working"
+        app:layout_constraintStart_toEndOf="@id/live_top_guideline_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:paddingBottom="6dp"/>
+
+    <TextView
+        android:id="@+id/live_help_text_bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Parcelles et cultures travaillées"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/live_preparation_value"
+        android:paddingTop="6dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/live_help_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Décochez les parcelles détectées non-travaillées"
+        app:layout_constraintTop_toBottomOf="@id/live_help_text_bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_crop_live"
+        app:layout_constraintTop_toBottomOf="@id/live_help_text"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--
+        The bottom bar menu
+    -->
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/live_nav_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="@color/primary"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:minHeight="0dp"
+            android:background="@color/transparent"
+            style="?android:attr/borderlessButtonStyle"
+            app:layout_constraintBaseline_toBaselineOf="@id/button_finish" />
+
+        <Button
+            android:id="@+id/button_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pause"
+            android:textColor="@color/white"
+            android:minHeight="0dp"
+            android:background="@color/transparent"
+            style="?android:attr/borderlessButtonStyle"
+            app:layout_constraintEnd_toStartOf="@id/button_finish"
+            app:layout_constraintBaseline_toBaselineOf="@id/button_finish"/>
+
+        <Button
+            android:id="@+id/button_finish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/finish"
+            android:textColor="@color/white"
+            android:minHeight="0dp"
+            android:background="@color/transparent"
+            style="?android:attr/borderlessButtonStyle"
+            app:layout_constraintEnd_toEndOf="@id/live_nav_container"
+            app:layout_constraintTop_toTopOf="@id/live_nav_container"
+            app:layout_constraintBottom_toBottomOf="@id/live_nav_container"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>
