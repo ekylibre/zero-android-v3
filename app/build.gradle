@@ -8,8 +8,8 @@ android {
         applicationId "com.ekylibre.android"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 4
-        versionName "0.9.3"
+        versionCode 5
+        versionName "0.9.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -69,8 +69,9 @@ dependencies {
     // Fancy showcase view
     //implementation 'com.github.faruktoptas:FancyShowCaseView:1.0.0'
     // Mapbox
-    // compile 'com.google.maps.android:android-maps-utils:0.4.4'
-    //implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.1.3'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.2.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:3.3.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.3'
     // OAuth & openID framework
     //implementation 'net.openid:appauth:0.7.0'
 }

@@ -49,11 +49,10 @@ import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
+import timber.log.Timber;
 
 
 public class MainActivity extends AppCompatActivity implements SyncResultReceiver.Receiver {
-
-    private static final String TAG = "MainActivity";
 
     public static Locale LOCALE;
     public int TYPE;
@@ -227,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         String ver = "Version " + BuildConfig.VERSION_NAME + (BuildConfig.DEBUG ? " [debug]" : null);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.appbar, menu);
-        menu.add(0, Menu.FIRST, Menu.NONE, ver);
+        menu.add(0, Menu.FIRST, Menu.NONE, ver).setEnabled(false);
         return true;
     }
 
@@ -263,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         swipeRefreshLayout.setRefreshing(false);
 
         if (resultCode == SyncService.DONE) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "Synchronization done");
+            Timber.e("Synchronization done");
             lastSyncTime = new Date();
             prefs.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
@@ -292,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "Updating interventions recyclerView...");
+            Timber.e("Updating interventions recyclerView...");
             AppDatabase database = AppDatabase.getInstance(context);
             interventionsList.clear();
             switch (filter) {
@@ -418,13 +417,13 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
                 try {
                     ProviderInstaller.installIfNeeded(getBaseContext());
                 } catch (GooglePlayServicesRepairableException e) {
-                    Log.e(TAG, "GooglePlayServicesRepairableException");
+                    Timber.e("GooglePlayServicesRepairableException");
                     GoogleApiAvailability.getInstance().showErrorNotification(getBaseContext(), e.getConnectionStatusCode());
                 } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.e(TAG, "GooglePlayServicesNotAvailableException");
+                    Timber.e("GooglePlayServicesNotAvailableException");
                 }
 
-                if (BuildConfig.DEBUG) Log.i(TAG, "Last Token created " + (new Date().getTime() - tokenTime) / 1000 + " seconds ago");
+                Timber.i("Last Token created %s seconds ago", (new Date().getTime() - tokenTime) / 1000);
 
                 AccessToken token = new AccessToken();
                 token.setAccess_token(prefs.getString("access_token", ""));
@@ -450,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
                 }
 
             } else {
-                if (BuildConfig.DEBUG) Log.i(TAG, "Token is up to date");
+                Timber.i("Token is up to date");
                 return true;
             }
             return false;

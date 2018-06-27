@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
@@ -15,7 +14,6 @@ import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
-import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.DeleteInterMutation;
 import com.ekylibre.android.FarmQuery;
 import com.ekylibre.android.InterventionActivity;

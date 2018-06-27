@@ -341,5 +341,13 @@
     <string name="create">Créer</string>
     <string name="volume">Volume</string>
     <string name="volume_cannot_be_null">Le volume ne peut être nul</string>
+    <string name="finish">Terminer</string>
+    <string name="pause">Pause</string>
+    <string name="speed">Vitesse</string>
+    <string name="working_width">Largeur de travail</string>
+    <string name="worked_area">Surface travaillée</string>
+    <string name="preparation">Préparation</string>
+    <string name="mooving">Déplacements</string>
+    <string name="intervention">Intervention</string>
 
 </resources>

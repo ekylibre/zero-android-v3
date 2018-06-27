@@ -29,6 +29,8 @@ query Intervention {
         id
         nature
         approximative
+        quantity
+        unit
         loads {
           number
           quantity

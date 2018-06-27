@@ -189,13 +189,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 if (current.harvests.size() > 0) {
                     for (Harvest harvest : current.harvests) {
                         sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
-                        sb.append(harvest.quantity).append(" ").append(Objects.requireNonNull(Units.getUnit(harvest.unit)).name);
+                        sb.append(String.format(MainActivity.LOCALE, "%.1f %s", harvest.quantity, Objects.requireNonNull(Units.getUnit(harvest.unit)).name));
                         sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
                         if (current.harvests.indexOf(harvest) + 1 != current.harvests.size()) sb.append("\n");
                     }
-                } else {
-                    sb.append("Gestion globale en ligne");
                 }
+//                else {
+//                    sb.append("Gestion globale en ligne");
+//                }
                 break;
         }
         holder.itemInfos.setText(sb.toString());
