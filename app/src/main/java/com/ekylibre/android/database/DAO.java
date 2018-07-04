@@ -203,7 +203,7 @@ public interface DAO {
     /**
      *    Seed
      */
-    @Query("SELECT MAX(" + Seed.COLUMN_ID + ") FROM " + Seed.TABLE_NAME + " WHERE used = 1")
+    @Query("SELECT MAX(" + Seed.COLUMN_ID + ") FROM " + Seed.TABLE_NAME + " WHERE registered = 0")
     Integer lastSeedId();
 
     @Transaction @Query("SELECT * FROM " + Seed.TABLE_NAME)
@@ -227,6 +227,9 @@ public interface DAO {
     @Query("SELECT " + Seed.COLUMN_ID + " FROM " + Seed.TABLE_NAME + " WHERE " + Seed.COLUMN_ID_EKY + " = :eky_id")
     int getSeedId(int eky_id);
 
+    @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE " + Seed.COLUMN_ID_EKY + " IS NULL AND CAST(" + Seed.COLUMN_ID + " AS INTEGER) < 100000")
+    List<Seed> getSeedWithoutEkyId();
+
 //    @Query("SELECT " + Seed.TABLE_NAME + ".*, " + Specie.TABLE_NAME + ".fra" + " FROM " + Seed.TABLE_NAME
 //    + " INNER JOIN " + Specie.TABLE_NAME + " ON " + Specie.COLUMN_NAME + " = " + Seed.COLUMN_SPECIE)
 //    List<Seed> selectInterventions();
@@ -235,7 +238,7 @@ public interface DAO {
     /**
      *    Phytosanitary
      **/
-    @Query("SELECT MAX(" + Phyto.COLUMN_ID + ") FROM " + Phyto.TABLE_NAME + " WHERE used = 1")
+    @Query("SELECT MAX(" + Phyto.COLUMN_ID + ") FROM " + Phyto.TABLE_NAME + " WHERE registered = 0")
     Integer lastPhytosanitaryId();
 
     @Transaction @Query("SELECT * FROM " + Phyto.TABLE_NAME + " ORDER BY used DESC")
@@ -247,8 +250,8 @@ public interface DAO {
     @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE maaid = :refId")
     Integer phytoExists(String refId);
 
-    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :id WHERE " + Phyto.COLUMN_ID + " = :refId AND name LIKE :name")
-    int setPhytoEkyId(Integer id, String refId, String name);
+    @Query("UPDATE " + Phyto.TABLE_NAME + " SET " + Phyto.COLUMN_ID_EKY + " = :ekyId WHERE " + Phyto.COLUMN_ID + " = :id")  // AND name LIKE :name
+    int setPhytoEkyId(int ekyId, int id);  // String name
 
     @Query("SELECT " + Phyto.COLUMN_ID + " FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " = :eky_id")
     int getPhytoId(int eky_id);
@@ -259,11 +262,14 @@ public interface DAO {
     @Query("SELECT * FROM " + InterventionPhytosanitary.TABLE_NAME + " WHERE intervention_id = :inter_id AND phytosanitary_id = :phyto_id")
     InterventionPhytosanitary getPhytoInter(int inter_id, int phyto_id);
 
+    @Query("SELECT * FROM " + Phyto.TABLE_NAME + " WHERE " + Phyto.COLUMN_ID_EKY + " IS NULL AND registered = 0")
+    List<Phyto> getPhytoWithoutEkyId();
+
 
     /**
      *    Fertilizer
      **/
-    @Query("SELECT MAX(" + Fertilizer.COLUMN_ID + ") FROM " + Fertilizer.TABLE_NAME + " WHERE used = 1")
+    @Query("SELECT MAX(" + Fertilizer.COLUMN_ID + ") FROM " + Fertilizer.TABLE_NAME + " WHERE registered = 0")
     Integer lastFertilizerId();
 
     @Transaction @Query("SELECT * FROM " + Fertilizer.TABLE_NAME + " ORDER BY used DESC, label_fra")
@@ -277,6 +283,9 @@ public interface DAO {
 
     @Query("SELECT " + Fertilizer.COLUMN_ID + " FROM " + Fertilizer.TABLE_NAME + " WHERE " + Fertilizer.COLUMN_ID_EKY + " = :eky_id")
     int getFertilizerId(int eky_id);
+
+    @Query("SELECT * FROM " + Fertilizer.TABLE_NAME + " WHERE " + Fertilizer.COLUMN_ID_EKY + " IS NULL AND registered = 0")
+    List<Fertilizer> getFertilizerWithoutEkyId();
 
 
     /**

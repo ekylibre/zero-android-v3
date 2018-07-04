@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -17,6 +18,7 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -68,6 +70,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+
+import timber.log.Timber;
 
 import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
 
@@ -145,6 +149,10 @@ public class InterventionActivity extends AppCompatActivity implements
     private EditText temperatureEditText, windSpeedEditText;
     private List<AppCompatImageButton> weatherIcons;
     private List<String> weatherEnum;
+
+    // Note
+    TextInputLayout descriptionInput;
+    EditText descriptionEditText;
 
     // Current intervention datasets
     public static List<Object> inputList = new ArrayList<>();
@@ -342,7 +350,6 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override public void onTextChanged(CharSequence charSequence, int start, int before, int count) {}
             @Override public void afterTextChanged(Editable editable) {
                 if (!editable.toString().equals("0") && editable.length() != 0) {
-                    Log.i(TAG, "afterTextChanged");
                     Integer volume = Integer.valueOf(editable.toString());
                     String unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).getName();
                     String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", volume / surface, unit);
@@ -361,7 +368,6 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String quantityEditText = irrigationQuantityEdit.getText().toString();
                 if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
-                    if (BuildConfig.DEBUG) Log.i(TAG, "onItemSelected");
                     Integer quantity = Integer.valueOf(quantityEditText);
                     Unit unit = Units.IRRIGATION_UNITS.get(position);
                     String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", quantity / surface, unit.name);
@@ -520,7 +526,6 @@ public class InterventionActivity extends AppCompatActivity implements
 
         harvestAddLabel.setOnClickListener(view -> {
             outputList.add(new Harvest());
-            if (BuildConfig.DEBUG) Log.e(TAG, "outputList.size() " + outputList.size() + " adapter.getItemCount() " + harvestAdapter.getItemCount());
             harvestAdapter.notifyDataSetChanged();
         });
 
@@ -726,6 +731,20 @@ public class InterventionActivity extends AppCompatActivity implements
                 }
             }
         }
+
+        // ================================ DESCRIPTION ======================================== //
+
+        descriptionInput = findViewById(R.id.comment);
+        descriptionEditText = descriptionInput.getEditText();
+
+        if (editIntervention != null) {
+            if (editIntervention.intervention.comment != null && descriptionEditText != null) {
+                descriptionEditText.setText(editIntervention.intervention.comment);
+            }
+        }
+
+        descriptionEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        descriptionEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         // ================================ BOTTOM BAR ========================================= //
 
@@ -970,7 +989,7 @@ public class InterventionActivity extends AppCompatActivity implements
             if (editIntervention != null) {
 
                 // We are editing an existing intervention
-                if (BuildConfig.DEBUG) Log.i(TAG, "Intervention edition");
+                Timber.i("Intervention edition");
 
                 // Symplify intervention object
                 intervention = editIntervention.intervention;
@@ -1013,10 +1032,14 @@ public class InterventionActivity extends AppCompatActivity implements
                 intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
             }
 
+            String comment = descriptionEditText.getText().toString();
+            if (!comment.isEmpty())
+                intervention.comment = comment;
+
             // Save/update intervention and get returning id
             int intervention_id = (int) (long) database.dao().insert(intervention);
 
-            Log.e(TAG, "Editing intervention id " + intervention_id);
+            Timber.e("Editing intervention id %s", intervention_id);
 
             database.dao().insert(new InterventionWorkingDay(intervention_id, date, duration));
 
@@ -1031,7 +1054,7 @@ public class InterventionActivity extends AppCompatActivity implements
             if (temperature != null || windSpeed != null || weatherDescription != null)
                 database.dao().insert(new Weather(intervention_id, temperature, windSpeed, weatherDescription));
 
-            Log.e(TAG, " Number of inputs: " + inputList.size());
+            Timber.e(" Number of inputs: %s", inputList.size());
             for (Object item : inputList) {
                 if (item instanceof Seeds) {
                     Seeds seed = (Seeds) item;
@@ -1041,9 +1064,8 @@ public class InterventionActivity extends AppCompatActivity implements
                 else if (item instanceof Phytos) {
                     Phytos phyto = (Phytos) item;
                     phyto.inter.intervention_id = intervention_id;
-                    Log.e(TAG, "Phyto params: "+phyto.inter.quantity+phyto.inter.unit+"interid: "+phyto.inter.intervention_id+"phytoid: "+phyto.inter.phyto_id);
                     database.dao().insert(phyto.inter);
-                    Log.e(TAG, "PhytoInter quantity--> " + database.dao().getPhytoInter(intervention_id, phyto.inter.phyto_id).quantity);
+                    Timber.i("Phyto #%s", phyto.phyto.get(0).id);
                 }
                 else if (item instanceof Fertilizers) {
                     Fertilizers ferti = (Fertilizers) item;
@@ -1068,9 +1090,8 @@ public class InterventionActivity extends AppCompatActivity implements
                             database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
 
-            Log.e(TAG, "outputList = " + outputList);
             for (Harvest harvest : outputList) {
-                Log.e(TAG, "Insert Harvest");
+                Timber.i("harvest id_storage == %s", harvest.id_storage);
                 harvest.type = Enums.OUTPUT_TYPES.get(harvestOutputType.getSelectedItemPosition());
                 harvest.intervention_id = intervention_id;
                 database.dao().insert(harvest);
@@ -1099,7 +1120,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Object selection) {
         if (selection != null) {
 
-            if (BuildConfig.DEBUG) Log.e(TAG, "onFragmentInteraction --> " + selection.toString());
+            Timber.e("onFragmentInteraction --> %s", selection.toString());
 
 //            if (selection instanceof Materials) {
 //                selectMaterialFragment.dismiss();
@@ -1205,7 +1226,7 @@ public class InterventionActivity extends AppCompatActivity implements
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max = dose_max;
-            if (BuildConfig.DEBUG) Log.e(TAG, "dose max = " + ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max);
+            Timber.e("dose max = %s", ((Phytos) inputList.get(inputList.indexOf(phyto))).phyto.get(0).dose_max);
         }
     }
 

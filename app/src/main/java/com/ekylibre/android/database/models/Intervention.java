@@ -23,7 +23,7 @@ public class Intervention {
     public Integer water_quantity;
     public String water_unit;
     public String farm;
-    public String comment;  // not yet implemented in api
+    public String comment;
     public String status;
 
     public Integer getEky_id() {

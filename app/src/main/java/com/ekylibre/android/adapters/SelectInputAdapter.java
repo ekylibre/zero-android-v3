@@ -2,6 +2,8 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.Group;
 import android.support.v7.widget.AppCompatTextView;
@@ -17,6 +19,7 @@ import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.SelectInputFragment;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Phyto;
@@ -26,18 +29,23 @@ import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
+import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.Enums;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
 
 
-public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements SyncResultReceiver.Receiver {
 
     private static final String TAG = "SelectInputAdapter";
-    private final int SEED = 0, PHYTO = 1, FERTI = 2;
+    public static final int SEED = 0, PHYTO = 1, FERTI = 2;
 
     private Context context;
     private List<Object> inputList;
@@ -48,6 +56,60 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.inputList = inputList;
         this.context = context;
         this.fragmentListener = fragmentListener;
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        if (resultCode == SyncService.DONE) {
+
+            int type = resultData.getInt("type", 0);
+            int local_id = resultData.getInt("local_id", 0);
+            int remote_id = resultData.getInt("remote_id", 0);
+
+            new SetInputId(context, type, local_id, remote_id).execute();
+
+            for (Object phyto : inputList) {
+                if (phyto instanceof Phyto)
+                    if (((Phyto) phyto).id == local_id) {
+                        ((Phyto) phyto).eky_id = remote_id;
+                        break;
+                    }
+            }
+        }
+    }
+
+    class SetInputId extends AsyncTask<Void, Void, Void> {
+
+        Context context;
+        int ekyId;
+        int id;
+        int type;
+
+        SetInputId(Context context, int type, int id, int ekyId) {
+            this.context = context;
+            this.type = type;
+            this.id = id;
+            this.ekyId = ekyId;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            AppDatabase database = AppDatabase.getInstance(context);
+
+            switch (type) {
+                case PHYTO:
+                    database.dao().setPhytoEkyId(ekyId, id);
+                    break;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            notifyDataSetChanged();
+        }
     }
 
     class SeedViewHolder extends RecyclerView.ViewHolder {
@@ -141,7 +203,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 break;
 
             default:
-                if (BuildConfig.DEBUG) Log.e(TAG, "default viewHolder --> pas normal");
+                Timber.e("default viewHolder --> pas normal");
                 View defaultView = inflater.inflate(R.layout.item_seed, parent, false);
                 viewHolder = new SeedViewHolder(defaultView);
                 break;
@@ -157,8 +219,14 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case SEED:
                 SeedViewHolder seedViewHolder = (SeedViewHolder) holder;
                 Seed seed = (Seed) inputList.get(position);
-                int res = context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName());
-                seedViewHolder.seedSpecie.setText(res != 0 ? context.getString(res) : seed.specie);
+                String specie = seed.variety;
+                if (seed.specie != null) {
+                    if (Enums.SPECIE_TYPES.contains(seed.specie.toUpperCase())) {
+                        int res = context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName());
+                        specie = context.getString(res);
+                    }
+                }
+                seedViewHolder.seedSpecie.setText(specie);
                 seedViewHolder.seedVariety.setText(seed.variety);
                 seedViewHolder.seedFavorite.setVisibility((seed.eky_id != null) ? View.VISIBLE : View.GONE);
                 seedViewHolder.seed = seed;
@@ -183,8 +251,8 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 phytoViewHolder.phytoName.setText(phyto.name);
                 phytoViewHolder.phythoCompany.setText(phyto.firm_name);
-                phytoViewHolder.phytoAmm.setText((!phyto.maaid.isEmpty()) ? phyto.maaid : context.getString(R.string.unspecified));
-                if (phyto.in_field_reentry_delay != -1)
+                phytoViewHolder.phytoAmm.setText((phyto.maaid != null) ? phyto.maaid : context.getString(R.string.unspecified));
+                if (phyto.in_field_reentry_delay != null)
                     phytoViewHolder.phytoDelay.setText(context.getResources().getQuantityString(R.plurals.x_hours, phyto.in_field_reentry_delay, phyto.in_field_reentry_delay));
                 else
                     phytoViewHolder.phytoDelay.setText(R.string.unspecified);
@@ -193,19 +261,20 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 phytoViewHolder.phytoMixWarning.setVisibility(View.GONE);
 
                 if (phyto.mix_category_code != null) {
-                    if (BuildConfig.DEBUG) Log.e(TAG, "Current item mix_category_code " + phyto.mix_category_code);
+                    Timber.e("Current item mix_category_code %s", phyto.mix_category_code);
 
                     List<Integer> codes = new ArrayList<>();
                     for (Object input : InterventionActivity.inputList) {
                         if (input instanceof Phytos) {
                             Phyto currentPhyto = ((Phytos) input).phyto.get(0);
                             if (currentPhyto != null)
-                                codes.add(currentPhyto.mix_category_code);
+                                if (currentPhyto.mix_category_code != null)
+                                    codes.add(currentPhyto.mix_category_code);
                         }
                     }
                     codes.add(phyto.mix_category_code);
 
-                    if (BuildConfig.DEBUG) Log.e(TAG, codes.toString());
+                    Timber.e(codes.toString());
 
                     if (codes.size() >= 2) {
                         if (!mixIsAuthorized(codes))
@@ -219,8 +288,12 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 FertiViewHolder fertiViewHolder = (FertiViewHolder) holder;
                 Fertilizer fertilizer = (Fertilizer) inputList.get(position);
                 fertiViewHolder.fertiName.setText(fertilizer.label_fra);
-                res = context.getResources().getIdentifier(fertilizer.nature, "string", context.getPackageName());
-                fertiViewHolder.fertiType.setText(context.getString(res));
+                String type = "";
+                if (fertilizer.nature != null) {
+                    int res = context.getResources().getIdentifier(fertilizer.nature, "string", context.getPackageName());
+                    type = context.getString(res);
+                }
+                fertiViewHolder.fertiType.setText(type);
                 fertiViewHolder.fertiFavorite.setVisibility((fertilizer.eky_id != null) ? View.VISIBLE : View.GONE);
                 fertiViewHolder.fertilizer = fertilizer;
                 break;

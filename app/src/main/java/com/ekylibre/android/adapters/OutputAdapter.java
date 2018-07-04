@@ -19,12 +19,15 @@ import android.widget.ImageView;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import timber.log.Timber;
 
 
 public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder> {
@@ -44,6 +47,8 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
         ImageView deleteImageView;
         EditText quantityEditText, numberEditText;
         AppCompatSpinner unitSpinner, storageSpinner;
+
+        boolean globalOutput = false;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -79,18 +84,23 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
             unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override public void onNothingSelected(AdapterView<?> parent) {}
                 @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    dataset.get(getAdapterPosition()).unit = Units.OUTPUT_UNITS.get(position).key;
+                    List<Unit> units = globalOutput ? Units.GLOBAL_OUTPUT_UNITS : Units.LOAD_OUTPUT_UNITS;
+                    dataset.get(getAdapterPosition()).unit = units.get(position).key;
                 }
             });
 
-            if (!Enums.STORAGE_LIST_NAMES.isEmpty()) {
-                storageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override public void onNothingSelected(AdapterView<?> parent) {}
-                    @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        dataset.get(getAdapterPosition()).id_storage = Enums.STORAGE_LIST.get(position).id;
+            storageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override public void onNothingSelected(AdapterView<?> parent) {}
+                @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Timber.i("position %s", position);
+                    if (position != 0) {
+                        dataset.get(getAdapterPosition()).id_storage = Enums.STORAGE_LIST.get(position - 1).id;
+                        Timber.i("Storage id --> %s", Enums.STORAGE_LIST.get(position - 1).id);
+                    } else {
+                        dataset.get(getAdapterPosition()).id_storage = null;
                     }
-                });
-            }
+                }
+            });
 
             numberEditText.addTextChangedListener(new TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -110,22 +120,30 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
                 quantityEditText.setText(String.valueOf(item.quantity));
 
             // Quantity unit selector
-            ArrayAdapter unitSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Units.OUTPUT_UNITS_L10N);
+            Unit currentUnit = Units.getUnit(item.unit);
+            List<String> unitList;
+            if (Units.GLOBAL_OUTPUT_UNITS.contains(currentUnit)) {
+                unitList = Units.GLOBAL_OUTPUT_UNITS_L10N;
+                globalOutput = true;
+            } else {
+                unitList = Units.LOAD_OUTPUT_UNITS_L10N;
+                globalOutput = false;
+            }
+
+            ArrayAdapter unitSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, unitList);
             unitSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             unitSpinner.setAdapter(unitSpinnerAdapter);
-            unitSpinner.setSelection(Units.OUTPUT_UNITS.indexOf(Units.getUnit(item.unit)));
+            if (currentUnit != null)
+                unitSpinner.setSelection(unitList.indexOf(currentUnit.name));
 
             // Storage selector
-            ArrayAdapter storageSpinnerAdapter;
-            if (Enums.STORAGE_LIST_NAMES.isEmpty()) {
-                storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Collections.singletonList("Non défini"));
-                storageSpinner.setEnabled(false);
-            } else
-                storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.STORAGE_LIST_NAMES);
-            storageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+            ArrayAdapter storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, Enums.STORAGE_LIST_NAMES);
+            storageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             storageSpinner.setAdapter(storageSpinnerAdapter);
-            if (item.id_storage != null)
-                storageSpinner.setSelection(Enums.STORAGE_LIST_NAMES.indexOf(item.unit));
+            Timber.i("storage #%s", item.id_storage);
+            if (item.id_storage != null) {
+                storageSpinner.setSelection(Enums.getIndex(item.id_storage) + 1);
+            }
 
             numberEditText.setText(item.number);
         }

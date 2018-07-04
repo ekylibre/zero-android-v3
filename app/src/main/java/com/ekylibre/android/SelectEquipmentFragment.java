@@ -24,7 +24,6 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
-import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.Enums;
@@ -232,7 +231,7 @@ public class SelectEquipmentFragment extends DialogFragment implements SyncResul
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
             Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_ARTICLES);
+            intent.setAction(SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT);
             intent.putExtra("receiver", resultReceiver);
             context.startService(intent);
         }

@@ -19,10 +19,12 @@ import com.ekylibre.android.FarmQuery;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.InterventionQuery;
 import com.ekylibre.android.MainActivity;
+import com.ekylibre.android.PushArticleMutation;
 import com.ekylibre.android.PushEquipmentMutation;
 import com.ekylibre.android.PushInterMutation;
 import com.ekylibre.android.PushPersonMutation;
 import com.ekylibre.android.UpdateInterMutation;
+import com.ekylibre.android.adapters.SelectInputAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
@@ -54,11 +56,12 @@ import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.network.GraphQLClient;
 
 import com.ekylibre.android.type.ArticleAllUnitEnum;
-import com.ekylibre.android.type.ArticleAttributes;
 import com.ekylibre.android.type.ArticleTypeEnum;
+import com.ekylibre.android.type.ArticleUnitEnum;
 import com.ekylibre.android.type.ArticleVolumeUnitEnum;
 import com.ekylibre.android.type.HarvestLoadAttributes;
 import com.ekylibre.android.type.HarvestLoadUnitEnum;
+import com.ekylibre.android.type.InterventionArticleAttributes;
 import com.ekylibre.android.type.InterventionInputAttributes;
 import com.ekylibre.android.type.InterventionOperatorAttributes;
 import com.ekylibre.android.type.InterventionOutputAttributes;
@@ -70,6 +73,7 @@ import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoleEnum;
+import com.ekylibre.android.type.StorageTypeEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.Enums;
@@ -92,16 +96,14 @@ import timber.log.Timber;
 
 public class SyncService extends IntentService {
 
-    private static final String TAG = "SyncService";
-
     public static final int DONE = 10;
     public static final int FAILED = 11;
 
     public static final String ACTION_SYNC_ALL = "com.ekylibre.android.services.action.SYNC_PULL";
     public static final String FIRST_TIME_SYNC = "com.ekylibre.android.services.action.FIRST_TIME_SYNC";
-    public static final String ACTION_CREATE_ARTICLES = "com.ekylibre.android.services.action.CREATE_ARTICLES";
+    public static final String ACTION_CREATE_PERSON_AND_EQUIPMENT = "com.ekylibre.android.services.action.CREATE_PERS_AND_EQUIP";
+    public static final String ACTION_CREATE_ARTICLE = "com.ekylibre.android.services.action.CREATE_ARTICLES";
 
-    private boolean ERROR = false;
     public static String ACCESS_TOKEN;
     private static SharedPreferences prefs;
     private AppDatabase database;
@@ -147,8 +149,14 @@ public class SyncService extends IntentService {
         // Route action to function
         switch (ACTION) {
 
-            case ACTION_CREATE_ARTICLES:
-                pushCreatePersonsAndEquipments();
+            case ACTION_CREATE_PERSON_AND_EQUIPMENT:
+                pushPerson();
+                pushEquipment();
+                break;
+
+            case ACTION_CREATE_ARTICLE:
+                pushArticle();
+                Timber.i("pushArticle break");
                 break;
 
             case FIRST_TIME_SYNC:
@@ -158,7 +166,8 @@ public class SyncService extends IntentService {
             case ACTION_SYNC_ALL:
 
                 // Mutations (order is important)
-                pushCreatePersonsAndEquipments();
+                pushPerson();
+                pushEquipment();
                 pushDeleteIntervention();
                 pushUpdateIntervention();  // TODO: merge update and create in one method
                 pushCreateIntervention();
@@ -266,7 +275,7 @@ public class SyncService extends IntentService {
                             .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id)).build());
 
                 for (Phytos phyto : updatableInter.phytos) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     if (phyto.phyto.get(0).eky_id == null) { // Create new article
                         if (phyto.phyto.get(0).registered)
@@ -284,7 +293,7 @@ public class SyncService extends IntentService {
                 }
 
                 for (Seeds seed : updatableInter.seeds) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     if (seed.seed.get(0).eky_id == null) { // Create new article
                         if (seed.seed.get(0).registered)
@@ -302,7 +311,7 @@ public class SyncService extends IntentService {
                 }
 
                 for (Fertilizers fertilizer : updatableInter.fertilizers) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     if (fertilizer.fertilizer.get(0).eky_id == null) { // Create new article
                         if (fertilizer.fertilizer.get(0).registered)
@@ -348,9 +357,9 @@ public class SyncService extends IntentService {
                     loadUpdates.add(HarvestLoadAttributes.builder()
                             .number(harvest.number)
                             .quantity(harvest.quantity)
-                            .netQuantity(harvest.quantity)
+                            .netQuantity((double) harvest.quantity)
                             .unit(HarvestLoadUnitEnum.valueOf(harvest.unit))
-                            .storageID(String.valueOf(harvest.id_storage)).build());
+                            .storageID(harvest.id_storage != null ? String.valueOf(harvest.id_storage) : null).build());
                 }
                 if (!loadUpdates.isEmpty()) {
                     outputUpdate.add(InterventionOutputAttributes.builder()
@@ -377,6 +386,7 @@ public class SyncService extends IntentService {
                         .weather(weatherUpdate)
                         .waterQuantity((updatableInter.intervention.water_quantity != null) ? (long) updatableInter.intervention.water_quantity : null)
                         .waterUnit((updatableInter.intervention.water_unit != null) ? ArticleVolumeUnitEnum.safeValueOf(updatableInter.intervention.water_unit) : null)
+                        .description(updatableInter.intervention.comment)
                         .build();
 
                 // Do the mutation and register callback
@@ -407,9 +417,8 @@ public class SyncService extends IntentService {
     /**
      * create person and equipment mutation
      */
-    private void pushCreatePersonsAndEquipments() {
+    private void pushPerson() {
 
-        List<Equipment> newEquipments = database.dao().getEquipmentWithoutEkyId();
         List<Person> newPersons = database.dao().getPersonsWithoutEkyId();
 
         if (!newPersons.isEmpty()) {
@@ -441,11 +450,20 @@ public class SyncService extends IntentService {
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Timber.e(e.getLocalizedMessage());
-                        ERROR = true;
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
                     }
                 });
             }
         } else Timber.i("No new Person to push");
+    }
+
+    /**
+     * create person and equipment mutation
+     */
+    private void pushEquipment() {
+
+        List<Equipment> newEquipments = database.dao().getEquipmentWithoutEkyId();
 
         if (!newEquipments.isEmpty()) {
             for (Equipment equipment : newEquipments) {
@@ -464,7 +482,7 @@ public class SyncService extends IntentService {
                             if (!mutation.equipment().id().equals("")) {
                                 database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
                                 Timber.i("Equipment #%s successfully created", mutation.equipment().id());
-                                if (ACTION.equals(ACTION_CREATE_ARTICLES)) {
+                                if (ACTION.equals(ACTION_CREATE_PERSON_AND_EQUIPMENT)) {
                                     Bundle bundle = new Bundle();
                                     bundle.putString("name", equipment.name);
                                     bundle.putInt("remote_id", Integer.valueOf(mutation.equipment().id()));
@@ -478,18 +496,134 @@ public class SyncService extends IntentService {
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Timber.e(e.getLocalizedMessage());
-                        ERROR = true;
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
                     }
                 });
             }
         } else {
             Timber.i("No new Equipment to push");
         }
+    }
 
-        if (ERROR) {
-            MainActivity.ITEMS_TO_SYNC = true;
-            receiver.send(FAILED, new Bundle());
+
+    /**
+     * create article
+     */
+    private void pushArticle() {
+
+        List<Phyto> phytosWithoutEkyId = database.dao().getPhytoWithoutEkyId();
+        List<Seed> seedsWithoutEkyId = database.dao().getSeedWithoutEkyId();
+        List<Fertilizer> fertilizersWithoutEkyId = database.dao().getFertilizerWithoutEkyId();
+
+        if (!phytosWithoutEkyId.isEmpty()) {
+            for (Phyto phyto : phytosWithoutEkyId) {
+
+                PushArticleMutation articleMutation = PushArticleMutation.builder()
+                        .farmId(MainActivity.FARM_ID)
+                        .type(ArticleTypeEnum.CHEMICAL)
+                        .name(phyto.name)
+                        .unit(ArticleUnitEnum.LITER)
+                        .build();
+
+                apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
+                        if (!response.hasErrors()) {
+                            PushArticleMutation.Data data = response.data();
+                            if (data != null) {
+                                PushArticleMutation.CreateArticle mutation = data.createArticle();
+                                if (mutation != null) {
+                                    PushArticleMutation.Article article = mutation.article();
+                                    if (article != null) {
+                                        database.dao().setPhytoEkyId(Integer.valueOf(article.id()), phyto.id);
+                                        Timber.i("Custom phyto #%s successfully created", article.id());
+                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
+                                            receiver.send(DONE, new Bundle());
+                                    }}}}}
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
         }
+
+        if (!seedsWithoutEkyId.isEmpty()) {
+            for (Seed seed : seedsWithoutEkyId) {
+
+                String specie = getResources().getString(getResources().getIdentifier(seed.specie.toUpperCase(), "string", getPackageName()));
+
+
+                PushArticleMutation articleMutation = PushArticleMutation.builder()
+                        .farmId(MainActivity.FARM_ID)
+                        .type(ArticleTypeEnum.SEED)
+                        .name(String.format("%s %s", specie, seed.variety))
+                        .unit(ArticleUnitEnum.KILOGRAM)
+                        .build();
+
+                apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
+                        if (!response.hasErrors()) {
+                            PushArticleMutation.Data data = response.data();
+                            if (data != null) {
+                                PushArticleMutation.CreateArticle mutation = data.createArticle();
+                                if (mutation != null) {
+                                    PushArticleMutation.Article article = mutation.article();
+                                    if (article != null) {
+                                        database.dao().setSeedEkyId(Integer.valueOf(article.id()), String.valueOf(seed.id));
+                                        Timber.i("Custom seed #%s successfully created", article.id());
+                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
+                                            receiver.send(DONE, new Bundle());
+                                    }}}}}
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        }
+
+        if (!fertilizersWithoutEkyId.isEmpty()) {
+            for (Fertilizer fertilizer : fertilizersWithoutEkyId) {
+
+                PushArticleMutation articleMutation = PushArticleMutation.builder()
+                        .farmId(MainActivity.FARM_ID)
+                        .type(ArticleTypeEnum.FERTILIZER)
+                        .name(fertilizer.label_fra)
+                        .unit(ArticleUnitEnum.KILOGRAM)
+                        .build();
+
+                apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
+                        if (!response.hasErrors()) {
+                            PushArticleMutation.Data data = response.data();
+                            if (data != null) {
+                                PushArticleMutation.CreateArticle mutation = data.createArticle();
+                                if (mutation != null) {
+                                    PushArticleMutation.Article article = mutation.article();
+                                    if (article != null) {
+                                        database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), String.valueOf(fertilizer.id));
+                                        Timber.i("Custom fertilizer #%s successfully created", article.id());
+                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
+                                            receiver.send(DONE, new Bundle());
+                                    }}}}}
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        }
+
 
     }
 
@@ -547,7 +681,7 @@ public class SyncService extends IntentService {
                 for (Harvest harvest : createInter.harvests) {
                     HarvestLoadAttributes.Builder loadBuilder = HarvestLoadAttributes.builder()
                             .quantity(harvest.quantity)
-                            .netQuantity(harvest.quantity)
+                            .netQuantity((double) harvest.quantity)
                             .unit(HarvestLoadUnitEnum.valueOf(harvest.unit));
                     if (harvest.number != null) loadBuilder.number(harvest.number);
                     if (harvest.id_storage != null) loadBuilder.storageID(String.valueOf(harvest.id_storage));
@@ -561,7 +695,7 @@ public class SyncService extends IntentService {
                 }
 
                 for (Phytos phyto : createInter.phytos) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     if (phyto.phyto.get(0).eky_id == null) {  // Create new article
                         if (phyto.phyto.get(0).registered)
@@ -578,7 +712,7 @@ public class SyncService extends IntentService {
                 }
 
                 for (Seeds seed : createInter.seeds) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     if (seed.seed.get(0).eky_id == null) { // Create new article
                         if (seed.seed.get(0).registered)
@@ -596,7 +730,7 @@ public class SyncService extends IntentService {
                 }
 
                 for (Fertilizers fertilizer : createInter.fertilizers) {
-                    ArticleAttributes.Builder articleBuilder = ArticleAttributes.builder();
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     if (fertilizer.fertilizer.get(0).eky_id == null) {  // Create new article
                         if (fertilizer.fertilizer.get(0).registered)
@@ -632,6 +766,8 @@ public class SyncService extends IntentService {
                 if (createInter.intervention.water_unit != null)
                     pushIntervention.waterUnit(ArticleVolumeUnitEnum.safeValueOf(createInter.intervention.water_unit));
                 if (weatherInput != null) pushIntervention.weather(weatherInput);
+                if (createInter.intervention.comment != null)
+                    pushIntervention.description(createInter.intervention.comment);
 
                 if (!inputs.isEmpty()) pushIntervention.inputs(inputs);
                 if (!outputs.isEmpty()) pushIntervention.outputs(outputs);
@@ -680,6 +816,9 @@ public class SyncService extends IntentService {
     private void getFarm() {
 
         List<Integer> personEkyIdList = database.dao().personEkiIdList();
+        List<Integer> phytoEkyIdList = database.dao().phytoEkiIdList();
+        List<Integer> seedEkyIdList = database.dao().seedEkiIdList();
+        List<Integer> fertiEkyIdList = database.dao().fertilizerEkiIdList();
 
         ApolloCall.Callback<FarmQuery.Data> farmCallback = new ApolloCall.Callback<FarmQuery.Data>() {
 
@@ -711,8 +850,9 @@ public class SyncService extends IntentService {
                     editor.putString("current-farm-name", farm.label());
                     editor.apply();
 
-
+                    ////////////////////
                     // Processing plots
+                    ////////////////////
                     List<FarmQuery.Plot> plots = farm.plots();
                     if (plots != null) {
                         Timber.i("Fetching plots...");
@@ -723,7 +863,9 @@ public class SyncService extends IntentService {
                         }
                     }
 
+                    /////////////////////////////////////////
                     // Processing crops and associated plots
+                    /////////////////////////////////////////
                     List<FarmQuery.Crop> crops = farm.crops();
                     if (crops != null) {
                         Timber.i("Fetching crops...");
@@ -753,7 +895,9 @@ public class SyncService extends IntentService {
                         editor.apply();
                     }
 
+                    /////////////////////
                     // Processing people
+                    /////////////////////
                     List<FarmQuery.person> people = farm.people();
                     if (people != null) {
                         Timber.i("Fetching people...");
@@ -773,7 +917,9 @@ public class SyncService extends IntentService {
                         // TODO: delete person if deleted on server --> or mark status deleted ?
                     }
 
+                    /////////////////////////
                     // Processing equipments
+                    /////////////////////////
                     List<FarmQuery.Equipment> equipments = farm.equipments();
                     if (equipments != null) {
                         Timber.i("Fetching equipments...");
@@ -789,11 +935,12 @@ public class SyncService extends IntentService {
                         }
                     }
 
+                    ///////////////////////
                     // Processing storages
+                    ///////////////////////
                     List<FarmQuery.Storage> storages = farm.storages();
                     if (storages != null) {
                         Timber.i("Fetching storages...");
-
                         for (FarmQuery.Storage storage : storages) {
                             Timber.d("	Create/update storage #%s", storage.id());
                             database.dao().insert(new Storage(
@@ -801,42 +948,81 @@ public class SyncService extends IntentService {
                                     storage.name(),
                                     storage.type().rawValue()));
                         }
-                        Enums.STORAGE_LIST = database.dao().getStorages();
-                        Enums.generateStorages(getBaseContext());
                     }
+                    Enums.generateStorages(database);
 
+                    ///////////////////////
                     // Processing articles
+                    ///////////////////////
                     List<FarmQuery.Article> articles = farm.articles();
                     if (articles != null) {
                         Timber.i("Fetching articles...");
 
                         for (FarmQuery.Article article : articles) {
 
+                            int ekyId = Integer.valueOf(article.id());
+
                             if (article.type() == ArticleTypeEnum.CHEMICAL) {
-                                long result = database.dao().setPhytoEkyId(Integer.valueOf(article.id()), article.referenceID(), article.name().split(" - ")[0] + "%");
-                                if (result != 1) {
-                                    Timber.d("	Create phyto #%s", article.id());
-                                    database.dao().insert(new Phyto(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), article.name(),
-                                            null, article.referenceID(), null,
-                                            null, null, false, true, "LITER"));
+
+                                if (article.referenceID() != null) {
+                                    Timber.d("	Assign ekyId to phyto #%s", article.referenceID());
+                                    database.dao().setPhytoEkyId(ekyId, Integer.valueOf(article.referenceID()));  // article.name().split(" - ")[0] + "%"
+
+                                } else {
+                                    if (!phytoEkyIdList.contains(ekyId)) {
+                                        Timber.d("	Create phyto #%s", article.id());
+                                        Integer newId = database.dao().lastPhytosanitaryId();
+                                        newId = newId != null ? ++newId : 100000;
+                                        database.dao().insert(new Phyto(newId, Integer.valueOf(article.id()), article.name(),
+                                                null, null, null,
+                                                null, null, false, true, "LITER"));
+                                    }
+                                    else {
+                                        // TODO: manage existing article without ekyId
+                                    }
                                 }
                             }
 
                             if (article.type() == ArticleTypeEnum.SEED) {
-                                long result = database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceID());
-                                if (result != 1) {
-                                    Timber.d("	Create seed #%s", article.id());
-                                    database.dao().insert(new Seed(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), article.name(),
-                                            null, false, true, "KILOGRAM"));
+
+                                if (article.referenceID() != null) {
+                                    Timber.d("	Assign ekyId to seed #%s", article.referenceID());
+                                    database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceID());
+
+                                } else {
+                                    if (!seedEkyIdList.contains(ekyId)) {
+                                        Integer newId = database.dao().lastSeedId();
+                                        newId = newId != null ? ++newId : 1;
+                                        String specie = article.species() != null ? article.species().rawValue().toLowerCase() : null;
+                                        String variety;
+                                        if (article.variety() == null || article.variety().isEmpty()) {
+                                            variety = article.name();
+                                        } else {
+                                            variety = article.variety();
+                                        }
+                                        Timber.i("Seed id:%s ekyId:%s specie:%s variety:%s", newId, article.id(), specie, variety);
+                                        database.dao().insert(new Seed(newId, Integer.valueOf(article.id()),
+                                                specie, variety, false, true, "KILOGRAM"));
+                                    }
                                 }
                             }
 
                             if (article.type() == ArticleTypeEnum.FERTILIZER) {
-                                if (database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), article.referenceID()) != 1) {
-                                    Timber.d("	Create fertilizer #%s", article.id());
-                                    database.dao().insert(new Fertilizer(Integer.valueOf(article.referenceID()), Integer.valueOf(article.id()), null,
+
+                                if (article.referenceID() != null) {
+                                    Timber.d("	Assign ekyId to fertilizer #%s", article.referenceID());
+                                    database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), article.referenceID());
+
+                                } else {
+                                    if (!fertiEkyIdList.contains(ekyId)) {
+                                        Integer newId = database.dao().lastFertilizerId();
+                                        Timber.i("Last Ferti id %s", newId);
+                                        newId = newId != null ? ++newId : 1000;
+                                        Timber.i("Fertilizer id:%s ekyId:%s name:%s", newId, article.id(), article.name());
+                                        database.dao().insert(new Fertilizer(newId, Integer.valueOf(article.id()), null,
                                             article.name(), null, null, null, null, null,
-                                            null, null, null, null, true, "KILOGRAM"));
+                                            null, null, null, false, true, "KILOGRAM"));
+                                    }
                                 }
                             }
                         }
@@ -861,7 +1047,7 @@ public class SyncService extends IntentService {
 
             @Override
             public void onFailure(@Nonnull ApolloException e) {
-                Timber.e(e, e.getMessage());
+                Timber.e(e);
                 Bundle bundle = new Bundle();
                 bundle.putString("message", e.getLocalizedMessage());
                 receiver.send(FAILED, bundle);
@@ -918,6 +1104,11 @@ public class SyncService extends IntentService {
                                     newInter.setWater_unit(waterUnit.rawValue());
                                 }
 
+                                // Set description is present
+                                String comment = inter.description();
+                                if (comment != null)
+                                    newInter.comment = comment;
+
                                 // Write Intervention and get fallback id
                                 id = (int) database.dao().insert(newInter);
 
@@ -937,6 +1128,11 @@ public class SyncService extends IntentService {
                                     existingInter.intervention.water_quantity = waterQuantity.intValue();
                                     existingInter.intervention.water_unit = waterUnit.rawValue();
                                 }
+
+                                // Set description is present
+                                String comment = inter.description();
+                                if (comment != null)
+                                    existingInter.intervention.comment = comment;
 
                                 // Upsert modified Intervention in database
                                 database.dao().insert(existingInter.intervention);
@@ -1050,14 +1246,24 @@ public class SyncService extends IntentService {
                                             database.dao().insert(new InterventionPhytosanitary(qtt, input.unit().toString(), id, articleId));
 
                                         } else if (article.type().equals(ArticleTypeEnum.SEED)) {
-                                            //int seedId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
-                                            database.dao().insert(new InterventionSeed(input.quantity().floatValue(), input.unit().toString(), id, Integer.valueOf(article.referenceID())));
+                                            if (referenceId != null)
+                                                articleId = Integer.valueOf(referenceId);
+                                            else
+                                                articleId = database.dao().getSeedId(Integer.valueOf(input.article().id()));
+
+                                            Double quantity = input.quantity();
+                                            float qtt = quantity != null ? quantity.floatValue() : 0;
+                                            database.dao().insert(new InterventionSeed(qtt, input.unit().toString(), id, articleId));
 
                                         } else if (article.type().equals(ArticleTypeEnum.FERTILIZER)) {
-                                            //int fertiId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
-                                            InterventionFertilizer interventionFertilizer =
-                                                    new InterventionFertilizer(input.quantity().floatValue(), input.unit().toString(), id, Integer.valueOf(article.referenceID()));
-                                            database.dao().insert(interventionFertilizer);
+                                            if (referenceId != null)
+                                                articleId = Integer.valueOf(referenceId);
+                                            else
+                                                articleId = database.dao().getFertilizerId(Integer.valueOf(input.article().id()));
+
+                                            Double quantity = input.quantity();
+                                            float qtt = quantity != null ? quantity.floatValue() : 0;
+                                            database.dao().insert(new InterventionFertilizer(qtt, input.unit().toString(), id, articleId));
                                         }
                                     }
                                 }
@@ -1087,6 +1293,7 @@ public class SyncService extends IntentService {
                                         InterventionOutputUnitEnum globalUnit = output.unit();
                                         String quantityUnit = globalUnit != null ? globalUnit.toString() : null;
                                         Double quantity = output.quantity();
+                                        //Integer storageId = output.s != null ? Integer.valueOf(storage.id()) : null;
                                         float qtt = quantity != null ? quantity.floatValue() : 0;
                                         database.dao().insert(new Harvest(id, qtt, quantityUnit, null, null, output.nature().toString()));
                                     }

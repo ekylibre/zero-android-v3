@@ -364,7 +364,8 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
      */
     private void generateUnitLists() {
         setUnitsName(Units.IRRIGATION_UNITS, Units.IRRIGATION_UNITS_L10N);
-        setUnitsName(Units.OUTPUT_UNITS, Units.OUTPUT_UNITS_L10N);
+        setUnitsName(Units.GLOBAL_OUTPUT_UNITS, Units.GLOBAL_OUTPUT_UNITS_L10N);
+        setUnitsName(Units.LOAD_OUTPUT_UNITS, Units.LOAD_OUTPUT_UNITS_L10N);
         setUnitsName(Units.VOLUME_UNITS, Units.VOLUME_UNITS_L10N);
         setUnitsName(Units.MASS_UNITS, Units.MASS_UNITS_L10N);
     }

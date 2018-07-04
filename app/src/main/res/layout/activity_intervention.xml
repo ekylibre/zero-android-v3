@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Notes"
                     android:imeOptions="actionDone"
-                    android:inputType="textLongMessage"
+                    android:inputType="textMultiLine"
                     android:maxLines="10"/>
             </android.support.design.widget.TextInputLayout>
 

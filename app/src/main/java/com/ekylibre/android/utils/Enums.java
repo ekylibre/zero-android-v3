@@ -4,8 +4,10 @@ package com.ekylibre.android.utils;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.type.EquipmentTypeEnum;
+import com.ekylibre.android.type.HarvestLoadUnitEnum;
 import com.ekylibre.android.type.InterventionOutputTypeEnum;
 import com.ekylibre.android.type.SpecieEnum;
 import com.ekylibre.android.type.StorageTypeEnum;
@@ -38,15 +40,21 @@ public class Enums {
     public static List<String> STORAGE_LIST_NAMES = new ArrayList<>();
 
 
-    public static void generateStorages(Context context) {
+    public static void generateStorages(AppDatabase database) {
+
+        Enums.STORAGE_LIST.clear();
+        Enums.STORAGE_LIST.addAll(database.dao().getStorages());
+
         STORAGE_LIST_NAMES.clear();
+        STORAGE_LIST_NAMES.add("---");
+        // STORAGE_LIST_NAMES.add(String.format("%s (%s)",storage.name, translate(context, storage.type)));
         for (Storage storage : STORAGE_LIST)
-            STORAGE_LIST_NAMES.add(String.format("%s (%s)",storage.name, translate(context, storage.type)));
+            STORAGE_LIST_NAMES.add(storage.name);
     }
 
-    public static int getIndex(String name) {
+    public static int getIndex(int id) {
         for (Storage storage : STORAGE_LIST)
-            if (storage.name.equals(name))
+            if (storage.id == id)
                 return STORAGE_LIST.indexOf(storage);
         return 0;
     }

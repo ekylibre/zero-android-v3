@@ -56,5 +56,6 @@ public class Harvest {
         this.unit = Units.QUINTAL_PER_HECTARE.toString();
         this.type = Enums.OUTPUT_ENUMS.get(0).toString();
         this.number = "";
+        this.id_storage = null;
     }
 }

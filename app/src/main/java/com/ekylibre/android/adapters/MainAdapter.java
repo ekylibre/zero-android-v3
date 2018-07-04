@@ -18,6 +18,7 @@ import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.models.Harvest;
+import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -144,7 +145,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
             case App.IMPLANTATION:
                 for (Seeds s : current.seeds) {
-                    String specie = context.getResources().getString(context.getResources().getIdentifier(s.seed.get(0).specie.toUpperCase(), "string", context.getPackageName()));
+                    Seed seed = s.seed.get(0);
+                    String specie;
+                    if (seed.specie != null)
+                        specie = context.getResources().getString(context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName()));
+                    else
+                        specie = seed.variety;
                     sb.append(specie).append(" • ");
                     sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(s.inter.unit)).name);

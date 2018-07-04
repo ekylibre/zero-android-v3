@@ -21,14 +21,14 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectPersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
+import com.ekylibre.android.services.SyncResultReceiver;
 import com.ekylibre.android.services.SyncService;
 
-import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectPersonFragment extends DialogFragment {
+public class SelectPersonFragment extends DialogFragment implements SyncResultReceiver.Receiver{
 
     private static final String TAG = SelectPersonFragment.class.getName();
 
@@ -141,6 +141,22 @@ public class SelectPersonFragment extends DialogFragment {
 
     }
 
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+//        if (resultCode == SyncService.DONE) {
+//            int remote_id = resultData.getInt("remote_id", 0);
+//
+//            new SetEquipmentId(context, name, remote_id).execute();
+//
+//            for (Equipment equipment : dataset) {
+//                if (equipment.name.equals(name)) {
+//                    equipment.eky_id = remote_id;
+//                    break;
+//                }
+//            }
+//        }
+    }
+
     class CreateNewPerson extends AsyncTask<Void, Void, Void> {
 
         Context context;
@@ -174,7 +190,7 @@ public class SelectPersonFragment extends DialogFragment {
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
             Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_ARTICLES);
+            intent.setAction(SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT);
             context.startService(intent);
         }
     }

@@ -1,8 +1,10 @@
 package com.ekylibre.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -23,12 +25,15 @@ import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectInputAdapter;
 import com.ekylibre.android.database.AppDatabase;
+import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
+import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 
@@ -36,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectInputFragment extends DialogFragment {
+public class SelectInputFragment extends DialogFragment implements SyncResultReceiver.Receiver{
 
     private static final String TAG = SelectInputFragment.class.getName();
 
@@ -44,7 +49,9 @@ public class SelectInputFragment extends DialogFragment {
     private static final int MIN_SEARCH_SIZE = 2;
 
     private Context context;
+    private AppDatabase database;
 
+    private SyncResultReceiver resultReceiver;
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
     private TextView createInput;
@@ -67,6 +74,9 @@ public class SelectInputFragment extends DialogFragment {
         this.context = getActivity();
         this.selectedList = new ArrayList<>();
         this.searchText = "";
+
+        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver.setReceiver(this);
 
         switch (InterventionActivity.procedure) {
 
@@ -171,6 +181,9 @@ public class SelectInputFragment extends DialogFragment {
             }
             tab.select();
         }
+
+        database = AppDatabase.getInstance(context);
+
         new RequestDatabase(context).execute();
     }
 
@@ -243,6 +256,18 @@ public class SelectInputFragment extends DialogFragment {
 
     }
 
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+
+//        if (resultCode == SyncService.DONE) {
+//            int local_id = resultData.getInt("local_id", 0);
+//            int remote_id = resultData.getInt("remote_id", 0);
+//            database.dao().setPhytoEkyId(remote_id, local_id);
+//        }
+
+        new RequestDatabase(context).execute();
+    }
+
     /**
      * The asynchrone input creation task
      */
@@ -250,6 +275,7 @@ public class SelectInputFragment extends DialogFragment {
 
         Context context;
         View dialogView;
+        long createdPhytoId;
 
         CreateInput(Context context, View dialogView) {
             this.context = context;
@@ -259,7 +285,6 @@ public class SelectInputFragment extends DialogFragment {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            AppDatabase database = AppDatabase.getInstance(context);
             Integer newId;
 
             switch (currentTab) {
@@ -291,10 +316,10 @@ public class SelectInputFragment extends DialogFragment {
 
                     wrapper = dialogView.findViewById(R.id.create_phyto_reentry);
                     String reentry = wrapper.getEditText().getText().toString();
-                    int reentryInt = (!reentry.isEmpty()) ? Integer.parseInt(reentry) : -1;
+                    Integer reentryInt = (!reentry.isEmpty()) ? Integer.parseInt(reentry) : null;
 
                     newId = database.dao().lastPhytosanitaryId();
-                    newId = (newId != null) ? ++newId : 50000;
+                    newId = (newId != null) ? ++newId : 100000;
 
                     Phyto phyto = new Phyto(newId, null, name, null, maaid, null, reentryInt, brand, false, true, "LITER");
                     database.dao().insert(phyto);
@@ -325,6 +350,11 @@ public class SelectInputFragment extends DialogFragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
+            Intent intent = new Intent(context, SyncService.class);
+            intent.setAction(SyncService.ACTION_CREATE_ARTICLE);
+            intent.putExtra("receiver", resultReceiver);
+            //intent.putExtra("createdPhytoId", createdPhytoId);
+            context.startService(intent);
         }
     }
 
@@ -347,7 +377,6 @@ public class SelectInputFragment extends DialogFragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            AppDatabase database = AppDatabase.getInstance(this.context);
             selectedList.clear();
             switch (currentTab) {
 
