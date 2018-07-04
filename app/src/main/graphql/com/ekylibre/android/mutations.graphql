@@ -2,15 +2,16 @@ mutation pushInter(
   $farmId: ID!,
   $procedure: InterventionTypeEnum!,
   $cropList: [InterventionTargetAttributes!]!,
-  $workingDays: [InterventionWorkingDayAttributes!]
-  $waterQuantity: Int
-  $waterUnit: ArticleVolumeUnitEnum
-  $inputs: [InterventionInputAttributes!]
-  $outputs: [InterventionOutputAttributes!]
-  $globalOutputs: Boolean
-  $tools: [InterventionToolAttributes!]
-  $operators: [InterventionOperatorAttributes!]
-  $weather: WeatherAttributes
+  $workingDays: [InterventionWorkingDayAttributes!],
+  $waterQuantity: Int,
+  $waterUnit: ArticleVolumeUnitEnum,
+  $inputs: [InterventionInputAttributes!],
+  $outputs: [InterventionOutputAttributes!],
+  $globalOutputs: Boolean,
+  $tools: [InterventionToolAttributes!],
+  $operators: [InterventionOperatorAttributes!],
+  $weather: WeatherAttributes,
+  $description: String
 )
   {
   createIntervention(
@@ -28,6 +29,7 @@ mutation pushInter(
         tools: $tools
         operators: $operators
         weather: $weather
+        description: $description
       }
     }
   ) {
@@ -43,14 +45,15 @@ mutation updateInter(
   $farmId: ID!,
   $procedure: InterventionTypeEnum!,
   $cropList: [InterventionTargetAttributes!]!,
-  $workingDays: [InterventionWorkingDayAttributes!]
-  $waterQuantity: Int
-  $waterUnit: ArticleVolumeUnitEnum
-  $inputs: [InterventionInputAttributes!]
-  $outputs: [InterventionOutputAttributes!]
-  $tools: [InterventionToolAttributes!]
-  $operators: [InterventionOperatorAttributes!]
-  $weather: WeatherAttributes
+  $workingDays: [InterventionWorkingDayAttributes!],
+  $waterQuantity: Int,
+  $waterUnit: ArticleVolumeUnitEnum,
+  $inputs: [InterventionInputAttributes!],
+  $outputs: [InterventionOutputAttributes!],
+  $tools: [InterventionToolAttributes!],
+  $operators: [InterventionOperatorAttributes!],
+  $weather: WeatherAttributes,
+  $description: String
 )
   {
   updateIntervention(
@@ -68,6 +71,7 @@ mutation updateInter(
         tools: $tools
         operators: $operators
         weather: $weather
+        description: $description
       }
     }
   ) {
@@ -78,7 +82,7 @@ mutation updateInter(
 mutation pushEquipment(
   $farmId: ID!,
   $type: EquipmentTypeEnum,
-  $name: String!
+  $name: String!,
   $number: String
 ) {
   createEquipment(
@@ -93,6 +97,29 @@ mutation pushEquipment(
   ) {
     errors,
     equipment {
+      id
+    }
+  }
+}
+
+mutation pushArticle(
+  $farmId: ID!,
+  $unit: ArticleUnitEnum!,
+  $name: String!,
+  $type: ArticleTypeEnum!
+) {
+  createArticle(
+    input: {
+      article: {
+        farmID: $farmId
+        unit: $unit
+        name: $name
+        nature: $type
+      }
+    }
+  ) {
+    errors,
+    article {
       id
     }
   }

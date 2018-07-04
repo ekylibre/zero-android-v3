@@ -20,6 +20,7 @@ query Intervention {
       waterQuantity
       waterUnit
       globalOutputs
+      description
       weather {
         temperature
         windSpeed
@@ -85,6 +86,9 @@ query Farm {
       type
       name
       referenceID
+      unit
+      species
+      variety
     }
     storages {
       id
