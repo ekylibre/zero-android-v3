@@ -20,6 +20,8 @@ import com.ekylibre.android.utils.Enums;
 import java.util.Collections;
 import java.util.List;
 
+import timber.log.Timber;
+
 
 public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipmentAdapter.ViewHolder> {
 
@@ -61,7 +63,7 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         void display(Equipment item) {
             equipment = item;
             nameTextView.setText(item.name);
-            Log.e(TAG, "eq " + item.type);
+            Timber.e("eq %s", item.type);
             typeTextView.setText(item.type != null ? Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.type)) : "Indéfini");
             typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName()));
 

@@ -304,7 +304,7 @@
     <string name="selecting_tools">Sélectionnez un outil</string>
     <string name="selecting_people">Sélectionnez une personne</string>
 
-    <string name="delete_harvest_prompt">Etes-vous sûr de vouloir supprimer la récolte ?</string>
+    <string name="delete_harvest_prompt">Etes-vous sûr de vouloir supprimer le chargement ?</string>
     <string name="delete_equipment_prompt">Etes-vous sûr de vouloir supprimer l\'outil ?</string>
     <string name="delete_material_prompt">Etes-vous sûr de vouloir supprimer le matériau ?</string>
     <string name="delete_person_prompt">Etes-vous sûr de vouloir supprimer la personne ?</string>

@@ -43,7 +43,7 @@ public interface DAO {
     /**
      *    Insert queries
      */
-    @Insert void insert(Equipment... equipments);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Equipment equipment);
     @Insert void insert(Material... materials);
 
     @Insert void insert(Phyto... phytos);

@@ -786,7 +786,7 @@ public class SyncService extends IntentService {
                                 Timber.e("Error while attributing id");
                             }
                             // Continue to global sync
-                            getFarm();
+                            // getFarm();
 
                         } else {
                             Bundle bundle = new Bundle();
@@ -803,6 +803,10 @@ public class SyncService extends IntentService {
                     }
                 });
             }
+
+            // Continue to global sync
+            getFarm();
+
         } else {
             // Continue to global sync
             getFarm();
@@ -925,15 +929,20 @@ public class SyncService extends IntentService {
                         Timber.i("Fetching equipments...");
                         for (FarmQuery.Equipment equipment : equipments) {
 
-                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
+//                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
+//                            Timber.i("setEquipmentEkyId result --> %s", result);
+//                            if (result != 1) {
 
-                            if (result != 1) {
-                                Timber.i("	Create equipment #%s", equipment.id());
-                                database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                        equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
-                            }
+                            Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
+                            long query_res = database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
+                                    equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
+                            Timber.i("Query result: %s", query_res);
                         }
                     }
+
+                    Timber.i("Equipment list");
+                    for (Equipment eq : database.dao().selectEquipment())
+                        Timber.i("    -> %s | %s | %s", eq.id, eq.eky_id, eq.name);
 
                     ///////////////////////
                     // Processing storages
@@ -1027,6 +1036,7 @@ public class SyncService extends IntentService {
                             }
                         }
                     }
+
                     getInterventions();
                 }
             }
