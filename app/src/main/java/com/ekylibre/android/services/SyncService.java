@@ -24,7 +24,6 @@ import com.ekylibre.android.PushEquipmentMutation;
 import com.ekylibre.android.PushInterMutation;
 import com.ekylibre.android.PushPersonMutation;
 import com.ekylibre.android.UpdateInterMutation;
-import com.ekylibre.android.adapters.SelectInputAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
@@ -73,7 +72,6 @@ import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.OperatorRoleEnum;
-import com.ekylibre.android.type.StorageTypeEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.Enums;
@@ -887,7 +885,7 @@ public class SyncService extends IntentService {
                             // Saving crop
                             Crop newCrop = new Crop(
                                     crop.uuid(), name, crop.specie().rawValue(), crop.productionNature().specie().rawValue(),
-                                    crop.productionMode(), null, null, null,
+                                    crop.productionMode(), null, null, crop.shape(),
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
                                     crop.startDate(), crop.stopDate(), crop.plot().uuid(),
                                     farm.id());

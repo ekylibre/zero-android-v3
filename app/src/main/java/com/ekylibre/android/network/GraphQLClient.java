@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.apollographql.apollo.ApolloClient;
 import com.ekylibre.android.BuildConfig;
-import com.ekylibre.android.network.helpers.ISO8601Adapter;
+import com.ekylibre.android.network.helpers.ApolloAdapters;
 import com.ekylibre.android.type.CustomType;
 import com.ekylibre.android.utils.App;
 
@@ -35,7 +35,8 @@ public class GraphQLClient {
         return ApolloClient.builder()
                 .serverUrl(App.API_URL + "/v1/graphql")
                 .okHttpClient(okHttpClient)
-                .addCustomTypeAdapter(CustomType.DATE, ISO8601Adapter.customTypeAdapter)
+                .addCustomTypeAdapter(CustomType.DATE, ApolloAdapters.customDateAdapter)
+                .addCustomTypeAdapter(CustomType.POLYGON, ApolloAdapters.customPolygonAdapter)
                 .build();
     }
 

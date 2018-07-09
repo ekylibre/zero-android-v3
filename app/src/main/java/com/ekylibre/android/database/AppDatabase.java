@@ -1,16 +1,15 @@
 package com.ekylibre.android.database;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
-import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.ekylibre.android.BuildConfig;
+import com.ekylibre.android.database.converters.DateConverter;
+import com.ekylibre.android.database.converters.PolygonConverter;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.models.Farm;
@@ -33,7 +32,6 @@ import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
-import com.ekylibre.android.utils.Converters;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -45,20 +43,26 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 
-@Database(entities = {
-        Farm.class, Intervention.class,
-        InterventionWorkingDay.class,
-        Phyto.class, InterventionPhytosanitary.class, PhytoDose.class,
-        Seed.class, InterventionSeed.class,
-        Fertilizer.class, InterventionFertilizer.class,
-        Material.class, InterventionMaterial.class,
-        Equipment.class, InterventionEquipment.class,
-        Person.class, InterventionPerson.class,
-        Weather.class,
-        Harvest.class, Storage.class,
-        Crop.class, InterventionCrop.class, Plot.class
-}, exportSchema = false, version = 1)
-@TypeConverters(Converters.class)
+@Database(
+        entities = {
+            Farm.class, Intervention.class,
+            InterventionWorkingDay.class,
+            Phyto.class, InterventionPhytosanitary.class, PhytoDose.class,
+            Seed.class, InterventionSeed.class,
+            Fertilizer.class, InterventionFertilizer.class,
+            Material.class, InterventionMaterial.class,
+            Equipment.class, InterventionEquipment.class,
+            Person.class, InterventionPerson.class,
+            Weather.class,
+            Harvest.class, Storage.class,
+            Crop.class, InterventionCrop.class, Plot.class
+        },
+        exportSchema = false,
+        version = 1
+)
+@TypeConverters(
+        { DateConverter.class, PolygonConverter.class }
+)
 public abstract class AppDatabase extends RoomDatabase {
 
     // Log TAG

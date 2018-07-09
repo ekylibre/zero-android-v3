@@ -115,6 +115,7 @@ query Farm {
       plot {
         uuid
       }
+      shape
     }
     people {
       id

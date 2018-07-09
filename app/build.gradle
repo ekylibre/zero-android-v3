@@ -35,7 +35,7 @@ android {
 
 apollo {
     customTypeMapping['Date'] = "java.util.Date"
-    customTypeMapping['Point'] = String
+    customTypeMapping['Polygon'] = "com.mapbox.geojson.Polygon"
 }
 
 
