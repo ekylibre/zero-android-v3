@@ -29,6 +29,8 @@ public class LiveActivity extends AppCompatActivity {
     public static List<Crop> cropList;
 
     private TextView speedTextView;
+    private TextView helpText;
+
     private Intent serviceIntent;
     private AppDatabase database;
 
@@ -43,6 +45,7 @@ public class LiveActivity extends AppCompatActivity {
         database = AppDatabase.getInstance(this);
 
         speedTextView = findViewById(R.id.live_speed_value);
+        helpText = findViewById(R.id.live_help_text_bold);
 
         if (!isServiceRunning())
             new StartLocationService().execute();
