@@ -249,7 +249,7 @@
     <string name="finishing_intervention_text" >Enregistrer une intervention de…</string>
     <string name="starting_intervention">Qui commence</string>
     <string name="finished_intervention">Déjà réalisée</string>
-    <string name="register_an_intervention">Enregistrer une intervention réalisée</string>
+    <string name="register_an_intervention">Enregistrer une intervention</string>
     <string name="save_intervention" >Enregistrer</string>
 
     <string name="recyclerview_nodata">Commencez à utiliser l\'application en ajoutant votre première intervention à l\'aide des boutons actions ci-dessous.</string>

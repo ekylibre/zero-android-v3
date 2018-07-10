@@ -34,6 +34,7 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Plot;
+import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
@@ -816,6 +817,8 @@ public class SyncService extends IntentService {
      * get intervention query
      */
     private void getFarm() {
+
+        database.dao().insert(new Point(new Date().getTime(), 0, 0, 0, 0, null, 0));
 
         List<Integer> personEkyIdList = database.dao().personEkiIdList();
         List<Integer> phytoEkyIdList = database.dao().phytoEkiIdList();

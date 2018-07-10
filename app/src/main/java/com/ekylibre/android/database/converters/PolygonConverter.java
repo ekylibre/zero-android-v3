@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Created by Rémi de Chazelles on 09/07/18.
  */

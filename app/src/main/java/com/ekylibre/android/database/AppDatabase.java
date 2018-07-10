@@ -1,10 +1,13 @@
 package com.ekylibre.android.database;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
+import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.ekylibre.android.BuildConfig;
@@ -21,6 +24,7 @@ import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
+import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
@@ -55,10 +59,11 @@ import java.util.List;
             Person.class, InterventionPerson.class,
             Weather.class,
             Harvest.class, Storage.class,
-            Crop.class, InterventionCrop.class, Plot.class
+            Crop.class, InterventionCrop.class, Plot.class,
+            Point.class
         },
         exportSchema = false,
-        version = 1
+        version = 2
 )
 @TypeConverters(
         { DateConverter.class, PolygonConverter.class }
@@ -76,7 +81,9 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (database == null)
-            database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db").build();
+            database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
+                    .addMigrations(MIGRATION_1_2)
+                    .build();
         return database;
     }
 
@@ -85,16 +92,20 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
 
-//    /**
-//     * Manage migrations
-//     */
-//    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-//        @Override
-//        public void migrate(@NonNull SupportSQLiteDatabase database) {
-//            //database.execSQL("ALTER TABLE Book ADD COLUMN pub_year INTEGER");
-//            database.execSQL("UPDATE TABLE Book ADD COLUMN pub_year INTEGER");
-//        }
-//    };
+    /**
+     * Manage migrations
+     */
+    private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE TABLE points (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "time INTEGER NOT NULL, lat REAL NOT NULL, lon REAL NOT NULL, " +
+                    "speed REAL NOT NULL, accuracy INTEGER NOT NULL, type TEXT, " +
+                    "intervention_id INTEGER NOT NULL)"
+            );
+        }
+    };
 
 
     /**

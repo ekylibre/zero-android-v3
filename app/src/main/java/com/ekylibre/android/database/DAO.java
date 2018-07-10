@@ -1,5 +1,6 @@
 package com.ekylibre.android.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -19,6 +20,7 @@ import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
+import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Storage;
@@ -71,6 +73,7 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Harvest harvests);
 
+    @Insert void insert(Point... points);
 
     @Delete void delete(InterventionWorkingDay... workingDays);
     @Delete void delete(InterventionSeed... seeds);
@@ -329,6 +332,11 @@ public interface DAO {
 //    List<ProductionNature> searchProductionNature(String search);
 
 
+    /**
+     *    Polygon points
+     */
+    @Query("SELECT * FROM points ORDER BY id DESC LIMIT 1")
+    LiveData<Point> getLastPoint();
 
 }
 
