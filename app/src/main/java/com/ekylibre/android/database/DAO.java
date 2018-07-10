@@ -35,6 +35,7 @@ import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
+import com.mapbox.geojson.Polygon;
 
 import java.util.List;
 
@@ -105,6 +106,9 @@ public interface DAO {
     @Transaction
     @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
     List<Plots> plotList(String farmId);
+
+    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
+    List<Crop> cropList(String farmId);
 
 
     /**

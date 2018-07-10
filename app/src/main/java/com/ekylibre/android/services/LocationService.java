@@ -1,6 +1,5 @@
 package com.ekylibre.android.services;
 
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,21 +8,24 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
+import com.ekylibre.android.LiveActivity;
 import com.ekylibre.android.database.AppDatabase;
+import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Point;
+import com.mapbox.turf.TurfJoins;
+
+import timber.log.Timber;
 
 
-@SuppressLint("LogNotTimber")
 public class LocationService extends Service {
 
-    private static final String TAG = "LocationService";
     private static final int INTERVAL = 1000;
     private static final int DISTANCE = 1;
 
     private LocationManager locationManager = null;
     private AppDatabase database;
+    private static boolean record = false;
 
     private class LocationListener implements android.location.LocationListener {
 
@@ -35,19 +37,29 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            new WriteDatabaseTask(location).execute();
-            Log.i(TAG, String.format("onLocationChanged: %s %s %s %s", location.getLatitude(), location.getLongitude(), location.getAccuracy(), location.getTime()));
+            if (record)
+                new WriteDatabaseTask(location).execute();
+            for (Crop crop : LiveActivity.cropList) {
+                if (TurfJoins.inside(
+                        com.mapbox.geojson.Point.fromLngLat(
+                                location.getLongitude(), location.getLatitude()), crop.shape)) {
+                    Timber.i("Tu es dans le polygon %s", crop.name);
+                    break;
+                }
+
+            }
+            Timber.i("onLocationChanged: %s %s %s %s", location.getLatitude(), location.getLongitude(), location.getAccuracy(), location.getTime());
             this.location.set(location);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            Log.i(TAG, "GPS disabled");
+            Timber.i("GPS disabled");
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            Log.i(TAG, "GPS enabled");
+            Timber.i("GPS enabled");
         }
 
         @Override
@@ -64,7 +76,7 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand");
+        Timber.e("onStartCommand");
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -72,35 +84,35 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
 
-        Log.d(TAG, "onCreate");
+        Timber.d("onCreate");
 
         initializeLocationManager();
         try {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, INTERVAL, DISTANCE, locationListener);
         } catch (java.lang.SecurityException ex) {
-            Log.e(TAG,"fail to request location update, ignore --> " + ex.getMessage());
+            Timber.e("fail to request location update, ignore --> %s", ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            Log.e(TAG, "gps provider does not exist " + ex.getMessage());
+            Timber.e("gps provider does not exist %s", ex.getMessage());
         }
         database = AppDatabase.getInstance(getApplicationContext());
     }
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "onDestroy");
+        Timber.e("onDestroy");
         super.onDestroy();
         if (locationManager != null) {
             try {
                 locationManager.removeUpdates(locationListener);
             } catch (Exception ex) {
-                Log.e(TAG,"fail to remove location listeners, ignore" + ex.getMessage());
+                Timber.e("fail to remove location listeners, ignore%s", ex.getMessage());
             }
         }
     }
 
     private void initializeLocationManager() {
-        Log.e(TAG, "initializeLocationManager");
+        Timber.e("initializeLocationManager");
         if (locationManager == null) {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         }

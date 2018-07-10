@@ -4,23 +4,29 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.ekylibre.android.database.AppDatabase;
+import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.services.LocationService;
+import com.mapbox.turf.TurfJoins;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * Created by Rémi de Chazelles on 09/07/18.
  */
 public class LiveActivity extends AppCompatActivity {
+
+    public static List<Crop> cropList;
 
     private TextView speedTextView;
     private Intent serviceIntent;
@@ -38,14 +44,14 @@ public class LiveActivity extends AppCompatActivity {
 
         speedTextView = findViewById(R.id.live_speed_value);
 
-        startLocationService();
+        if (!isServiceRunning())
+            new StartLocationService().execute();
 
 
 //        Polygon polygon = Polygon.fromJson(polyJson);
 //        Log.e("GPS", "Polygon --> " + polygon);
 
 
-//        TurfJoins.inside(Point.fromLngLat();
     }
 
     @Override
@@ -59,13 +65,7 @@ public class LiveActivity extends AppCompatActivity {
     }
 
     private void startLocationService() {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        } else {
-            startService(serviceIntent);
-        }
+
     }
 
     private void stopLocationService() {
@@ -75,7 +75,39 @@ public class LiveActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        stopLocationService();
+        if (isServiceRunning())
+            stopLocationService();
+    }
+
+    private boolean isServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (manager != null)
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+                if (LocationService.class.getName().equals(service.service.getClassName()))
+                    return true;
+        return false;
+    }
+
+    private class StartLocationService extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            cropList = database.dao().cropList(MainActivity.FARM_ID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (ContextCompat.checkSelfPermission(LiveActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(LiveActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            } else {
+                startService(serviceIntent);
+            }
+        }
     }
 
     @Override
@@ -86,19 +118,8 @@ public class LiveActivity extends AppCompatActivity {
                     startLocationService();
                 else
                     // Snackbar.make(mainLayout, "Permission denied", Snackbar.LENGTH_LONG).show();
-                break;
+                    break;
         }
     }
 
-    private boolean isServiceRunning() {
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        if (manager != null) {
-            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-                if (LocationService.class.getName().equals(service.service.getClassName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }
