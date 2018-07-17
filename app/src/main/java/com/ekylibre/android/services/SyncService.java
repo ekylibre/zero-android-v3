@@ -929,14 +929,12 @@ public class SyncService extends IntentService {
                         Timber.i("Fetching equipments...");
                         for (FarmQuery.Equipment equipment : equipments) {
 
-//                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
-//                            Timber.i("setEquipmentEkyId result --> %s", result);
-//                            if (result != 1) {
-
-                            Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
-                            long query_res = database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                    equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
-                            Timber.i("Query result: %s", query_res);
+                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
+                            if (result != 1) {
+                                Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
+                                database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
+                                        equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
+                            }
                         }
                     }
 
