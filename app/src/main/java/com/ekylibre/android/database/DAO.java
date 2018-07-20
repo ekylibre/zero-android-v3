@@ -20,9 +20,10 @@ import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
-import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
+import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.pojos.CropsByProduction;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Plots;
 import com.ekylibre.android.database.relations.InterventionCrop;
@@ -94,6 +95,18 @@ public interface DAO {
 
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE plot = :uuid")  //AND start_date < :now AND stop_date > :now
     List<Crop> cropsByPlotUuid(String uuid);  //long now
+
+//    @Transaction
+//    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
+//    List<Crops> interCropList(String farmId);
+
+    @Transaction
+    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
+    List<CropsByProduction> cropsByProduction(String farmId);
+
+//    @Transaction
+//    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
+//    List<CropsByProduction> interventionCropDetail(String farmId);
 
 
     /**
