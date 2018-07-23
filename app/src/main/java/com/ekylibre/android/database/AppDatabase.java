@@ -57,7 +57,7 @@ import java.util.List;
         Weather.class,
         Harvest.class, Storage.class,
         Crop.class, InterventionCrop.class, Plot.class
-}, exportSchema = false, version = 1)
+}, version = 1)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
 
