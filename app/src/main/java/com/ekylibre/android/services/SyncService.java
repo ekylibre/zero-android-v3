@@ -778,15 +778,21 @@ public class SyncService extends IntentService {
                     @Override
                     public void onResponse(@Nonnull Response<PushInterMutation.Data> response) {
                         if (!response.hasErrors()) {
-                            PushInterMutation.CreateIntervention mutation = response.data().createIntervention();
-                            if (!mutation.intervention().id().equals("")) {
-                                Timber.i("|--> eky_id #%s attributed", mutation.intervention().id());
-                                database.dao().setInterventionEkyId(createInter.intervention.id, Integer.valueOf(mutation.intervention().id()));
-                            } else {
-                                Timber.e("Error while attributing id");
+                            PushInterMutation.Data data = response.data();
+                            if (data != null) {
+                                PushInterMutation.CreateIntervention mutation = data.createIntervention();
+                                if (mutation != null) {
+                                    PushInterMutation.Intervention intervention = mutation.intervention();
+                                    if (intervention != null && !intervention.id().equals("")) {
+                                        Timber.i("|--> eky_id #%s attributed", intervention.id());
+                                        database.dao().setInterventionEkyId(createInter.intervention.id, Integer.valueOf(mutation.intervention().id()));
+                                    } else {
+                                        Timber.e("Error while attributing id");
+                                    }
+                                    // Continue to global sync
+                                    // getFarm();
+                                }
                             }
-                            // Continue to global sync
-                            // getFarm();
 
                         } else {
                             Bundle bundle = new Bundle();
@@ -1126,6 +1132,8 @@ public class SyncService extends IntentService {
 
                                 // Get actual local Intervention and proceed update
                                 Interventions existingInter = database.dao().getIntervention(Integer.parseInt(inter.id()));
+
+                                existingInter.intervention.type = inter.type().rawValue();
 
                                 Date validatedAt = inter.validatedAt();
                                 existingInter.intervention.status = validatedAt != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;
