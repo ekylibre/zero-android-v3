@@ -9,14 +9,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.ekylibre.android.database.AppDatabase;
-import com.ekylibre.android.database.pojos.CropsByProduction;
+import com.ekylibre.android.adapters.CropInfo.CropsWithIntervention;
+import com.ekylibre.android.database.models.Crop;
+import com.ekylibre.android.database.models.Intervention;
+import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.pojos.SimpleInterventions;
+import com.ekylibre.android.utils.TimberLogTree;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
-import timber.log.Timber;
+import java.util.Map;
 
 public class InfoActivity extends AppCompatActivity
         implements InfoFragment.OnFragmentInteractionListener {
+
+    private HashMap<String, Multimap> map = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +41,36 @@ public class InfoActivity extends AppCompatActivity
     private class RequestCropList extends AsyncTask<Void, Void, Void> {
 
         Context context;
+        String farm;
 
         RequestCropList(final Context context) {
             this.context = context;
+            this.farm = MainActivity.FARM_ID;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
 
             AppDatabase database = AppDatabase.getInstance(context);
-            List<CropsByProduction> cropsByProduction = database.dao().cropsByProduction(MainActivity.FARM_ID);
 
-            for (CropsByProduction item : cropsByProduction) {
-                Timber.i("Crop: %s - Interventions: %s", item.crop.name, item.interventionCrop);
+            List<SimpleInterventions> interventions = database.dao().getSimpleInterventionList(farm);
+
+            for (SimpleInterventions item : interventions) {
+                for (Crops inter : item.crops) {
+
+                    // Get production nature from crop
+                    String prod = inter.crop.get(0).production_nature;
+
+                    if (map.containsKey(prod)) {
+                            Multimap<Crop, Intervention>  multimap = map.get(prod);
+                            multimap.put(inter.crop.get(0), item.intervention);
+                    } else {
+                        Multimap<Crop, Intervention> multimap = ArrayListMultimap.create();
+                        multimap.put(inter.crop.get(0), item.intervention);
+                        map.put(prod, multimap);
+                    }
+                }
             }
-
 
             return null;
         }
@@ -52,6 +78,13 @@ public class InfoActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                System.out.println(pair.getKey() + " = " + pair.getValue());
+                it.remove();
+            }
 
 //            if (editIntervention != null) {
 //                int count = 0;
