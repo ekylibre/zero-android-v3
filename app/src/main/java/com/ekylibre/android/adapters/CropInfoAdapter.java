@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ekylibre.android.MainActivity;
@@ -16,6 +17,7 @@ import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.CropInfo.CropItem;
 import com.ekylibre.android.adapters.CropInfo.ListItem;
 import com.ekylibre.android.adapters.CropInfo.ProductionItem;
+import com.ekylibre.android.database.models.Intervention;
 
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView headerTextView;
+        TextView headerTextView;
 
         HeaderViewHolder(View itemView) {
             super(itemView);
@@ -42,37 +44,69 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     class CropViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView nameTextView, areaTextView;
+        TextView nameTextView, areaTextView;
+        LinearLayoutCompat interContainer;
 
         CropViewHolder(View itemView) {
             super(itemView);
 
             nameTextView = itemView.findViewById(R.id.crop_info_name);
             areaTextView = itemView.findViewById(R.id.crop_info_area);
+            interContainer = itemView.findViewById(R.id.crop_info_inter_container);
+        }
+
+        void display(CropItem cropItem) {
+
+            String name = cropItem.getName().split(" \\| ")[0];
+            nameTextView.setText(name);
+            areaTextView.setText(String.format(MainActivity.LOCALE, "%.1f ha", cropItem.getSurface()));
+
+            interContainer.removeAllViews();
+
+            if (cropItem.getInterventions().size() > 0) {
+                interContainer.setVisibility(View.VISIBLE);
+                for (Intervention intervention : cropItem.getInterventions()) {
+                    int ressourceId = context.getResources().getIdentifier("procedure_" + intervention.type.toLowerCase(), "drawable", context.getPackageName());
+
+                    ImageView imageView = new ImageView(context);
+                    imageView.setImageResource(ressourceId);
+
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    lp.setMarginStart(50);
+                    imageView.setLayoutParams(lp);
+
+//                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
+//                marginParams.setMarginStart(15);
+//                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(marginParams);
+//                imageView.setLayoutParams(lp);
+
+                    interContainer.addView(imageView);
+                }
+            }
         }
     }
 
-
-    class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView plotArea;
-        CheckBox plotCheckBox;
-        ImageView plotArrow;
-        LinearLayoutCompat cropContainer;
-        LayoutInflater inflater;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-
-            plotArea = itemView.findViewById(R.id.plot_area);
-            plotCheckBox = itemView.findViewById(R.id.plot_checkbox);
-            plotArrow = itemView.findViewById(R.id.plot_arrow);
-            cropContainer = itemView.findViewById(R.id.crop_container);
-
-            inflater = (LayoutInflater) itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        }
-
+//
+//    class ViewHolder extends RecyclerView.ViewHolder {
+//
+//        TextView plotArea;
+//        CheckBox plotCheckBox;
+//        ImageView plotArrow;
+//        LinearLayoutCompat cropContainer;
+//        LayoutInflater inflater;
+//
+//        ViewHolder(View itemView) {
+//            super(itemView);
+//
+//            plotArea = itemView.findViewById(R.id.plot_area);
+//            plotCheckBox = itemView.findViewById(R.id.plot_checkbox);
+//            plotArrow = itemView.findViewById(R.id.plot_arrow);
+//            cropContainer = itemView.findViewById(R.id.crop_container);
+//
+//            inflater = (LayoutInflater) itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//
+//        }
+//
 //        void display(Plots item) {
 //
 //            plotCheckBox.setText(item.plot.name);
@@ -81,38 +115,9 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 //
 //            // Display all crops associated to a plot
 //            displayCrops(item);
-//            updateTotal();
 //
-//            // Accordion control
-//            itemView.setOnClickListener(view -> {
-//                if (cropContainer.getVisibility() == View.GONE) {
-//                    plotArrow.setRotation(180);
-//                    cropContainer.setVisibility(View.VISIBLE);
-//                } else {
-//                    plotArrow.setRotation(0);
-//                    cropContainer.setVisibility(View.GONE);
-//                }
-//            });
-//
-//            // Plot CheckBox onChecked
-//            plotCheckBox.setOnClickListener(view -> {
-//
-//                boolean isChecked = plotCheckBox.isChecked();
-//
-//                // Save action (checked/unchecked) to dataset item plot and crops
-//                item.plot.is_checked = isChecked;
-//
-//                for (Crop crop : item.crops)
-//                    crop.is_checked = isChecked;
-//
-//                // Updates crops display
-//                displayCrops(item);
-//
-//                // Updates surface area total
-//                updateTotal();
-//            });
 //        }
-
+//
 //        void displayCrops(Plots item) {
 //
 //            // First remove all childs view
@@ -194,7 +199,7 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 //            InterventionActivity.surface = total;
 //
 //        }
-    }
+//    }
 
     @NonNull
     @Override
@@ -222,9 +227,10 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             CropItem cropItem = (CropItem) dataset.get(position);
             CropViewHolder cropViewHolder = (CropViewHolder) holder;
-            String name = cropItem.getName().split(" \\| ")[0];
-            cropViewHolder.nameTextView.setText(name);
-            cropViewHolder.areaTextView.setText(String.format(MainActivity.LOCALE, "%.1f ha", cropItem.getSurface()));
+            cropViewHolder.display(cropItem);
+//            String name = cropItem.getName().split(" \\| ")[0];
+//            cropViewHolder.nameTextView.setText(name);
+//            cropViewHolder.areaTextView.setText(String.format(MainActivity.LOCALE, "%.1f ha", cropItem.getSurface()));
         }
     }
 

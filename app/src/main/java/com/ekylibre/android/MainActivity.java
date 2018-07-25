@@ -258,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
             case R.id.action_crop:
                 startActivity(new Intent(this, InfoActivity.class));
-                finish();
                 return true;
 
             default:
