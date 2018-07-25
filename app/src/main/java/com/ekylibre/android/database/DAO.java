@@ -138,13 +138,15 @@ public interface DAO {
      *    Interventions (POJO)
      */
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
+    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " + " JOIN " + InterventionWorkingDay.TABLE_NAME +
             " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
             " WHERE status != 'deleted' AND farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
     List<Interventions> selectInterventions(String farmId);
 
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE farm = :farmId")
+    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +
+            " JOIN " + InterventionWorkingDay.TABLE_NAME + " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+            " WHERE farm = :farmId ORDER BY execution_date ASC")
     List<SimpleInterventions> getSimpleInterventionList(String farmId);
 
     @Transaction

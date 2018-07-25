@@ -19,6 +19,7 @@ import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.SimpleInterventions;
+import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -49,10 +50,21 @@ public class InfoActivity extends AppCompatActivity
         RecyclerView recyclerView = findViewById(R.id.crop_info_recycler);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+
         adapter = new CropInfoAdapter(this, dataset);
         recyclerView.setAdapter(adapter);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         new RequestCropList(this).execute();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private class RequestCropList extends AsyncTask<Void, Void, List<SimpleInterventions>> {
@@ -72,7 +84,7 @@ public class InfoActivity extends AppCompatActivity
 
         protected void onPostExecute(List<SimpleInterventions> result) {
 
-            Timber.i("onPostExecute --> %s", result);
+            dataset.clear();
 
             for (SimpleInterventions item : result) {
                 for (Crops inter : item.crops) {
