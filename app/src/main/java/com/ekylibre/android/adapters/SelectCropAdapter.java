@@ -117,9 +117,8 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
 
                 StringBuilder sb = new StringBuilder();
                 sb.append(crop.production_nature);
-                if (crop.production_mode.equals("Agriculture biologique")) {
+                if (crop.production_mode.equals("Agriculture biologique"))
                     sb.append(" bio");
-                }
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(crop.stop_date);
                 sb.append(" ").append(cal.get(Calendar.YEAR));

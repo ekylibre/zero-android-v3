@@ -23,6 +23,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,15 +78,21 @@ public class InfoActivity extends AppCompatActivity
                 for (Crops inter : item.crops) {
 
                     // Get production nature from crop
-                    String prod = inter.crop.get(0).production_nature;
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(inter.crop.get(0).production_nature);
+                    if (inter.crop.get(0).production_mode.equals("Agriculture biologique"))
+                        sb.append(" bio");
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(inter.crop.get(0).stop_date);
+                    sb.append(" ").append(cal.get(Calendar.YEAR));
 
-                    if (map.containsKey(prod)) {
-                        Multimap<Crop, Intervention>  multimap = map.get(prod);
+                    if (map.containsKey(sb.toString())) {
+                        Multimap<Crop, Intervention>  multimap = map.get(sb.toString());
                         multimap.put(inter.crop.get(0), item.intervention);
                     } else {
                         Multimap<Crop, Intervention> multimap = ArrayListMultimap.create();
                         multimap.put(inter.crop.get(0), item.intervention);
-                        map.put(prod, multimap);
+                        map.put(sb.toString(), multimap);
                     }
                 }
             }

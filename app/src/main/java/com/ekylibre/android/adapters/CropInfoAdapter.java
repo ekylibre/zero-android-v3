@@ -222,8 +222,9 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             CropItem cropItem = (CropItem) dataset.get(position);
             CropViewHolder cropViewHolder = (CropViewHolder) holder;
-            cropViewHolder.nameTextView.setText(cropItem.getName());
-            cropViewHolder.areaTextView.setText(String.format(MainActivity.LOCALE, "%.1f", cropItem.getSurface()));
+            String name = cropItem.getName().split(" \\| ")[0];
+            cropViewHolder.nameTextView.setText(name);
+            cropViewHolder.areaTextView.setText(String.format(MainActivity.LOCALE, "%.1f ha", cropItem.getSurface()));
         }
     }
 
