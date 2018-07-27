@@ -34,6 +34,7 @@ import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -142,6 +143,13 @@ public interface DAO {
             " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
             " WHERE status != 'deleted' AND farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
     List<Interventions> selectInterventions(String farmId);
+
+    @Transaction
+    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +
+            " JOIN " + InterventionWorkingDay.TABLE_NAME + " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+            " WHERE " + Intervention.COLUMN_ID + " IN (:interIDs)" +
+            " ORDER BY execution_date DESC")
+    List<Interventions> selectInterventionsByInterIDs(List<Integer> interIDs);
 
     @Transaction
     @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +

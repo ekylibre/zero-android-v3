@@ -2,6 +2,9 @@ package com.ekylibre.android;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,11 +22,15 @@ import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.SimpleInterventions;
+import com.ekylibre.android.utils.Converters;
+import com.ekylibre.android.utils.DateTools;
+import com.ekylibre.android.utils.RecyclerViewClickListener;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,7 +40,7 @@ import java.util.Map;
 import timber.log.Timber;
 
 public class InfoActivity extends AppCompatActivity
-        implements InfoFragment.OnFragmentInteractionListener {
+        implements InfoFragment.OnFragmentInteractionListener{
 
     private HashMap<String, Multimap> map;
     private List<ListItem> dataset;
@@ -52,7 +59,29 @@ public class InfoActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
-        adapter = new CropInfoAdapter(this, dataset);
+        RecyclerViewClickListener listener = (view, position) -> {
+
+            CropItem cropItem = (CropItem) dataset.get(position);
+
+            Bundle args = new Bundle();
+            args.putString("full_name", cropItem.getName());
+            args.putString("start_date", Converters.toString(cropItem.getStartDate()));
+            args.putString("stop_date", Converters.toString(cropItem.getStopDate()));
+            args.putString("yield", cropItem.getYield());
+            args.putFloat("surface", cropItem.getSurface());
+            args.putString("uuid", cropItem.getUUID());
+
+            ArrayList<Integer> interIDs = new ArrayList<>();
+            for (Intervention inter : cropItem.getInterventions())
+                interIDs.add(inter.id);
+            args.putIntegerArrayList("interventionsIDs", interIDs);
+            Timber.i("InterIDs --> %s", interIDs);
+
+            InfoFragment infoFragment = InfoFragment.newInstance(args);
+            infoFragment.show(getFragmentTransaction(), "dialog");
+        };
+
+        adapter = new CropInfoAdapter(this, dataset, listener);
         recyclerView.setAdapter(adapter);
     }
 
@@ -122,7 +151,11 @@ public class InfoActivity extends AppCompatActivity
                     CropItem cropItem = new CropItem();
                     cropItem.setName(crop.name);
                     cropItem.setSurface(crop.surface_area);
+                    cropItem.setStartDate(crop.start_date);
+                    cropItem.setStopDate(crop.stop_date);
+                    cropItem.setYield(crop.provisional_yield);
                     cropItem.setInterventions((List) cropsInProd.get(crop));
+                    cropItem.setUUID(crop.uuid);
                     dataset.add(cropItem);
                 }
                 it.remove();
@@ -164,8 +197,15 @@ public class InfoActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Object selection) {
-        if (selection != null) {
-            // TODO
-        }
+
+    }
+
+    public FragmentTransaction getFragmentTransaction() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null)
+            ft.remove(prev);
+        ft.addToBackStack(null);
+        return ft;
     }
 }

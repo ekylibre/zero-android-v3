@@ -5,12 +5,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +15,16 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ekylibre.android.adapters.SelectMaterialAdapter;
+import com.ekylibre.android.adapters.CropDetailAdapter;
+import com.ekylibre.android.adapters.CropInfo.CropItem;
 import com.ekylibre.android.database.AppDatabase;
-import com.ekylibre.android.database.models.Material;
-import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.utils.Converters;
+import com.ekylibre.android.utils.DateTools;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -34,20 +35,27 @@ public class InfoFragment extends DialogFragment {
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
 
-    private ArrayList<Crops> dataset;
+    private CropItem cropItem;
 
-    public InfoFragment() {
-    }
+    private List<Interventions> interventionsList;
+    private List<Integer> interIDs;
 
-    public static InfoFragment newInstance() {
-        return new InfoFragment();
+
+    public InfoFragment() {}
+
+    public static InfoFragment newInstance(Bundle args) {
+
+        InfoFragment fragment = new InfoFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.context = getActivity();
-        this.dataset = new ArrayList<>();
+        this.interventionsList = new ArrayList<>();
     }
 
     @Override
@@ -58,39 +66,33 @@ public class InfoFragment extends DialogFragment {
 
         View inflatedView = inflater.inflate(R.layout.fragment_crop_info, container, false);
 
-//        createMaterial = inflatedView.findViewById(R.id.material_dialog_create_new);
-//        SearchView searchView = inflatedView.findViewById(R.id.search_material);
-//        RecyclerView recyclerView = inflatedView.findViewById(R.id.material_dialog_recycler);
-//
-//        createMaterial.setOnClickListener(view -> createMaterialDialog());
-//        searchView.setOnSearchClickListener(view -> createMaterial.setVisibility(View.GONE));
-//
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                searchText = query;
-//                new RequestDatabase(context).execute();
-//                createMaterial.setVisibility(View.VISIBLE);
-//                return false;
-//            }
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                searchText = newText;
-//                if (newText.length() > 2)
-//                    new RequestDatabase(context).execute();
-//                return false;
-//            }
-//        });
-//
-//        searchView.setOnCloseListener(() -> {
-//            new RequestDatabase(context).execute();
-//            createMaterial.setVisibility(View.VISIBLE);
-//            return false;
-//        });
-//
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-//        adapter = new SelectMaterialAdapter(dataset, fragmentListener);
-//        recyclerView.setAdapter(adapter);
+        TextView cropName = inflatedView.findViewById(R.id.crop_detail_crop_name);
+        TextView cropProduction = inflatedView.findViewById(R.id.crop_detail_production);
+        TextView cropPeriods = inflatedView.findViewById(R.id.crop_detail_periods);
+        TextView cropYield = inflatedView.findViewById(R.id.crop_detail_yield);
+        TextView cropSurface = inflatedView.findViewById(R.id.crop_detail_surface);
+
+        RecyclerView recyclerView = inflatedView.findViewById(R.id.crop_detail_recycler);
+
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            cropItem = new CropItem();
+            cropItem.setUUID(bundle.getString("uuid"));
+            interIDs = bundle.getIntegerArrayList("interventionsIDs");
+            String[] fullName = bundle.getString("full_name").split(" \\| ");
+            cropName.setText(fullName[0]);
+            Date startDate = Converters.toDate(bundle.getString("start_date"));
+            Date stopDate = Converters.toDate(bundle.getString("stop_date"));
+            cropProduction.setText(fullName[1]);
+            cropPeriods.setText(
+                    String.format("Du %s au %s", DateTools.display(startDate), DateTools.display(stopDate)));
+            cropYield.setText(String.format("Rendement: %s", bundle.getString("yield", "non renseigné")));
+            cropSurface.setText(String.format(MainActivity.LOCALE, "%.1f ha", bundle.getFloat("surface")));
+        }
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        adapter = new CropDetailAdapter(context, interventionsList);
+        recyclerView.setAdapter(adapter);
 
         return inflatedView;
     }
@@ -120,17 +122,10 @@ public class InfoFragment extends DialogFragment {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            adapter.notifyItemRangeRemoved(0, dataset.size());
-        }
-
-        @Override
         protected Void doInBackground(Void... voids) {
-
-            AppDatabase database = AppDatabase.getInstance(this.context);
-            dataset.clear();
-            //dataset.addAll(database.dao().selectMaterial());
+            AppDatabase database = AppDatabase.getInstance(context);
+            interventionsList.clear();
+            interventionsList.addAll(database.dao().selectInterventionsByInterIDs(interIDs));
 
             return null;
         }
