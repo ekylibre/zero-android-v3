@@ -81,4 +81,5 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:3.3.0'
     // OAuth & openID framework
     //implementation 'net.openid:appauth:0.7.0'
+    api 'com.google.guava:guava:25.1-android'
 }

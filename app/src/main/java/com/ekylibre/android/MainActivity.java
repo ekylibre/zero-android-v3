@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -178,6 +180,10 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 //                    .focusOn(menuLayout).title("Pour démarrer, c'est ici !")
 //                    .focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(1)
 //                    .disableFocusAnimation().build().show();}
+
+//        BottomNavigationView navigation = findViewById(R.id.navigation);
+//        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
+
     }
 
 //    private void startSync(String action) {
@@ -248,9 +254,12 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 //                editor.remove("current-farm-name");
 //                editor.remove("current-farm-id");
 //                editor.apply();
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(this, LoginActivity.class));
                 finish();
+                return true;
+
+            case R.id.action_crop:
+                startActivity(new Intent(this, InfoActivity.class));
                 return true;
 
             default:
@@ -346,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             procedureChoiceLayout.setVisibility(View.GONE);
             menuTitle.setVisibility(View.GONE);
             menuTitle.setText(R.string.register_an_intervention);
-            startingButton.setVisibility(View.VISIBLE);
+            //startingButton.setVisibility(View.VISIBLE);
             finishingButton.setVisibility(View.VISIBLE);
             return true;
         } else if (state && procedureChoiceLayout.getVisibility() == View.GONE) {
@@ -472,4 +481,17 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
             }
         }
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
+            = item -> {
+        switch (item.getItemId()) {
+            case R.id.navigation_home:
+                return true;
+            case R.id.navigation_dashboard:
+                return true;
+            case R.id.navigation_notifications:
+                return true;
+        }
+        return false;
+    };
 }

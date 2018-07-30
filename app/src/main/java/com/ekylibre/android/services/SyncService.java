@@ -889,12 +889,12 @@ public class SyncService extends IntentService {
                         for (FarmQuery.Crop crop : crops) {
 
                             cal.setTime(crop.stopDate());
-                            String name = crop.productionNature().name() + " " + cal.get(Calendar.YEAR);
+                            //String name = crop.productionNature().name() + " " + cal.get(Calendar.YEAR);
 
                             // Saving crop
                             Crop newCrop = new Crop(
-                                    crop.uuid(), name, crop.specie().rawValue(), crop.productionNature().specie().rawValue(),
-                                    crop.productionMode(), null, null, crop.shape(),
+                                    crop.uuid(), crop.name(), crop.species().rawValue(), crop.productionNature().name(),
+                                    crop.productionMode(), null, crop.provisionalYield(), null,
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
                                     crop.startDate(), crop.stopDate(), crop.plot().uuid(),
                                     farm.id());

@@ -38,6 +38,8 @@
             android:name=".services.LocationService"
             android:enabled="true" />
 
+        <activity android:name=".InfoActivity" />
+
     </application>
 
 </manifest>
