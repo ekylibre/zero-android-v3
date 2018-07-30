@@ -103,7 +103,7 @@ query Farm {
     crops {
       uuid
       name
-      specie
+      species
       productionNature {
         name
         specie

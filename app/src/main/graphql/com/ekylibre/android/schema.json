@@ -1355,13 +1355,9 @@
               "description": null,
               "args": [],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Plot",
-                  "ofType": null
-                }
+                "kind": "OBJECT",
+                "name": "Plot",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -3904,7 +3900,7 @@
               "args": [],
               "type": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "Float",
                 "ofType": null
               },
               "isDeprecated": false,
