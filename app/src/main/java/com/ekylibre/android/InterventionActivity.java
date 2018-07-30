@@ -167,7 +167,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public static String cropSummaryText;
 
     private Calendar date = Calendar.getInstance();
-    private Integer duration = 7;
+    private float duration = 7f;
     private String weatherDescription;
     private Interventions editIntervention;
     private InputMethodManager keyboardManager;
@@ -413,8 +413,8 @@ public class InterventionActivity extends AppCompatActivity implements
                 if (editText.isEmpty())
                     return true;
                 else {
-                    duration = Integer.parseInt(editText);
-                    workingPeriodDurationUnit.setText(getResources().getQuantityString(R.plurals.hours, duration));
+                    duration = Float.parseFloat(editText);
+                    workingPeriodDurationUnit.setText(getResources().getQuantityString(R.plurals.hours, (int) duration));
                     keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     workingPeriodEditDuration.clearFocus();
                 }

@@ -63,7 +63,7 @@ import java.util.List;
             Point.class
         },
         exportSchema = false,
-        version = 2
+        version = 3
 )
 @TypeConverters(
         { DateConverter.class, PolygonConverter.class }
@@ -82,7 +82,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public static synchronized AppDatabase getInstance(Context context) {
         if (database == null)
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build();
         return database;
     }
@@ -104,6 +104,25 @@ public abstract class AppDatabase extends RoomDatabase {
                     "speed REAL NOT NULL, accuracy INTEGER NOT NULL, type TEXT, " +
                     "intervention_id INTEGER NOT NULL)"
             );
+        }
+    };
+
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE temp_interwd (wd_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "wd_intervention_id INTEGER NOT NULL, hour_duration REAL NOT NULL, " +
+                    "execution_date TEXT NOT NULL, " +
+                    "FOREIGN KEY(wd_intervention_id) REFERENCES interventions(intervention_id) " +
+                    "ON UPDATE NO ACTION ON DELETE CASCADE )");
+
+            database.execSQL("INSERT INTO temp_interwd (wd_id, wd_intervention_id, hour_duration, execution_date) "
+                    + "SELECT wd_id, wd_intervention_id, CAST(hour_duration AS REAL), execution_date "
+                    + "FROM intervention_working_days");
+
+            database.execSQL("DROP TABLE intervention_working_days");
+
+            database.execSQL("ALTER TABLE temp_interwd RENAME TO intervention_working_days");
         }
     };
 

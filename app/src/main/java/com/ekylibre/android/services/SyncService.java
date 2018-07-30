@@ -1181,9 +1181,9 @@ public class SyncService extends IntentService {
                             //////////////////////
                             for (InterventionQuery.WorkingDay workingDay : inter.workingDays()) {
                                 Date executionDate = workingDay.executionDate();
-                                Long hourDuration = workingDay.hourDuration();
-                                if (executionDate != null && hourDuration != null)
-                                    database.dao().insert(new InterventionWorkingDay(id, executionDate, hourDuration.intValue()));
+                                Double duration = workingDay.hourDuration();
+                                if (executionDate != null && duration != null)
+                                    database.dao().insert(new InterventionWorkingDay(id, executionDate, workingDay.hourDuration().floatValue()));
                             }
 
                             //////////////////////////

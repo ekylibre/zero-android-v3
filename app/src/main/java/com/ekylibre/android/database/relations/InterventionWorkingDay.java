@@ -36,13 +36,12 @@ public class InterventionWorkingDay {
     @ColumnInfo(name = COLUMN_INTERVENTION_ID, index = true)
     public Integer intervention_id;
 
-    @NonNull
-    public Integer hour_duration;
+    public float hour_duration;
 
     @NonNull
     public Date execution_date;
 
-    public InterventionWorkingDay(@NonNull Integer intervention_id, @NonNull Date execution_date, @NonNull Integer hour_duration) {
+    public InterventionWorkingDay(@NonNull Integer intervention_id, @NonNull Date execution_date, float hour_duration) {
         this.intervention_id = intervention_id;
         this.execution_date = execution_date;
         this.hour_duration = hour_duration;
