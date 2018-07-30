@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         swipeRefreshLayout.setRefreshing(false);
 
         if (resultCode == SyncService.DONE) {
-            Timber.e("Synchronization done");
+            Timber.i("Synchronization done");
             lastSyncTime = new Date();
             prefs.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
@@ -291,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Timber.e("Updating interventions recyclerView...");
             AppDatabase database = AppDatabase.getInstance(context);
             interventionsList.clear();
             switch (filter) {
