@@ -109,6 +109,7 @@ query Farm {
         specie
       }
       productionMode
+      provisionalYield
       startDate
       stopDate
       surfaceArea
