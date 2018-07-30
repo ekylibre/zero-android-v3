@@ -852,12 +852,16 @@ public class InterventionActivity extends AppCompatActivity implements
 
             // Check at least one crop is selected
             int cropCount = 0;
-            countCropLoop:
             for (Plots plotWithCrops : plotList) {
                 for (Crop culture : plotWithCrops.crops) {
                     if (culture.is_checked) {
                         ++cropCount;
-                        break countCropLoop;
+                        if (date.compareTo(culture.start_date) < 0 || date.compareTo(culture.stop_date) >= 0) {
+                            cancel(true);
+                            Toast toast = Toast.makeText(context, "La date d'intervention doit correspondre aux dates de la culture !", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.BOTTOM, 0, 200);
+                            toast.show();
+                        }
                     }
                 }
             }
