@@ -5,118 +5,135 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+
+import com.ekylibre.android.LiveActivity;
+import com.ekylibre.android.database.AppDatabase;
+import com.ekylibre.android.database.models.Crop;
+import com.ekylibre.android.database.models.Point;
+import com.mapbox.turf.TurfJoins;
 
 import timber.log.Timber;
 
 
 public class LocationService extends Service {
 
-    private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 1000;
-    private static final float LOCATION_DISTANCE = 10f;
+    private static final int INTERVAL = 1000;
+    private static final int DISTANCE = 1;
+
+    private LocationManager locationManager = null;
+    private AppDatabase database;
+    private static boolean record = false;
 
     private class LocationListener implements android.location.LocationListener {
 
-        Location mLastLocation;
+        Location location;
 
-        public LocationListener(String provider)
-        {
-            Timber.e("LocationListener %s", provider);
-            mLastLocation = new Location(provider);
+        LocationListener(String provider) {
+            location = new Location(provider);
         }
 
         @Override
-        public void onLocationChanged(Location location)
-        {
-            Timber.e("onLocationChanged: %s", location);
-            mLastLocation.set(location);
+        public void onLocationChanged(Location location) {
+            if (record)
+                new WriteDatabaseTask(location).execute();
+            for (Crop crop : LiveActivity.cropList) {
+                if (TurfJoins.inside(
+                        com.mapbox.geojson.Point.fromLngLat(
+                                location.getLongitude(), location.getLatitude()), crop.shape)) {
+                    Timber.i("Tu es dans le polygon %s", crop.name);
+                    break;
+                }
+
+            }
+            Timber.i("onLocationChanged: %s %s %s %s", location.getLatitude(), location.getLongitude(), location.getAccuracy(), location.getTime());
+            this.location.set(location);
         }
 
         @Override
-        public void onProviderDisabled(String provider)
-        {
-            Timber.e("onProviderDisabled: %s", provider);
+        public void onProviderDisabled(String provider) {
+            Timber.i("GPS disabled");
         }
 
         @Override
-        public void onProviderEnabled(String provider)
-        {
-            Timber.e("onProviderEnabled: %s", provider);
+        public void onProviderEnabled(String provider) {
+            Timber.i("GPS enabled");
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras)
-        {
-            Timber.e("onStatusChanged: %s", provider);
-        }
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 
-    LocationListener[] mLocationListeners = new LocationListener[] {
-            new LocationListener(LocationManager.GPS_PROVIDER),
-            new LocationListener(LocationManager.NETWORK_PROVIDER)
-    };
+    LocationListener locationListener = new LocationListener(LocationManager.GPS_PROVIDER);
+
 
     @Override
-    public IBinder onBind(Intent arg0)
-    {
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         Timber.e("onStartCommand");
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
     @Override
-    public void onCreate()
-    {
-        Timber.e("onCreate");
+    public void onCreate() {
+
+        Timber.d("onCreate");
+
         initializeLocationManager();
         try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[1]);
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, INTERVAL, DISTANCE, locationListener);
         } catch (java.lang.SecurityException ex) {
-            Timber.i(ex, "fail to request location update, ignore");
+            Timber.e("fail to request location update, ignore --> %s", ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            Timber.d("network provider does not exist, %s", ex.getMessage());
+            Timber.e("gps provider does not exist %s", ex.getMessage());
         }
-        try {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[0]);
-        } catch (java.lang.SecurityException ex) {
-            Timber.i(ex, "fail to request location update, ignore");
-        } catch (IllegalArgumentException ex) {
-            Timber.d("gps provider does not exist %s", ex.getMessage());
-        }
+        database = AppDatabase.getInstance(getApplicationContext());
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         Timber.e("onDestroy");
         super.onDestroy();
-        if (mLocationManager != null) {
-            for (LocationListener mLocationListener : mLocationListeners) {
-                try {
-                    mLocationManager.removeUpdates(mLocationListener);
-                } catch (Exception ex) {
-                    Timber.i(ex, "fail to remove location listners, ignore");
-                }
+        if (locationManager != null) {
+            try {
+                locationManager.removeUpdates(locationListener);
+            } catch (Exception ex) {
+                Timber.e("fail to remove location listeners, ignore%s", ex.getMessage());
             }
         }
     }
 
     private void initializeLocationManager() {
         Timber.e("initializeLocationManager");
-        if (mLocationManager == null) {
-            mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager == null) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+    }
+
+    private class WriteDatabaseTask extends AsyncTask<Void, Void, Void> {
+
+        private Location location;
+
+        WriteDatabaseTask(Location location) {
+            this.location = location;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            database.dao().insert(
+                    new Point(location.getTime(), location.getLatitude(), location.getLongitude(),
+                            Math.round(location.getSpeed()*36f)/10.0f, (int) location.getAccuracy(), null, 0));
+
+            return null;
         }
     }
 }

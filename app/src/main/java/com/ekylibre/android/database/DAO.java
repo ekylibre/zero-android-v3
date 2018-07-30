@@ -1,5 +1,6 @@
 package com.ekylibre.android.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -19,6 +20,7 @@ import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
+import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Storage;
@@ -33,6 +35,7 @@ import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
+import com.mapbox.geojson.Polygon;
 
 import java.util.List;
 
@@ -71,6 +74,7 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Harvest harvests);
 
+    @Insert void insert(Point... points);
 
     @Delete void delete(InterventionWorkingDay... workingDays);
     @Delete void delete(InterventionSeed... seeds);
@@ -102,6 +106,9 @@ public interface DAO {
     @Transaction
     @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
     List<Plots> plotList(String farmId);
+
+    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
+    List<Crop> cropList(String farmId);
 
 
     /**
@@ -329,6 +336,11 @@ public interface DAO {
 //    List<ProductionNature> searchProductionNature(String search);
 
 
+    /**
+     *    Polygon points
+     */
+    @Query("SELECT * FROM points ORDER BY id DESC LIMIT 1")
+    LiveData<Point> getLastPoint();
 
 }
 

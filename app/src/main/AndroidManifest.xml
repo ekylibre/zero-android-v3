@@ -30,13 +30,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LiveActivity" />
 
         <service android:name=".services.SyncService" />
-        <!--<service-->
-            <!--android:name=".services.LocationService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true"-->
-            <!--android:permission="" />-->
+
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true" />
+
     </application>
 
 </manifest>

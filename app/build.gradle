@@ -31,6 +31,7 @@ android {
             resValue 'string', 'api_url', '"https://ekylibre-test.com"'
             resValue 'string', 'client_id', '"e31cb2014a4604ff169b08ab171715a290bd2b24f7b0409a8cc428c75a2f3b75"'
             resValue 'string', 'client_secret', '"aa33d1f551329fc8504e2d860767428d500418132c64f746afcc9fc160476293"'
+            resValue 'string', 'mapbox_token', '"pk.eyJ1IjoibGludXhpcGhvIiwiYSI6ImNqamZwbjV5aDM0bXQzcW8zamRsY3N5ZGcifQ.D3bVCNhekyQLq4cy5JffAQ"'
         }
     }
     compileOptions {
@@ -41,7 +42,7 @@ android {
 
 apollo {
     customTypeMapping['Date'] = "java.util.Date"
-    customTypeMapping['Point'] = String
+    customTypeMapping['Polygon'] = "com.mapbox.geojson.Polygon"
 }
 
 
@@ -65,7 +66,7 @@ dependencies {
     implementation 'android.arch.persistence.room:runtime:1.1.1'
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
     // Retrofit & Picasso
-    //implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
@@ -76,8 +77,8 @@ dependencies {
     //implementation 'com.github.faruktoptas:FancyShowCaseView:1.0.0'
     // Mapbox
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.2.1'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:3.3.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:3.3.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.3'
     // OAuth & openID framework
     //implementation 'net.openid:appauth:0.7.0'
 }

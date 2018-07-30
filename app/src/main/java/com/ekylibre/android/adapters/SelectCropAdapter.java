@@ -18,13 +18,17 @@ import com.ekylibre.android.R;
 import com.ekylibre.android.SelectCropFragment;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.pojos.Plots;
+import com.mapbox.api.staticmap.v1.MapboxStaticMap;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import timber.log.Timber;
+
+import static com.mapbox.api.staticmap.v1.StaticMapCriteria.SATELLITE_STYLE;
+
 
 public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.ViewHolder> {
-
-    private static final String TAG = "CropAdapter";
 
     private Context context;
     private List<Plots> dataset;
@@ -113,9 +117,25 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                 CheckBox cropCheckBox = child.findViewById(R.id.crop_checkbox);
                 TextView cropName = child.findViewById(R.id.crop_name);
                 TextView cropArea = child.findViewById(R.id.crop_area);
+                ImageView cropMap = child.findViewById(R.id.crop_map);
                 cropName.setText(crop.name);
                 cropArea.setText(String.format(MainActivity.LOCALE, "%.1f ha travaillés", crop.surface_area));
                 cropCheckBox.setChecked(crop.is_checked);
+
+                MapboxStaticMap staticImage = MapboxStaticMap.builder()
+                        .accessToken(context.getString(R.string.mapbox_token))
+                        .width(128)
+                        .height(128)
+                        .retina(true)
+                        .geoJson(crop.shape)
+                        .cameraAuto(true)
+                        .attribution(false)
+                        .logo(false)
+                        .styleId(SATELLITE_STYLE)
+                        .build();
+                String imageUrl = staticImage.url().toString();
+                Timber.i(imageUrl);
+                Picasso.get().load(imageUrl).into(cropMap);
 
                 cropCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     // Save action (checked/unchecked) to dataset item crop and update total

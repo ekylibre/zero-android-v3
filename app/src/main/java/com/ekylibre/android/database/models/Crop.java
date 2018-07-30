@@ -7,6 +7,8 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.mapbox.geojson.Polygon;
+
 import java.util.Date;
 
 
@@ -45,7 +47,7 @@ public class Crop {
 
     public String provisional_yield;  // Measure{unit: ton_per_hectare}
 
-    public String shape;
+    public Polygon shape;  //String
 
     public float surface_area;
 
@@ -69,7 +71,7 @@ public class Crop {
 
     public Crop(@NonNull String uuid, String name, String specie, String production_nature,
                 String production_mode, String production_output, String provisional_yield,
-                String shape, float surface_area, String centroid, Date start_date, Date stop_date,
+                Polygon shape, float surface_area, String centroid, Date start_date, Date stop_date,
                 String plot, String farm) {
 
         this.uuid = uuid;
