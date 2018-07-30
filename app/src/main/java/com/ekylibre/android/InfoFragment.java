@@ -85,7 +85,7 @@ public class InfoFragment extends DialogFragment {
             Date stopDate = Converters.toDate(bundle.getString("stop_date"));
             cropProduction.setText(fullName[1]);
             cropPeriods.setText(
-                    String.format("Du %s au %s", DateTools.display(startDate), DateTools.display(stopDate)));
+                    String.format("Du %s au %s", DateTools.STANDARD_DISPLAY.format(startDate), DateTools.STANDARD_DISPLAY.format(stopDate)));
             cropYield.setText(String.format("Rendement: %s", bundle.getString("yield", "non renseigné")));
             cropSurface.setText(String.format(MainActivity.LOCALE, "%.1f ha", bundle.getFloat("surface")));
         }

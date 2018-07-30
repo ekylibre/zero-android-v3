@@ -887,7 +887,7 @@ public class SyncService extends IntentService {
                             // Saving crop
                             Crop newCrop = new Crop(
                                     crop.uuid(), crop.name(), crop.specie().rawValue(), crop.productionNature().name(),
-                                    crop.productionMode(), null, null, null,
+                                    crop.productionMode(), null, crop.provisionalYield(), null,
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
                                     crop.startDate(), crop.stopDate(), crop.plot().uuid(),
                                     farm.id());

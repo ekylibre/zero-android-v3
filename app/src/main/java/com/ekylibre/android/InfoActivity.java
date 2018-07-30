@@ -2,7 +2,6 @@ package com.ekylibre.android;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -23,14 +22,12 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.SimpleInterventions;
 import com.ekylibre.android.utils.Converters;
-import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.RecyclerViewClickListener;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
