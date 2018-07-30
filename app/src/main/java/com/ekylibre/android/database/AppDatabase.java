@@ -82,7 +82,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public static synchronized AppDatabase getInstance(Context context) {
         if (database == null)
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3)
                     .build();
         return database;
     }
@@ -123,6 +123,9 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("DROP TABLE intervention_working_days");
 
             database.execSQL("ALTER TABLE temp_interwd RENAME TO intervention_working_days");
+
+            database.execSQL("CREATE INDEX index_intervention_working_days_wd_id ON intervention_working_days (wd_id)");
+            database.execSQL("CREATE INDEX index_intervention_working_days_wd_intervention_id ON intervention_working_days (wd_intervention_id)");
         }
     };
 
