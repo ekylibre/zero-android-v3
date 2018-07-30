@@ -777,15 +777,21 @@ public class SyncService extends IntentService {
                     @Override
                     public void onResponse(@Nonnull Response<PushInterMutation.Data> response) {
                         if (!response.hasErrors()) {
-                            PushInterMutation.CreateIntervention mutation = response.data().createIntervention();
-                            if (!mutation.intervention().id().equals("")) {
-                                Timber.i("|--> eky_id #%s attributed", mutation.intervention().id());
-                                database.dao().setInterventionEkyId(createInter.intervention.id, Integer.valueOf(mutation.intervention().id()));
-                            } else {
-                                Timber.e("Error while attributing id");
+                            PushInterMutation.Data data = response.data();
+                            if (data != null) {
+                                PushInterMutation.CreateIntervention mutation = data.createIntervention();
+                                if (mutation != null) {
+                                    PushInterMutation.Intervention intervention = mutation.intervention();
+                                    if (intervention != null && !intervention.id().equals("")) {
+                                        Timber.i("|--> eky_id #%s attributed", intervention.id());
+                                        database.dao().setInterventionEkyId(createInter.intervention.id, Integer.valueOf(mutation.intervention().id()));
+                                    } else {
+                                        Timber.e("Error while attributing id");
+                                    }
+                                    // Continue to global sync
+                                    // getFarm();
+                                }
                             }
-                            // Continue to global sync
-                            // getFarm();
 
                         } else {
                             Bundle bundle = new Bundle();
@@ -930,14 +936,12 @@ public class SyncService extends IntentService {
                         Timber.i("Fetching equipments...");
                         for (FarmQuery.Equipment equipment : equipments) {
 
-//                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
-//                            Timber.i("setEquipmentEkyId result --> %s", result);
-//                            if (result != 1) {
-
-                            Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
-                            long query_res = database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                    equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
-                            Timber.i("Query result: %s", query_res);
+                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
+                            if (result != 1) {
+                                Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
+                                database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
+                                        equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
+                            }
                         }
                     }
 
@@ -1129,6 +1133,8 @@ public class SyncService extends IntentService {
 
                                 // Get actual local Intervention and proceed update
                                 Interventions existingInter = database.dao().getIntervention(Integer.parseInt(inter.id()));
+
+                                existingInter.intervention.type = inter.type().rawValue();
 
                                 Date validatedAt = inter.validatedAt();
                                 existingInter.intervention.status = validatedAt != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;

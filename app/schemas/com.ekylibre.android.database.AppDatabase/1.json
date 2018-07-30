@@ -1,0 +1,1647 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "8245b4c1e316a7cbfffdb8d1c58b1d9a",
+    "entities": [
+      {
+        "tableName": "farms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`farm_id` TEXT NOT NULL, `name` TEXT, PRIMARY KEY(`farm_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "farm_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "farm_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_farms_farm_id",
+            "unique": false,
+            "columnNames": [
+              "farm_id"
+            ],
+            "createSql": "CREATE  INDEX `index_farms_farm_id` ON `${TABLE_NAME}` (`farm_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "interventions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`intervention_id` INTEGER PRIMARY KEY AUTOINCREMENT, `intervention_id_eky` INTEGER, `type` TEXT, `output` INTEGER, `water_quantity` INTEGER, `water_unit` TEXT, `farm` TEXT, `comment` TEXT, `status` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "eky_id",
+            "columnName": "intervention_id_eky",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "output",
+            "columnName": "output",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "water_quantity",
+            "columnName": "water_quantity",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "water_unit",
+            "columnName": "water_unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "farm",
+            "columnName": "farm",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "comment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_interventions_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_interventions_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_interventions_intervention_id_eky",
+            "unique": false,
+            "columnNames": [
+              "intervention_id_eky"
+            ],
+            "createSql": "CREATE  INDEX `index_interventions_intervention_id_eky` ON `${TABLE_NAME}` (`intervention_id_eky`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_working_days",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wd_id` INTEGER PRIMARY KEY AUTOINCREMENT, `wd_intervention_id` INTEGER NOT NULL, `hour_duration` INTEGER NOT NULL, `execution_date` TEXT NOT NULL, FOREIGN KEY(`wd_intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "wd_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "wd_intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hour_duration",
+            "columnName": "hour_duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "execution_date",
+            "columnName": "execution_date",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "wd_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_intervention_working_days_wd_id",
+            "unique": false,
+            "columnNames": [
+              "wd_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_working_days_wd_id` ON `${TABLE_NAME}` (`wd_id`)"
+          },
+          {
+            "name": "index_intervention_working_days_wd_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "wd_intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_working_days_wd_intervention_id` ON `${TABLE_NAME}` (`wd_intervention_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "wd_intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "phytos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`phyto_id` INTEGER, `phyto_id_eky` INTEGER, `name` TEXT, `nature` TEXT, `maaid` TEXT, `mix_category_code` INTEGER, `in_field_reentry_delay` INTEGER, `firm_name` TEXT, `registered` INTEGER, `used` INTEGER, `unit` TEXT, PRIMARY KEY(`phyto_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "phyto_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "eky_id",
+            "columnName": "phyto_id_eky",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nature",
+            "columnName": "nature",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maaid",
+            "columnName": "maaid",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mix_category_code",
+            "columnName": "mix_category_code",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "in_field_reentry_delay",
+            "columnName": "in_field_reentry_delay",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "firm_name",
+            "columnName": "firm_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "registered",
+            "columnName": "registered",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "used",
+            "columnName": "used",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "phyto_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_phytos_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE  INDEX `index_phytos_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_phytos_maaid",
+            "unique": false,
+            "columnNames": [
+              "maaid"
+            ],
+            "createSql": "CREATE  INDEX `index_phytos_maaid` ON `${TABLE_NAME}` (`maaid`)"
+          },
+          {
+            "name": "index_phytos_registered",
+            "unique": false,
+            "columnNames": [
+              "registered"
+            ],
+            "createSql": "CREATE  INDEX `index_phytos_registered` ON `${TABLE_NAME}` (`registered`)"
+          },
+          {
+            "name": "index_phytos_used",
+            "unique": false,
+            "columnNames": [
+              "used"
+            ],
+            "createSql": "CREATE  INDEX `index_phytos_used` ON `${TABLE_NAME}` (`used`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_phytosanitary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`quantity` REAL NOT NULL, `unit` TEXT, `intervention_id` INTEGER NOT NULL, `phytosanitary_id` INTEGER NOT NULL, PRIMARY KEY(`intervention_id`, `phytosanitary_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`phytosanitary_id`) REFERENCES `phytos`(`phyto_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phyto_id",
+            "columnName": "phytosanitary_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "phytosanitary_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_phytosanitary_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_phytosanitary_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_phytosanitary_phytosanitary_id",
+            "unique": false,
+            "columnNames": [
+              "phytosanitary_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_phytosanitary_phytosanitary_id` ON `${TABLE_NAME}` (`phytosanitary_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "phytos",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "phytosanitary_id"
+            ],
+            "referencedColumns": [
+              "phyto_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "phyto_doses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER, `dose` REAL, PRIMARY KEY(`product_id`))",
+        "fields": [
+          {
+            "fieldPath": "product_id",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dose",
+            "columnName": "dose",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "product_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "seeds",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`seed_id` INTEGER, `seed_id_eky` INTEGER, `specie` TEXT, `variety` TEXT, `registered` INTEGER, `used` INTEGER, `unit` TEXT, PRIMARY KEY(`seed_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "seed_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "eky_id",
+            "columnName": "seed_id_eky",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "specie",
+            "columnName": "specie",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "variety",
+            "columnName": "variety",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "registered",
+            "columnName": "registered",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "used",
+            "columnName": "used",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "seed_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_seeds_specie",
+            "unique": false,
+            "columnNames": [
+              "specie"
+            ],
+            "createSql": "CREATE  INDEX `index_seeds_specie` ON `${TABLE_NAME}` (`specie`)"
+          },
+          {
+            "name": "index_seeds_variety",
+            "unique": false,
+            "columnNames": [
+              "variety"
+            ],
+            "createSql": "CREATE  INDEX `index_seeds_variety` ON `${TABLE_NAME}` (`variety`)"
+          },
+          {
+            "name": "index_seeds_registered",
+            "unique": false,
+            "columnNames": [
+              "registered"
+            ],
+            "createSql": "CREATE  INDEX `index_seeds_registered` ON `${TABLE_NAME}` (`registered`)"
+          },
+          {
+            "name": "index_seeds_used",
+            "unique": false,
+            "columnNames": [
+              "used"
+            ],
+            "createSql": "CREATE  INDEX `index_seeds_used` ON `${TABLE_NAME}` (`used`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_seeds",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`quantity` REAL NOT NULL, `unit` TEXT, `intervention_id` INTEGER NOT NULL, `seed_id` INTEGER NOT NULL, PRIMARY KEY(`intervention_id`, `seed_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`seed_id`) REFERENCES `seeds`(`seed_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seed_id",
+            "columnName": "seed_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "seed_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_seeds_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_seeds_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_seeds_seed_id",
+            "unique": false,
+            "columnNames": [
+              "seed_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_seeds_seed_id` ON `${TABLE_NAME}` (`seed_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "seeds",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "seed_id"
+            ],
+            "referencedColumns": [
+              "seed_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "fertilizers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fertilizer_id` INTEGER, `fertilizer_id_eky` INTEGER, `name` TEXT, `label_fra` TEXT, `variant` TEXT, `variety` TEXT, `derivative_of` TEXT, `nature` TEXT, `nitrogen_concentration` TEXT, `phosphorus_concentration` TEXT, `potassium_concentration` TEXT, `sulfur_trioxyde_concentration` TEXT, `registered` INTEGER, `used` INTEGER, `unit` TEXT, PRIMARY KEY(`fertilizer_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "fertilizer_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "eky_id",
+            "columnName": "fertilizer_id_eky",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "label_fra",
+            "columnName": "label_fra",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "variant",
+            "columnName": "variant",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "variety",
+            "columnName": "variety",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "derivative_of",
+            "columnName": "derivative_of",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nature",
+            "columnName": "nature",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nitrogen_concentration",
+            "columnName": "nitrogen_concentration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "phosphorus_concentration",
+            "columnName": "phosphorus_concentration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "potassium_concentration",
+            "columnName": "potassium_concentration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sulfur_trioxyde_concentration",
+            "columnName": "sulfur_trioxyde_concentration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "registered",
+            "columnName": "registered",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "used",
+            "columnName": "used",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "fertilizer_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_fertilizers_label_fra",
+            "unique": false,
+            "columnNames": [
+              "label_fra"
+            ],
+            "createSql": "CREATE  INDEX `index_fertilizers_label_fra` ON `${TABLE_NAME}` (`label_fra`)"
+          },
+          {
+            "name": "index_fertilizers_registered",
+            "unique": false,
+            "columnNames": [
+              "registered"
+            ],
+            "createSql": "CREATE  INDEX `index_fertilizers_registered` ON `${TABLE_NAME}` (`registered`)"
+          },
+          {
+            "name": "index_fertilizers_used",
+            "unique": false,
+            "columnNames": [
+              "used"
+            ],
+            "createSql": "CREATE  INDEX `index_fertilizers_used` ON `${TABLE_NAME}` (`used`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_fertilizers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`quantity` REAL NOT NULL, `unit` TEXT, `intervention_id` INTEGER NOT NULL, `fertilizer_id` INTEGER NOT NULL, PRIMARY KEY(`intervention_id`, `fertilizer_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`fertilizer_id`) REFERENCES `fertilizers`(`fertilizer_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ferti_id",
+            "columnName": "fertilizer_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "fertilizer_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_fertilizers_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_fertilizers_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_fertilizers_fertilizer_id",
+            "unique": false,
+            "columnNames": [
+              "fertilizer_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_fertilizers_fertilizer_id` ON `${TABLE_NAME}` (`fertilizer_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "fertilizers",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "fertilizer_id"
+            ],
+            "referencedColumns": [
+              "fertilizer_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "materials",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`material_id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT, `description` TEXT, `unit` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "material_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "material_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_materials_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE  INDEX `index_materials_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_materials",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`quantity` INTEGER, `unit` TEXT, `approximative_value` INTEGER, `intervention_id` INTEGER NOT NULL, `material_id` INTEGER NOT NULL, PRIMARY KEY(`intervention_id`, `material_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`material_id`) REFERENCES `materials`(`material_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "approximative_value",
+            "columnName": "approximative_value",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "material_id",
+            "columnName": "material_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "material_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_materials_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_materials_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_materials_material_id",
+            "unique": false,
+            "columnNames": [
+              "material_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_materials_material_id` ON `${TABLE_NAME}` (`material_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "materials",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "material_id"
+            ],
+            "referencedColumns": [
+              "material_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "equipments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`equipment_id` INTEGER PRIMARY KEY AUTOINCREMENT, `equipment_id_eky` INTEGER, `name` TEXT, `number` TEXT, `type` TEXT, `farmId` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "equipment_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "eky_id",
+            "columnName": "equipment_id_eky",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "number",
+            "columnName": "number",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "farmId",
+            "columnName": "farmId",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "equipment_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_equipments_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE  INDEX `index_equipments_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_equipments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`intervention_id` INTEGER NOT NULL, `equipment_id` INTEGER NOT NULL, PRIMARY KEY(`intervention_id`, `equipment_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`equipment_id`) REFERENCES `equipments`(`equipment_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "equipment_id",
+            "columnName": "equipment_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "equipment_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_equipments_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_equipments_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_equipments_equipment_id",
+            "unique": false,
+            "columnNames": [
+              "equipment_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_equipments_equipment_id` ON `${TABLE_NAME}` (`equipment_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "equipments",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "equipment_id"
+            ],
+            "referencedColumns": [
+              "equipment_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "persons",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`person_id` INTEGER PRIMARY KEY AUTOINCREMENT, `person_id_eky` INTEGER, `first_name` TEXT, `last_name` TEXT, `role` TEXT, `farm_id` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "person_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "eky_id",
+            "columnName": "person_id_eky",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "first_name",
+            "columnName": "first_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "last_name",
+            "columnName": "last_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "farm_id",
+            "columnName": "farm_id",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "person_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_persons_first_name",
+            "unique": false,
+            "columnNames": [
+              "first_name"
+            ],
+            "createSql": "CREATE  INDEX `index_persons_first_name` ON `${TABLE_NAME}` (`first_name`)"
+          },
+          {
+            "name": "index_persons_last_name",
+            "unique": false,
+            "columnNames": [
+              "last_name"
+            ],
+            "createSql": "CREATE  INDEX `index_persons_last_name` ON `${TABLE_NAME}` (`last_name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intervention_persons",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`intervention_id` INTEGER NOT NULL, `person_id` INTEGER NOT NULL, `is_driver` INTEGER, PRIMARY KEY(`intervention_id`, `person_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`person_id`) REFERENCES `persons`(`person_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "person_id",
+            "columnName": "person_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "is_driver",
+            "columnName": "is_driver",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "person_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_persons_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_persons_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_persons_person_id",
+            "unique": false,
+            "columnNames": [
+              "person_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_persons_person_id` ON `${TABLE_NAME}` (`person_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "persons",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "person_id"
+            ],
+            "referencedColumns": [
+              "person_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "weather",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`intervention_id` INTEGER NOT NULL, `temperature` REAL, `wind_speed` REAL, `description` TEXT, PRIMARY KEY(`intervention_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "temperature",
+            "columnName": "temperature",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wind_speed",
+            "columnName": "wind_speed",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_weather_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_weather_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "harvests",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`harvest_id` INTEGER, `id_intervention` INTEGER, `id_storage` INTEGER, `quantity` REAL, `unit` TEXT, `number` TEXT, `type` TEXT, PRIMARY KEY(`harvest_id`), FOREIGN KEY(`id_storage`) REFERENCES `storages`(`storage_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "harvest_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "id_intervention",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id_storage",
+            "columnName": "id_storage",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "number",
+            "columnName": "number",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "harvest_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_harvests_id_intervention",
+            "unique": false,
+            "columnNames": [
+              "id_intervention"
+            ],
+            "createSql": "CREATE  INDEX `index_harvests_id_intervention` ON `${TABLE_NAME}` (`id_intervention`)"
+          },
+          {
+            "name": "index_harvests_id_storage",
+            "unique": false,
+            "columnNames": [
+              "id_storage"
+            ],
+            "createSql": "CREATE  INDEX `index_harvests_id_storage` ON `${TABLE_NAME}` (`id_storage`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "storages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_storage"
+            ],
+            "referencedColumns": [
+              "storage_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "storages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storage_id` INTEGER, `name` TEXT, `type` TEXT, PRIMARY KEY(`storage_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "storage_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "storage_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "crops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`crop_uuid` TEXT NOT NULL, `name` TEXT, `specie` TEXT, `production_nature` TEXT, `production_mode` TEXT, `production_output` TEXT, `provisional_yield` TEXT, `shape` TEXT, `surface_area` REAL NOT NULL, `centroid` TEXT, `start_date` TEXT, `stop_date` TEXT, `plot` TEXT, `farm` TEXT, PRIMARY KEY(`crop_uuid`), FOREIGN KEY(`plot`) REFERENCES `plots`(`plot_uuid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "uuid",
+            "columnName": "crop_uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "specie",
+            "columnName": "specie",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "production_nature",
+            "columnName": "production_nature",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "production_mode",
+            "columnName": "production_mode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "production_output",
+            "columnName": "production_output",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "provisional_yield",
+            "columnName": "provisional_yield",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "shape",
+            "columnName": "shape",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "surface_area",
+            "columnName": "surface_area",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "centroid",
+            "columnName": "centroid",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "start_date",
+            "columnName": "start_date",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stop_date",
+            "columnName": "stop_date",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "plot",
+            "columnName": "plot",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "farm",
+            "columnName": "farm",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "crop_uuid"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_crops_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE  INDEX `index_crops_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_crops_plot",
+            "unique": false,
+            "columnNames": [
+              "plot"
+            ],
+            "createSql": "CREATE  INDEX `index_crops_plot` ON `${TABLE_NAME}` (`plot`)"
+          },
+          {
+            "name": "index_crops_farm",
+            "unique": false,
+            "columnNames": [
+              "farm"
+            ],
+            "createSql": "CREATE  INDEX `index_crops_farm` ON `${TABLE_NAME}` (`farm`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "plots",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "plot"
+            ],
+            "referencedColumns": [
+              "plot_uuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "intervention_crops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`intervention_id` INTEGER NOT NULL, `crop_id_id` TEXT NOT NULL, `work_area_percentage` INTEGER, PRIMARY KEY(`intervention_id`, `crop_id_id`), FOREIGN KEY(`intervention_id`) REFERENCES `interventions`(`intervention_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`crop_id_id`) REFERENCES `crops`(`crop_uuid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "intervention_id",
+            "columnName": "intervention_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop_id",
+            "columnName": "crop_id_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "work_area_percentage",
+            "columnName": "work_area_percentage",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "intervention_id",
+            "crop_id_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_intervention_crops_intervention_id",
+            "unique": false,
+            "columnNames": [
+              "intervention_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_crops_intervention_id` ON `${TABLE_NAME}` (`intervention_id`)"
+          },
+          {
+            "name": "index_intervention_crops_crop_id_id",
+            "unique": false,
+            "columnNames": [
+              "crop_id_id"
+            ],
+            "createSql": "CREATE  INDEX `index_intervention_crops_crop_id_id` ON `${TABLE_NAME}` (`crop_id_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "interventions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "intervention_id"
+            ],
+            "referencedColumns": [
+              "intervention_id"
+            ]
+          },
+          {
+            "table": "crops",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "crop_id_id"
+            ],
+            "referencedColumns": [
+              "crop_uuid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "plots",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plot_uuid` TEXT NOT NULL, `name` TEXT, `shape` TEXT, `surface_area` REAL NOT NULL, `centroid` TEXT, `startDate` TEXT, `stopDate` TEXT, `farm` TEXT, PRIMARY KEY(`plot_uuid`))",
+        "fields": [
+          {
+            "fieldPath": "uuid",
+            "columnName": "plot_uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "shape",
+            "columnName": "shape",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "surface_area",
+            "columnName": "surface_area",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "centroid",
+            "columnName": "centroid",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "startDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stopDate",
+            "columnName": "stopDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "farm",
+            "columnName": "farm",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "plot_uuid"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_plots_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE  INDEX `index_plots_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"8245b4c1e316a7cbfffdb8d1c58b1d9a\")"
+    ]
+  }
+}
