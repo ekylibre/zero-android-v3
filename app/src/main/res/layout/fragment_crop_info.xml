@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InfoFragment">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/crop_detail_crop_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bernessard #1"
+        android:textSize="22dp"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:singleLine="true"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/crop_detail_surface"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/crop_detail_surface"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7,3 ha"
+        app:layout_constraintBaseline_toBaselineOf="@id/crop_detail_crop_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/crop_detail_production"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Blé tendre de printemps 2018"
+        android:singleLine="true"
+        app:layout_constraintTop_toBottomOf="@id/crop_detail_crop_name"
+        app:layout_constraintStart_toStartOf="@id/crop_detail_crop_name"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/crop_detail_periods"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Du 23/11/2017 au 05/06/2018"
+        app:layout_constraintTop_toBottomOf="@id/crop_detail_production"
+        app:layout_constraintStart_toStartOf="@id/crop_detail_production"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/crop_detail_yield"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rendement: 86 q/ha"
+        app:layout_constraintTop_toBottomOf="@id/crop_detail_periods"
+        app:layout_constraintStart_toStartOf="@id/crop_detail_periods"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/crop_detail_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/crop_detail_yield"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        tools:listitem="@layout/item_intervention"/>
+
+
+
+</android.support.constraint.ConstraintLayout>

@@ -19,6 +19,7 @@ import com.ekylibre.android.SelectCropFragment;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.pojos.Plots;
 
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -113,7 +114,16 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                 CheckBox cropCheckBox = child.findViewById(R.id.crop_checkbox);
                 TextView cropName = child.findViewById(R.id.crop_name);
                 TextView cropArea = child.findViewById(R.id.crop_area);
-                cropName.setText(crop.name);
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(crop.production_nature);
+                if (crop.production_mode.equals("Agriculture biologique"))
+                    sb.append(" bio");
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(crop.stop_date);
+                sb.append(" ").append(cal.get(Calendar.YEAR));
+                cropName.setText(sb);
+
                 cropArea.setText(String.format(MainActivity.LOCALE, "%.1f ha travaillés", crop.surface_area));
                 cropCheckBox.setChecked(crop.is_checked);
 

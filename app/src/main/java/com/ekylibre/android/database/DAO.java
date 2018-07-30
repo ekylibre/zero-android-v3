@@ -20,11 +20,11 @@ import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.PhytoDose;
 import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Seed;
-import com.ekylibre.android.database.models.Specie;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Plots;
+import com.ekylibre.android.database.pojos.SimpleInterventions;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
@@ -34,6 +34,7 @@ import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -95,6 +96,36 @@ public interface DAO {
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE plot = :uuid")  //AND start_date < :now AND stop_date > :now
     List<Crop> cropsByPlotUuid(String uuid);  //long now
 
+//    @Query("SELECT DISTINCT production_nature FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
+//    List<String> getProductions(String farmId);
+
+//    @Transaction
+//    @Query("SELECT DISTINCT crop_uuid, i.intervention_id, c.*, i.* FROM " + Crop.TABLE_NAME +" AS c, " + Intervention.TABLE_NAME + " AS i" +
+//            " JOIN " + InterventionCrop.TABLE_NAME + " ON " + Crop.COLUMN_UUID + " = " + InterventionCrop.COLUMN_CROP_ID +
+//            " JOIN " + Intervention.TABLE_NAME + " ON " + InterventionCrop.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID)
+//    List<SimpleInterventions> getSimpleInterventionList(String farmId);
+
+//    @Transaction
+//    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
+//    List<Crops> interCropList(String farmId);
+
+//    @Transaction
+//    @Query("SELECT * FROM " + InterventionCrop.TABLE_NAME +
+//    " JOIN " + Crop.TABLE_NAME + " ON " + Crop.COLUMN_UUID + " = " + InterventionCrop.COLUMN_CROP_ID +
+//    " JOIN " + Intervention.TABLE_NAME + " ON " + Intervention.COLUMN_ID + " = " + InterventionCrop.COLUMN_INTERVENTION_ID)
+//    List<InterventionCropPojo> cropWithInter();
+//
+//    @Transaction
+//    @Query("SELECT intervention_id, crop_uuid FROM " + Crop.TABLE_NAME +
+//            " JOIN " + InterventionCrop.COLUMN_CROP_ID + " ON " + Crop.COLUMN_UUID + " = " + InterventionCrop.COLUMN_CROP_ID +
+//            " JOIN " + Intervention.TABLE_NAME + " ON " + InterventionCrop.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+//            " WHERE farm = :farmId")
+//    List<CropsWithIntervention> cropsWithInter(String farmId);
+
+//    @Transaction
+//    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
+//    List<CropsWithIntervention> interventionCropDetail(String farmId);
+
 
     /**
      *    Plot list
@@ -108,10 +139,23 @@ public interface DAO {
      *    Interventions (POJO)
      */
     @Transaction
-    @Query("SELECT * FROM " + Intervention.TABLE_NAME + " JOIN " + InterventionWorkingDay.TABLE_NAME +
+    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " + " JOIN " + InterventionWorkingDay.TABLE_NAME +
             " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
             " WHERE status != 'deleted' AND farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
     List<Interventions> selectInterventions(String farmId);
+
+    @Transaction
+    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +
+            " JOIN " + InterventionWorkingDay.TABLE_NAME + " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+            " WHERE " + Intervention.COLUMN_ID + " IN (:interIDs)" +
+            " ORDER BY execution_date DESC")
+    List<Interventions> selectInterventionsByInterIDs(List<Integer> interIDs);
+
+    @Transaction
+    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +
+            " JOIN " + InterventionWorkingDay.TABLE_NAME + " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+            " WHERE farm = :farmId ORDER BY execution_date ASC")
+    List<SimpleInterventions> getSimpleInterventionList(String farmId);
 
     @Transaction
     @Query("SELECT * FROM " + Intervention.TABLE_NAME + " WHERE " + Intervention.COLUMN_ID_EKY + " IS NULL AND status != 'deleted' AND farm = :farmId")
