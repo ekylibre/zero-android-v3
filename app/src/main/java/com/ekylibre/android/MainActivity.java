@@ -4,6 +4,7 @@ package com.ekylibre.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -167,7 +168,16 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
 //            toast.show();
         });
 
-        swipeRefreshLayout.setOnRefreshListener(() -> new StartSync(SyncService.ACTION_SYNC_ALL).execute());
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (App.isOnline(this))
+                new StartSync(SyncService.ACTION_SYNC_ALL).execute();
+            else {
+                Toast toast = Toast.makeText(this, "Vous n'êtes pas connecté à internet. Veuillez essayer plus tard.", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                toast.show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         // Run a get Sync on startup
         new StartSync(SyncService.FIRST_TIME_SYNC).execute();
@@ -378,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         setUnitsName(Units.LOAD_OUTPUT_UNITS, Units.LOAD_OUTPUT_UNITS_L10N);
         setUnitsName(Units.VOLUME_UNITS, Units.VOLUME_UNITS_L10N);
         setUnitsName(Units.MASS_UNITS, Units.MASS_UNITS_L10N);
+        setUnitsName(Units.ALL_BASE_UNITS, Units.ALL_BASE_UNITS_L10N);
     }
 
     private void setUnitsName(List<Unit> unitList, List<String> unitListString) {
@@ -494,4 +505,5 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         }
         return false;
     };
+
 }

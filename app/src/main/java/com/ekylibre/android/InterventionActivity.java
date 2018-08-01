@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.ekylibre.android.adapters.EquipmentAdapter;
 import com.ekylibre.android.adapters.InputAdapter;
+import com.ekylibre.android.adapters.MaterialAdapter;
 import com.ekylibre.android.adapters.OutputAdapter;
 import com.ekylibre.android.adapters.PersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
@@ -50,6 +51,7 @@ import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Plots;
@@ -117,16 +119,16 @@ public class InterventionActivity extends AppCompatActivity implements
     private RecyclerView.Adapter inputAdapter;
 
     // Harvest layout
-    private Group harvestRecyclerGroup;
     private RecyclerView.Adapter harvestAdapter;
     private Group harvestDetail;
     private AppCompatSpinner harvestOutputType;
 
-//    private ImageView materialArrow;
-//    private TextView materialSummary, materialAddLabel;
-//    private DialogFragment selectMaterialFragment;
-//    private RecyclerView materialRecyclerView;
-//    private RecyclerView.Adapter materialAdapter;
+    // Material layout
+    private ImageView materialArrow;
+    private TextView materialSummary, materialAddLabel;
+    private DialogFragment selectMaterialFragment;
+    private RecyclerView materialRecyclerView;
+    private RecyclerView.Adapter materialAdapter;
 
     // Equipment layout
     private Group equipmentRecyclerGroup;
@@ -160,7 +162,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Persons> personList = new ArrayList<>();
     public static List<Plots> plotList = new ArrayList<>();
     private static List<Harvest> outputList = new ArrayList<>();
-    //public static List<Materials> materialList = new ArrayList<>();
+    public static List<Materials> materialList = new ArrayList<>();
 
     public static float surface = 0f;
     public static String procedure;
@@ -235,11 +237,11 @@ public class InterventionActivity extends AppCompatActivity implements
         harvestOutputType = findViewById(R.id.harvest_output_spinner);
 
         // Materials
-//        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
-//        materialArrow = findViewById(R.id.material_arrow);
-//        materialSummary = findViewById(R.id.material_summary);
-//        materialAddLabel = findViewById(R.id.material_add_label);
-//        materialRecyclerView = findViewById(R.id.material_recycler);
+        ConstraintLayout materialLayout = findViewById(R.id.material_layout);
+        materialArrow = findViewById(R.id.material_arrow);
+        materialSummary = findViewById(R.id.material_summary);
+        materialAddLabel = findViewById(R.id.material_add_label);
+        materialRecyclerView = findViewById(R.id.material_recycler);
 
         // Equipments
         ConstraintLayout equipmentZone = findViewById(R.id.equipment_zone);
@@ -285,7 +287,7 @@ public class InterventionActivity extends AppCompatActivity implements
         irrigationLayout.setVisibility(View.GONE);
         harvestLayout.setVisibility(View.GONE);
         inputLayout.setVisibility(View.VISIBLE);
-        // materialLayout.setVisibility(View.GONE);
+        materialLayout.setVisibility(View.GONE);
 
         switch (procedure) {
             case App.IRRIGATION:
@@ -299,9 +301,9 @@ public class InterventionActivity extends AppCompatActivity implements
                 harvestLayout.setVisibility(View.VISIBLE);
                 inputLayout.setVisibility(View.GONE);
                 break;
-//            case MainActivity.CARE:
-//                materialLayout.setVisibility(View.VISIBLE);
-//                break;
+            case App.CARE:
+                materialLayout.setVisibility(View.VISIBLE);
+                break;
         }
 
         // =============================== CROPS EVENTS ======================================== //
@@ -534,47 +536,47 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ============================== MATERIALS EVENTS ===================================== //
 
-//        materialAddLabel.setOnClickListener(view -> {
-//            selectMaterialFragment = SelectMaterialFragment.newInstance();
-//            selectMaterialFragment.show(getFragmentTransaction(), "dialog");
-//        });
-//
-//        View.OnClickListener materialListener = view -> {
-//            if (materialRecyclerView.getVisibility() == View.GONE) {
-//                materialArrow.setVisibility(View.VISIBLE);
-//                materialArrow.setRotation(180);
-//                materialSummary.setVisibility(View.GONE);
-//                materialAddLabel.setVisibility(View.VISIBLE);
-//                materialRecyclerView.setVisibility(View.VISIBLE);
-//            } else {
-//                int count = materialList.size();
-//                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
-//                materialArrow.setRotation(0);
-//                materialSummary.setVisibility(View.VISIBLE);
-//                materialAddLabel.setVisibility(View.GONE);
-//                materialRecyclerView.setVisibility(View.GONE);
-//            }
-//        };
-//
-//        materialArrow.setOnClickListener(materialListener);
-//        materialSummary.setOnClickListener(materialListener);
-//
-//        materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-//        materialAdapter = new MaterialAdapter(this, materialList);
-//        materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//            @Override
-//            public void onChanged() {
-//                if (materialAdapter.getItemCount() == 0) {
-//                    materialArrow.performClick();
-//                    materialArrow.setVisibility(View.GONE);
-//                    materialSummary.setVisibility(View.GONE);
-//                    materialAddLabel.setVisibility(View.VISIBLE);
-//                    materialRecyclerView.setVisibility(View.GONE);
-//                }
-//            }
-//        });
-//        materialRecyclerView.setAdapter(materialAdapter);
+        materialAddLabel.setOnClickListener(view -> {
+            selectMaterialFragment = SelectMaterialFragment.newInstance();
+            selectMaterialFragment.show(getFragmentTransaction(), "dialog");
+        });
+
+        View.OnClickListener materialListener = view -> {
+            if (materialRecyclerView.getVisibility() == View.GONE) {
+                materialArrow.setVisibility(View.VISIBLE);
+                materialArrow.setRotation(180);
+                materialSummary.setVisibility(View.GONE);
+                materialAddLabel.setVisibility(View.VISIBLE);
+                materialRecyclerView.setVisibility(View.VISIBLE);
+            } else {
+                int count = materialList.size();
+                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
+                materialArrow.setRotation(0);
+                materialSummary.setVisibility(View.VISIBLE);
+                materialAddLabel.setVisibility(View.GONE);
+                materialRecyclerView.setVisibility(View.GONE);
+            }
+        };
+
+        materialArrow.setOnClickListener(materialListener);
+        materialSummary.setOnClickListener(materialListener);
+
+        materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        materialAdapter = new MaterialAdapter(this, materialList);
+        materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                if (materialAdapter.getItemCount() == 0) {
+                    materialArrow.performClick();
+                    materialArrow.setVisibility(View.GONE);
+                    materialSummary.setVisibility(View.GONE);
+                    materialAddLabel.setVisibility(View.VISIBLE);
+                    materialRecyclerView.setVisibility(View.GONE);
+                }
+            }
+        });
+        materialRecyclerView.setAdapter(materialAdapter);
 
 
         // ============================= EQUIPMENTS EVENTS ===================================== //
@@ -706,7 +708,7 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override
             public void afterTextChanged(Editable editable) {
                 if (editable.length() > 0)
-                    weatherSummary.setText(editable.toString() + "°C");
+                    weatherSummary.setText(String.format("%s °C", editable.toString()));
                 else
                     weatherSummary.setText(R.string.not_provided);
             }
@@ -743,8 +745,10 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         }
 
-        descriptionEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        descriptionEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        if (descriptionEditText != null) {
+            descriptionEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            descriptionEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        }
 
         // ================================ BOTTOM BAR ========================================= //
 
@@ -813,7 +817,6 @@ public class InterventionActivity extends AppCompatActivity implements
             if (editIntervention != null) {
                 int count = 0;
                 float total = 0;
-                if (BuildConfig.DEBUG) Log.e(TAG, plotList.toString());
                 for (Plots plot : plotList) {
                     for (Crops culture : editIntervention.crops) {
                         for (Crop crop : plot.crops) {
@@ -895,13 +898,11 @@ public class InterventionActivity extends AppCompatActivity implements
                     break;
 
                 case App.IMPLANTATION:
-                    if (BuildConfig.DEBUG) Log.i(TAG, "Verify crop integrity for IMPLANTATION");
                     HashSet<String> productionNature = new HashSet<>();
                     outerLoop:
                     for (Plots plot : plotList) {
                         for (Crop crop : plot.crops) {
                             if (crop.is_checked) {
-                                Log.i(TAG, "Crop checked " + crop.name + " | productionNature " + crop.specie);
                                 if (productionNature.isEmpty() || productionNature.contains(crop.specie)) {
                                     productionNature.add(crop.specie);
                                 } else {
@@ -1014,6 +1015,8 @@ public class InterventionActivity extends AppCompatActivity implements
                     database.dao().delete(seed.inter);
                 for (Fertilizers fertilizer : editIntervention.fertilizers)
                     database.dao().delete(fertilizer.inter);
+                for (Materials material : editIntervention.materials)
+                    database.dao().delete(material.inter);
                 for (Equipments equipment : editIntervention.equipments)
                     database.dao().delete(equipment.inter);
                 for (Harvest harvest : editIntervention.harvests)
@@ -1102,11 +1105,10 @@ public class InterventionActivity extends AppCompatActivity implements
             }
             //database.dao().insert(outputList.toArray(new Harvest[outputList.size()]));  // Bulk insert
 
-
-//            for (Materials item : materialList) {
-//                item.inter.intervention_id = intervention_id;
-//                database.dao().insert(item.inter);
-//            }
+            for (Materials item : materialList) {
+                item.inter.intervention_id = intervention_id;
+                database.dao().insert(item.inter);
+            }
 
             return null;
         }
@@ -1126,14 +1128,14 @@ public class InterventionActivity extends AppCompatActivity implements
 
             Timber.e("onFragmentInteraction --> %s", selection.toString());
 
-//            if (selection instanceof Materials) {
-//                selectMaterialFragment.dismiss();
-//                materialList.add((Materials) selection);
-//                materialAdapter.notifyDataSetChanged();
-//                if (materialRecyclerView.getVisibility() == View.GONE)
-//                    materialArrow.performClick();
+            if (selection instanceof Materials) {
+                selectMaterialFragment.dismiss();
+                materialList.add((Materials) selection);
+                materialAdapter.notifyDataSetChanged();
+                if (materialRecyclerView.getVisibility() == View.GONE)
+                    materialArrow.performClick();
 
-            if (selection instanceof Equipments) {
+            } else if (selection instanceof Equipments) {
                 selectEquipmentFragment.dismiss();
                 equipmentList.add((Equipments) selection);
                 equipmentAdapter.notifyDataSetChanged();
@@ -1157,8 +1159,9 @@ public class InterventionActivity extends AppCompatActivity implements
                     new GetMaxDose((Phytos) selection).execute();
                 }
 
-            } else if (selectCropFragment.isVisible()){
-                selectCropFragment.dismiss();
+            } else {
+                if (selectCropFragment != null && selectCropFragment.isVisible())
+                    selectCropFragment.dismiss();
                 List<Plots> plots = (List<Plots>) selection;
                 if (!plots.isEmpty()) {
                     if (cropSummaryText.equals(this.getString(R.string.no_crop_selected))) {
@@ -1208,7 +1211,7 @@ public class InterventionActivity extends AppCompatActivity implements
         personList.clear();
         plotList.clear();
         outputList.clear();
-        //materialList.clear();
+        materialList.clear();
     }
 
     private class GetMaxDose extends AsyncTask<Void, Void, Void> {

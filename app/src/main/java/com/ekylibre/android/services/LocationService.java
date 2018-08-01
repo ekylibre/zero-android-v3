@@ -37,8 +37,7 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            if (record)
-                new WriteDatabaseTask(location).execute();
+            new WriteDatabaseTask(location).execute();
             for (Crop crop : LiveActivity.cropList) {
                 if (TurfJoins.inside(
                         com.mapbox.geojson.Point.fromLngLat(

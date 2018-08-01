@@ -101,7 +101,7 @@
 
     <string-array name="unit_keys">
         <item>METER</item>
-        <item>UNIT</item>
+        <item>UNITY</item>
         <item>THOUSAND</item>
         <item>GRAM</item>
         <item>KILOGRAM</item>

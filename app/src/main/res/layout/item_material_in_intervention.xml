@@ -26,16 +26,16 @@
         app:layout_constraintStart_toEndOf="@id/item_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/item_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:text="@string/default_input_name_more"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBaseline_toBaselineOf="@id/item_name"
-        app:layout_constraintStart_toEndOf="@id/item_name" />
+    <!--<android.support.v7.widget.AppCompatTextView-->
+        <!--android:id="@+id/item_desc"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="6dp"-->
+        <!--android:text="@string/default_input_name_more"-->
+        <!--android:textColor="#000000"-->
+        <!--android:textStyle="bold"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@id/item_name"-->
+        <!--app:layout_constraintStart_toEndOf="@id/item_name" />-->
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_quantity_label"
@@ -74,16 +74,7 @@
         app:layout_constraintStart_toEndOf="@id/item_quantity_edit"
         app:layout_constraintTop_toTopOf="@id/item_quantity_edit"
         app:layout_constraintBottom_toBottomOf="@id/item_quantity_edit"
-        android:entries="@array/unity_unit_values" />
-
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/item_total"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="13,5 t au total"
-        app:layout_constraintTop_toBottomOf="@id/item_quantity_label"
-        app:layout_constraintStart_toStartOf="@id/item_quantity_edit"/>
+        android:entries="@array/unit_values" />
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/item_approximated"
@@ -92,7 +83,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="@+id/item_quantity_label"
         app:layout_constraintStart_toStartOf="@id/item_quantity_label"
-        app:layout_constraintTop_toBottomOf="@id/item_total" />
+        app:layout_constraintTop_toBottomOf="@id/item_unit_spinner" />
 
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="wrap_content"

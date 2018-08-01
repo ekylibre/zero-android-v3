@@ -47,14 +47,12 @@ public interface DAO {
     /**
      *    Insert queries
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Equipment equipment);
-    @Insert void insert(Material... materials);
+
 
     @Insert void insert(Phyto... phytos);
     @Insert void insert(PhytoDose... doses);
     @Insert void insert(Seed... seeds);
-    @Insert void insert(Fertilizer... fertilizers);
-
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Fertilizer... fertilizers);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Intervention intervention);  // return id as long
 
@@ -64,6 +62,8 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... crops);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Farm... farms);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Equipment equipment);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Material... materials);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay interventionWorkingDay);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed interventionSeeds);
@@ -75,17 +75,18 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Harvest harvests);
 
-    @Insert void insert(Point... points);
-
     @Delete void delete(InterventionWorkingDay... workingDays);
     @Delete void delete(InterventionSeed... seeds);
     @Delete void delete(InterventionPhytosanitary... phytosanitaries);
     @Delete void delete(InterventionFertilizer... fertilizers);
+    @Delete void delete(InterventionMaterial... materials);
     @Delete void delete(InterventionEquipment... equipment);
     @Delete void delete(InterventionPerson... people);
     @Delete void delete(InterventionCrop... crops);
     @Delete void delete(Weather... weather);
     @Delete void delete(Harvest... harvests);
+    @Insert void insert(Point... points);
+
     @Delete void delete(Intervention intervention);
 
     /**
@@ -212,6 +213,9 @@ public interface DAO {
     @Query("SELECT " + Fertilizer.COLUMN_ID_EKY + " FROM " + Fertilizer.TABLE_NAME + " WHERE " + Fertilizer.COLUMN_ID_EKY + " NOT NULL")
     List<Integer> fertilizerEkiIdList();
 
+    @Query("SELECT " + Material.COLUMN_ID_EKY + " FROM " + Material.TABLE_NAME + " WHERE " + Material.COLUMN_ID_EKY + " NOT NULL")
+    List<Integer> materialEkiIdList();
+
     @Query("SELECT " + Person.COLUMN_ID_EKY + " FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " NOT NULL")
     List<Integer> personEkiIdList();
 
@@ -250,6 +254,14 @@ public interface DAO {
     @Query("SELECT * FROM " + Material.TABLE_NAME + " WHERE name LIKE :search ORDER BY name" )
     List<Material> searchMaterial(String search);
 
+    @Query("SELECT * FROM " + Material.TABLE_NAME + " WHERE " + Material.COLUMN_ID_EKY + " IS NULL")
+    List<Material> getMaterialWithoutEkyId();
+
+    @Query("SELECT * FROM " + Material.TABLE_NAME + " WHERE " + Material.COLUMN_ID_EKY + " = :id")
+    Material getMaterialByEkyId(Integer id);
+
+
+
 
     /**
      *    Seed
@@ -272,11 +284,14 @@ public interface DAO {
     @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE specie = :specie" )
     List<Seed> selectBySpecie(String specie);
 
-    @Query("UPDATE " + Seed.TABLE_NAME + " SET " + Seed.COLUMN_ID_EKY + " = :id WHERE " + Seed.COLUMN_ID + " = :refId")
-    int setSeedEkyId(Integer id, String refId);
+//    @Query("UPDATE " + Seed.TABLE_NAME + " SET " + Seed.COLUMN_ID_EKY + " = :id WHERE " + Seed.COLUMN_ID + " = :refId")
+//    int setSeedEkyId(Integer id, String refId);
 
     @Query("SELECT " + Seed.COLUMN_ID + " FROM " + Seed.TABLE_NAME + " WHERE " + Seed.COLUMN_ID_EKY + " = :eky_id")
     int getSeedId(int eky_id);
+
+    @Query("UPDATE " + Seed.TABLE_NAME + " SET " + Seed.COLUMN_ID_EKY + " = :id WHERE " + Seed.COLUMN_ID + " = :refId")
+    int setSeedEkyId(Integer id, String refId);
 
     @Query("SELECT * FROM " + Seed.TABLE_NAME + " WHERE " + Seed.COLUMN_ID_EKY + " IS NULL AND CAST(" + Seed.COLUMN_ID + " AS INTEGER) < 100000")
     List<Seed> getSeedWithoutEkyId();

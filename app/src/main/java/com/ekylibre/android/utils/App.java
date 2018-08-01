@@ -1,5 +1,8 @@
 package com.ekylibre.android.utils;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+
 public class App {
 
     public static final String OAUTH_GRANT_TYPE = "password";
@@ -16,5 +19,16 @@ public class App {
     public static final String HARVEST = "HARVEST";
     public static final String IMPLANTATION = "IMPLANTATION";
     public static final String IRRIGATION = "IRRIGATION";
+
+    public static boolean isOnline(Context ctx) {
+        ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        boolean response = false;
+
+        if (cm != null)
+            response = cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+
+        return response;
+    }
 
 }

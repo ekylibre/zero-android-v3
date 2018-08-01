@@ -7,7 +7,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +23,6 @@ import java.util.Objects;
 
 
 public class SelectCropFragment extends DialogFragment {
-
-    private static final String TAG = SelectCropFragment.class.getName();
 
     private Context context;
 
@@ -78,49 +75,10 @@ public class SelectCropFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
 
-        if (BuildConfig.DEBUG) Log.e(TAG, "onStart()");
-
         Window window = getDialog().getWindow();
         if (window != null)
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
     }
-
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//
-//        if (dataset.isEmpty()) {
-//            Log.e(TAG, "Request database for crop list");
-//            new RequestDatabase(context).execute();
-//        }
-//    }
-//
-//    /**
-//     * The asynchrone request task
-//     */
-//    private class RequestDatabase extends AsyncTask<Void, Void, Void> {
-//
-//        Context context;
-//
-//        RequestDatabase(final Context context) {
-//            this.context = context;
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//
-//            AppDatabase database = AppDatabase.getInstance(this.context);
-//
-//            List<Plot> plotList = database.dao().plotList();
-//
-//            for (Plot plot : plotList) {
-//                PlotWithCrops plotWithCrops = new PlotWithCrops(plot);
-//                plotWithCrops.crops = database.dao().cropsByPlotUuid(plot.uuid);  //new Date().getTime()
-//                dataset.add(plotWithCrops);
-//            }
-//            return null;
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {

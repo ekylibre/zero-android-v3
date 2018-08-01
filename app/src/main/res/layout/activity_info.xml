@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".InfoActivity">
+    tools:context=".InfoActivity"
+    android:background="@color/another_light_grey">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/crop_info_recycler"

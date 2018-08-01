@@ -19,6 +19,10 @@ public class Units {
     private static final float QUINTAL_FACTOR = 100;
     private static final float TON_FACTOR = 1000;
 
+    private static final float METER_FACTOR = 1;
+    private static final float UNITY_FACTOR = 1;
+    private static final float THOUSAND_FACTOR = 1000;
+
     // Volume (reference is LITER_PER_HECTARE)
     public static final Unit LITER = new Unit("LITER", LITER_FACTOR);
     public static final Unit LITER_PER_HECTARE = new Unit("LITER_PER_HECTARE", "LITER", LITER_FACTOR, HECTARE_FACTOR);
@@ -45,9 +49,9 @@ public class Units {
     public static final Unit TON_PER_SQUARE_METER = new Unit("TON_PER_SQUARE_METER", "TON", TON_FACTOR, SQUARE_METER_FACTOR);
 
     // Unit
-//    public static final Unit METER = new Unit("METER", );
-//    public static final Unit UNIT = new Unit("UNIT", );
-//    public static final Unit THOUSAND = new Unit("THOUSAND", );
+    public static final Unit METER = new Unit("METER", METER_FACTOR);
+    public static final Unit UNITY = new Unit("UNITY", UNITY_FACTOR);
+    public static final Unit THOUSAND = new Unit("THOUSAND", THOUSAND_FACTOR);
 
     // Lists
     public static final List<Unit> IRRIGATION_UNITS = Arrays.asList(CUBIC_METER, LITER, HECTOLITER);
@@ -55,13 +59,16 @@ public class Units {
     public static final List<Unit> LOAD_OUTPUT_UNITS = Arrays.asList(QUINTAL, TON, KILOGRAM);
     public static final List<Unit> VOLUME_UNITS = Arrays.asList(LITER, LITER_PER_HECTARE, LITER_PER_SQUARE_METER, HECTOLITER, HECTOLITER_PER_HECTARE, HECTOLITER_PER_SQUARE_METER, CUBIC_METER, CUBIC_METER_PER_HECTARE, CUBIC_METER_PER_SQUARE_METER);
     public static final List<Unit> MASS_UNITS = Arrays.asList(GRAM, GRAM_PER_HECTARE, GRAM_PER_SQUARE_METER, KILOGRAM, KILOGRAM_PER_HECTARE, KILOGRAM_PER_SQUARE_METER, QUINTAL, QUINTAL_PER_HECTARE, QUINTAL_PER_SQUARE_METER, TON, TON_PER_HECTARE, TON_PER_SQUARE_METER);
-    public static final List<Unit> ALL_UNITS = Arrays.asList(LITER, LITER_PER_HECTARE, LITER_PER_SQUARE_METER, HECTOLITER, HECTOLITER_PER_HECTARE, HECTOLITER_PER_SQUARE_METER, CUBIC_METER, CUBIC_METER_PER_HECTARE, CUBIC_METER_PER_SQUARE_METER, GRAM, GRAM_PER_HECTARE, GRAM_PER_SQUARE_METER, KILOGRAM, KILOGRAM_PER_HECTARE, KILOGRAM_PER_SQUARE_METER, QUINTAL, QUINTAL_PER_HECTARE, QUINTAL_PER_SQUARE_METER, TON, TON_PER_HECTARE, TON_PER_SQUARE_METER);
+    public static final List<Unit> ALL_BASE_UNITS = Arrays.asList(METER, UNITY, THOUSAND, LITER, HECTOLITER, CUBIC_METER, GRAM, KILOGRAM, QUINTAL, TON);
+
+    public static final List<Unit> ALL_UNITS = Arrays.asList(METER, UNITY, THOUSAND, LITER, LITER_PER_HECTARE, LITER_PER_SQUARE_METER, HECTOLITER, HECTOLITER_PER_HECTARE, HECTOLITER_PER_SQUARE_METER, CUBIC_METER, CUBIC_METER_PER_HECTARE, CUBIC_METER_PER_SQUARE_METER, GRAM, GRAM_PER_HECTARE, GRAM_PER_SQUARE_METER, KILOGRAM, KILOGRAM_PER_HECTARE, KILOGRAM_PER_SQUARE_METER, QUINTAL, QUINTAL_PER_HECTARE, QUINTAL_PER_SQUARE_METER, TON, TON_PER_HECTARE, TON_PER_SQUARE_METER);
 
     public static final List<String> IRRIGATION_UNITS_L10N = new ArrayList<>();
     public static final List<String> GLOBAL_OUTPUT_UNITS_L10N = new ArrayList<>();
     public static final List<String> LOAD_OUTPUT_UNITS_L10N = new ArrayList<>();
     public static final List<String> VOLUME_UNITS_L10N= new ArrayList<>();
     public static final List<String> MASS_UNITS_L10N = new ArrayList<>();
+    public static final List<String> ALL_BASE_UNITS_L10N = new ArrayList<>();
 
     public static Unit getUnit(String name) {
         for (Unit unit : ALL_UNITS)

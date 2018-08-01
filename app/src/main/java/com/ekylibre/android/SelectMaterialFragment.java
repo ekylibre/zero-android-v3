@@ -1,8 +1,10 @@
 package com.ekylibre.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -15,18 +17,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ekylibre.android.adapters.SelectMaterialAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Material;
+import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.Unit;
+import com.ekylibre.android.utils.Units;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectMaterialFragment extends DialogFragment {
+public class SelectMaterialFragment extends DialogFragment implements SyncResultReceiver.Receiver {
 
     private static final String TAG = SelectMaterialFragment.class.getName();
 
@@ -35,6 +43,7 @@ public class SelectMaterialFragment extends DialogFragment {
     private Context context;
 
     private OnFragmentInteractionListener fragmentListener;
+    private SyncResultReceiver resultReceiver;
     private RecyclerView.Adapter adapter;
     private TextView createMaterial;
 
@@ -54,6 +63,9 @@ public class SelectMaterialFragment extends DialogFragment {
         this.context = getActivity();
         this.dataset = new ArrayList<>();
         this.searchText = "";
+
+        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver.setReceiver(this);
     }
 
     @Override
@@ -122,6 +134,11 @@ public class SelectMaterialFragment extends DialogFragment {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_material, null);
 
+        Spinner spinner = dialogView.findViewById(R.id.create_material_unit_spinner);
+
+        ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Units.ALL_BASE_UNITS_L10N);
+        spinner.setAdapter(spinnerAdapter);
+
         builder.setView(dialogView);
         builder.setNegativeButton("Annuler", (dialog, i) -> dialog.cancel());
         builder.setPositiveButton("Créer", (dialog, i) -> {
@@ -157,14 +174,14 @@ public class SelectMaterialFragment extends DialogFragment {
             TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_material_name);
             String name = nameTextInput.getEditText().getText().toString();
 
-            TextInputLayout descTextInput = dialogView.findViewById(R.id.create_material_desc);
-            String desc = descTextInput.getEditText().getText().toString();
+//            TextInputLayout descTextInput = dialogView.findViewById(R.id.create_material_desc);
+//            String desc = descTextInput.getEditText().getText().toString();
 
             AppCompatSpinner unitSpinner = dialogView.findViewById(R.id.create_material_unit_spinner);
             int spinner_pos = unitSpinner.getSelectedItemPosition();
-            String unit = getResources().getStringArray(R.array.unit_values)[spinner_pos];
+            String unit = Units.ALL_BASE_UNITS.get(spinner_pos).key;
 
-            database.dao().insert(new Material(name, desc, unit));
+            database.dao().insert(new Material(null, name, null, unit));
 
             return null;
         }
@@ -173,7 +190,17 @@ public class SelectMaterialFragment extends DialogFragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
+
+            Intent intent = new Intent(context, SyncService.class);
+            intent.setAction(SyncService.ACTION_CREATE_ARTICLE);
+            intent.putExtra("receiver", resultReceiver);
+            context.startService(intent);
         }
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        //new RequestDatabase(context).execute();
     }
 
     /**
@@ -210,7 +237,6 @@ public class SelectMaterialFragment extends DialogFragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             adapter.notifyDataSetChanged();
         }
     }

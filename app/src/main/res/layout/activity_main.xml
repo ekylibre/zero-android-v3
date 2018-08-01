@@ -98,7 +98,7 @@
             app:layout_constraintEnd_toEndOf="@id/nav_layout"
             android:background="@drawable/background_round_corners"
             android:layout_margin="6dp"
-            android:visibility="visible"
+            android:visibility="gone"
             android:minHeight="0dp"
             android:padding="6dp"/>
 

@@ -222,6 +222,11 @@
     <string name="TON_PER_HECTARE">t/ha</string>
     <string name="TON_PER_SQUARE_METER">t/m²</string>
 
+    <!-- Other units -->
+    <string name="METER">meter</string>
+    <string name="UNITY">unity</string>
+    <string name="THOUSAND">thousand</string>
+
     <!-- Output types -->
     <string name="STRAW">straw</string>
     <string name="GRAIN">grain</string>
@@ -349,6 +354,7 @@
     <string name="preparation">Préparation</string>
     <string name="mooving">Déplacement</string>
     <string name="intervention">Intervention</string>
+    <string name="notes">Notes</string>
 
 
 </resources>

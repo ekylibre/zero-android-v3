@@ -7,7 +7,6 @@ import android.support.constraint.Group;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Fertilizers;
@@ -34,7 +32,6 @@ import java.util.List;
 
 public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> {
 
-    private static final String TAG = "InputAdapter";
     private static final int SEED = 0, PHYTO = 1, FERTI = 2;
 
     private Context context;
@@ -151,7 +148,6 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                     Float dose_max = currentPhytos.phyto.get(0).dose_max;
                     if (dose_max != null) {
                         float dose;
-                        if (BuildConfig.DEBUG) Log.e(TAG, "currentUnit" + currentUnit.name);
                         if (currentUnit.surface_factor == 0)
                             dose = quantity * currentUnit.quantity_factor / InterventionActivity.surface;
                         else
@@ -231,12 +227,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             else {
                 itemTotal.setVisibility(View.GONE);
             }
-
         }
-
-
-
-
     }
 
     @NonNull

@@ -23,6 +23,7 @@ import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
+import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.App;
@@ -33,10 +34,11 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
 
+import timber.log.Timber;
+
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
-    private static final String TAG = MainAdapter.class.getName();
     private List<Interventions> interventionsList;
     private Context context;
 
@@ -167,16 +169,16 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 }
                 break;
 
-//            case MainActivity.CARE:
-//                for (Materials m : current.materials) {
-//                    sb.append(m.material.get(0).name).append(" • ");
-//                    sb.append(m.inter.quantity).append(" ");
-//                    sb.append(unitValues.get(unitKeys.indexOf(m.inter.unit)));
-//                    if (current.materials.indexOf(m) + 1 != current.materials.size()) sb.append("\n");
-//                }
-//                break;
-
             case App.CARE:
+                Timber.i("Entretien #################");
+                for (Materials m : current.materials) {
+                    sb.append(m.material.get(0).name).append(" • ");
+                    sb.append(m.inter.quantity).append(" ");
+                    sb.append(Objects.requireNonNull(Units.getUnit(m.inter.unit)).name);
+                    if (current.materials.indexOf(m) + 1 != current.materials.size()) sb.append("\n");
+                }
+                break;
+
             case App.GROUND_WORK:
                 for (Equipments e : current.equipments) {
                     sb.append(e.equipment.get(0).name);

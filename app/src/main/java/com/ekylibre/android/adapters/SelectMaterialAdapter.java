@@ -19,11 +19,6 @@ import java.util.List;
 
 public class SelectMaterialAdapter extends RecyclerView.Adapter<SelectMaterialAdapter.ViewHolder> {
 
-    private static final String TAG = SelectMaterialAdapter.class.getName();
-
-    private static final int EMPTY_VIEW_TYPE = 0;
-    private static final int REGULAR_VIEW_TYPE = 1;
-
     private List<Material> dataset;
     private SelectMaterialFragment.OnFragmentInteractionListener fragmentListener;
 
@@ -34,14 +29,14 @@ public class SelectMaterialAdapter extends RecyclerView.Adapter<SelectMaterialAd
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView nameTextView, descTextView;
+        TextView nameTextView;
         Material material;
 
         ViewHolder(View itemView) {
             super(itemView);
 
             nameTextView = itemView.findViewById(R.id.material_name);
-            descTextView = itemView.findViewById(R.id.material_desc);
+//            descTextView = itemView.findViewById(R.id.material_desc);
 
             itemView.setOnClickListener(v -> {
                 Materials selection = new Materials();
@@ -54,7 +49,7 @@ public class SelectMaterialAdapter extends RecyclerView.Adapter<SelectMaterialAd
         void display(Material item) {
             material = item;
             nameTextView.setText(item.name);
-            descTextView.setText(item.description);
+//            descTextView.setText(item.description);
         }
     }
 
@@ -63,10 +58,6 @@ public class SelectMaterialAdapter extends RecyclerView.Adapter<SelectMaterialAd
     public SelectMaterialAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         int layoutId = R.layout.item_material;
-
-//        if (viewType == EMPTY_VIEW_TYPE)
-//            layoutId = R.layout.item_material_empty;
-
         View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
 
         return new ViewHolder(view);
@@ -81,13 +72,5 @@ public class SelectMaterialAdapter extends RecyclerView.Adapter<SelectMaterialAd
     public int getItemCount() {
         return dataset.size();
     }
-
-//    @Override
-//    public int getItemViewType(int position) {
-//        if (dataset.isEmpty())
-//            return EMPTY_VIEW_TYPE;
-//        else
-//            return REGULAR_VIEW_TYPE;
-//    }
 
 }
