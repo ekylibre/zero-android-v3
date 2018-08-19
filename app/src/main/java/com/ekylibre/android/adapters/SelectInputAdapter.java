@@ -8,14 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.constraint.Group;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.SelectInputFragment;
 import com.ekylibre.android.R;
@@ -29,7 +27,7 @@ import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
-import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.Enums;
 
@@ -42,7 +40,7 @@ import timber.log.Timber;
 import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
 
 
-public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements SyncResultReceiver.Receiver {
+public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ServiceResultReceiver.Receiver {
 
     private static final String TAG = "SelectInputAdapter";
     public static final int SEED = 0, PHYTO = 1, FERTI = 2;

@@ -68,7 +68,7 @@ public class LiveActivity extends AppCompatActivity {
     }
 
     private void startLocationService() {
-
+        startService(serviceIntent);
     }
 
     private void stopLocationService() {
@@ -118,7 +118,8 @@ public class LiveActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    startLocationService();
+                    if (!isServiceRunning())
+                        startService(serviceIntent);
                 else
                     // Snackbar.make(mainLayout, "Permission denied", Snackbar.LENGTH_LONG).show();
                     break;

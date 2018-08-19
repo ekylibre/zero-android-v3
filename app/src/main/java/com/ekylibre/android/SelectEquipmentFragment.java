@@ -24,7 +24,7 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
-import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.Enums;
 
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectEquipmentFragment extends DialogFragment implements SyncResultReceiver.Receiver{
+public class SelectEquipmentFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
     private static final String TAG = "SelectEquipmentFragment";
 
@@ -43,7 +43,7 @@ public class SelectEquipmentFragment extends DialogFragment implements SyncResul
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
     private TextView createEquipment;
-    private SyncResultReceiver resultReceiver;
+    private ServiceResultReceiver resultReceiver;
 
     private String searchText;
     private ArrayList<Equipment> dataset;
@@ -116,7 +116,7 @@ public class SelectEquipmentFragment extends DialogFragment implements SyncResul
         if (window != null)
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver = new ServiceResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
     }
 

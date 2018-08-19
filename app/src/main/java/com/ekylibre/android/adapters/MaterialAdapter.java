@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -99,6 +100,19 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
             approximativeSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
                 Materials interMaterial = dataset.get(getAdapterPosition());
                 interMaterial.inter.approximative_value = compoundButton.isChecked();
+            });
+
+            unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    dataset.get(getLayoutPosition()).inter.unit = Units.ALL_BASE_UNITS.get(position).key;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
             });
         }
 

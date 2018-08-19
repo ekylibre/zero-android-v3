@@ -4,18 +4,15 @@ package com.ekylibre.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,7 +29,7 @@ import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.network.EkylibreAPI;
 import com.ekylibre.android.network.ServiceGenerator;
 import com.ekylibre.android.network.pojos.AccessToken;
-import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
@@ -55,7 +52,7 @@ import retrofit2.Call;
 import timber.log.Timber;
 
 
-public class MainActivity extends AppCompatActivity implements SyncResultReceiver.Receiver {
+public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver {
 
     public static Locale LOCALE;
     public int TYPE;
@@ -83,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
     public static List<Interventions> interventionsList = new ArrayList<>();
 
     private SharedPreferences prefs;
-    private SyncResultReceiver resultReceiver;
+    private ServiceResultReceiver resultReceiver;
 
     public static String FARM_ID;
     public static Date lastSyncTime;
@@ -109,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements SyncResultReceive
         // Get locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
 
-        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver = new ServiceResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
         // Get layout refs

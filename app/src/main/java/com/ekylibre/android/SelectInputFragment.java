@@ -31,7 +31,7 @@ import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
-import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectInputFragment extends DialogFragment implements SyncResultReceiver.Receiver{
+public class SelectInputFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
     private static final String TAG = SelectInputFragment.class.getName();
 
@@ -50,7 +50,7 @@ public class SelectInputFragment extends DialogFragment implements SyncResultRec
     private Context context;
     private AppDatabase database;
 
-    private SyncResultReceiver resultReceiver;
+    private ServiceResultReceiver resultReceiver;
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
     private TextView createInput;
@@ -74,7 +74,7 @@ public class SelectInputFragment extends DialogFragment implements SyncResultRec
         this.selectedList = new ArrayList<>();
         this.searchText = "";
 
-        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver = new ServiceResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
         switch (InterventionActivity.procedure) {

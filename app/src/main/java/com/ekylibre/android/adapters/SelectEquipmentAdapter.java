@@ -65,7 +65,9 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
             nameTextView.setText(item.name);
             Timber.e("eq %s", item.type);
             typeTextView.setText(item.type != null ? Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.type)) : "Indéfini");
-            typeImageView.setImageResource(context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName()));
+            Integer iconRessource = context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName());
+            if (iconRessource != 0)
+                typeImageView.setImageResource(iconRessource);
 
         }
     }

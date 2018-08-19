@@ -168,6 +168,7 @@ public class SyncService extends IntentService {
             case ACTION_SYNC_ALL:
 
                 // Mutations (order is important)
+                pushArticle();
                 pushPerson();
                 pushEquipment();
                 pushDeleteIntervention();
@@ -330,6 +331,24 @@ public class SyncService extends IntentService {
                             .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
                 }
 
+                for (Materials material : updatableInter.materials) {
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
+
+//                    if (material.material.get(0).eky_id == null) { // Create new article
+//                        if (fertilizer.fertilizer.get(0).registered)
+//                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
+//                                    .type(ArticleTypeEnum.FERTILIZER);
+//
+//                    } else { // Use existing article
+//                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
+//                    }
+
+                    inputUpdates.add(InterventionInputAttributes.builder()
+                            .article(articleBuilder.id(String.valueOf(material.material.get(0).eky_id)).build())
+                            .quantity(material.inter.quantity)
+                            .unit(ArticleAllUnitEnum.safeValueOf(material.inter.unit)).build());
+                }
+
                 for (Weather weather : updatableInter.weather)
                     weatherUpdate = WeatherAttributes.builder()
                             .description(weather.description != null ? WeatherEnum.valueOf(weather.description) : null)
@@ -461,18 +480,22 @@ public class SyncService extends IntentService {
                     @Override
                     public void onResponse(@Nonnull Response<PushEquipmentMutation.Data> response) {
                         if (!response.hasErrors()) {
-                            PushEquipmentMutation.CreateEquipment mutation = response.data().createEquipment();
-                            if (!mutation.equipment().id().equals("")) {
-                                database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
-                                Timber.i("Equipment #%s successfully created", mutation.equipment().id());
-                                if (ACTION.equals(ACTION_CREATE_PERSON_AND_EQUIPMENT)) {
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("name", equipment.name);
-                                    bundle.putInt("remote_id", Integer.valueOf(mutation.equipment().id()));
-                                    receiver.send(DONE, bundle);
+                            PushEquipmentMutation.Data responseData = response.data();
+                            if (responseData != null) {
+                                PushEquipmentMutation.CreateEquipment mutation = responseData.createEquipment();
+                                if (mutation != null && mutation.equipment() != null) {
+                                    if (!mutation.equipment().id().equals("")) {
+                                        database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
+                                        Timber.i("Equipment #%s successfully created", mutation.equipment().id());
+                                        if (ACTION.equals(ACTION_CREATE_PERSON_AND_EQUIPMENT)) {
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("name", equipment.name);
+                                            bundle.putInt("remote_id", Integer.valueOf(mutation.equipment().id()));
+                                            receiver.send(DONE, bundle);
+                                        }
+                                    }
                                 }
                             }
-
                         }
                     }
 

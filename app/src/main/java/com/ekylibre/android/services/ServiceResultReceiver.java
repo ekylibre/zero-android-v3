@@ -5,11 +5,11 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 
 
-public class SyncResultReceiver extends ResultReceiver {
+public class ServiceResultReceiver extends ResultReceiver {
 
     private Receiver mReceiver;
 
-    public SyncResultReceiver(Handler handler) {
+    public ServiceResultReceiver(Handler handler) {
         super(handler);
         // TODO Auto-generated constructor stub
     }

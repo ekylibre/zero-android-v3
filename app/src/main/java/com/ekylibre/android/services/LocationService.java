@@ -8,6 +8,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.Snackbar;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.ekylibre.android.LiveActivity;
 import com.ekylibre.android.database.AppDatabase;
@@ -25,7 +28,7 @@ public class LocationService extends Service {
 
     private LocationManager locationManager = null;
     private AppDatabase database;
-    private static boolean record = false;
+    public static boolean writeDatabase = false;
 
     private class LocationListener implements android.location.LocationListener {
 
@@ -37,7 +40,9 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            new WriteDatabaseTask(location).execute();
+            if (writeDatabase) {
+                new WriteDatabaseTask(location).execute();
+            }
             for (Crop crop : LiveActivity.cropList) {
                 if (TurfJoins.inside(
                         com.mapbox.geojson.Point.fromLngLat(
@@ -54,6 +59,9 @@ public class LocationService extends Service {
         @Override
         public void onProviderDisabled(String provider) {
             Timber.i("GPS disabled");
+            Toast toast = Toast.makeText(getBaseContext(), "Le GPS de votre smartphone est éteint...", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, 200);
+            toast.show();
         }
 
         @Override

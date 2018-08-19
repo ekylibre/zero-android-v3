@@ -79,4 +79,21 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
             return CustomTypeValue.fromRawValue(sb.toString());
         }
     };
+
+
+    public static CustomTypeAdapter<Point> customPointAdapter = new CustomTypeAdapter<Point>() {
+
+        @Override
+        public Point decode(CustomTypeValue value) {
+            String json = value.value.toString();
+            return Point.fromJson(json);
+        }
+
+        @NonNull
+        @Override
+        public CustomTypeValue encode(@NonNull Point value) {
+
+            return CustomTypeValue.fromRawValue(value.toJson());
+        }
+    };
 }

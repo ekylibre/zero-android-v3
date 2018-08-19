@@ -541,6 +541,8 @@ public class InterventionActivity extends AppCompatActivity implements
             selectMaterialFragment.show(getFragmentTransaction(), "dialog");
         });
 
+
+
         View.OnClickListener materialListener = view -> {
             if (materialRecyclerView.getVisibility() == View.GONE) {
                 materialArrow.setVisibility(View.VISIBLE);
@@ -558,8 +560,16 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         };
 
+
+
         materialArrow.setOnClickListener(materialListener);
         materialSummary.setOnClickListener(materialListener);
+
+        // Fill data if editing
+        if (editIntervention != null) {
+            materialList.addAll(editIntervention.materials);
+            materialArrow.performClick();
+        }
 
         materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -577,6 +587,7 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         });
         materialRecyclerView.setAdapter(materialAdapter);
+        materialAdapter.notifyDataSetChanged();
 
 
         // ============================= EQUIPMENTS EVENTS ===================================== //

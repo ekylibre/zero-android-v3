@@ -25,16 +25,15 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectMaterialAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Material;
-import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
-import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectMaterialFragment extends DialogFragment implements SyncResultReceiver.Receiver {
+public class SelectMaterialFragment extends DialogFragment implements ServiceResultReceiver.Receiver {
 
     private static final String TAG = SelectMaterialFragment.class.getName();
 
@@ -43,7 +42,7 @@ public class SelectMaterialFragment extends DialogFragment implements SyncResult
     private Context context;
 
     private OnFragmentInteractionListener fragmentListener;
-    private SyncResultReceiver resultReceiver;
+    private ServiceResultReceiver resultReceiver;
     private RecyclerView.Adapter adapter;
     private TextView createMaterial;
 
@@ -64,7 +63,7 @@ public class SelectMaterialFragment extends DialogFragment implements SyncResult
         this.dataset = new ArrayList<>();
         this.searchText = "";
 
-        resultReceiver = new SyncResultReceiver(new Handler());
+        resultReceiver = new ServiceResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
     }
 

@@ -21,14 +21,14 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectPersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
-import com.ekylibre.android.services.SyncResultReceiver;
+import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class SelectPersonFragment extends DialogFragment implements SyncResultReceiver.Receiver{
+public class SelectPersonFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
     private static final String TAG = SelectPersonFragment.class.getName();
 

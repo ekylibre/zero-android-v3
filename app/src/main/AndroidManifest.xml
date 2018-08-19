@@ -34,13 +34,15 @@
         <activity android:name=".LiveActivity" />
 
         <service android:name=".services.SyncService" />
-
         <service
             android:name=".services.LocationService"
             android:enabled="true" />
 
         <activity android:name=".InfoActivity" />
 
+        <service
+            android:name=".services.OneShotLocationIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

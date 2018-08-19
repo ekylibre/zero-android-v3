@@ -37,6 +37,7 @@ public class GraphQLClient {
                 .okHttpClient(okHttpClient)
                 .addCustomTypeAdapter(CustomType.DATE, ApolloAdapters.customDateAdapter)
                 .addCustomTypeAdapter(CustomType.POLYGON, ApolloAdapters.customPolygonAdapter)
+                //.addCustomTypeAdapter(CustomType.POINT, ApolloAdapters.customPointAdapter)
                 .build();
     }
 
