@@ -27,14 +27,17 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
 
     private static final String TAG = "SelectEquipmentAdapter";
 
+    private List<Integer> selectedEquipments;
     private List<Equipment> dataset;
     private Context context;
 
     private SelectEquipmentFragment.OnFragmentInteractionListener fragmentListener;
 
 
-    public SelectEquipmentAdapter(Context context, List<Equipment> dataset, SelectEquipmentFragment.OnFragmentInteractionListener fragmentListener) {
+    public SelectEquipmentAdapter(Context context, List<Equipment> dataset, List<Integer> selectedEquipments,
+                                  SelectEquipmentFragment.OnFragmentInteractionListener fragmentListener) {
         this.dataset = dataset;
+        this.selectedEquipments = selectedEquipments;
         this.context = context;
         this.fragmentListener = fragmentListener;
     }
@@ -44,6 +47,7 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         TextView nameTextView, typeTextView;
         AppCompatImageView typeImageView;
         Equipment equipment;
+        View.OnClickListener onClick;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -52,12 +56,12 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
             typeTextView = itemView.findViewById(R.id.equipment_type);
             typeImageView = itemView.findViewById(R.id.equipment_icon);
 
-            itemView.setOnClickListener(v -> {
+            onClick = v -> {
                 Equipments selection = new Equipments();
                 selection.equipment = Collections.singletonList(equipment);
                 selection.inter = new InterventionEquipment(equipment.id);
                 fragmentListener.onFragmentInteraction(selection);
-            });
+            };
         }
 
         void display(Equipment item) {
@@ -69,6 +73,16 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
             Integer iconRessource = context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName());
             if (iconRessource != 0)
                 typeImageView.setImageResource(iconRessource);
+
+            int colorId;
+            if (selectedEquipments.contains(item.id)) {
+                itemView.setOnClickListener(null);
+                colorId = context.getResources().getColor(R.color.light_grey);
+                itemView.setBackgroundColor(colorId);
+            } else {
+                itemView.setOnClickListener(onClick);
+                //colorId = context.getResources().getColor(R.color.white);
+            }
 
         }
     }

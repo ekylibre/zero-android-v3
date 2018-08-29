@@ -24,11 +24,13 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.Enums;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -101,8 +103,13 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
             return false;
         });
 
+        List<Integer> selectedEquipments = new ArrayList<>();
+        for (Equipments equipments : InterventionActivity.equipmentList) {
+            selectedEquipments.add(equipments.equipment.get(0).id);
+        }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        adapter = new SelectEquipmentAdapter(context, dataset, fragmentListener);
+        adapter = new SelectEquipmentAdapter(context, dataset, selectedEquipments, fragmentListener);
         recyclerView.setAdapter(adapter);
 
         return inflatedView;

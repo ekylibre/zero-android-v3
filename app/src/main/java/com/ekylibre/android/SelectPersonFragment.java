@@ -21,16 +21,16 @@ import android.widget.TextView;
 import com.ekylibre.android.adapters.SelectPersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
+import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
 public class SelectPersonFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
-
-    private static final String TAG = SelectPersonFragment.class.getName();
 
     private static final int MIN_SEARCH_SIZE = 2;
 
@@ -96,8 +96,13 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
             return false;
         });
 
+        List<Integer> selectedPeople = new ArrayList<>();
+        for (Persons persons : InterventionActivity.personList) {
+            selectedPeople.add(persons.person.get(0).id);
+        }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        adapter = new SelectPersonAdapter(dataset, fragmentListener);
+        adapter = new SelectPersonAdapter(context, dataset, selectedPeople, fragmentListener);
         recyclerView.setAdapter(adapter);
 
         return inflatedView;

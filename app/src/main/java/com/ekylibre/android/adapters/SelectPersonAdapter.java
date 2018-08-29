@@ -1,5 +1,6 @@
 package com.ekylibre.android.adapters;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,20 +20,24 @@ import java.util.List;
 
 public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapter.ViewHolder> {
 
-    private static final String TAG = SelectPersonAdapter.class.getName();
-
+    private Context context;
     private List<Person> dataset;
+    private List<Integer> selectedPeople;
     private SelectPersonFragment.OnFragmentInteractionListener fragmentListener;
 
-    public SelectPersonAdapter(List<Person> dataset, SelectPersonFragment.OnFragmentInteractionListener fragmentListener) {
+    public SelectPersonAdapter(Context context, List<Person> dataset, List<Integer> selectedPeople,
+                               SelectPersonFragment.OnFragmentInteractionListener fragmentListener) {
+        this.context = context;
         this.dataset = dataset;
         this.fragmentListener = fragmentListener;
+        this.selectedPeople = selectedPeople;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView firstNameTextView, lastNameTextView, descTextView;
         Person person;
+        View.OnClickListener onClick;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -41,12 +46,12 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
             lastNameTextView = itemView.findViewById(R.id.person_lastname);
             //descTextView = itemView.findViewById(R.id.person_description);
 
-            itemView.setOnClickListener(v -> {
+            onClick = v -> {
                 Persons selection = new Persons();
                 selection.person = Collections.singletonList(person);
                 selection.inter = new InterventionPerson(person.id);
                 fragmentListener.onFragmentInteraction(selection);
-            });
+            };
         }
 
         void display(Person item) {
@@ -54,6 +59,16 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
             firstNameTextView.setText(item.first_name);
             lastNameTextView.setText(item.last_name);
             //descTextView.setText(item.role);
+
+            int colorId;
+            if (selectedPeople.contains(item.id)) {
+                itemView.setOnClickListener(null);
+                colorId = context.getResources().getColor(R.color.light_grey);
+                itemView.setBackgroundColor(colorId);
+            } else {
+                itemView.setOnClickListener(onClick);
+                //colorId = context.getResources().getColor(R.color.white);
+            }
         }
     }
 
