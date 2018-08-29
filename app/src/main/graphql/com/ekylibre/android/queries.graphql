@@ -89,6 +89,7 @@ query Farm {
       unit
       species
       variety
+      marketingAuthorizationNumber
     }
     storages {
       id
