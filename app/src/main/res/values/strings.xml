@@ -178,6 +178,8 @@
     <string name="TEDDER">Tedder</string>
     <string name="WRAPPER">Wrapper</string>
     <string name="FORAGE_PLATFORM">Forage platform</string>
+    <string name="WATER_SPREADER">Water spreader</string>
+    <string name="IRRIGATION_PIVOT">Irrigation pivot</string>
 
     <!-- Plurals -->
     <string name="crop">%d crop</string>

@@ -178,6 +178,8 @@
     <string name="TEDDER">Faneuse</string>
     <string name="WRAPPER">Enrubanneuse</string>
     <string name="FORAGE_PLATFORM">Plateau</string>
+    <string name="WATER_SPREADER">Enrouleur</string>
+    <string name="IRRIGATION_PIVOT">Pivot</string>
 
     <!-- Plurals -->
     <string name="crop">%d culture</string>
