@@ -12,6 +12,7 @@ public class CropItem extends ListItem {
 
     private String name;
     private String UUID;
+    private String production;
     private float surface;
     private Date startDate;
     private Date stopDate;
@@ -32,6 +33,14 @@ public class CropItem extends ListItem {
 
     public void setUUID(String UUID) {
         this.UUID = UUID;
+    }
+
+    public String getProduction() {
+        return production;
+    }
+
+    public void setProduction(String production) {
+        this.production = production;
     }
 
     public float getSurface() {

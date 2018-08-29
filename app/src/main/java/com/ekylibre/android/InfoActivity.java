@@ -84,6 +84,7 @@ public class InfoActivity extends AppCompatActivity
 
             Bundle args = new Bundle();
             args.putString("full_name", cropItem.getName());
+            args.putString("production", cropItem.getProduction());
             args.putString("start_date", Converters.toString(cropItem.getStartDate()));
             args.putString("stop_date", Converters.toString(cropItem.getStopDate()));
             args.putString("yield", cropItem.getYield());
@@ -185,6 +186,7 @@ public class InfoActivity extends AppCompatActivity
                     for (Crop crop : cropsInProd.keySet()) {
                         CropItem cropItem = new CropItem();
                         cropItem.setName(crop.name);
+                        cropItem.setProduction(crop.production_nature);
                         cropItem.setSurface(crop.surface_area);
                         cropItem.setStartDate(crop.start_date);
                         cropItem.setStopDate(crop.stop_date);

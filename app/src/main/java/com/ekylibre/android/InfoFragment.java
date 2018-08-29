@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import timber.log.Timber;
+
 
 public class InfoFragment extends DialogFragment {
 
@@ -79,11 +81,12 @@ public class InfoFragment extends DialogFragment {
             cropItem = new CropItem();
             cropItem.setUUID(bundle.getString("uuid"));
             interIDs = bundle.getIntegerArrayList("interventionsIDs");
-            String[] fullName = bundle.getString("full_name").split(" \\| ");
-            cropName.setText(fullName[0]);
+            //String[] fullName = bundle.getString("full_name").split(" \\| ");
+            //Timber.i(fullName.toString());
+            cropName.setText(bundle.getString("full_name"));
             Date startDate = Converters.toDate(bundle.getString("start_date"));
             Date stopDate = Converters.toDate(bundle.getString("stop_date"));
-            cropProduction.setText(fullName[1]);
+            cropProduction.setText(bundle.getString("production"));
             cropPeriods.setText(
                     String.format("Du %s au %s", DateTools.STANDARD_DISPLAY.format(startDate), DateTools.STANDARD_DISPLAY.format(stopDate)));
             cropYield.setText(String.format("Rendement: %s", bundle.getString("yield", "non renseigné")));
