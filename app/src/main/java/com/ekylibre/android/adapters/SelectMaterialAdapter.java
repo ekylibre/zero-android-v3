@@ -42,6 +42,7 @@ public class SelectMaterialAdapter extends RecyclerView.Adapter<SelectMaterialAd
                 Materials selection = new Materials();
                 selection.material = Collections.singletonList(material);
                 selection.inter = new InterventionMaterial(material.id);
+                selection.inter.unit = material.unit;
                 fragmentListener.onFragmentInteraction(selection);
             });
         }

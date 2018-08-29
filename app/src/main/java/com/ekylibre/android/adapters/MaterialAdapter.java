@@ -40,7 +40,7 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView iconImageView, deleteImageView;
+        ImageView deleteImageView;
         TextView nameTextView;
         EditText quantityEditText;
         AppCompatSpinner unitSpinner;
@@ -49,7 +49,6 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
         ViewHolder(View itemView) {
             super(itemView);
 
-            iconImageView = itemView.findViewById(R.id.item_icon);
             nameTextView = itemView.findViewById(R.id.item_name);
 //            descTextView = itemView.findViewById(R.id.item_desc);
             quantityEditText = itemView.findViewById(R.id.item_quantity_edit);
@@ -119,7 +118,6 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
         void display(Materials item) {
 
             String quantityAsString = String.valueOf(item.inter.quantity);
-            iconImageView.setImageResource(R.drawable.icon_fertilizer);
             nameTextView.setText(item.material.get(0).name);
 //            if (item.material.get(0).description != null)
 //                descTextView.setText(item.material.get(0).description);
