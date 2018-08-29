@@ -199,7 +199,7 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        //new RequestDatabase(context).execute();
+        new RequestDatabase(context).execute();
     }
 
     /**

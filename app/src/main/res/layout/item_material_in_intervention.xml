@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/item_name"
         app:layout_constraintTop_toTopOf="@id/item_name"
-        app:srcCompat="@drawable/icon_grain" />
+        app:srcCompat="@drawable/icon_material" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_name"

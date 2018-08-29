@@ -370,6 +370,8 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             finishingButton.setVisibility(View.GONE);
             darkMask.setVisibility(View.VISIBLE);
             darkMask.bringToFront();
+            menuTitle.setVisibility(View.GONE);
+            menuTitle.setText(R.string.finishing_intervention_text);
             procedureChoiceLayout.setVisibility(View.VISIBLE);
             return true;
         }

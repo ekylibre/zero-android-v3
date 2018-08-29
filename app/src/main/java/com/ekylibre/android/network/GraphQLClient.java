@@ -2,10 +2,8 @@ package com.ekylibre.android.network;
 
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.apollographql.apollo.ApolloClient;
-import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.network.helpers.ApolloAdapters;
 import com.ekylibre.android.type.CustomType;
 import com.ekylibre.android.utils.App;
@@ -18,6 +16,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import timber.log.Timber;
 
 
 public class GraphQLClient {
@@ -91,7 +90,7 @@ public class GraphQLClient {
 
         @Override
         public Response intercept(@NonNull Chain chain) throws IOException {
-            if (BuildConfig.DEBUG) Log.i("Interceptor", "Bearer " + authToken);
+            Timber.d("Bearer %s", authToken);
             Request request = chain.request();
             Request.Builder requestBuilder = request.newBuilder();
             requestBuilder.addHeader("Authorization", "Bearer " + authToken);

@@ -539,8 +539,6 @@ public class InterventionActivity extends AppCompatActivity implements
             selectMaterialFragment.show(getFragmentTransaction(), "dialog");
         });
 
-
-
         View.OnClickListener materialListener = view -> {
             if (materialRecyclerView.getVisibility() == View.GONE) {
                 materialArrow.setVisibility(View.VISIBLE);
@@ -557,8 +555,6 @@ public class InterventionActivity extends AppCompatActivity implements
                 materialRecyclerView.setVisibility(View.GONE);
             }
         };
-
-
 
         materialArrow.setOnClickListener(materialListener);
         materialSummary.setOnClickListener(materialListener);

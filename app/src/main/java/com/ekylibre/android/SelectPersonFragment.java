@@ -124,6 +124,9 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_person, null);
 
+//        TextInputLayout til = dialogView.findViewById(R.id.create_person_lastname);
+//        til.setError("You need to enter a name");
+
         builder.setView(dialogView);
         builder.setNegativeButton("Annuler", (dialog, i) -> dialog.cancel());
         builder.setPositiveButton("Créer", (dialog, i) -> {
