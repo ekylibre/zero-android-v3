@@ -1046,7 +1046,7 @@ public class SyncService extends IntentService {
                                         Integer newId = database.dao().lastPhytosanitaryId();
                                         newId = newId != null ? ++newId : 100000;
                                         database.dao().insert(new Phyto(newId, ekyId, articleName,
-                                                null, null, null,
+                                                null, article.marketingAuthorizationNumber(), null,
                                                 null, null, false, true, articleUnit));
                                     }
                                     else {
