@@ -319,19 +319,19 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== IRRIGATION EVENTS =================================== //
 
+        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.VOLUME_UNITS_L10N);
+        irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
+
         if (editIntervention != null) {
             if (editIntervention.intervention.type.equals(App.IRRIGATION)) {
                 Integer volume = editIntervention.intervention.water_quantity;
                 irrigationQuantityEdit.setText(String.valueOf(volume));
                 Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
-                irrigationUnitSpinner.setSelection(Units.IRRIGATION_UNITS.indexOf(unit));
+                irrigationUnitSpinner.setSelection(Units.VOLUME_UNITS.indexOf(unit));
                 irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                irrigationSummary.setText(String.format(MainActivity.LOCALE, "Volume %d %s", volume, unit.name));
+                irrigationSummary.setText(String.format(MainActivity.LOCALE, "Volume • %d %s", volume, unit.getName()));
             }
         }
-
-        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
-        irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
 
         View.OnClickListener irrigationListener = view -> {
             if (irrigationDetail.getVisibility() == View.GONE) {
@@ -353,11 +353,10 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override public void afterTextChanged(Editable editable) {
                 if (!editable.toString().equals("0") && editable.length() != 0) {
                     Integer volume = Integer.valueOf(editable.toString());
-                    String unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).getName();
-                    String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", volume / surface, unit);
-                    irrigationTotal.setText(message);
+                    Unit unit = Units.VOLUME_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition());
+                    irrigationTotal.setText(composeIrrigationMessage(unit, volume));
                     irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                    irrigationSummary.setText(String.format("Volume %s %s", volume, unit));
+                    irrigationSummary.setText(String.format("Volume • %s %s", volume, unit.name));
                 } else {
                     irrigationTotal.setText(R.string.quantity_cannot_be_null);
                     irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
@@ -370,10 +369,9 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String quantityEditText = irrigationQuantityEdit.getText().toString();
                 if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
-                    Integer quantity = Integer.valueOf(quantityEditText);
-                    Unit unit = Units.IRRIGATION_UNITS.get(position);
-                    String message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", quantity / surface, unit.name);
-                    irrigationTotal.setText(message);
+                    Integer volume = Integer.valueOf(quantityEditText);
+                    Unit unit = Units.VOLUME_UNITS.get(position);
+                    irrigationTotal.setText(composeIrrigationMessage(unit, volume));
                 }
             }
         });
@@ -786,6 +784,18 @@ public class InterventionActivity extends AppCompatActivity implements
 
     }
 
+    private String composeIrrigationMessage(Unit unit, Integer volume) {
+        String message;
+        if (unit.surface_factor == 0) {
+            message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", volume / surface, unit.name);
+        } else {
+            message = String.format(MainActivity.LOCALE,
+                    "Soit %.1f %s", volume * surface * unit.surface_factor,
+                    getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName())));
+        }
+        return message;
+    };
+
     private void selectWeatherIcon(AppCompatImageButton selected) {
         if (selected.isSelected())
             selected.setSelected(false);
@@ -1047,7 +1057,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
             if (procedure.equals(App.IRRIGATION)) {
                 intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
-                intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
+                intervention.setWater_unit(Units.VOLUME_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
             }
 
             String comment = descriptionEditText.getText().toString();

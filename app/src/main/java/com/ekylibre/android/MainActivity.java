@@ -389,11 +389,13 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     }
 
     private void setUnitsName(List<Unit> unitList, List<String> unitListString) {
-        for (Unit unit : unitList) {
-            String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
-            String quantity_name_only = (unit.surface_factor != 0) ? getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName())) : null;
-            unitListString.add(name);
-            unit.setName(name, quantity_name_only);
+        if (unitListString.isEmpty()) {
+            for (Unit unit : unitList) {
+                String name = getString(getResources().getIdentifier(unit.key, "string", getPackageName()));
+                String quantity_name_only = (unit.surface_factor != 0) ? getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName())) : null;
+                unitListString.add(name);
+                unit.setName(name, quantity_name_only);
+            }
         }
     }
 
