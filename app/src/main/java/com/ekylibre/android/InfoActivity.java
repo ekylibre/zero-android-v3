@@ -219,15 +219,15 @@ public class InfoActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.crop_activity, menu);
-        if (latestFilter == FILTER_BY_PRODUCTION) {
-            menu.findItem(R.id.filter_by_production).setEnabled(false);
-            menu.findItem(R.id.filter_by_proximity).setEnabled(true);
-        } else {
-            menu.findItem(R.id.filter_by_production).setEnabled(true);
-            menu.findItem(R.id.filter_by_proximity).setEnabled(false);
-        }
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.crop_activity, menu);
+//        if (latestFilter == FILTER_BY_PRODUCTION) {
+//            menu.findItem(R.id.filter_by_production).setEnabled(false);
+//            menu.findItem(R.id.filter_by_proximity).setEnabled(true);
+//        } else {
+//            menu.findItem(R.id.filter_by_production).setEnabled(true);
+//            menu.findItem(R.id.filter_by_proximity).setEnabled(false);
+//        }
         return true;
     }
 
