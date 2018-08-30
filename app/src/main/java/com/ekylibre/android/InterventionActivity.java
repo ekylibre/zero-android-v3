@@ -479,7 +479,7 @@ public class InterventionActivity extends AppCompatActivity implements
                     for (Object input : inputList) {
                         if (input instanceof Phytos) {
                             Phyto phyto = ((Phytos) input).phyto.get(0);
-                            if (phyto != null)
+                            if (phyto != null && phyto.mix_category_code != null)
                                 codes.add(phyto.mix_category_code);
                         }
                     }
