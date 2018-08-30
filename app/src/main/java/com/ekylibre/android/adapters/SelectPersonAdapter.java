@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ekylibre.android.R;
@@ -37,6 +38,7 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
 
         TextView firstNameTextView, lastNameTextView, descTextView;
         Person person;
+        ImageView personIcon;
         View.OnClickListener onClick;
 
         ViewHolder(View itemView) {
@@ -45,6 +47,7 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
             firstNameTextView = itemView.findViewById(R.id.person_firstname);
             lastNameTextView = itemView.findViewById(R.id.person_lastname);
             //descTextView = itemView.findViewById(R.id.person_description);
+            personIcon = itemView.findViewById(R.id.person_icon);
 
             onClick = v -> {
                 Persons selection = new Persons();
@@ -60,14 +63,20 @@ public class SelectPersonAdapter extends RecyclerView.Adapter<SelectPersonAdapte
             lastNameTextView.setText(item.last_name);
             //descTextView.setText(item.role);
 
-            int colorId;
             if (selectedPeople.contains(item.id)) {
                 itemView.setOnClickListener(null);
-                colorId = context.getResources().getColor(R.color.light_grey);
-                itemView.setBackgroundColor(colorId);
+                //itemView.setBackground(context.getResources().getDrawable(R.drawable.border_bottom_disabled));
+                firstNameTextView.setTextColor(context.getResources().getColor(R.color.grey));
+                lastNameTextView.setTextColor(context.getResources().getColor(R.color.grey));
+                personIcon.setColorFilter(context.getResources().getColor(R.color.grey));
+                personIcon.setBackgroundResource(R.drawable.background_white);
             } else {
                 itemView.setOnClickListener(onClick);
-                //colorId = context.getResources().getColor(R.color.white);
+                //itemView.setBackground(context.getResources().getDrawable(R.drawable.border_bottom));
+                firstNameTextView.setTextColor(context.getResources().getColor(R.color.black));
+                lastNameTextView.setTextColor(context.getResources().getColor(R.color.secondary_text));
+                personIcon.clearColorFilter();
+                personIcon.setBackgroundResource(R.drawable.background_grey);
             }
         }
     }

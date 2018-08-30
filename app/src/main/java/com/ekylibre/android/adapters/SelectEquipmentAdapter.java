@@ -1,6 +1,8 @@
 package com.ekylibre.android.adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.ColorFilter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
@@ -65,6 +67,7 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
         }
 
         void display(Equipment item) {
+            // Set data
             equipment = item;
             nameTextView.setText(item.name);
             Timber.e("eq %s", item.type);
@@ -74,16 +77,22 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
             if (iconRessource != 0)
                 typeImageView.setImageResource(iconRessource);
 
-            int colorId;
+            // Adapt layout according to selected or not
             if (selectedEquipments.contains(item.id)) {
                 itemView.setOnClickListener(null);
-                colorId = context.getResources().getColor(R.color.light_grey);
-                itemView.setBackgroundColor(colorId);
+                //itemView.setBackground(context.getResources().getDrawable(R.drawable.border_bottom_disabled));
+                nameTextView.setTextColor(context.getResources().getColor(R.color.grey));
+                typeTextView.setTextColor(context.getResources().getColor(R.color.grey));
+                typeImageView.setColorFilter(context.getResources().getColor(R.color.grey));
+                typeImageView.setBackgroundResource(R.drawable.background_white);
             } else {
                 itemView.setOnClickListener(onClick);
-                //colorId = context.getResources().getColor(R.color.white);
+                //itemView.setBackground(context.getResources().getDrawable(R.drawable.border_bottom));
+                nameTextView.setTextColor(context.getResources().getColor(R.color.black));
+                typeTextView.setTextColor(context.getResources().getColor(R.color.secondary_text));
+                typeImageView.clearColorFilter();
+                typeImageView.setBackgroundResource(R.drawable.background_grey);
             }
-
         }
     }
 
