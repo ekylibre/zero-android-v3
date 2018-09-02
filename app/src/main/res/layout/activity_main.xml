@@ -70,13 +70,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:autoSizeTextType="uniform"
-            android:lines="1" />
+            android:lines="1"
+            android:visibility="gone"/>
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/button_finishing"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/finished_intervention"
+            android:text="@string/register_an_intervention"
             app:layout_constraintTop_toBottomOf="@id/nav_message"
             app:layout_constraintBottom_toBottomOf="@id/nav_layout"
             app:layout_constraintStart_toStartOf="@id/nav_layout"

@@ -26,6 +26,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static com.mapbox.api.staticmap.v1.StaticMapCriteria.LIGHT_STYLE;
 import static com.mapbox.api.staticmap.v1.StaticMapCriteria.SATELLITE_STYLE;
 
 
@@ -141,7 +142,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                         .cameraAuto(true)
                         .attribution(false)
                         .logo(false)
-                        .styleId(SATELLITE_STYLE)
+                        .styleId(LIGHT_STYLE)
                         .build();
                 String imageUrl = staticImage.url().toString();
                 Timber.i(imageUrl);

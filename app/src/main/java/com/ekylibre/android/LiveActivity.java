@@ -62,9 +62,9 @@ public class LiveActivity extends AppCompatActivity {
         super.onResume();
 
         // Attache the observer
-        database.dao().getLastPoint().observeForever(position -> {
-            speedTextView.setText(String.format(Locale.FRANCE, "%.1f km/h", position.speed * 3.6));
-        });
+        database.dao().getLastPoint().observeForever(position ->
+            speedTextView.setText(String.format(Locale.FRANCE, "%.1f km/h", position.speed * 3.6))
+        );
     }
 
     private void startLocationService() {

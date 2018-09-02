@@ -70,7 +70,6 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
             // Set data
             equipment = item;
             nameTextView.setText(item.name);
-            Timber.e("eq %s", item.type);
             String typeText = Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.type));
             typeTextView.setText(String.format("%s #%s", typeText, item.number));
             Integer iconRessource = context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName());

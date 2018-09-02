@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
     public static String FARM_ID;
     public static Date lastSyncTime;
-    public static final SimpleDateFormat LAST_SYNC = new SimpleDateFormat( "yyyy-MM-dd HH:mm");
+    public static SimpleDateFormat LAST_SYNC;
 
 
     @Override
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
         // Get locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
+        LAST_SYNC = new SimpleDateFormat( "yyyy-MM-dd HH:mm", LOCALE);
 
         resultReceiver = new ServiceResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
@@ -361,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             darkMask.setVisibility(View.GONE);
             procedureChoiceLayout.setVisibility(View.GONE);
             menuTitle.setVisibility(View.GONE);
-            menuTitle.setText(R.string.register_an_intervention);
+            //menuTitle.setText(R.string.register_an_intervention);
             //startingButton.setVisibility(View.VISIBLE);
             finishingButton.setVisibility(View.VISIBLE);
             return true;
@@ -371,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             darkMask.setVisibility(View.VISIBLE);
             darkMask.bringToFront();
             menuTitle.setVisibility(View.GONE);
-            menuTitle.setText(R.string.finishing_intervention_text);
+            menuTitle.setText(R.string.register_an_intervention);
             procedureChoiceLayout.setVisibility(View.VISIBLE);
             return true;
         }

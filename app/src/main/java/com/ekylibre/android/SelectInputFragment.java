@@ -39,6 +39,8 @@ import com.ekylibre.android.utils.Enums;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import timber.log.Timber;
+
 
 public class SelectInputFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
@@ -448,7 +450,7 @@ public class SelectInputFragment extends DialogFragment implements ServiceResult
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (BuildConfig.DEBUG) Log.e(TAG, "REQUESTDATABASE --> onPostExecute()");
+            Timber.e("REQUESTDATABASE --> onPostExecute()");
             // inputAdapter.notifyItemRangeRemoved(0, currentSize);
             // inputAdapter = new SelectInputAdapter(selectedList);
             // inputRecyclerView.setAdapter(inputAdapter);

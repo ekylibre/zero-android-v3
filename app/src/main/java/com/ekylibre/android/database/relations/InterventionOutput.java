@@ -38,15 +38,15 @@ public class InterventionOutput {
     public String unit;
 
     @ColumnInfo(name = COLUMN_INTERVENTION_ID, index = true)
-    @NonNull public Integer id_intervention;
+    public Integer id_intervention;
 
     @ColumnInfo(name = COLUMN_OUTPUT_ID, index = true)
-    @NonNull public Integer id_output;
+    public Integer id_output;
 
     @Ignore
     public Seed seed;
 
-    public InterventionOutput(float quantity, String unit, @NonNull Integer id_intervention, @NonNull Integer id_output) {
+    public InterventionOutput(float quantity, String unit, Integer id_intervention, Integer id_output) {
         this.quantity = quantity;
         this.unit = unit;
         this.id_intervention = id_intervention;

@@ -106,7 +106,7 @@ public class SyncService extends IntentService {
     public static final String ACTION_CREATE_PERSON_AND_EQUIPMENT = "com.ekylibre.android.services.action.CREATE_PERS_AND_EQUIP";
     public static final String ACTION_CREATE_ARTICLE = "com.ekylibre.android.services.action.CREATE_ARTICLES";
 
-    public static String ACCESS_TOKEN;
+    private static String ACCESS_TOKEN;
     private static SharedPreferences prefs;
     private AppDatabase database;
     private ApolloClient apolloClient;
@@ -266,7 +266,9 @@ public class SyncService extends IntentService {
                 for (InterventionWorkingDay wd : updatableInter.workingDays)
                     workingDayUpdate.add(InterventionWorkingDayAttributes.builder()
                             .executionDate(wd.execution_date)
-                            .hourDuration((long) wd.hour_duration).build());
+                            .hourDuration((long) wd.hour_duration)
+                            .build()
+                    );
 
                 for (Persons person : updatableInter.persons)
                     operatorUpdates.add(InterventionOperatorAttributes.builder()

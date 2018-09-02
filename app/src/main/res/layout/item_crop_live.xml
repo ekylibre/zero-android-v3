@@ -62,7 +62,7 @@
         android:text="Réalisé"
         android:textAllCaps="true"
         android:textColor="@color/black"
-        android:textSize="12dp"
+        android:textSize="12sp"
         android:paddingStart="6dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/live_area_value_done"

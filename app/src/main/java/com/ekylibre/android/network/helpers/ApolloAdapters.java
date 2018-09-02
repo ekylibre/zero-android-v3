@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.apollographql.apollo.response.CustomTypeAdapter;
 import com.apollographql.apollo.response.CustomTypeValue;
+import com.ekylibre.android.MainActivity;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
 public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
 
-    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd");
+    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd", MainActivity.LOCALE);
 
     public static CustomTypeAdapter<Date> customDateAdapter = new CustomTypeAdapter<Date>() {
 

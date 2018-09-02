@@ -9,6 +9,8 @@ import com.ekylibre.android.database.pojos.Phytos;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class PhytosanitaryMiscibility {
 
     private static boolean isValid(int firstProduct, int secondProduct) {
@@ -55,7 +57,7 @@ public class PhytosanitaryMiscibility {
 
     public static boolean mixIsAuthorized(List<Integer> codes) {
 
-        Log.e("Miscibility", codes.toString());
+        Timber.e(codes.toString());
 
         for (int i = 0; i <= codes.size() - 1; i++) {
             List<Integer> codesCopy = new ArrayList<>(codes);

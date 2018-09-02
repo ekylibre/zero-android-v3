@@ -128,13 +128,13 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         new RequestDatabase(context).execute();
     }
 
-    public void createEquipmentDialog() {
+    private void createEquipmentDialog() {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_equipment, null);

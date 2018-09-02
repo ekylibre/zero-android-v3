@@ -2,6 +2,8 @@ package com.ekylibre.android.utils;
 
 import android.arch.persistence.room.TypeConverter;
 
+import com.ekylibre.android.MainActivity;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,7 +11,7 @@ import java.util.Date;
 
 public class Converters {
 
-    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd");
+    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd", MainActivity.LOCALE);
 
     @TypeConverter
     public static Date toDate(String value) {

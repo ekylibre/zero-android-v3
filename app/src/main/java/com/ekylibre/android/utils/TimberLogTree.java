@@ -1,5 +1,7 @@
 package com.ekylibre.android.utils;
 
+import android.support.annotation.NonNull;
+
 import com.ekylibre.android.BuildConfig;
 
 import timber.log.Timber;
@@ -8,7 +10,7 @@ import timber.log.Timber;
 public class TimberLogTree extends Timber.DebugTree {
 
     @Override
-    protected void log(int priority, String tag, String message, Throwable t) {
+    protected void log(int priority, String tag, @NonNull String message, Throwable t) {
         // Workaround for devices that doesn't show lower priority logs
         if (BuildConfig.DEBUG)
             super.log(priority, tag, message, t);
@@ -16,7 +18,7 @@ public class TimberLogTree extends Timber.DebugTree {
     }
 
     @Override
-    protected String createStackElementTag(StackTraceElement element) {
+    protected String createStackElementTag(@NonNull StackTraceElement element) {
         // Add log statements line number to the log
         return super.createStackElementTag(element);  // + " - " + element.getLineNumber()
     }

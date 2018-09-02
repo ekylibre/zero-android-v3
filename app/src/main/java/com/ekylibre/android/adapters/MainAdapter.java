@@ -170,7 +170,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 break;
 
             case App.CARE:
-                Timber.i("Entretien #################");
                 for (Materials m : current.materials) {
                     sb.append(m.material.get(0).name).append(" • ");
                     sb.append(m.inter.quantity).append(" ");

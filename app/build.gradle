@@ -3,11 +3,11 @@ apply plugin: 'com.apollographql.android'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.ekylibre.android"
         minSdkVersion 19
         targetSdkVersion 27
+//        multiDexEnabled true
         versionCode 5
         versionName "0.9.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -26,6 +26,7 @@ android {
             resValue 'string', 'api_url', '"https://api.ekylibre.com"'
             resValue 'string', 'client_id', '"a95a0450e0a79c21b4d0b8992a4da7aad5bbce5c0c529295d6d78bc197591020"'
             resValue 'string', 'client_secret', '"1a0f31cd06d306f4a184e5e4cd82903f39074ba1fa2e5e84c1f0566afd26a70b"'
+            resValue 'string', 'mapbox_token', '"pk.eyJ1IjoibGludXhpcGhvIiwiYSI6ImNqamZwbjV5aDM0bXQzcW8zamRsY3N5ZGcifQ.D3bVCNhekyQLq4cy5JffAQ"'
         }
         debug {
             resValue 'string', 'api_url', '"https://ekylibre-test.com"'
@@ -51,6 +52,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Support libraries
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:exifinterface:27.1.1'  // Fix lint error
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:support-fragment:27.1.1'

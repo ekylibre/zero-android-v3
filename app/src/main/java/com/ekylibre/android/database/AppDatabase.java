@@ -46,6 +46,8 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import timber.log.Timber;
+
 
 @Database(
         entities = {
@@ -200,8 +202,7 @@ public abstract class AppDatabase extends RoomDatabase {
             database.dao().insert(list3.toArray(new Seed[list3.size()]));
 
 
-
-            if (BuildConfig.DEBUG) Log.e(TAG, "Reference data inserted !");
+            Timber.e("Reference data inserted !");
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -216,7 +217,7 @@ public abstract class AppDatabase extends RoomDatabase {
             int bytesRead = inputStream.read(buffer);
             inputStream.close();
 
-            if (bytesRead != buffer.length) Log.e(TAG, "Error while reading file %s" + fileName);
+            if (bytesRead != buffer.length) Timber.e("Error while reading file %s", fileName);
 
             return new String(buffer, "UTF-8");
 
