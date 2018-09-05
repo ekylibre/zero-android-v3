@@ -18,7 +18,7 @@ import java.util.List;
 
 public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
 
-    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd", MainActivity.LOCALE);
+    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd");
 
     public static CustomTypeAdapter<Date> customDateAdapter = new CustomTypeAdapter<Date>() {
 

@@ -12,10 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatTextView;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -39,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 
 import retrofit2.Call;
+import timber.log.Timber;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -49,8 +48,6 @@ import javax.annotation.Nonnull;
 
 
 public class LoginActivity extends AppCompatActivity {
-
-    private static final String TAG = "LoginActivity";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -75,8 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
         if (sharedPreferences.getBoolean("is_authenticated", false)) {
-            if (BuildConfig.DEBUG) Log.i(TAG, "Already authenticated. Redirect to MainActivity...");
-            Log.e(TAG, "=========== IS AUTHENTICATED ===========");
+            Timber.i("=========== IS AUTHENTICATED ===========");
             if (!startingApp)
                 startApp();
         } else {
@@ -130,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startApp() {
         startingApp = true;
-        Log.e(TAG, "=========== START MAIN ACTIVITY ===========");
+        Timber.e("=========== START MAIN ACTIVITY ===========");
         showDialog(false);
         authTask = null;
         Intent intent = new Intent(this, MainActivity.class);
@@ -216,7 +212,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
 
                         accessToken = response.body();
-                        if (BuildConfig.DEBUG) Log.i(TAG, "AccessToken --> " + (accessToken != null ? accessToken.getAccess_token() : null));
+                        Timber.i("AccessToken --> %s", (accessToken != null ? accessToken.getAccess_token() : null));
 
                         ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
                         ProfileQuery profileQuery = ProfileQuery.builder().build();
@@ -228,7 +224,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 // We got an access_token
                                 ProfileQuery.Data data = response.data();
-                                if (BuildConfig.DEBUG) Log.i(TAG, data.toString());
+                                Timber.i(String.valueOf(data));
 
                                 List<String> farmNameList = new ArrayList<>();
 
@@ -262,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.putBoolean("initial_data_loaded", true);
                                     editor.apply();
                                 } else {
-                                    Log.e(TAG, "=========== INITIAL DATA ALREADY LOADED ===========");
+                                    Timber.i("=========== INITIAL DATA ALREADY LOADED ===========");
                                     if (!startingApp)
                                         startApp();
                                 }
@@ -271,7 +267,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(@Nonnull ApolloException e) {
-                                if (BuildConfig.DEBUG) Log.e(TAG, "ApolloException --> " + e.getMessage());
+                                Timber.i("ApolloException --> %s", e.getMessage());
                                 authTask = null;
                                 showDialog(false);
                                 Snackbar.make(findViewById(R.id.login_layout),
@@ -341,7 +337,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Log.e(TAG, "=========== AFTER INITIAL DATA ===========");
+            Timber.i("=========== AFTER INITIAL DATA ===========");
             if (!startingApp)
                 startApp();
         }
@@ -349,21 +345,21 @@ public class LoginActivity extends AppCompatActivity {
 
     void fixHandShakeFailed() {
         try {
-            if (BuildConfig.DEBUG) Log.e(TAG, "Updating Security Policy");
+            Timber.i("Updating Security Policy");
             ProviderInstaller.installIfNeeded(this);
 
         } catch (GooglePlayServicesRepairableException e) {
             // Indicates that Google Play services is out of date, disabled, etc.
-            if (BuildConfig.DEBUG) Log.e(TAG, "GooglePlayServicesRepairableException");
+            Timber.i("GooglePlayServicesRepairableException");
             GoogleApiAvailability.getInstance()
                     .showErrorNotification(this, e.getConnectionStatusCode());
 
         } catch (GooglePlayServicesNotAvailableException e) {
             // Indicates a non-recoverable error; the ProviderInstaller is not able
             // to install an up-to-date Provider.
-            if (BuildConfig.DEBUG) Log.e(TAG, "GooglePlayServicesNotAvailableException");
+            Timber.i("GooglePlayServicesNotAvailableException");
         }
-        if (BuildConfig.DEBUG) Log.e(TAG, "fixHandShake done");
+        Timber.i("fixHandShake done");
     }
 }
 
