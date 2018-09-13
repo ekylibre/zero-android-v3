@@ -130,7 +130,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/icon_dot"
-        android:tint="@color/warning"
+        android:tint="@color/error"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/live_main_time"
         app:layout_constraintTop_toTopOf="@id/live_main_time"

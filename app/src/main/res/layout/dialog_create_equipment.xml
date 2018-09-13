@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
     android:orientation="vertical"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    app:errorEnabled="true">
 
     <android.support.v7.widget.AppCompatTextView
         android:layout_width="wrap_content"
@@ -16,11 +17,19 @@
         android:textStyle="bold"
         android:textColor="#000000" />
 
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/create_equipment_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        app:srcCompat="@drawable/tool_tractor"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/chose_type"
-        android:layout_marginTop="16dp"/> <!-- style="@style/InputLabel" -->
+        android:text="@string/chose_type" /> <!-- style="@style/InputLabel" -->
 
     <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/create_equipment_type_spinner"

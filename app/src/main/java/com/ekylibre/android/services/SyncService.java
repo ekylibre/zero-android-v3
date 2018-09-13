@@ -3,7 +3,6 @@ package com.ekylibre.android.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ResultReceiver;
@@ -13,7 +12,6 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
-
 import com.ekylibre.android.DeleteInterMutation;
 import com.ekylibre.android.FarmQuery;
 import com.ekylibre.android.InterventionActivity;
@@ -48,7 +46,6 @@ import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
-
 import com.ekylibre.android.database.relations.InterventionEquipment;
 import com.ekylibre.android.database.relations.InterventionFertilizer;
 import com.ekylibre.android.database.relations.InterventionMaterial;
@@ -57,11 +54,11 @@ import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
 import com.ekylibre.android.network.GraphQLClient;
-
 import com.ekylibre.android.type.ArticleAllUnitEnum;
 import com.ekylibre.android.type.ArticleTypeEnum;
 import com.ekylibre.android.type.ArticleUnitEnum;
 import com.ekylibre.android.type.ArticleVolumeUnitEnum;
+import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.HarvestLoadAttributes;
 import com.ekylibre.android.type.HarvestLoadUnitEnum;
 import com.ekylibre.android.type.InterventionArticleAttributes;
@@ -72,18 +69,14 @@ import com.ekylibre.android.type.InterventionOutputTypeEnum;
 import com.ekylibre.android.type.InterventionOutputUnitEnum;
 import com.ekylibre.android.type.InterventionTargetAttributes;
 import com.ekylibre.android.type.InterventionToolAttributes;
-import com.ekylibre.android.type.InterventionWorkingDayAttributes;
-import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionTypeEnum;
+import com.ekylibre.android.type.InterventionWaterVolumeUnitEnum;
+import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.OperatorRoleEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
-
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -106,7 +99,6 @@ public class SyncService extends IntentService {
     public static final String ACTION_CREATE_PERSON_AND_EQUIPMENT = "com.ekylibre.android.services.action.CREATE_PERS_AND_EQUIP";
     public static final String ACTION_CREATE_ARTICLE = "com.ekylibre.android.services.action.CREATE_ARTICLES";
 
-    private static String ACCESS_TOKEN;
     private static SharedPreferences prefs;
     private AppDatabase database;
     private ApolloClient apolloClient;
@@ -123,300 +115,50 @@ public class SyncService extends IntentService {
 
         Timber.i("Starting SyncService");
 
-        // Handle Handshake Errors
-        try {
-            ProviderInstaller.installIfNeeded(this);
-        } catch (GooglePlayServicesRepairableException e) {
-            Timber.e("GooglePlayServicesRepairableException");
-            GoogleApiAvailability.getInstance().showErrorNotification(this, e.getConnectionStatusCode());
-        } catch (GooglePlayServicesNotAvailableException e) {
-            Timber.e("GooglePlayServicesNotAvailableException");
-        }
-
-        prefs = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        ACCESS_TOKEN = prefs.getString("access_token", null);
-
-//        if (App.API_URL == null) {
-//            App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
-//            App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
-//            App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
-//        }
-
-        // Get ResultReceiver from intent
-        receiver = intent.getParcelableExtra("receiver");
-        database = AppDatabase.getInstance(this);
-        apolloClient = GraphQLClient.getApolloClient(ACCESS_TOKEN);
         ACTION = Objects.requireNonNull(intent.getAction());
+        receiver = intent.getParcelableExtra("receiver");
+        String accessToken = Objects.requireNonNull(intent.getStringExtra("accessToken"));
+
+        prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        database = AppDatabase.getInstance(this);
+
+        apolloClient = GraphQLClient.getApolloClient(accessToken);
+
+        if (App.API_URL == null) {
+            App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
+        }
 
         // Route action to function
         switch (ACTION) {
 
+            case FIRST_TIME_SYNC:
+                getFarm();
+                break;
+
             case ACTION_CREATE_PERSON_AND_EQUIPMENT:
-                pushPerson();
                 pushEquipment();
+                pushPerson();
                 break;
 
             case ACTION_CREATE_ARTICLE:
                 pushArticle();
-                Timber.i("pushArticle break");
-                break;
-
-            case FIRST_TIME_SYNC:
-                getFarm();
                 break;
 
             case ACTION_SYNC_ALL:
 
                 // Mutations (order is important)
                 pushArticle();
-                pushPerson();
                 pushEquipment();
+                pushPerson();
                 pushDeleteIntervention();
                 pushUpdateIntervention();  // TODO: merge update and create in one method
                 pushCreateIntervention();
 
-                // Queries
-                //getFarm();   is call in code
-
-                // Action done
-                //receiver.send(DONE, new Bundle());  called in code
+                // Action done -> now called in code
+                //receiver.send(DONE, new Bundle());
                 break;
         }
     }
-
-
-    /**
-     * delete intervention mutation
-     */
-    private void pushDeleteIntervention() {
-
-        List<Interventions> deletableIntervention = database.dao().getDeletableInterventions(MainActivity.FARM_ID);
-
-        if (!deletableIntervention.isEmpty()) {
-            for (Interventions deletableInter : deletableIntervention) {
-
-                DeleteInterMutation deleteInter = DeleteInterMutation.builder()
-                        .id(String.valueOf(deletableInter.intervention.eky_id)).build();
-
-                apolloClient.mutate(deleteInter).enqueue(new ApolloCall.Callback<DeleteInterMutation.Data>() {
-                    @Override
-                    public void onResponse(@Nonnull Response<DeleteInterMutation.Data> response) {
-
-                        boolean alreadyDeleted = false;
-                        if (response.hasErrors()) {
-                            for (Error error : response.errors()) {
-                                String message = error.message();
-                                if (message != null && message.contains("does not exist"))
-                                    alreadyDeleted = true;
-                            }
-                        }
-
-                        if (!response.hasErrors() || alreadyDeleted) {
-                            Timber.i("Intervention #%s deleted", deletableInter.intervention.id);
-                            database.dao().delete(deletableInter.intervention);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e) {
-                        Timber.e(e.getLocalizedMessage());
-                    }
-                });
-            }
-        } else Timber.d("No intervention to delete");
-    }
-
-
-    /**
-     * update intervention mutation
-     */
-    private void pushUpdateIntervention() {
-
-        List<Interventions> updatableInterventions = database.dao().getUpdatableInterventions(MainActivity.FARM_ID);
-
-        if (!updatableInterventions.isEmpty()) {
-
-            List<InterventionTargetAttributes> targetUpdates;
-            List<InterventionWorkingDayAttributes> workingDayUpdate;
-            List<InterventionInputAttributes> inputUpdates;
-            List<InterventionOperatorAttributes> operatorUpdates;
-            List<InterventionToolAttributes> toolUpdates;
-            List<HarvestLoadAttributes> loadUpdates;
-            List<InterventionOutputAttributes> outputUpdate;
-            WeatherAttributes weatherUpdate;
-
-            for (Interventions updatableInter : updatableInterventions) {
-
-                Timber.i("Updating remote intervention #%s", updatableInter.intervention.eky_id);
-
-                targetUpdates = new ArrayList<>();
-                workingDayUpdate = new ArrayList<>();
-                inputUpdates = new ArrayList<>();
-                loadUpdates = new ArrayList<>();
-                outputUpdate = new ArrayList<>();
-                operatorUpdates = new ArrayList<>();
-                toolUpdates = new ArrayList<>();
-                weatherUpdate = null;
-
-                for (Crops crop : updatableInter.crops)
-                    targetUpdates.add(InterventionTargetAttributes.builder()
-                            .cropID(crop.inter.crop_id)
-                            .workAreaPercentage(crop.inter.work_area_percentage).build());
-
-                for (InterventionWorkingDay wd : updatableInter.workingDays)
-                    workingDayUpdate.add(InterventionWorkingDayAttributes.builder()
-                            .executionDate(wd.execution_date)
-                            .hourDuration((long) wd.hour_duration)
-                            .build()
-                    );
-
-                for (Persons person : updatableInter.persons)
-                    operatorUpdates.add(InterventionOperatorAttributes.builder()
-                            .personId(String.valueOf(person.person.get(0).eky_id))
-                            .role((person.inter.is_driver) ? OperatorRoleEnum.DRIVER : OperatorRoleEnum.OPERATOR).build());
-
-                for (Equipments equipment : updatableInter.equipments)
-                    toolUpdates.add(InterventionToolAttributes.builder()
-                            .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id)).build());
-
-                for (Phytos phyto : updatableInter.phytos) {
-                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
-
-                    if (phyto.phyto.get(0).eky_id == null) { // Create new article
-                        if (phyto.phyto.get(0).registered)
-                            articleBuilder.referenceID(String.valueOf(phyto.phyto.get(0).id))
-                                    .type(ArticleTypeEnum.CHEMICAL);
-
-                    } else { // Use existing article
-                        articleBuilder.id(String.valueOf(phyto.phyto.get(0).eky_id));
-                    }
-
-                    inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(articleBuilder.build())
-                            .quantity(phyto.inter.quantity)
-                            .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
-                }
-
-                for (Seeds seed : updatableInter.seeds) {
-                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
-
-                    if (seed.seed.get(0).eky_id == null) { // Create new article
-                        if (seed.seed.get(0).registered)
-                            articleBuilder.referenceID(String.valueOf(seed.seed.get(0).id))
-                                    .type(ArticleTypeEnum.SEED);
-
-                    } else {  // Use existing article
-                        articleBuilder.id(String.valueOf(seed.seed.get(0).eky_id));
-                    }
-
-                    inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(articleBuilder.build())
-                            .quantity(seed.inter.quantity)
-                            .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
-                }
-
-                for (Fertilizers fertilizer : updatableInter.fertilizers) {
-                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
-
-                    if (fertilizer.fertilizer.get(0).eky_id == null) { // Create new article
-                        if (fertilizer.fertilizer.get(0).registered)
-                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
-                                    .type(ArticleTypeEnum.FERTILIZER);
-
-                    } else { // Use existing article
-                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
-                    }
-
-                    inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(articleBuilder.build())
-                            .quantity(fertilizer.inter.quantity)
-                            .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
-                }
-
-                for (Materials material : updatableInter.materials) {
-                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
-
-//                    if (material.material.get(0).eky_id == null) { // Create new article
-//                        if (fertilizer.fertilizer.get(0).registered)
-//                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
-//                                    .type(ArticleTypeEnum.FERTILIZER);
-//
-//                    } else { // Use existing article
-//                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
-//                    }
-
-                    inputUpdates.add(InterventionInputAttributes.builder()
-                            .article(articleBuilder.id(String.valueOf(material.material.get(0).eky_id)).build())
-                            .quantity(material.inter.quantity)
-                            .unit(ArticleAllUnitEnum.safeValueOf(material.inter.unit)).build());
-                }
-
-                for (Weather weather : updatableInter.weather)
-                    weatherUpdate = WeatherAttributes.builder()
-                            .description(weather.description != null ? WeatherEnum.valueOf(weather.description) : null)
-                            .temperature(weather.temperature != null ? Double.valueOf(weather.temperature) : null)
-                            .windSpeed(weather.wind_speed != null ? Double.valueOf(weather.wind_speed) : null).build();
-
-                for (Harvest harvest : updatableInter.harvests) {
-                    loadUpdates.add(HarvestLoadAttributes.builder()
-                            .number(harvest.number)
-                            .quantity(harvest.quantity)
-                            .netQuantity((double) harvest.quantity)
-                            .unit(HarvestLoadUnitEnum.valueOf(harvest.unit))
-                            .storageID(harvest.id_storage != null ? String.valueOf(harvest.id_storage) : null).build());
-                }
-                if (!loadUpdates.isEmpty()) {
-                    outputUpdate.add(InterventionOutputAttributes.builder()
-                            .nature(InterventionOutputTypeEnum.safeValueOf(updatableInter.harvests.get(0).type))
-                            .loads(loadUpdates).build());
-                }
-
-                // Whould be cleaner if the API were accepting null value in this cases
-//                if (inputUpdates.isEmpty()) inputUpdates = null;
-//                if (outputUpdate.isEmpty()) outputUpdate = null;
-//                if (operatorUpdates.isEmpty()) operatorUpdates = null;
-//                if (toolUpdates.isEmpty()) toolUpdates = null;
-
-                UpdateInterMutation updateIntervention = UpdateInterMutation.builder()
-                        .farmId(updatableInter.intervention.farm)
-                        .interventionId(String.valueOf(updatableInter.intervention.eky_id))
-                        .procedure(InterventionTypeEnum.safeValueOf(updatableInter.intervention.type))
-                        .cropList(targetUpdates)
-                        .workingDays(workingDayUpdate)
-                        .inputs(inputUpdates)
-                        .outputs(outputUpdate)
-                        .tools(toolUpdates)
-                        .operators(operatorUpdates)
-                        .weather(weatherUpdate)
-                        .waterQuantity((updatableInter.intervention.water_quantity != null) ? (long) updatableInter.intervention.water_quantity : null)
-                        .waterUnit((updatableInter.intervention.water_unit != null) ? ArticleVolumeUnitEnum.safeValueOf(updatableInter.intervention.water_unit) : null)
-                        .description(updatableInter.intervention.comment)
-                        .build();
-
-                // Do the mutation and register callback
-                apolloClient.mutate(updateIntervention).enqueue(new ApolloCall.Callback<UpdateInterMutation.Data>() {
-                    @Override
-                    public void onResponse(@Nonnull Response<UpdateInterMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            database.dao().setInterventionSynced(updatableInter.intervention.id);
-                            Timber.d("\tIntervention #%s successfully updated !", updatableInter.intervention.eky_id);
-                        } else {
-                            Timber.e("Error while updating intervention #%s", updatableInter.intervention.id);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e) {
-                        Timber.e("Error on update %s", e.getLocalizedMessage());
-                        //receiver.send(FAILED, new Bundle());
-                    }
-                });
-                // Hack avoiding false positive error TODO: correct this
-                database.dao().setInterventionSynced(updatableInter.intervention.id);
-            }
-        }
-    }
-
 
     /**
      * create person and equipment mutation
@@ -676,6 +418,241 @@ public class SyncService extends IntentService {
 
 
     /**
+     * delete intervention mutation
+     */
+    private void pushDeleteIntervention() {
+
+        List<Interventions> deletableIntervention = database.dao().getDeletableInterventions(MainActivity.FARM_ID);
+
+        if (!deletableIntervention.isEmpty()) {
+            for (Interventions deletableInter : deletableIntervention) {
+
+                DeleteInterMutation deleteInter = DeleteInterMutation.builder()
+                        .id(String.valueOf(deletableInter.intervention.eky_id))
+                        .farmId(MainActivity.FARM_ID)
+                        .build();
+
+                apolloClient.mutate(deleteInter).enqueue(new ApolloCall.Callback<DeleteInterMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<DeleteInterMutation.Data> response) {
+
+                        boolean alreadyDeleted = false;
+                        if (response.hasErrors()) {
+                            for (Error error : response.errors()) {
+                                String message = error.message();
+                                if (message != null && message.contains("does not exist"))
+                                    alreadyDeleted = true;
+                            }
+                        }
+
+                        if (!response.hasErrors() || alreadyDeleted) {
+                            Timber.i("Intervention #%s deleted", deletableInter.intervention.id);
+                            database.dao().delete(deletableInter.intervention);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                    }
+                });
+            }
+        } else Timber.d("No intervention to delete");
+    }
+
+
+    /**
+     * update intervention mutation
+     */
+    private void pushUpdateIntervention() {
+
+        List<Interventions> updatableInterventions = database.dao().getUpdatableInterventions(MainActivity.FARM_ID);
+
+        if (!updatableInterventions.isEmpty()) {
+
+            List<InterventionTargetAttributes> targetUpdates;
+            List<InterventionWorkingDayAttributes> workingDayUpdate;
+            List<InterventionInputAttributes> inputUpdates;
+            List<InterventionOperatorAttributes> operatorUpdates;
+            List<InterventionToolAttributes> toolUpdates;
+            List<HarvestLoadAttributes> loadUpdates;
+            List<InterventionOutputAttributes> outputUpdate;
+            WeatherAttributes weatherUpdate;
+
+            for (Interventions updatableInter : updatableInterventions) {
+
+                Timber.i("Updating remote intervention #%s", updatableInter.intervention.eky_id);
+
+                targetUpdates = new ArrayList<>();
+                workingDayUpdate = new ArrayList<>();
+                inputUpdates = new ArrayList<>();
+                loadUpdates = new ArrayList<>();
+                outputUpdate = new ArrayList<>();
+                operatorUpdates = new ArrayList<>();
+                toolUpdates = new ArrayList<>();
+                weatherUpdate = null;
+
+                for (Crops crop : updatableInter.crops)
+                    targetUpdates.add(InterventionTargetAttributes.builder()
+                            .cropID(crop.inter.crop_id)
+                            .workAreaPercentage(crop.inter.work_area_percentage).build());
+
+                for (InterventionWorkingDay wd : updatableInter.workingDays)
+                    workingDayUpdate.add(InterventionWorkingDayAttributes.builder()
+                            .executionDate(wd.execution_date)
+                            .hourDuration((double) wd.hour_duration)
+                            .build()
+                    );
+
+                for (Persons person : updatableInter.persons)
+                    operatorUpdates.add(InterventionOperatorAttributes.builder()
+                            .personId(String.valueOf(person.person.get(0).eky_id))
+                            .role((person.inter.is_driver) ? OperatorRoleEnum.DRIVER : OperatorRoleEnum.OPERATOR).build());
+
+                for (Equipments equipment : updatableInter.equipments)
+                    toolUpdates.add(InterventionToolAttributes.builder()
+                            .equipmentId(String.valueOf(equipment.equipment.get(0).eky_id)).build());
+
+                for (Phytos phyto : updatableInter.phytos) {
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
+
+                    if (phyto.phyto.get(0).eky_id == null) { // Create new article
+                        if (phyto.phyto.get(0).registered)
+                            articleBuilder.referenceID(String.valueOf(phyto.phyto.get(0).id))
+                                    .type(ArticleTypeEnum.CHEMICAL);
+
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(phyto.phyto.get(0).eky_id));
+                    }
+
+                    inputUpdates.add(InterventionInputAttributes.builder()
+                            .article(articleBuilder.build())
+                            .quantity(phyto.inter.quantity)
+                            .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
+                }
+
+                for (Seeds seed : updatableInter.seeds) {
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
+
+                    if (seed.seed.get(0).eky_id == null) { // Create new article
+                        if (seed.seed.get(0).registered)
+                            articleBuilder.referenceID(String.valueOf(seed.seed.get(0).id))
+                                    .type(ArticleTypeEnum.SEED);
+
+                    } else {  // Use existing article
+                        articleBuilder.id(String.valueOf(seed.seed.get(0).eky_id));
+                    }
+
+                    inputUpdates.add(InterventionInputAttributes.builder()
+                            .article(articleBuilder.build())
+                            .quantity(seed.inter.quantity)
+                            .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
+                }
+
+                for (Fertilizers fertilizer : updatableInter.fertilizers) {
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
+
+                    if (fertilizer.fertilizer.get(0).eky_id == null) { // Create new article
+                        if (fertilizer.fertilizer.get(0).registered)
+                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
+                                    .type(ArticleTypeEnum.FERTILIZER);
+
+                    } else { // Use existing article
+                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
+                    }
+
+                    inputUpdates.add(InterventionInputAttributes.builder()
+                            .article(articleBuilder.build())
+                            .quantity(fertilizer.inter.quantity)
+                            .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
+                }
+
+                for (Materials material : updatableInter.materials) {
+                    InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
+
+//                    if (material.material.get(0).eky_id == null) { // Create new article
+//                        if (fertilizer.fertilizer.get(0).registered)
+//                            articleBuilder.referenceID(String.valueOf(fertilizer.fertilizer.get(0).id))
+//                                    .type(ArticleTypeEnum.FERTILIZER);
+//
+//                    } else { // Use existing article
+//                        articleBuilder.id(String.valueOf(fertilizer.fertilizer.get(0).eky_id));
+//                    }
+
+                    inputUpdates.add(InterventionInputAttributes.builder()
+                            .article(articleBuilder.id(String.valueOf(material.material.get(0).eky_id)).build())
+                            .quantity(material.inter.quantity)
+                            .unit(ArticleAllUnitEnum.safeValueOf(material.inter.unit)).build());
+                }
+
+                for (Weather weather : updatableInter.weather)
+                    weatherUpdate = WeatherAttributes.builder()
+                            .description(weather.description != null ? WeatherEnum.valueOf(weather.description) : null)
+                            .temperature(weather.temperature != null ? Double.valueOf(weather.temperature) : null)
+                            .windSpeed(weather.wind_speed != null ? Double.valueOf(weather.wind_speed) : null).build();
+
+                for (Harvest harvest : updatableInter.harvests) {
+                    loadUpdates.add(HarvestLoadAttributes.builder()
+                            .number(harvest.number)
+                            .quantity(harvest.quantity)
+                            .netQuantity((double) harvest.quantity)
+                            .unit(HarvestLoadUnitEnum.valueOf(harvest.unit))
+                            .storageID(harvest.id_storage != null ? String.valueOf(harvest.id_storage) : null).build());
+                }
+                if (!loadUpdates.isEmpty()) {
+                    outputUpdate.add(InterventionOutputAttributes.builder()
+                            .nature(InterventionOutputTypeEnum.safeValueOf(updatableInter.harvests.get(0).type))
+                            .loads(loadUpdates).build());
+                }
+
+                // Whould be cleaner if the API were accepting null value in this cases
+//                if (inputUpdates.isEmpty()) inputUpdates = null;
+//                if (outputUpdate.isEmpty()) outputUpdate = null;
+//                if (operatorUpdates.isEmpty()) operatorUpdates = null;
+//                if (toolUpdates.isEmpty()) toolUpdates = null;
+
+                UpdateInterMutation updateIntervention = UpdateInterMutation.builder()
+                        .farmId(updatableInter.intervention.farm)
+                        .interventionId(String.valueOf(updatableInter.intervention.eky_id))
+                        .procedure(InterventionTypeEnum.safeValueOf(updatableInter.intervention.type))
+                        .cropList(targetUpdates)
+                        .workingDays(workingDayUpdate)
+                        .inputs(inputUpdates)
+                        .outputs(outputUpdate)
+                        .tools(toolUpdates)
+                        .operators(operatorUpdates)
+                        .weather(weatherUpdate)
+                        .waterQuantity((updatableInter.intervention.water_quantity != null) ? (long) updatableInter.intervention.water_quantity : null)
+                        .waterUnit((updatableInter.intervention.water_unit != null) ? ArticleVolumeUnitEnum.safeValueOf(updatableInter.intervention.water_unit) : null)
+                        .description(updatableInter.intervention.comment)
+                        .build();
+
+                // Do the mutation and register callback
+                apolloClient.mutate(updateIntervention).enqueue(new ApolloCall.Callback<UpdateInterMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<UpdateInterMutation.Data> response) {
+                        if (!response.hasErrors()) {
+                            database.dao().setInterventionSynced(updatableInter.intervention.id);
+                            Timber.d("\tIntervention #%s successfully updated !", updatableInter.intervention.eky_id);
+                        } else {
+                            Timber.e("Error while updating intervention #%s", updatableInter.intervention.id);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e("Error on update %s", e.getLocalizedMessage());
+                        //receiver.send(FAILED, new Bundle());
+                    }
+                });
+                // Hack avoiding false positive error TODO: correct this
+                database.dao().setInterventionSynced(updatableInter.intervention.id);
+            }
+        }
+    }
+
+
+    /**
      * create intervention mutation
      */
     private void pushCreateIntervention() {
@@ -714,7 +691,7 @@ public class SyncService extends IntentService {
                 for (InterventionWorkingDay wd : createInter.workingDays)
                     workingDays.add(InterventionWorkingDayAttributes.builder()
                             .executionDate(wd.execution_date)
-                            .hourDuration((long) wd.hour_duration).build());
+                            .hourDuration((double) wd.hour_duration).build());
 
                 for (Persons person : createInter.persons)
                     operators.add(InterventionOperatorAttributes.builder()
@@ -820,7 +797,7 @@ public class SyncService extends IntentService {
                 if (createInter.intervention.water_quantity != null)
                     pushIntervention.waterQuantity((long) createInter.intervention.water_quantity);
                 if (createInter.intervention.water_unit != null)
-                    pushIntervention.waterUnit(ArticleVolumeUnitEnum.safeValueOf(createInter.intervention.water_unit));
+                    pushIntervention.waterUnit(InterventionWaterVolumeUnitEnum.safeValueOf(createInter.intervention.water_unit));
                 if (weatherInput != null) pushIntervention.weather(weatherInput);
                 if (createInter.intervention.comment != null)
                     pushIntervention.description(createInter.intervention.comment);
@@ -1094,7 +1071,7 @@ public class SyncService extends IntentService {
                                         Timber.i("Fertilizer id:%s ekyId:%s name:%s", newId, ekyId, articleName);
                                         database.dao().insert(new Fertilizer(newId, ekyId, null,
                                                 articleName, null, null, null, null, null,
-                                            null, null, null, false, true, articleUnit));
+                                                null, null, null, false, true, articleUnit));
                                     }
                                 }
                             }
@@ -1186,7 +1163,7 @@ public class SyncService extends IntentService {
 
                                 // Setting water values if present
                                 Long waterQuantity = inter.waterQuantity();
-                                ArticleVolumeUnitEnum waterUnit = inter.waterUnit();
+                                InterventionWaterVolumeUnitEnum waterUnit = inter.waterUnit();
                                 if (waterQuantity != null && waterUnit != null) {
                                     newInter.setWater_quantity(waterQuantity.intValue());
                                     newInter.setWater_unit(waterUnit.rawValue());
@@ -1213,7 +1190,7 @@ public class SyncService extends IntentService {
                                 existingInter.intervention.status = validatedAt != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;
 
                                 Long waterQuantity = inter.waterQuantity();
-                                ArticleVolumeUnitEnum waterUnit = inter.waterUnit();
+                                InterventionWaterVolumeUnitEnum waterUnit = inter.waterUnit();
                                 if (waterQuantity != null && waterUnit != null) {
                                     existingInter.intervention.water_quantity = waterQuantity.intValue();
                                     existingInter.intervention.water_unit = waterUnit.rawValue();

@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_logout"
-        android:title="@string/menu_logout" />
+        android:id="@+id/action_crop"
+        android:title="@string/my_cultures" />
 
     <item
-        android:id="@+id/action_crop"
-        android:title="Mes cultures" />
+        android:id="@+id/action_logout"
+        android:title="@string/menu_logout" />
 
 </menu>

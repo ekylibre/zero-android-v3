@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base colors -->
+    <color name="primary">#2A3741</color>
+    <color name="primary_dark">#4A5668</color>
+    <color name="accent">#FFB300</color>
+
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="divider">#BDBDBD</color>
+    <color name="grey">#CACACA</color>
+    <color name="light_grey">#DEDEDE</color>
+    <color name="another_light_grey">#EEEEEE</color>
+    <color name="background">#FAFAFA</color>
+
+    <color name="error">#CC0000</color>
+    <color name="warning">#FF9500</color>
+    <color name="success">#8BC34A</color>
+
+    <!-- Layout specific colors -->
+    <color name="cancel_cross">@color/error</color>
+    <color name="procedure_menu_text">@color/accent</color>
+    <color name="dialogColor">@color/primary</color>
+    <color name="dialogTitleColor">@color/accent</color>
+    <color name="createText">@color/primary</color>
+
+</resources>

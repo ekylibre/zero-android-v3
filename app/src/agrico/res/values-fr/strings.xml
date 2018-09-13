@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Parcelles by Agriconomie.com</string>
+    <string name="connect_me">Me connecter</string>
+    <string name="disconnecting">Déconnection en cours…</string>
+    <string name="refreshing_token">Authentification…</string>
+</resources>

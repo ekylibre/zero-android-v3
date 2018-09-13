@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ekylibre.android.InterventionActivity;
-import com.ekylibre.android.SelectInputFragment;
+import com.ekylibre.android.fragments.SelectInputFragment;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;

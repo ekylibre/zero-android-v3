@@ -1,5 +1,6 @@
-package com.ekylibre.android;
+package com.ekylibre.android.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -9,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,10 +19,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
+import com.ekylibre.android.MainActivity;
+import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.SelectEquipmentAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Equipment;
@@ -33,10 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import timber.log.Timber;
+
 
 public class SelectEquipmentFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
-
-    private static final String TAG = "SelectEquipmentFragment";
 
     private static final int MIN_SEARCH_SIZE = 2;
 
@@ -49,6 +55,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
 
     private String searchText;
     private ArrayList<Equipment> dataset;
+    private List<String> equipmentNames;
 
     public SelectEquipmentFragment() {
     }
@@ -62,6 +69,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
         super.onCreate(savedInstanceState);
         this.context = getActivity();
         this.dataset = new ArrayList<>();
+        this.equipmentNames = new ArrayList<>();
         this.searchText = "";
     }
 
@@ -103,6 +111,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
             return false;
         });
 
+
         List<Integer> selectedEquipments = new ArrayList<>();
         for (Equipments equipments : InterventionActivity.equipmentList) {
             selectedEquipments.add(equipments.equipment.get(0).id);
@@ -128,26 +137,40 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         new RequestDatabase(context).execute();
     }
 
-    private void createEquipmentDialog() {
+    public void createEquipmentDialog() {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_equipment, null);
 
+        TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_equipment_name);
+        AppCompatImageView typeIcon = dialogView.findViewById(R.id.create_equipment_icon);
+
         builder.setView(dialogView);
         builder.setNegativeButton(R.string.cancel, (dialog, i) -> dialog.cancel());
         builder.setPositiveButton(R.string.create, (dialog, i) -> {
-            new CreateNewEquipment(context, dialogView).execute();
-            dialog.dismiss();
+            // pass
         });
 
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String name = nameTextInput.getEditText().getText().toString();
+            if (equipmentNames.contains(name)) {
+                nameTextInput.setError(context.getString(R.string.equipment_name_not_available));
+            } else if (name.isEmpty()) {
+                nameTextInput.setError(context.getString(R.string.equipment_name_is_empty));
+            } else {
+                new CreateNewEquipment(context, dialogView).execute();
+                dialog.dismiss();
+            }
+        });
 
         // Adjust dialog window to wrap content horizontally
         Window window = dialog.getWindow();
@@ -157,6 +180,21 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
         AppCompatSpinner spinner = dialogView.findViewById(R.id.create_equipment_type_spinner);
         ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.EQUIMPMENT_NAMES);
         spinner.setAdapter(spinnerAdapter);
+
+        Timber.i("Equipment type = tool_%s", Enums.EQUIMPMENT_TYPES.get(0).toLowerCase());
+        typeIcon.setImageResource(getResources().getIdentifier(
+                "tool_" + Enums.EQUIMPMENT_TYPES.get(0).toLowerCase(), "drawable", context.getPackageName()));
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+                typeIcon.setImageResource(getResources().getIdentifier(
+                        "tool_" + Enums.EQUIMPMENT_TYPES.get(pos).toLowerCase(),
+                        "drawable", context.getPackageName()));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 
     @Override
@@ -271,6 +309,8 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
                 dataset.addAll(database.dao().selectEquipment());
             else
                 dataset.addAll(database.dao().searchEquipment("%" + searchText + "%"));
+
+            equipmentNames.addAll(database.dao().selectEquipmentNames());
 
             return null;
         }

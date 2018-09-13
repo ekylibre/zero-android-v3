@@ -7,14 +7,21 @@ import android.content.res.Resources;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.type.EquipmentTypeEnum;
-import com.ekylibre.android.type.HarvestLoadUnitEnum;
 import com.ekylibre.android.type.InterventionOutputTypeEnum;
 import com.ekylibre.android.type.SpecieEnum;
 import com.ekylibre.android.type.StorageTypeEnum;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 
 public class Enums {
@@ -61,10 +68,16 @@ public class Enums {
 
     public static void buildEnumsTranslation(Context context) {
 
+        Map<String,String> equimpment_map = new HashMap<>();
+        Map<String,String> sorted_equimpment_map;
         EQUIMPMENT_ENUMS.remove(EquipmentTypeEnum.$UNKNOWN);
         for (EquipmentTypeEnum item : EQUIMPMENT_ENUMS) {
-            EQUIMPMENT_TYPES.add(item.rawValue());
-            EQUIMPMENT_NAMES.add(translate(context, item.rawValue()));
+            equimpment_map.put(item.rawValue(), translate(context, item.rawValue()));
+        }
+        sorted_equimpment_map = sortMapByValues(equimpment_map);
+        for (Map.Entry<String,String> entry : sorted_equimpment_map.entrySet()) {
+            EQUIMPMENT_TYPES.add(entry.getKey());
+            EQUIMPMENT_NAMES.add(entry.getValue());
         }
 
         OUTPUT_ENUMS.remove(InterventionOutputTypeEnum.$UNKNOWN);
@@ -73,10 +86,16 @@ public class Enums {
             OUTPUT_NAMES.add(translate(context, item.rawValue()));
         }
 
+        Map<String,String> specie_map = new HashMap<>();
+        Map<String,String> sorted_specie_map;
         SPECIE_ENUMS.remove(SpecieEnum.$UNKNOWN);
         for (SpecieEnum item : SPECIE_ENUMS) {
-            SPECIE_TYPES.add(item.rawValue());
-            SPECIE_NAMES.add(translate(context, item.rawValue()));
+            specie_map.put(item.rawValue(), translate(context, item.rawValue()));
+        }
+        sorted_specie_map = sortMapByValues(specie_map);
+        for (Map.Entry<String,String> entry : sorted_specie_map.entrySet()) {
+            SPECIE_TYPES.add(entry.getKey());
+            SPECIE_NAMES.add(entry.getValue());
         }
 
         STORAGE_TYPE_ENUMS.remove(StorageTypeEnum.$UNKNOWN);
@@ -94,5 +113,28 @@ public class Enums {
             translation = rawValue;
         }
         return translation;
+    }
+
+    private static Map sortMapByValues(Map<String, String> aMap) {
+
+        Set<Map.Entry<String,String>> mapEntries = aMap.entrySet();
+
+        // used linked list to sort, because insertion of elements in linked list is faster than an array list.
+        List<Map.Entry<String,String>> aList = new LinkedList<>(mapEntries);
+
+        // sorting the List
+        Collections.sort(aList, (ele1, ele2) -> {
+            Collator localeCollator = Collator.getInstance(Locale.FRANCE);
+            return localeCollator.compare(ele1.getValue(), ele2.getValue());
+        });
+
+        // Storing the list into Linked HashMap to preserve the order of insertion.
+        Map<String,String> aMap2 = new LinkedHashMap<>();
+        for(Map.Entry<String,String> entry: aList) {
+            aMap2.put(entry.getKey(), entry.getValue());
+        }
+
+        return aMap2;
+
     }
 }

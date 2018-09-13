@@ -98,7 +98,7 @@
         app:layout_constraintStart_toStartOf="@id/input_recycler"
         app:layout_constraintTop_toBottomOf="@id/input_recycler"
         app:srcCompat="@drawable/icon_dot"
-        android:tint="@color/warning" />
+        android:tint="@color/error" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/phyto_mix_message"
@@ -108,7 +108,7 @@
         app:layout_constraintTop_toTopOf="@id/phyto_mix_allowed"
         android:layout_marginStart="0dp"
         android:text="mélange non autorisé"
-        android:textColor="@color/warning" />
+        android:textColor="@color/error" />
 
     <View
         android:id="@+id/input_recycler_bottom_margin"

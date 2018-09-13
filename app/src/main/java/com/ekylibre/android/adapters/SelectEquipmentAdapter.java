@@ -1,19 +1,16 @@
 package com.ekylibre.android.adapters;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.ColorFilter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ekylibre.android.R;
-import com.ekylibre.android.SelectEquipmentFragment;
+import com.ekylibre.android.fragments.SelectEquipmentFragment;
 import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.relations.InterventionEquipment;
@@ -21,8 +18,6 @@ import com.ekylibre.android.utils.Enums;
 
 import java.util.Collections;
 import java.util.List;
-
-import timber.log.Timber;
 
 
 public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipmentAdapter.ViewHolder> {
@@ -70,8 +65,11 @@ public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipment
             // Set data
             equipment = item;
             nameTextView.setText(item.name);
-            String typeText = Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.type));
-            typeTextView.setText(String.format("%s #%s", typeText, item.number));
+            StringBuilder sb = new StringBuilder();
+            sb.append(Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.type)));
+            if (item.number != null && !item.number.isEmpty())
+                sb.append(String.format(" #%s", item.number));
+            typeTextView.setText(sb);
             Integer iconRessource = context.getResources().getIdentifier("tool_" + item.type.toLowerCase(), "drawable", context.getPackageName());
             if (iconRessource != 0)
                 typeImageView.setImageResource(iconRessource);

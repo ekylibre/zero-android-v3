@@ -65,15 +65,12 @@ import timber.log.Timber;
             Point.class
         },
         exportSchema = false,
-        version = 4
+        version = 5
 )
 @TypeConverters(
         { DateConverter.class, PolygonConverter.class }
 )
 public abstract class AppDatabase extends RoomDatabase {
-
-    // Log TAG
-    private static final String TAG = "AppDatabase";
 
     // Entities tables
     public abstract DAO dao();
@@ -84,7 +81,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public static synchronized AppDatabase getInstance(Context context) {
         if (database == null)
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
-                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5)
                     .build();
         return database;
     }
@@ -137,6 +134,31 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE materials ADD COLUMN material_id_eky INTEGER DEFAULT NULL");
         }
     };
+
+    private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+    @Override
+    public void migrate(@NonNull SupportSQLiteDatabase database) {
+        database.execSQL("CREATE TABLE temp_crops (crop_uuid TEXT NOT NULL, name TEXT, specie TEXT, " +
+                        "production_nature TEXT, production_mode TEXT, production_output TEXT, " +
+                        "provisional_yield TEXT, shape TEXT, surface_area REAL NOT NULL, " +
+                        "centroid TEXT, start_date TEXT, stop_date TEXT, plot_uuid TEXT, farm TEXT, " +
+                        "PRIMARY KEY(crop_uuid))");
+
+        database.execSQL("INSERT INTO temp_crops (crop_uuid, name, specie, production_nature, " +
+                "production_mode, production_output, provisional_yield, shape, surface_area, " +
+                "centroid, start_date, stop_date, plot_uuid, farm) " +
+                "SELECT crop_uuid, name, specie, " +
+                "production_nature, production_mode, production_output, provisional_yield, shape," +
+                "surface_area, centroid, start_date, stop_date, plot, farm FROM crops");
+
+        database.execSQL("DROP TABLE crops;");
+
+        database.execSQL("ALTER TABLE temp_crops RENAME TO crops");
+
+        database.execSQL("CREATE INDEX index_crops_farm ON crops (farm)");
+        database.execSQL("CREATE INDEX index_crops_name ON crops (name)");
+        }
+};
 
 
     /**

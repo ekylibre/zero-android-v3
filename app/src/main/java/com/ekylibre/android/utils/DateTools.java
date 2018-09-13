@@ -1,6 +1,5 @@
 package com.ekylibre.android.utils;
 
-import android.util.Log;
 
 import com.ekylibre.android.MainActivity;
 
@@ -8,15 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static java.lang.Math.abs;
-
 
 public class DateTools {
 
-    private static final String TAG = "DateTools";
-
     private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("d MMM", MainActivity.LOCALE);
-    private static SimpleDateFormat SIMPLE_DATE_YEAR = new SimpleDateFormat("d MMM yyyy", MainActivity.LOCALE);
     public static SimpleDateFormat STANDARD_DISPLAY = new SimpleDateFormat("dd/MM/yyyy", MainActivity.LOCALE);
     private static long TODAY = setMidnight();
     private static int DAY = 86400000;

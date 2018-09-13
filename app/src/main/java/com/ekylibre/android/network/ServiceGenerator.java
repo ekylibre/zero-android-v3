@@ -1,9 +1,7 @@
 package com.ekylibre.android.network;
 
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
+import com.ekylibre.android.BuildConfig;
 import com.ekylibre.android.network.pojos.AccessToken;
 import com.ekylibre.android.utils.App;
 
@@ -96,7 +94,7 @@ public class ServiceGenerator {
 
                 // We need a new client, since we don't want to make another call using our client with access token
                 EkylibreAPI ekylibreAPI = createService(EkylibreAPI.class);
-                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, mToken.getRefresh_token(), "refresh_token");
+                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(BuildConfig.CLIENT_ID, BuildConfig.CLIENT_SECRET, mToken.getRefresh_token(), "refresh_token");
                 try {
                     retrofit2.Response<AccessToken> tokenResponse = call.execute();
                     if (tokenResponse.code() == 200) {
@@ -104,8 +102,8 @@ public class ServiceGenerator {
                         mToken = newToken;
 //                        SharedPreferences sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 //                        SharedPreferences.Editor editor = sharedPreferences.edit();
-//                        editor.putString("access_token", newToken.getAccess_token());
-//                        editor.putString("refresh_token", newToken.getRefresh_token());
+//                        editor.putString("access_token", newToken.getAccessToken());
+//                        editor.putString("refresh_token", newToken.getRefreshToken());
 //                        editor.putInt("token_created_at", newToken.getCreated_at());
 //                        editor.putBoolean("is_authenticated", true);
 //                        editor.apply();

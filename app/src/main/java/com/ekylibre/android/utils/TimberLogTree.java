@@ -1,5 +1,6 @@
 package com.ekylibre.android.utils;
 
+
 import android.support.annotation.NonNull;
 
 import com.ekylibre.android.BuildConfig;
@@ -14,7 +15,6 @@ public class TimberLogTree extends Timber.DebugTree {
         // Workaround for devices that doesn't show lower priority logs
         if (BuildConfig.DEBUG)
             super.log(priority, tag, message, t);
-
     }
 
     @Override

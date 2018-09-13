@@ -1,4 +1,4 @@
-package com.ekylibre.android;
+package com.ekylibre.android.fragments;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,19 +15,19 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ekylibre.android.MainActivity;
+import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.CropDetailAdapter;
 import com.ekylibre.android.adapters.CropInfo.CropItem;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
-import com.ekylibre.android.utils.Converters;
+import com.ekylibre.android.database.converters.Converters;
 import com.ekylibre.android.utils.DateTools;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import timber.log.Timber;
 
 
 public class InfoFragment extends DialogFragment {

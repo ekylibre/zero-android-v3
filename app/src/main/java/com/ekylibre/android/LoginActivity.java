@@ -54,8 +54,8 @@ public class LoginActivity extends AppCompatActivity {
      */
     private UserLoginTask authTask = null;
     private boolean startingApp = false;
-    private AccessToken accessToken = null;
-    private SharedPreferences sharedPreferences;
+    private AccessToken accessToken;
+    private SharedPreferences sharedPreferences = null;
 
     // UI references.
     private TextInputLayout emailView, passwordView;
@@ -66,8 +66,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
-        App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
-        App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
+        App.OAUTH_CLIENT_ID = BuildConfig.CLIENT_ID;
+        App.OAUTH_CLIENT_SECRET = BuildConfig.CLIENT_SECRET;
 
         sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
@@ -139,7 +139,8 @@ public class LoginActivity extends AppCompatActivity {
             dialog = new ProgressDialog(this);
             dialog.setMessage(getString(R.string.authenticating));
         }
-        if (yes) {
+        Timber.i("Dialog window --> %s", dialog);
+        if (yes && !dialog.isShowing()) {
             dialog.show();
         } else if (dialog.isShowing()) {
             dialog.dismiss();
@@ -203,83 +204,98 @@ public class LoginActivity extends AppCompatActivity {
             fixHandShakeFailed();
 
             EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class);
-            Call<AccessToken> call = ekylibreAPI.getNewAccessToken(App.OAUTH_CLIENT_ID,
-                    App.OAUTH_CLIENT_SECRET, App.OAUTH_GRANT_TYPE, email, password, App.OAUTH_SCOPE);
+
+            Timber.i("Client id -> %s", BuildConfig.CLIENT_ID);
+            Timber.i("Client secret -> %s", BuildConfig.CLIENT_SECRET);
+
+            Call<AccessToken> call = ekylibreAPI.getNewAccessToken(BuildConfig.CLIENT_ID,
+                    BuildConfig.CLIENT_SECRET, App.OAUTH_GRANT_TYPE, email, password, App.OAUTH_SCOPE);
 
             call.enqueue(new retrofit2.Callback<AccessToken>() {
                 @Override
                 public void onResponse(@NonNull Call<AccessToken> call, @NonNull retrofit2.Response<AccessToken> response) {
+
                     if (response.isSuccessful()) {
-
                         accessToken = response.body();
-                        Timber.i("AccessToken --> %s", (accessToken != null ? accessToken.getAccess_token() : null));
 
-                        ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
-                        ProfileQuery profileQuery = ProfileQuery.builder().build();
-                        ApolloCall<ProfileQuery.Data> profileCall = apolloClient.query(profileQuery);
+                        if (accessToken != null) {
+                            Timber.i("AccessToken --> %s", accessToken.getAccess_token());
 
-                        profileCall.enqueue(new ApolloCall.Callback<ProfileQuery.Data>() {
-                            @Override
-                            public void onResponse(@Nonnull Response<ProfileQuery.Data> response) {
+                            ApolloClient apolloClient = GraphQLClient.getApolloClient(accessToken.getAccess_token());
+                            ProfileQuery profileQuery = ProfileQuery.builder().build();
+                            ApolloCall<ProfileQuery.Data> profileCall = apolloClient.query(profileQuery);
 
-                                // We got an access_token
-                                ProfileQuery.Data data = response.data();
-                                Timber.i(String.valueOf(data));
+                            profileCall.enqueue(new ApolloCall.Callback<ProfileQuery.Data>() {
+                                @Override
+                                public void onResponse(@Nonnull Response<ProfileQuery.Data> response) {
 
-                                List<String> farmNameList = new ArrayList<>();
+                                    // We got an access_token
+                                    ProfileQuery.Data data = response.data();
+                                    Timber.i(String.valueOf(data));
 
-                                for (ProfileQuery.Farm farm : data.farms)
-                                    farmNameList.add(farm.label);
+                                    List<String> farmNameList = new ArrayList<>();
 
-                                int farmPosition = 0;
+                                    for (ProfileQuery.Farm farm : data.farms)
+                                        farmNameList.add(farm.label);
 
-                                for (String str1 : farmNameList) {
-                                    for (String str2 : farmNameList)
-                                        if (str1.compareToIgnoreCase(str2) < 0)
-                                            farmPosition = farmNameList.indexOf(str1);
-                                }
+                                    int farmPosition = 0;
 
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("firstName", data.profile.firstName);
-                                editor.putString("lastName", data.profile.lastName);
-                                editor.putString("email", email);
-                                editor.putString("access_token", accessToken.getAccess_token());
-                                editor.putString("refresh_token", accessToken.getRefresh_token());
-                                editor.putInt("token_created_at", accessToken.getCreated_at());
-                                editor.putString("current-farm-name", data.farms().get(farmPosition).label);
-                                editor.putString("current-farm-id", data.farms().get(farmPosition).id);
-                                editor.putBoolean("is_authenticated", true);
-                                editor.apply();
+                                    for (String str1 : farmNameList) {
+                                        for (String str2 : farmNameList)
+                                            if (str1.compareToIgnoreCase(str2) < 0)
+                                                farmPosition = farmNameList.indexOf(str1);
+                                    }
 
-                                // Finish the login activity
-                                if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
-                                    runOnUiThread(changeMessage);
-                                    new LoadInitialData(getBaseContext()).execute();
-                                    editor.putBoolean("initial_data_loaded", true);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("firstName", data.profile.firstName);
+                                    editor.putString("lastName", data.profile.lastName);
+                                    editor.putString("email", email);
+                                    editor.putString("access_token", accessToken.getAccess_token());
+                                    editor.putString("refresh_token", accessToken.getRefresh_token());
+                                    editor.putInt("token_created_at", accessToken.getCreated_at());
+                                    editor.putString("current-farm-name", data.farms().get(farmPosition).label);
+                                    editor.putString("current-farm-id", data.farms().get(farmPosition).id);
+                                    editor.putBoolean("is_authenticated", true);
                                     editor.apply();
-                                } else {
-                                    Timber.i("=========== INITIAL DATA ALREADY LOADED ===========");
-                                    if (!startingApp)
-                                        startApp();
+
+                                    // Finish the login activity
+                                    if (!sharedPreferences.getBoolean("initial_data_loaded", false)) {
+                                        runOnUiThread(changeMessage);
+                                        new LoadInitialData(getBaseContext()).execute();
+                                        editor.putBoolean("initial_data_loaded", true);
+                                        editor.apply();
+                                    } else {
+                                        Timber.i("=========== INITIAL DATA ALREADY LOADED ===========");
+                                        if (!startingApp)
+                                            startApp();
+                                    }
+
                                 }
 
-                            }
+                                @Override
+                                public void onFailure(@Nonnull ApolloException e) {
+                                    Timber.i("ApolloException --> %s", e.getMessage());
+                                    authTask = null;
+                                    showDialog(false);
+                                    Snackbar.make(findViewById(R.id.login_layout),
+                                            R.string.network_failure, Snackbar.LENGTH_LONG).show();
+                                }
+                            });
+                        } else {
+                            authTask = null;
+                            showDialog(false);
+                            Snackbar.make(findViewById(R.id.login_layout),
+                                    R.string.unknown_login_failure, Snackbar.LENGTH_LONG).show();
+                            cancel(true);
+                        }
 
-                            @Override
-                            public void onFailure(@Nonnull ApolloException e) {
-                                Timber.i("ApolloException --> %s", e.getMessage());
-                                authTask = null;
-                                showDialog(false);
-                                Snackbar.make(findViewById(R.id.login_layout),
-                                        R.string.network_failure, Snackbar.LENGTH_LONG).show();
-                            }
-                        });
                     } else {
                         authTask = null;
                         showDialog(false);
                         Snackbar.make(findViewById(R.id.login_layout),
                                 R.string.login_failure, Snackbar.LENGTH_LONG).show();
                     }
+
                 }
 
                 @Override

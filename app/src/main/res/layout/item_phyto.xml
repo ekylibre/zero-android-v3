@@ -38,7 +38,7 @@
         android:id="@+id/item_mix_allowed"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:tint="@color/warning"
+        android:tint="@color/error"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/phyto_company"
         app:srcCompat="@drawable/icon_dot" />
@@ -51,7 +51,7 @@
         app:layout_constraintTop_toBottomOf="@id/phyto_company"
         android:layout_marginStart="0dp"
         android:text="mélange non autorisé"
-        android:textColor="@color/warning" />
+        android:textColor="@color/error" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/phyto_amm_label"

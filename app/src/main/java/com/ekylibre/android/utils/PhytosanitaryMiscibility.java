@@ -1,15 +1,11 @@
 package com.ekylibre.android.utils;
 
-import android.util.Log;
-
-import com.ekylibre.android.InterventionActivity;
-import com.ekylibre.android.database.models.Phyto;
-import com.ekylibre.android.database.pojos.Phytos;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
+
 
 public class PhytosanitaryMiscibility {
 
@@ -37,6 +33,24 @@ public class PhytosanitaryMiscibility {
         }
     }
 
+    public static boolean mixIsAuthorized(List<Integer> codes) {
+
+        Timber.e(codes.toString());
+
+        for (int i = 0; i <= codes.size() - 1; i++) {
+            List<Integer> codesCopy = new ArrayList<>(codes);
+            codesCopy.remove(i);
+            int firstProduct = codes.get(i);
+            for (int secondProduct : codesCopy) {
+                if (!isValid(firstProduct, secondProduct))
+                    return false;
+            }
+        }
+        return true;
+    }
+}
+
+
 //    public static boolean mixIsAuthorized(int secondProduct) {
 //
 //        int index = 0;
@@ -54,20 +68,3 @@ public class PhytosanitaryMiscibility {
 //
 //        return index <= 0;
 //    }
-
-    public static boolean mixIsAuthorized(List<Integer> codes) {
-
-        Timber.e(codes.toString());
-
-        for (int i = 0; i <= codes.size() - 1; i++) {
-            List<Integer> codesCopy = new ArrayList<>(codes);
-            codesCopy.remove(i);
-            int firstProduct = codes.get(i);
-            for (int secondProduct : codesCopy) {
-                if (!isValid(firstProduct, secondProduct))
-                    return false;
-            }
-        }
-        return true;
-    }
-}

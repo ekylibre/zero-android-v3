@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ekylibre.android.R;
-import com.ekylibre.android.SelectPersonFragment;
+import com.ekylibre.android.fragments.SelectPersonFragment;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.relations.InterventionPerson;

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".InfoFragment">
+    tools:context=".fragments.InfoFragment">
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/crop_detail_crop_name"

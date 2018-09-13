@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ekylibre.android.SelectMaterialFragment"
+    tools:context="com.ekylibre.android.fragments.SelectMaterialFragment"
     android:background="@color/background"
     style="@style/NoActionBar">
 
@@ -18,8 +18,8 @@
             android:layout_height="wrap_content"
             app:title="@string/selecting_crops"
             app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
-            app:titleTextColor="@color/white"
-            android:background="@color/accent"/>
+            app:titleTextColor="@color/dialogTitleColor"
+            android:background="@color/dialogColor"/>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:background="@color/accent"
+        android:background="@color/dialogColor"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <android.support.v7.widget.AppCompatTextView
@@ -50,7 +50,7 @@
             app:layout_constraintBaseline_toBaselineOf="@id/button_validate"
             app:layout_constraintStart_toStartOf="@id/nav_layout"
             android:layout_marginStart="16dp"
-            android:textColor="@color/white"
+            android:textColor="@color/dialogTitleColor"
             android:textStyle="bold"/>
 
         <android.support.v7.widget.AppCompatButton

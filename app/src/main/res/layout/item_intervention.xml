@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:srcCompat="@drawable/icon_check"
-        android:tint="@color/accent"
+        android:tint="@color/success"
         app:layout_constraintStart_toEndOf="@id/item_procedure"
         app:layout_constraintTop_toTopOf="@id/item_procedure"
         app:layout_constraintBottom_toBottomOf="@id/item_procedure"

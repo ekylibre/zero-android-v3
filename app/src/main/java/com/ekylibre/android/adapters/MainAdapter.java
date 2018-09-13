@@ -36,6 +36,8 @@ import java.util.Objects;
 
 import timber.log.Timber;
 
+import static com.ekylibre.android.utils.Utils.decimalFormat;
+
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
@@ -106,15 +108,15 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         switch (current.intervention.status) {
             case InterventionActivity.SYNCED:
                 holder.itemSynchronized.setImageResource(R.drawable.icon_check);
-                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.success)));
                 break;
             case InterventionActivity.VALIDATED:
                 holder.itemSynchronized.setImageResource(R.drawable.icon_check_validated);
-                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.success)));
                 break;
             default:
                 holder.itemSynchronized.setImageResource(R.drawable.icon_sync);
-                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.warning)));
                 break;
         }
 
@@ -129,7 +131,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         }
 
         String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
-        String totalString = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
+        String totalString = String.format(MainActivity.LOCALE, "%s • %s ha", cropCount, decimalFormat.format(total));
         holder.itemCrops.setText(totalString);
 
         // Display input by nature
@@ -138,9 +140,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
             case App.CROP_PROTECTION:
                 for (Phytos p : current.phytos) {
-                    sb.append(p.phyto.get(0).name).append(" • ");
-                    sb.append(String.format(MainActivity.LOCALE, "%.1f", p.inter.quantity)).append(" ");
-                    sb.append(Objects.requireNonNull(Units.getUnit(p.inter.unit)).name);
+                    sb.append(p.phyto.get(0).name).append(" • ")
+                            .append(decimalFormat.format(p.inter.quantity)).append(" ")
+                            .append(Objects.requireNonNull(Units.getUnit(p.inter.unit)).name);
                     if (current.phytos.indexOf(p) + 1 != current.phytos.size()) sb.append("\n");
                 }
                 break;
@@ -153,27 +155,27 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                         specie = context.getResources().getString(context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName()));
                     else
                         specie = seed.variety;
-                    sb.append(specie).append(" • ");
-                    sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");
-                    sb.append(Objects.requireNonNull(Units.getUnit(s.inter.unit)).name);
+                    sb.append(specie).append(" • ")
+                            .append(decimalFormat.format(s.inter.quantity)).append(" ")
+                            .append(Objects.requireNonNull(Units.getUnit(s.inter.unit)).name);
                     if (current.seeds.indexOf(s) + 1 != current.seeds.size()) sb.append("\n");
                 }
                 break;
 
             case App.FERTILIZATION:
                 for (Fertilizers f : current.fertilizers) {
-                    sb.append(f.fertilizer.get(0).label_fra).append(" • ");
-                    sb.append(String.format(MainActivity.LOCALE, "%.1f", f.inter.quantity)).append(" ");
-                    sb.append(Objects.requireNonNull(Units.getUnit(f.inter.unit)).name);
+                    sb.append(f.fertilizer.get(0).label_fra).append(" • ")
+                            .append(decimalFormat.format(f.inter.quantity)).append(" ")
+                            .append(Objects.requireNonNull(Units.getUnit(f.inter.unit)).name);
                     if (current.fertilizers.indexOf(f) + 1 != current.fertilizers.size()) sb.append("\n");
                 }
                 break;
 
             case App.CARE:
                 for (Materials m : current.materials) {
-                    sb.append(m.material.get(0).name).append(" • ");
-                    sb.append(m.inter.quantity).append(" ");
-                    sb.append(Objects.requireNonNull(Units.getUnit(m.inter.unit)).name);
+                    sb.append(m.material.get(0).name).append(" • ")
+                            .append(m.inter.quantity).append(" ")
+                            .append(Objects.requireNonNull(Units.getUnit(m.inter.unit)).name);
                     if (current.materials.indexOf(m) + 1 != current.materials.size()) sb.append("\n");
                 }
                 break;
@@ -195,9 +197,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             case App.HARVEST:
                 if (current.harvests.size() > 0) {
                     for (Harvest harvest : current.harvests) {
-                        sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
-                        sb.append(String.format(MainActivity.LOCALE, "%.1f %s", harvest.quantity, Objects.requireNonNull(Units.getUnit(harvest.unit)).name));
-                        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+                        sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ")
+                                .append(decimalFormat.format(harvest.quantity)).append(" ")
+                                .append( Objects.requireNonNull(Units.getUnit(harvest.unit)).name)
+                                .setCharAt(0, Character.toUpperCase(sb.charAt(0)));
                         if (current.harvests.indexOf(harvest) + 1 != current.harvests.size()) sb.append("\n");
                     }
                 }

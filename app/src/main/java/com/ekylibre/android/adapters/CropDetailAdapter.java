@@ -100,15 +100,15 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
         switch (current.intervention.status) {
             case InterventionActivity.SYNCED:
                 holder.itemSynchronized.setImageResource(R.drawable.icon_check);
-                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.success)));
                 break;
             case InterventionActivity.VALIDATED:
                 holder.itemSynchronized.setImageResource(R.drawable.icon_check_validated);
-                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.accent)));
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.success)));
                 break;
             default:
                 holder.itemSynchronized.setImageResource(R.drawable.icon_sync);
-                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                ImageViewCompat.setImageTintList(holder.itemSynchronized, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.warning)));
                 break;
         }
 

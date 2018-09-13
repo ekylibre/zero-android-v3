@@ -90,7 +90,7 @@
         android:id="@+id/item_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tint="@color/accent"
+        android:tint="@color/cancel_cross"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_clear" />
@@ -106,7 +106,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginTop="6dp"
-        android:tint="@color/warning"
+        android:tint="@color/error"
         app:layout_constraintStart_toStartOf="@id/item_quantity_edit"
         app:layout_constraintTop_toBottomOf="@id/item_quantity_edit"
         app:srcCompat="@drawable/icon_dot" />
@@ -119,7 +119,7 @@
         app:layout_constraintTop_toTopOf="@id/item_dose_max"
         app:layout_constraintStart_toEndOf="@id/item_dose_max"
         android:text="dose invalide"
-        android:textColor="@color/warning" />
+        android:textColor="@color/error" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/item_total"

@@ -113,16 +113,16 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                 return false;
             });
 
-            itemQuantityEdit.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String string = itemQuantityEdit.getText().toString();
-                    if (string.isEmpty()) {
-                        itemQuantityEdit.requestFocus();
-                    } else {
-                        updateTotal();
-                    }
-                }
-            });
+//            itemQuantityEdit.setOnFocusChangeListener((v, hasFocus) -> {
+//                if (!hasFocus) {
+//                    String string = itemQuantityEdit.getText().toString();
+//                    if (string.isEmpty()) {
+//                        itemQuantityEdit.requestFocus();
+//                    } else {
+//                        updateTotal();
+//                    }
+//                }
+//            });
 
             itemUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override  public void onNothingSelected(AdapterView<?> parentView) {}

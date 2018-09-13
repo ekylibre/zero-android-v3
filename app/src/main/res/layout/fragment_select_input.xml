@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ekylibre.android.SelectInputFragment"
+    tools:context="com.ekylibre.android.fragments.SelectInputFragment"
     android:background="@color/background">
 
     <android.support.design.widget.AppBarLayout
@@ -31,8 +31,10 @@
             android:layout_height="wrap_content"
             app:tabMode="scrollable"
             app:tabGravity="fill"
-            android:background="@color/accent"
-            app:tabIndicatorColor="@color/white"
+            android:background="@color/dialogColor"
+            app:tabTextColor="@color/dialogTitleColor"
+            app:tabSelectedTextColor="@color/dialogTitleColor"
+            app:tabIndicatorColor="@color/dialogTitleColor"
             app:tabIndicatorHeight="3dp"/>
 
     </android.support.design.widget.AppBarLayout>
@@ -53,7 +55,7 @@
         android:layout_marginBottom="16dp"
         android:text="@string/create_new_seed"
         android:textAllCaps="true"
-        android:textColor="@color/accent"
+        android:textColor="@color/createText"
         android:visibility="visible"/>
 
     <android.support.v7.widget.RecyclerView

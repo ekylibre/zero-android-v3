@@ -1,15 +1,13 @@
-package com.ekylibre.android;
+package com.ekylibre.android.fragments;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -17,43 +15,42 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.ekylibre.android.adapters.SelectMaterialAdapter;
+import com.ekylibre.android.InterventionActivity;
+import com.ekylibre.android.MainActivity;
+import com.ekylibre.android.R;
+import com.ekylibre.android.adapters.SelectPersonAdapter;
 import com.ekylibre.android.database.AppDatabase;
-import com.ekylibre.android.database.models.Material;
+import com.ekylibre.android.database.models.Person;
+import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
-import com.ekylibre.android.utils.Units;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
-public class SelectMaterialFragment extends DialogFragment implements ServiceResultReceiver.Receiver {
-
-    private static final String TAG = SelectMaterialFragment.class.getName();
+public class SelectPersonFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
     private static final int MIN_SEARCH_SIZE = 2;
 
     private Context context;
 
     private OnFragmentInteractionListener fragmentListener;
-    private ServiceResultReceiver resultReceiver;
     private RecyclerView.Adapter adapter;
-    private TextView createMaterial;
+    private TextView createPerson;
 
     private String searchText;
-    private ArrayList<Material> dataset;
+    private ArrayList<Person> dataset;
 
-    public SelectMaterialFragment() {
+    public SelectPersonFragment() {
     }
 
-    public static SelectMaterialFragment newInstance() {
-        return new SelectMaterialFragment();
+    public static SelectPersonFragment newInstance() {
+        return new SelectPersonFragment();
     }
 
     @Override
@@ -62,9 +59,6 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         this.context = getActivity();
         this.dataset = new ArrayList<>();
         this.searchText = "";
-
-        resultReceiver = new ServiceResultReceiver(new Handler());
-        resultReceiver.setReceiver(this);
     }
 
     @Override
@@ -73,21 +67,21 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         // Disables AppBar
         Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
 
-        View inflatedView = inflater.inflate(R.layout.fragment_select_material, container, false);
+        View inflatedView = inflater.inflate(R.layout.fragment_select_person, container, false);
 
-        createMaterial = inflatedView.findViewById(R.id.material_dialog_create_new);
-        SearchView searchView = inflatedView.findViewById(R.id.search_material);
-        RecyclerView recyclerView = inflatedView.findViewById(R.id.material_dialog_recycler);
+        createPerson = inflatedView.findViewById(R.id.person_dialog_create_new);
+        SearchView searchView = inflatedView.findViewById(R.id.search_person);
+        RecyclerView recyclerView = inflatedView.findViewById(R.id.person_dialog_recycler);
 
-        createMaterial.setOnClickListener(view -> createMaterialDialog());
-        searchView.setOnSearchClickListener(view -> createMaterial.setVisibility(View.GONE));
+        createPerson.setOnClickListener(view -> createPersonDialog());
+        searchView.setOnSearchClickListener(view -> createPerson.setVisibility(View.GONE));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchText = query;
                 new RequestDatabase(context).execute();
-                createMaterial.setVisibility(View.VISIBLE);
+                createPerson.setVisibility(View.VISIBLE);
                 return false;
             }
             @Override
@@ -101,12 +95,17 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
 
         searchView.setOnCloseListener(() -> {
             new RequestDatabase(context).execute();
-            createMaterial.setVisibility(View.VISIBLE);
+            createPerson.setVisibility(View.VISIBLE);
             return false;
         });
 
+        List<Integer> selectedPeople = new ArrayList<>();
+        for (Persons persons : InterventionActivity.personList) {
+            selectedPeople.add(persons.person.get(0).id);
+        }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
-        adapter = new SelectMaterialAdapter(dataset, fragmentListener);
+        adapter = new SelectPersonAdapter(context, dataset, selectedPeople, fragmentListener);
         recyclerView.setAdapter(adapter);
 
         return inflatedView;
@@ -128,20 +127,18 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         new RequestDatabase(context).execute();
     }
 
-    public void createMaterialDialog() {
+    public void createPersonDialog() {
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
-        View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_material, null);
+        View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_person, null);
 
-        Spinner spinner = dialogView.findViewById(R.id.create_material_unit_spinner);
-
-        ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Units.ALL_BASE_UNITS_L10N);
-        spinner.setAdapter(spinnerAdapter);
+//        TextInputLayout til = dialogView.findViewById(R.id.create_person_lastname);
+//        til.setError("You need to enter a name");
 
         builder.setView(dialogView);
         builder.setNegativeButton("Annuler", (dialog, i) -> dialog.cancel());
         builder.setPositiveButton("Créer", (dialog, i) -> {
-            new CreateNewMaterial(context, dialogView).execute();
+            new CreateNewPerson(context, dialogView).execute();
             dialog.dismiss();
         });
 
@@ -155,12 +152,28 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
 
     }
 
-    class CreateNewMaterial extends AsyncTask<Void, Void, Void> {
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+//        if (resultCode == SyncService.DONE) {
+//            int remote_id = resultData.getInt("remote_id", 0);
+//
+//            new SetEquipmentId(context, name, remote_id).execute();
+//
+//            for (Equipment equipment : dataset) {
+//                if (equipment.name.equals(name)) {
+//                    equipment.eky_id = remote_id;
+//                    break;
+//                }
+//            }
+//        }
+    }
+
+    class CreateNewPerson extends AsyncTask<Void, Void, Void> {
 
         Context context;
         View dialogView;
 
-        CreateNewMaterial(Context context, View dialogView) {
+        CreateNewPerson(Context context, View dialogView) {
             this.context = context;
             this.dialogView = dialogView;
         }
@@ -168,19 +181,17 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         @Override
         protected Void doInBackground(Void... voids) {
 
+            TextInputLayout textInputLayout = dialogView.findViewById(R.id.create_person_firstname);
+            String firstName = textInputLayout.getEditText().getText().toString();
+
+            textInputLayout = dialogView.findViewById(R.id.create_person_lastname);
+            String lastName = textInputLayout.getEditText().getText().toString();
+
+//            textInputLayout = dialogView.findViewById(R.id.create_person_description);
+//            String description = textInputLayout.getEditText().getText().toString();
+
             AppDatabase database = AppDatabase.getInstance(context);
-
-            TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_material_name);
-            String name = nameTextInput.getEditText().getText().toString();
-
-//            TextInputLayout descTextInput = dialogView.findViewById(R.id.create_material_desc);
-//            String desc = descTextInput.getEditText().getText().toString();
-
-            AppCompatSpinner unitSpinner = dialogView.findViewById(R.id.create_material_unit_spinner);
-            int spinner_pos = unitSpinner.getSelectedItemPosition();
-            String unit = Units.ALL_BASE_UNITS.get(spinner_pos).key;
-
-            database.dao().insert(new Material(null, name, null, unit));
+            database.dao().insert(new Person(null, firstName, lastName, MainActivity.FARM_ID));
 
             return null;
         }
@@ -189,17 +200,10 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             new RequestDatabase(context).execute();
-
             Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_ARTICLE);
-            intent.putExtra("receiver", resultReceiver);
+            intent.setAction(SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT);
             context.startService(intent);
         }
-    }
-
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        new RequestDatabase(context).execute();
     }
 
     /**
@@ -226,9 +230,9 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
             dataset.clear();
 
             if (searchText.length() < MIN_SEARCH_SIZE)
-                dataset.addAll(database.dao().selectMaterial());
+                dataset.addAll(database.dao().selectPerson());
             else
-                dataset.addAll(database.dao().searchMaterial("%" + searchText + "%"));
+                dataset.addAll(database.dao().searchPerson("%" + searchText + "%"));
 
             return null;
         }
@@ -236,6 +240,7 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             adapter.notifyDataSetChanged();
         }
     }

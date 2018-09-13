@@ -86,6 +86,7 @@ public interface DAO {
     @Delete void delete(Weather... weather);
     @Delete void delete(Harvest... harvests);
     @Insert void insert(Point... points);
+    @Delete void delete(Equipment... equipment);
 
     @Delete void delete(Intervention intervention);
 
@@ -98,8 +99,9 @@ public interface DAO {
 //    @Transaction @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE start_date < :now AND stop_date > :now")
 //    List<PlotWithCrops> cropsByPlot(long now);
 
-    @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE plot = :uuid")  //AND start_date < :now AND stop_date > :now
-    List<Crop> cropsByPlotUuid(String uuid);  //long now
+//    @Query("SELECT * FROM " +Crop.TABLE_NAME+
+//            " JOIN " +Plot.TABLE_NAME+ " ON " +Plot.COLUMN_UUID+ " = " +Crop.COLUMN_PLOT+ " WHERE plot_uuid = :uuid")  //AND start_date < :now AND stop_date > :now
+//    List<Crop> cropsByPlotUuid(String uuid);  //long now
 
 //    @Query("SELECT DISTINCT production_nature FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId")
 //    List<String> getProductions(String farmId);
@@ -243,6 +245,9 @@ public interface DAO {
 
     @Query("SELECT * FROM "+Equipment.TABLE_NAME+" WHERE " + Equipment.COLUMN_ID_EKY + " IS NULL")
     List<Equipment> getEquipmentWithoutEkyId();
+
+    @Query("SELECT name FROM " + Equipment.TABLE_NAME)
+    List<String> selectEquipmentNames();
 
 
     /**

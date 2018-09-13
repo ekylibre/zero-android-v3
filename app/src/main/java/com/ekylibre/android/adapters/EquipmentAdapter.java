@@ -59,8 +59,11 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
 
         void display(Equipments item) {
             nameTextView.setText(item.equipment.get(0).name);
-            String typeText = Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.equipment.get(0).type));
-            typeTextView.setText(String.format("%s #%s", typeText, item.equipment.get(0).number));
+            StringBuilder sb = new StringBuilder();
+            sb.append(Enums.EQUIMPMENT_NAMES.get(Enums.EQUIMPMENT_TYPES.indexOf(item.equipment.get(0).type)));
+            if (item.equipment.get(0).number != null && !item.equipment.get(0).number.isEmpty())
+                sb.append(String.format(" #%s", item.equipment.get(0).number));
+            typeTextView.setText(sb);
             Integer iconRessource = context.getResources().getIdentifier("tool_" + item.equipment.get(0).type.toLowerCase(), "drawable", context.getPackageName());
             if (iconRessource != 0)
                 iconImageView.setImageResource(iconRessource);

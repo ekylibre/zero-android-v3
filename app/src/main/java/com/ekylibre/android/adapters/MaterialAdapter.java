@@ -126,7 +126,7 @@ public class MaterialAdapter extends RecyclerView.Adapter<MaterialAdapter.ViewHo
 
             ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Units.ALL_BASE_UNITS_L10N);
             unitSpinner.setAdapter(spinnerAdapter);
-            unitSpinner.setSelection(Units.ALL_BASE_UNITS.indexOf(Units.getUnit(item.material.get(0).unit)));
+            unitSpinner.setSelection(Units.ALL_BASE_UNITS.indexOf(Units.getUnit(item.inter.unit)));
 
         }
     }

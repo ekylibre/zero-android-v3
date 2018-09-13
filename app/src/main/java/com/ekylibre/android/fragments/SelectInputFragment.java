@@ -1,4 +1,4 @@
-package com.ekylibre.android;
+package com.ekylibre.android.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,6 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,8 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
+import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.SelectInputAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Fertilizer;

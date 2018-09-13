@@ -1,6 +1,5 @@
 package com.ekylibre.android;
 
-
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -20,7 +19,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,6 +56,11 @@ import com.ekylibre.android.database.pojos.Plots;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
+import com.ekylibre.android.fragments.SelectCropFragment;
+import com.ekylibre.android.fragments.SelectEquipmentFragment;
+import com.ekylibre.android.fragments.SelectInputFragment;
+import com.ekylibre.android.fragments.SelectMaterialFragment;
+import com.ekylibre.android.fragments.SelectPersonFragment;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.DateTools;
@@ -75,6 +78,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static com.ekylibre.android.utils.Utils.decimalFormat;
 import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
 
 
@@ -84,8 +88,6 @@ public class InterventionActivity extends AppCompatActivity implements
         SelectEquipmentFragment.OnFragmentInteractionListener,
         SelectPersonFragment.OnFragmentInteractionListener,
         SelectCropFragment.OnFragmentInteractionListener {
-
-    private static final String TAG = "InterventionActivity";
 
     public static final String CREATED = "created";
     public static final String UPDATED = "updated";
@@ -187,9 +189,12 @@ public class InterventionActivity extends AppCompatActivity implements
             procedure = getIntent().getStringExtra("procedure");
         }
 
-        setTitle(this.getResources().getIdentifier(procedure, "string", this.getPackageName()));
+        setTitle(getResources().getIdentifier(procedure, "string", getPackageName()));
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setLogo(getResources().getIdentifier("procedure_" + procedure.toLowerCase(), "drawable", getPackageName()));
+//        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
-        keyboardManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        keyboardManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
 
         // ================================ LAYOUT ============================================= //
@@ -319,7 +324,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== IRRIGATION EVENTS =================================== //
 
-        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.VOLUME_UNITS_L10N);
+        ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
         irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
 
         if (editIntervention != null) {
@@ -327,9 +332,9 @@ public class InterventionActivity extends AppCompatActivity implements
                 Integer volume = editIntervention.intervention.water_quantity;
                 irrigationQuantityEdit.setText(String.valueOf(volume));
                 Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
-                irrigationUnitSpinner.setSelection(Units.VOLUME_UNITS.indexOf(unit));
+                irrigationUnitSpinner.setSelection(Units.IRRIGATION_UNITS.indexOf(unit));
                 irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                irrigationSummary.setText(String.format(MainActivity.LOCALE, "Volume • %d %s", volume, unit.getName()));
+                irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.getName()));
             }
         }
 
@@ -353,10 +358,10 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override public void afterTextChanged(Editable editable) {
                 if (!editable.toString().equals("0") && editable.length() != 0) {
                     Integer volume = Integer.valueOf(editable.toString());
-                    Unit unit = Units.VOLUME_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition());
+                    Unit unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition());
                     irrigationTotal.setText(composeIrrigationMessage(unit, volume));
                     irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                    irrigationSummary.setText(String.format("Volume • %s %s", volume, unit.name));
+                    irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.name));
                 } else {
                     irrigationTotal.setText(R.string.quantity_cannot_be_null);
                     irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
@@ -370,7 +375,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 String quantityEditText = irrigationQuantityEdit.getText().toString();
                 if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
                     Integer volume = Integer.valueOf(quantityEditText);
-                    Unit unit = Units.VOLUME_UNITS.get(position);
+                    Unit unit = Units.IRRIGATION_UNITS.get(position);
                     irrigationTotal.setText(composeIrrigationMessage(unit, volume));
                 }
             }
@@ -382,7 +387,7 @@ public class InterventionActivity extends AppCompatActivity implements
         if (editIntervention != null) {
             duration = editIntervention.workingDays.get(0).hour_duration;
             date.setTime(editIntervention.workingDays.get(0).execution_date);
-            workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), duration));
+            workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), decimalFormat.format(duration)));
         }
 
         workingPeriodEditDuration.setText(String.valueOf(duration));
@@ -395,7 +400,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 workingPeriodSummary.setVisibility(View.GONE);
                 workingPeriodDetail.setVisibility(View.VISIBLE);
             } else {
-                workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), duration));
+                workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), decimalFormat.format(duration)));
                 workingPeriodArrow.setRotation(0);
                 workingPeriodSummary.setVisibility(View.VISIBLE);
                 workingPeriodDetail.setVisibility(View.GONE);
@@ -415,8 +420,8 @@ public class InterventionActivity extends AppCompatActivity implements
                 else {
                     duration = Float.parseFloat(editText);
                     workingPeriodDurationUnit.setText(getResources().getQuantityString(R.plurals.hours, (int) duration));
-                    keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     workingPeriodEditDuration.clearFocus();
+                    keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 }
             }
             return false;
@@ -515,13 +520,13 @@ public class InterventionActivity extends AppCompatActivity implements
         harvestRecyclerView.setAdapter(harvestAdapter);
 
         harvestAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-           @Override
-           public void onChanged() {
-               if (outputList.size() > 0)
-                   harvestDetail.setVisibility(View.VISIBLE);
-               else
-                   harvestDetail.setVisibility(View.GONE);
-           }
+            @Override
+            public void onChanged() {
+                if (outputList.size() > 0)
+                    harvestDetail.setVisibility(View.VISIBLE);
+                else
+                    harvestDetail.setVisibility(View.GONE);
+            }
         });
 
         harvestAddLabel.setOnClickListener(view -> {
@@ -711,11 +716,21 @@ public class InterventionActivity extends AppCompatActivity implements
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.length() > 0)
-                    weatherSummary.setText(String.format("%s °C", editable.toString()));
-                else
-                    weatherSummary.setText(R.string.not_provided);
+            public void afterTextChanged(Editable temp) {
+                Editable wind = windSpeedEditText.getText();
+                weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
+            }
+        });
+
+        windSpeedEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            @Override
+            public void afterTextChanged(Editable wind) {
+                Editable temp = temperatureEditText.getText();
+                weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
             }
         });
 
@@ -738,6 +753,14 @@ public class InterventionActivity extends AppCompatActivity implements
                 }
             }
         }
+
+        windSpeedEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE){
+                windSpeedEditText.clearFocus();
+                keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+            return false;
+        });
 
         // ================================ DESCRIPTION ======================================== //
 
@@ -780,10 +803,24 @@ public class InterventionActivity extends AppCompatActivity implements
 
     }
 
+    private String weatherSummaryText(String temp, String wind) {
+        StringBuilder sb = new StringBuilder();
+
+        if (temp.isEmpty() && wind.isEmpty()) {
+            sb.append(getText(R.string.not_provided));
+        } else {
+            sb.append(String.format("Temp.: %s °C",
+                    temp.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(temp))));
+            sb.append(String.format(" | vent: %s km/h",
+                    wind.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(wind))));
+        }
+        return sb.toString();
+    }
+
     private String composeIrrigationMessage(Unit unit, Integer volume) {
         String message;
         if (unit.surface_factor == 0) {
-            message = String.format(MainActivity.LOCALE, "Soit %.1f %s par hectare", volume / surface, unit.name);
+            message = String.format("Soit %s %s par hectare", decimalFormat.format(volume / surface), unit.name);
         } else {
             message = String.format(MainActivity.LOCALE,
                     "Soit %.1f %s", volume * surface * unit.surface_factor,
@@ -878,7 +915,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         ++cropCount;
                         if (date.compareTo(culture.start_date) < 0 || date.compareTo(culture.stop_date) >= 0) {
                             cancel(true);
-                            Toast toast = Toast.makeText(context, "La date d'intervention doit correspondre aux dates de la culture !", Toast.LENGTH_LONG);
+                            Toast toast = Toast.makeText(context, R.string.date_not_corresponding_to_crop, Toast.LENGTH_LONG);
                             toast.setGravity(Gravity.BOTTOM, 0, 200);
                             toast.show();
                         }
@@ -887,7 +924,7 @@ public class InterventionActivity extends AppCompatActivity implements
             }
             if (cropCount == 0) {
                 cancel(true);
-                Toast toast = Toast.makeText(context, "Vous devez sélectionner au moins une culture !", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(context, R.string.you_have_to_select_a_crop, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 200);
                 toast.show();
             }
@@ -900,7 +937,7 @@ public class InterventionActivity extends AppCompatActivity implements
                             if (input instanceof Phytos) {
                                 if (((Phytos) input).inter.quantity <= 0) {
                                     cancel(true);
-                                    Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour le produit !", Toast.LENGTH_LONG);
+                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_quantity, Toast.LENGTH_LONG);
                                     toast.setGravity(Gravity.BOTTOM, 0, 200);
                                     toast.show();
                                 }
@@ -908,7 +945,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         }
                     } else {
                         cancel(true);
-                        Toast toast = Toast.makeText(context, "Vous devez ajouter au moins un produit phytosanitaire !", Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(context, R.string.you_have_to_enter_phyto, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.BOTTOM, 0, 200);
                         toast.show();
                     }
@@ -924,7 +961,7 @@ public class InterventionActivity extends AppCompatActivity implements
                                     productionNature.add(crop.specie);
                                 } else {
                                     cancel(true);
-                                    Toast toast = Toast.makeText(context, "Vous ne pouvez pas semer sur des productions de natures différentes !", Toast.LENGTH_LONG);
+                                    Toast toast = Toast.makeText(context, R.string.implantation_have_to_be_on_same_crop_nature, Toast.LENGTH_LONG);
                                     toast.setGravity(Gravity.BOTTOM, 0, 200);
                                     toast.show();
                                     break outerLoop;
@@ -938,7 +975,7 @@ public class InterventionActivity extends AppCompatActivity implements
                             if (input instanceof Seeds) {
                                 if (((Seeds) input).inter.quantity <= 0) {
                                     cancel(true);
-                                    Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour la semence !", Toast.LENGTH_LONG);
+                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_seed_quantity, Toast.LENGTH_LONG);
                                     toast.setGravity(Gravity.BOTTOM, 0, 200);
                                     toast.show();
                                 }
@@ -946,7 +983,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         }
                     } else {
                         cancel(true);
-                        Toast toast = Toast.makeText(context, "Vous devez ajouter au moins une semence !", Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(context, R.string.you_must_select_seed, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.BOTTOM, 0, 200);
                         toast.show();
                     }
@@ -958,7 +995,7 @@ public class InterventionActivity extends AppCompatActivity implements
                             if (input instanceof Fertilizers) {
                                 if (((Fertilizers) input).inter.quantity <= 0) {
                                     cancel(true);
-                                    Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour le produit !", Toast.LENGTH_LONG);
+                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_a_product_quantity, Toast.LENGTH_LONG);
                                     toast.setGravity(Gravity.BOTTOM, 0, 200);
                                     toast.show();
                                 }
@@ -966,7 +1003,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         }
                     } else {
                         cancel(true);
-                        Toast toast = Toast.makeText(context, "Vous devez ajouter au moins un produit phytosanitaire !", Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(context, R.string.you_must_select_a_fertilizer, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.BOTTOM, 0, 200);
                         toast.show();
                     }
@@ -975,7 +1012,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 case App.IRRIGATION:
                     if (irrigationQuantityEdit.getText().toString().equals("0") || irrigationQuantityEdit.getText().toString().isEmpty()) {
                         cancel(true);
-                        Toast toast = Toast.makeText(context, "Vous devez rentrer le volume d'eau utilisé !", Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(context, R.string.you_must_enter_a_water_volume, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.BOTTOM, 0, 200);
                         toast.show();
                     }
@@ -986,14 +1023,14 @@ public class InterventionActivity extends AppCompatActivity implements
                         for (Harvest harvest : outputList) {
                             if (harvest.quantity == null || harvest.quantity <= 0) {
                                 cancel(true);
-                                Toast toast = Toast.makeText(context, "Vous devez rentrer une quantité pour la récolte !", Toast.LENGTH_LONG);
+                                Toast toast = Toast.makeText(context, R.string.you_must_enter_harvest_quantity, Toast.LENGTH_LONG);
                                 toast.setGravity(Gravity.BOTTOM, 0, 200);
                                 toast.show();
                             }
                         }
                     } else {
                         cancel(true);
-                        Toast toast = Toast.makeText(context, "Vous devez ajouter un chargement pour créer une récolte !", Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(context, R.string.you_must_create_a_harvest_load, Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.BOTTOM, 0, 200);
                         toast.show();
                     }
@@ -1053,7 +1090,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
             if (procedure.equals(App.IRRIGATION)) {
                 intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
-                intervention.setWater_unit(Units.VOLUME_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
+                intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
             }
 
             String comment = descriptionEditText.getText().toString();
@@ -1109,9 +1146,9 @@ public class InterventionActivity extends AppCompatActivity implements
             }
 
             for (Plots plot : plotList) {
-                    for (Crop crop : plot.crops)
-                        if (crop.is_checked)
-                            database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
+                for (Crop crop : plot.crops)
+                    if (crop.is_checked)
+                        database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
             }
 
             for (Harvest harvest : outputList) {
@@ -1269,7 +1306,7 @@ public class InterventionActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.action_delete_intervention:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Etes-vous sûr de vouloir supprimer l'intervention ?");
+                builder.setMessage(R.string.confirm_deleting_intervention);
                 builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
                 builder.setPositiveButton("oui", (dialog, i) -> {
                     if (!editIntervention.intervention.status.equals(VALIDATED)) {

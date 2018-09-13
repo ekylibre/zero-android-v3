@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
-import com.ekylibre.android.SelectCropFragment;
+import com.ekylibre.android.fragments.SelectCropFragment;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.pojos.Plots;
 import com.mapbox.api.staticmap.v1.MapboxStaticMap;
@@ -27,7 +27,6 @@ import java.util.List;
 import timber.log.Timber;
 
 import static com.mapbox.api.staticmap.v1.StaticMapCriteria.LIGHT_STYLE;
-import static com.mapbox.api.staticmap.v1.StaticMapCriteria.SATELLITE_STYLE;
 
 
 public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.ViewHolder> {

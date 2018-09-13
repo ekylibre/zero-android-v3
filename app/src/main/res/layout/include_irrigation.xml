@@ -100,7 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/volume_cannot_be_null"
-        android:textColor="@color/warning"
+        android:textColor="@color/error"
         app:layout_constraintTop_toBottomOf="@id/irrigation_quantity_label"
         app:layout_constraintStart_toStartOf="@id/irrigation_quantity_edit"/>
 

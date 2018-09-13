@@ -8,8 +8,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,24 +23,22 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// TODO: Important ! --> Path to change according to flavor
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
+
 import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
-import com.ekylibre.android.network.EkylibreAPI;
-import com.ekylibre.android.network.ServiceGenerator;
-import com.ekylibre.android.network.pojos.AccessToken;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
+import com.ekylibre.android.utils.Utils;
 
-import java.io.IOException;
+import com.jakewharton.processphoenix.ProcessPhoenix;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,7 +46,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit2.Call;
 import timber.log.Timber;
 
 
@@ -97,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         Enums.buildEnumsTranslation(this);
 
         // Get shared preferences and set title
-        prefs = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        prefs = getSharedPreferences("prefs", MODE_PRIVATE);
         setTitle(prefs.getString("current-farm-name", "No name"));
 
         // Get current farm_id
@@ -168,7 +165,8 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             if (App.isOnline(this))
-                new StartSync(SyncService.ACTION_SYNC_ALL).execute();
+                new PerformSyncWithFreshToken(this,
+                        SyncService.ACTION_SYNC_ALL, resultReceiver).execute();
             else {
                 Toast toast = Toast.makeText(this, "Vous n'êtes pas connecté à internet. Veuillez essayer plus tard.", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 200);
@@ -177,36 +175,14 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             }
         });
 
-        // Run a get Sync on startup
-        new StartSync(SyncService.FIRST_TIME_SYNC).execute();
-
-//        if (!prefs.getBoolean("showcase-passed", false)) {
-//            SharedPreferences.Editor editor = prefs.edit();
-//            editor.putBoolean("showcase-passed", true);
-//            editor.apply();
-//            new FancyShowCaseView.Builder(this)
-//                    .focusOn(menuLayout).title("Pour démarrer, c'est ici !")
-//                    .focusShape(FocusShape.ROUNDED_RECTANGLE).roundRectRadius(1)
-//                    .disableFocusAnimation().build().show();}
+        if (App.isOnline(this))
+            new PerformSyncWithFreshToken(this,
+                    SyncService.FIRST_TIME_SYNC, resultReceiver).execute();
 
 //        BottomNavigationView navigation = findViewById(R.id.navigation);
 //        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
     }
-
-//    private void startSync(String action) {
-//        if (!swipeRefreshLayout.isRefreshing())
-//            swipeRefreshLayout.setRefreshing(true);
-//        if (new StartSync().execute()) {
-//            Intent intent = new Intent(this, SyncService.class);
-//            intent.setAction(action);
-//            intent.putExtra("receiver", resultReceiver);
-//            startService(intent);
-//        } else {
-//            if (swipeRefreshLayout.isRefreshing())
-//                swipeRefreshLayout.setRefreshing(false);
-//        }
-//    }
 
     @Override
     protected void onResume() {
@@ -239,11 +215,19 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Add the menubar (top right) with disconnect option
-        String ver = "Version " + BuildConfig.VERSION_NAME + (BuildConfig.DEBUG ? " [debug]" : null);
+        String ver = "Version " + BuildConfig.VERSION_NAME + (BuildConfig.DEBUG ? " [debug]" : "");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.appbar, menu);
         menu.add(0, Menu.FIRST, Menu.NONE, ver).setEnabled(false);
         return true;
+    }
+
+    public class DeleteDatabaseAsync extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            AppDatabase.getInstance(getApplicationContext()).clearAllTables();
+            return null;
+        }
     }
 
     @Override
@@ -251,19 +235,26 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_logout:
-                AppDatabase.revokeInstance();
-                deleteDatabase("db");
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.clear();
-                editor.apply();
-//                editor.remove("is_authenticated");
-//                editor.remove("access_token");
-//                editor.remove("refresh_token");
-//                editor.remove("current-farm-name");
-//                editor.remove("current-farm-id");
-//                editor.apply();
-                startActivity(new Intent(this, LoginActivity.class));
-                finish();
+
+                Context context = swipeRefreshLayout.getContext();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(R.string.disconnect_prompt);
+                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
+
+                    new DeleteDatabaseAsync().execute();
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.clear();
+
+                    if (!editor.commit())
+                        Timber.i("Erreur de déconnection");
+
+                    Utils.sleep(2000);
+                    ProcessPhoenix.triggerRebirth(this);
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
                 return true;
 
             case R.id.action_crop:
@@ -278,14 +269,16 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     @Override
     public void onReceiveResult(int resultCode, Bundle bundle) {
 
-        swipeRefreshLayout.setRefreshing(false);
+        if (swipeRefreshLayout.isRefreshing())
+            swipeRefreshLayout.setRefreshing(false);
 
         if (resultCode == SyncService.DONE) {
             Timber.i("Synchronization done");
             lastSyncTime = new Date();
             prefs.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
             new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
-        } else if (resultCode == SyncService.FAILED) { //R.string.sync_failure
+        }
+        else if (resultCode == SyncService.FAILED) { //R.string.sync_failure
             String message = bundle.getString("message");
             Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
@@ -401,111 +394,4 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             }
         }
     }
-
-    /**
-     * Verify token validity. Ask for new one if expired.
-     */
-
-    public class StartSync extends AsyncTask<Void, Void, Boolean> {
-
-        String action;
-
-        StartSync(String action) {
-            this.action = action;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            if (!swipeRefreshLayout.isRefreshing())
-                swipeRefreshLayout.setRefreshing(true);
-
-            if (App.API_URL == null) {
-                App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
-                App.OAUTH_CLIENT_ID = getString(getResources().getIdentifier("client_id", "string", getPackageName()));
-                App.OAUTH_CLIENT_SECRET = getString(getResources().getIdentifier("client_secret", "string", getPackageName()));
-            }
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-
-            long tokenTime = (long) prefs.getInt("token_created_at", 0) * 1000;
-            long now = new Date().getTime();
-
-            if (now - tokenTime >= 7000000) {
-
-                // Handle Handshake Errors
-                try {
-                    ProviderInstaller.installIfNeeded(getBaseContext());
-                } catch (GooglePlayServicesRepairableException e) {
-                    Timber.e("GooglePlayServicesRepairableException");
-                    GoogleApiAvailability.getInstance().showErrorNotification(getBaseContext(), e.getConnectionStatusCode());
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Timber.e("GooglePlayServicesNotAvailableException");
-                }
-
-                Timber.i("Last Token created %s seconds ago", (new Date().getTime() - tokenTime) / 1000);
-
-                AccessToken token = new AccessToken();
-                token.setAccess_token(prefs.getString("access_token", ""));
-                token.setRefresh_token(prefs.getString("refresh_token", ""));
-                token.setToken_type("bearer");
-
-                EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class, token);
-                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(App.OAUTH_CLIENT_ID, App.OAUTH_CLIENT_SECRET, token.getRefresh_token(), "refresh_token");
-
-                try {
-                    retrofit2.Response<AccessToken> response = call.execute();
-                    if (response.isSuccessful()) {
-                        AccessToken responseToken = response.body();
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("access_token", responseToken.getAccess_token());
-                        editor.putString("refresh_token", responseToken.getRefresh_token());
-                        editor.putInt("token_created_at", responseToken.getCreated_at());
-                        editor.apply();
-                        return true;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                Timber.i("Token is up to date");
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-
-            if (aBoolean) {
-                Intent intent = new Intent(getBaseContext(), SyncService.class);
-                intent.setAction(action);
-                intent.putExtra("receiver", resultReceiver);
-                startService(intent);
-            } else {
-                if (swipeRefreshLayout.isRefreshing())
-                    swipeRefreshLayout.setRefreshing(false);
-            }
-        }
-    }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
-            = item -> {
-        switch (item.getItemId()) {
-            case R.id.navigation_home:
-                return true;
-            case R.id.navigation_dashboard:
-                return true;
-            case R.id.navigation_notifications:
-                return true;
-        }
-        return false;
-    };
-
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ekylibre.android.SelectMaterialFragment"
+    tools:context="com.ekylibre.android.fragments.SelectMaterialFragment"
     android:background="@color/background">
 
     <android.support.design.widget.AppBarLayout
@@ -16,8 +16,8 @@
             android:layout_height="wrap_content"
             app:title="Sélectionnez un matériau"
             app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
-            app:titleTextColor="@color/white"
-            android:background="@color/accent"/>
+            app:titleTextColor="@color/dialogTitleColor"
+            android:background="@color/dialogColor"/>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.SearchView
@@ -36,7 +36,7 @@
         android:layout_marginBottom="16dp"
         android:text="@string/create_new_material"
         android:textAllCaps="true"
-        android:textColor="@color/accent"
+        android:textColor="@color/createText"
         android:visibility="visible"/>
 
     <android.support.v7.widget.RecyclerView

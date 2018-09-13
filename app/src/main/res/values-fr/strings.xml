@@ -247,7 +247,7 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Mot de passe</string>
     <string name="action_sign_in">Connexion</string>
-    <string name="menu_logout">Se déconnecter</string>
+    <string name="menu_logout">Me déconnecter</string>
     <string name="cancel">Annuler</string>
     <string name="validate">Valider</string>
     <string name="delete">Supprimer</string>
@@ -357,8 +357,28 @@
     <string name="mooving">Déplacements</string>
     <string name="intervention">Intervention</string>
     <string name="notes">Notes</string>
+    <string name="no_connexion_try_again">Vous n\'êtes pas connecté à internet. Veuillez essayer plus tard.</string>
+    <string name="date_not_corresponding_to_crop">La date d\'intervention doit correspondre aux dates de la culture !</string>
+    <string name="you_have_to_select_a_crop">Vous devez sélectionner au moins une culture !</string>
+    <string name="you_have_to_enter_quantity">Vous devez rentrer une quantité pour le produit !</string>
+    <string name="you_have_to_enter_phyto">Vous devez ajouter au moins un produit phytosanitaire !</string>
+    <string name="implantation_have_to_be_on_same_crop_nature">Vous ne pouvez pas semer sur des productions de natures différentes !</string>
+    <string name="you_have_to_enter_seed_quantity">Vous devez rentrer une quantité pour la semence !</string>
+    <string name="you_must_select_seed">Vous devez ajouter au moins une semence !</string>
+    <string name="you_have_to_enter_a_product_quantity">Vous devez rentrer une quantité pour le produit !</string>
+    <string name="you_must_select_a_fertilizer">Vous devez ajouter au moins un produit fertilisant !</string>
+    <string name="you_must_enter_a_water_volume">Vous devez rentrer le volume d\'eau utilisé !</string>
+    <string name="you_must_enter_harvest_quantity">Vous devez rentrer une quantité pour la récolte !</string>
+    <string name="you_must_create_a_harvest_load">Vous devez ajouter un chargement pour créer une récolte !</string>
+    <string name="confirm_deleting_intervention">Etes-vous sûr de vouloir supprimer l\'intervention ?</string>
+    <string name="start_online_with_crops">Vous n\'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !</string>
     <string name="title">Titre</string>
     <string name="first_name">Prénom</string>
     <string name="last_name">Nom de famille</string>
+    <string name="equipment_name_not_available">Ce nom d\'équipement est déjà utilisé. Veuillez en choisir un autre</string>
+    <string name="equipment_name_is_empty">Le nom de l\'équipement ne peut être vide</string>
+    <string name="disconnect_prompt">Est-vous sûr de vouloir vous déconnecter ? Toutes données non synchronisées seront perdues.</string>
+    <string name="my_cultures">Mes cultures</string>
+    <string name="unknown_login_failure">Désolé, une erreur inconnue s\'est produite, veuillez contacter le support.</string>
 
 </resources>

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ekylibre.android.R;
-import com.ekylibre.android.SelectMaterialFragment;
+import com.ekylibre.android.fragments.SelectMaterialFragment;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.relations.InterventionMaterial;

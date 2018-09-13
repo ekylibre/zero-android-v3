@@ -1,4 +1,4 @@
-package com.ekylibre.android;
+package com.ekylibre.android.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +14,8 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
+import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.SelectCropAdapter;
 import com.ekylibre.android.database.pojos.Plots;
 

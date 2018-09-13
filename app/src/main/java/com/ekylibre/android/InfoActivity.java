@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.ekylibre.android.adapters.CropInfo.CropItem;
@@ -30,16 +29,15 @@ import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.SimpleInterventions;
+import com.ekylibre.android.fragments.InfoFragment;
 import com.ekylibre.android.services.LocationService;
 import com.ekylibre.android.services.OneShotLocationIntentService;
 import com.ekylibre.android.services.ServiceResultReceiver;
-import com.ekylibre.android.utils.Converters;
+import com.ekylibre.android.database.converters.Converters;
 import com.ekylibre.android.utils.RecyclerViewClickListener;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.mapbox.turf.TurfConstants;
-import com.mapbox.turf.TurfMeasurement;
 
 import java.util.ArrayList;
 import java.util.Calendar;

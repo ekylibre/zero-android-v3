@@ -2,7 +2,6 @@ package com.ekylibre.android.database.models;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
@@ -12,22 +11,23 @@ import com.mapbox.geojson.Polygon;
 import java.util.Date;
 
 
-@Entity(tableName = Crop.TABLE_NAME, foreignKeys = {
-
-    @ForeignKey(entity = Plot.class,
-            parentColumns = Plot.COLUMN_UUID,
-            childColumns = Crop.COLUMN_PLOT),
+//        foreignKeys = {
+//        @ForeignKey(
+//                entity = Plot.class,
+//                parentColumns = Plot.COLUMN_UUID,
+//                childColumns = Crop.COLUMN_PLOT),
 
 //    @ForeignKey(entity = Farm.class,
 //            parentColumns = Farm.COLUMN_ID,
 //            childColumns = Crop.COLUMN_FARM)
-})
+//}
+@Entity(tableName = Crop.TABLE_NAME)
 public class Crop {
 
     public static final String TABLE_NAME = "crops";
     public static final String COLUMN_UUID = "crop_uuid";
     public static final String COLUMN_FARM = "farm";
-    public static final String COLUMN_PLOT = "plot";
+    public static final String COLUMN_PLOT = "plot_uuid";
 
     @NonNull
     @PrimaryKey
@@ -57,8 +57,8 @@ public class Crop {
 
     public Date stop_date;
 
-    @ColumnInfo(name = COLUMN_PLOT, index = true)
-    public String plot;
+    @ColumnInfo(name = COLUMN_PLOT)
+    public String plot_uuid;
 
     @ColumnInfo(name = COLUMN_FARM, index = true)
     public String farm;
@@ -72,7 +72,7 @@ public class Crop {
     public Crop(@NonNull String uuid, String name, String specie, String production_nature,
                 String production_mode, String production_output, String provisional_yield,
                 Polygon shape, float surface_area, String centroid, Date start_date, Date stop_date,
-                String plot, String farm) {
+                String plot_uuid, String farm) {
 
         this.uuid = uuid;
         this.name = name;
@@ -86,7 +86,7 @@ public class Crop {
         this.centroid = centroid;
         this.start_date = start_date;
         this.stop_date = stop_date;
-        this.plot = plot;
+        this.plot_uuid = plot_uuid;
         this.farm = farm;
         this.is_checked = false;
         this.work_area_percentage = 100;

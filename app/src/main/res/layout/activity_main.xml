@@ -149,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/IMPLANTATION"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
             </android.support.v7.widget.LinearLayoutCompat>
@@ -180,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/GROUND_WORK"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
             </android.support.v7.widget.LinearLayoutCompat>
@@ -211,7 +211,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/IRRIGATION"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
             </android.support.v7.widget.LinearLayoutCompat>
@@ -243,7 +243,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/HARVEST"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
             </android.support.v7.widget.LinearLayoutCompat>
@@ -275,7 +275,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/CARE"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
             </android.support.v7.widget.LinearLayoutCompat>
@@ -307,7 +307,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/FERTILIZATION"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1"/>
             </android.support.v7.widget.LinearLayoutCompat>
@@ -339,7 +339,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center|bottom"
                     android:text="@string/CROP_PROTECTION"
-                    android:textColor="@color/white"
+                    android:textColor="@color/procedure_menu_text"
                     app:autoSizeTextType="uniform"
                     android:lines="1" />
             </android.support.v7.widget.LinearLayoutCompat>
