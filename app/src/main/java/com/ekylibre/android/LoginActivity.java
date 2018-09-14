@@ -289,6 +289,7 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         authTask = null;
                         showDialog(false);
+                        Timber.e(response.message());
                         Snackbar.make(findViewById(R.id.login_layout),
                                 R.string.login_failure, Snackbar.LENGTH_LONG).show();
                     }

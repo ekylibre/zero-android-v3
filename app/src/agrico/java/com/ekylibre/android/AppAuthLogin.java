@@ -338,13 +338,19 @@ public class AppAuthLogin extends AppCompatActivity {
             authService = new AuthorizationService(this);
 
         AuthState.AuthStateAction action = (accessToken, idToken, ex) -> {
-            if (authState.getLastTokenResponse() != null || authState.getAuthorizationException() != null) {
-                authState = authStateManager.updateAfterTokenResponse(authState.getLastTokenResponse(), authState.getAuthorizationException());
-                Timber.i(ex, "New token = %s", accessToken);
-                startApp();
-            } else {
+            Timber.i("TokenResponse = %s", authState.getLastTokenResponse().accessToken);
+            Timber.e(ex, "Exception");
+
+            if (ex == null) {
+                if (authState.getLastTokenResponse() != null) {
+                    authState = authStateManager.updateAfterTokenResponse(authState.getLastTokenResponse(), ex);
+                    startApp();
+                } else
+                    configureAuthService();
+            } else
                 configureAuthService();
-            }
+
+
         };
 
         ClientAuthentication clientAuth = new ClientSecretPost(CLIENT_SECRET);

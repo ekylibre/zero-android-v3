@@ -21,7 +21,7 @@ import timber.log.Timber;
 
 public class GraphQLClient {
 
-    private static final int TIME_OUT = 10000;
+    private static final int TIME_OUT = 30000;  // 30 sec timout !
     private static OkHttpClient okHttpClient;
 
     // get the instance of apollo client with all the headers and correct url

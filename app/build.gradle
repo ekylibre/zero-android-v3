@@ -2,25 +2,34 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.apollographql.android'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias key_alias
+            keyPassword store_password
+            storeFile file(store_path)
+            storePassword store_password
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.ekylibre.android"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 9
-        versionName "0.9.6"
+        versionCode 10
+        versionName "0.9.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
         manifestPlaceholders = [
                 'appAuthRedirectScheme': 'agrico'
         ]
-        resValue 'string', 'mapbox_token', '"pk.eyJ1IjoibGludXhpcGhvIiwiYSI6ImNqamZwbjV5aDM0bXQzcW8zamRsY3N5ZGcifQ.D3bVCNhekyQLq4cy5JffAQ"'
+        resValue 'string', 'mapbox_token', mapbox_token
 //        javaCompileOptions {
 //            annotationProcessorOptions {
 //                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
 //            }
 //        }
+        signingConfig signingConfigs.config
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -30,10 +39,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "API_URL", '"https://api.ekylibre.com"'
+            buildConfigField "String", "API_URL", eky_api_url
+            debuggable true
         }
         debug {
-            buildConfigField "String", "API_URL", '"https://ekylibre-test.com"'
+            buildConfigField "String", "API_URL", eky_debug_api_url
         }
     }
     flavorDimensions "version"
@@ -44,9 +54,10 @@ android {
             versionNameSuffix "-eky"
             buildConfigField 'boolean', 'IS_AGRICO', 'false'
             ext {
-                client_id = [debug: "e31cb2014a4604ff169b08ab171715a290bd2b24f7b0409a8cc428c75a2f3b75", release: "a95a0450e0a79c21b4d0b8992a4da7aad5bbce5c0c529295d6d78bc197591020"]
-                client_secret = [debug: "aa33d1f551329fc8504e2d860767428d500418132c64f746afcc9fc160476293", release: "1a0f31cd06d306f4a184e5e4cd82903f39074ba1fa2e5e84c1f0566afd26a70b"]
+                client_id = [debug: eky_debug_client_id, release: eky_client_id]
+                client_secret = [debug: eky_debug_client_secret, release: eky_client_secret]
             }
+            signingConfig signingConfigs.config
         }
         agrico {
             dimension "version"
@@ -54,10 +65,11 @@ android {
             versionNameSuffix "-agrico"
             buildConfigField 'boolean', 'IS_AGRICO', 'true'
             ext {
-                client_id = [debug: "1_4i9aq3clcsysos8c4k8so8kgw4g80w4okc80sowwc0w0ccscwo", release: "2_5vj3h0spce800484o4o08ws4488gcsgkwo4gcs0ocswo800sgk"]
-                client_secret = [debug: "5uc7natireo0kksc40s4gs08cow4cgs004cwsw0co4o8so0ksk", release: "4vxjutk8kzs4wowggw040ogg8gw48k4wocw84cgco8g8kggkcw"]
-                api_agrico = [debug: "https://ekylibre:ek1l1bre@preprod.agriconomie.com", release: "https://www.agriconomie.com"]
+                client_id = [debug: agrico_debug_client_id, release: agrico_client_id]
+                client_secret = [debug: agrico_debug_client_secret, release: agrico_client_secret]
+                api_agrico = [debug: agrico_debug_api_url, release: agrico_api_url]
             }
+            signingConfig signingConfigs.config
         }
     }
     applicationVariants.all { variant ->
@@ -77,17 +89,18 @@ apollo {
     customTypeMapping['Point'] = "com.mapbox.geojson.Point"
 }
 
+ext.supportLibraryVersion = "27.1.1"
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Support libraries
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:exifinterface:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support:support-fragment:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:support-vector-drawable:27.1.1'
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:exifinterface:$supportLibraryVersion"
+    implementation "com.android.support:design:$supportLibraryVersion"
+    implementation "com.android.support:support-v4:$supportLibraryVersion"
+    implementation "com.android.support:support-fragment:$supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    implementation "com.android.support:support-vector-drawable:$supportLibraryVersion"
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     // Test libraries
     testImplementation 'junit:junit:4.12'
