@@ -380,5 +380,6 @@
     <string name="disconnect_prompt">Est-vous sûr de vouloir vous déconnecter ? Toutes données non synchronisées seront perdues.</string>
     <string name="my_cultures">Mes cultures</string>
     <string name="unknown_login_failure">Désolé, une erreur inconnue s\'est produite, veuillez contacter le support.</string>
+    <string name="no_internet">Vous devez être connecté à internet pour vous identifier la première fois.</string>
 
 </resources>

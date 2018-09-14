@@ -12,6 +12,7 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+
 import com.ekylibre.android.DeleteInterMutation;
 import com.ekylibre.android.FarmQuery;
 import com.ekylibre.android.InterventionActivity;
@@ -75,7 +76,6 @@ import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.OperatorRoleEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
-import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 
 import java.util.ArrayList;
@@ -123,10 +123,6 @@ public class SyncService extends IntentService {
         database = AppDatabase.getInstance(this);
 
         apolloClient = GraphQLClient.getApolloClient(accessToken);
-
-        if (App.API_URL == null) {
-            App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
-        }
 
         // Route action to function
         switch (ACTION) {
@@ -399,7 +395,7 @@ public class SyncService extends IntentService {
                                     if (article != null) {
                                         material.eky_id = Integer.valueOf(article.id());
                                         database.dao().insert(material);
-                                        Timber.i("Custom fertilizer #%s successfully created", article.id());
+                                        Timber.i("Custom material #%s successfully created", article.id());
                                         if (ACTION.equals(ACTION_CREATE_ARTICLE))
                                             receiver.send(DONE, new Bundle());
                                     }}}}}
@@ -412,8 +408,6 @@ public class SyncService extends IntentService {
                 });
             }
         }
-
-
     }
 
 
@@ -719,6 +713,8 @@ public class SyncService extends IntentService {
                 }
 
                 for (Materials material : createInter.materials) {
+
+                    Timber.i("Material unit--> %s", material.inter.unit);
                     InterventionArticleAttributes.Builder articleBuilder = InterventionArticleAttributes.builder();
 
                     inputs.add(InterventionInputAttributes.builder()

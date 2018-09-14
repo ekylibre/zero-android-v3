@@ -36,6 +36,7 @@ import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -351,12 +352,12 @@ public class SelectInputFragment extends DialogFragment implements ServiceResult
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             new RequestDatabase(context).execute();
-            Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_ARTICLE);
-            intent.putExtra("receiver", resultReceiver);
-            //intent.putExtra("createdPhytoId", createdPhytoId);
-            context.startService(intent);
+
+            if (App.isOnline(context))
+                new PerformSyncWithFreshToken(context,
+                        SyncService.ACTION_CREATE_ARTICLE, resultReceiver).execute();
         }
     }
 

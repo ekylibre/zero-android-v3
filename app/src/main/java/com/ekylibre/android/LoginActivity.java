@@ -49,13 +49,13 @@ import javax.annotation.Nonnull;
 
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask authTask = null;
     private boolean startingApp = false;
     private AccessToken accessToken;
     private SharedPreferences sharedPreferences = null;
+
+    private static final String CLIENT_ID = BuildConfig.CLIENT_ID;
+    private static final String CLIENT_SECRET = BuildConfig.CLIENT_SECRET;
 
     // UI references.
     private TextInputLayout emailView, passwordView;
@@ -65,11 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        App.API_URL = getString(getResources().getIdentifier("api_url", "string", getPackageName()));
-        App.OAUTH_CLIENT_ID = BuildConfig.CLIENT_ID;
-        App.OAUTH_CLIENT_SECRET = BuildConfig.CLIENT_SECRET;
-
-        sharedPreferences = this.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
 
         if (sharedPreferences.getBoolean("is_authenticated", false)) {
             Timber.i("=========== IS AUTHENTICATED ===========");
@@ -94,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
 
             // Display app version on page
             AppCompatTextView appVersion = findViewById(R.id.app_version);
-            appVersion.setText(BuildConfig.VERSION_NAME + String.format("%s", BuildConfig.DEBUG ? " [debug]" : "" ));
+            appVersion.setText(String.format("%s %s", BuildConfig.VERSION_NAME, BuildConfig.DEBUG ? " [debug]" : "" ));
 
             EditText passEditText = passwordView.getEditText();
             Objects.requireNonNull(passEditText).setOnEditorActionListener((textView, id, keyEvent) -> {
@@ -109,9 +105,14 @@ public class LoginActivity extends AppCompatActivity {
 
             Button signInButton = findViewById(R.id.sign_in_button);
             signInButton.setOnClickListener(view -> {
-                authTask = null;
-                hideKeyboard();
-                attemptLogin();
+                if (App.isOnline(this)) {
+                    authTask = null;
+                    hideKeyboard();
+                    attemptLogin();
+                } else {
+                    Snackbar.make(findViewById(R.id.login_layout),
+                            R.string.no_internet, Snackbar.LENGTH_LONG).show();
+                }
             });
         }
     }
@@ -126,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startApp() {
         startingApp = true;
-        Timber.e("=========== START MAIN ACTIVITY ===========");
+        Timber.i("=========== START MAIN ACTIVITY ===========");
         showDialog(false);
         authTask = null;
         Intent intent = new Intent(this, MainActivity.class);
@@ -139,7 +140,6 @@ public class LoginActivity extends AppCompatActivity {
             dialog = new ProgressDialog(this);
             dialog.setMessage(getString(R.string.authenticating));
         }
-        Timber.i("Dialog window --> %s", dialog);
         if (yes && !dialog.isShowing()) {
             dialog.show();
         } else if (dialog.isShowing()) {
@@ -205,11 +205,8 @@ public class LoginActivity extends AppCompatActivity {
 
             EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class);
 
-            Timber.i("Client id -> %s", BuildConfig.CLIENT_ID);
-            Timber.i("Client secret -> %s", BuildConfig.CLIENT_SECRET);
-
-            Call<AccessToken> call = ekylibreAPI.getNewAccessToken(BuildConfig.CLIENT_ID,
-                    BuildConfig.CLIENT_SECRET, App.OAUTH_GRANT_TYPE, email, password, App.OAUTH_SCOPE);
+            Call<AccessToken> call = ekylibreAPI.getNewAccessToken(CLIENT_ID, CLIENT_SECRET,
+                    App.OAUTH_GRANT_TYPE, email, password, App.OAUTH_SCOPE);
 
             call.enqueue(new retrofit2.Callback<AccessToken>() {
                 @Override

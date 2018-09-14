@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme"
         android:icon="@drawable/icon_agrico">
 
-        <activity android:name="com.agriconomie.android.AppAuthLogin"
+        <activity android:name=".AppAuthLogin"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,7 +17,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.agriconomie.android.HANDLE_AUTHORIZATION_RESPONSE"/>
+                <action android:name="com.ekylibre.android.HANDLE_AUTHORIZATION_RESPONSE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>

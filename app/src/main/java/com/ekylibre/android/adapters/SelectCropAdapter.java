@@ -145,7 +145,8 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                         .build();
                 String imageUrl = staticImage.url().toString();
                 Timber.i(imageUrl);
-                Picasso.get().load(imageUrl).into(cropMap);
+                Picasso.get().load(imageUrl)
+                        .placeholder(R.drawable.icon_parcel).into(cropMap);
 
                 cropCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     // Save action (checked/unchecked) to dataset item crop and update total

@@ -1,7 +1,6 @@
 package com.ekylibre.android.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +27,8 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.App;
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 import com.ekylibre.android.utils.Units;
 
 import java.util.ArrayList;
@@ -35,8 +36,6 @@ import java.util.Objects;
 
 
 public class SelectMaterialFragment extends DialogFragment implements ServiceResultReceiver.Receiver {
-
-    private static final String TAG = SelectMaterialFragment.class.getName();
 
     private static final int MIN_SEARCH_SIZE = 2;
 
@@ -189,12 +188,11 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             new RequestDatabase(context).execute();
 
-            Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_ARTICLE);
-            intent.putExtra("receiver", resultReceiver);
-            context.startService(intent);
+            if (App.isOnline(context))
+                new PerformSyncWithFreshToken(context, SyncService.ACTION_CREATE_ARTICLE, resultReceiver).execute();
         }
     }
 

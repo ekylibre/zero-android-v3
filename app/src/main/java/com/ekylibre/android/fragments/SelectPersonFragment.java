@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -27,6 +28,8 @@ import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.App;
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,7 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
     private Context context;
 
     private OnFragmentInteractionListener fragmentListener;
+    private ServiceResultReceiver resultReceiver;
     private RecyclerView.Adapter adapter;
     private TextView createPerson;
 
@@ -59,6 +63,9 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
         this.context = getActivity();
         this.dataset = new ArrayList<>();
         this.searchText = "";
+
+        resultReceiver = new ServiceResultReceiver(new Handler());
+        resultReceiver.setReceiver(this);
     }
 
     @Override
@@ -199,10 +206,13 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             new RequestDatabase(context).execute();
-            Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT);
-            context.startService(intent);
+
+            if (App.isOnline(context))
+                new PerformSyncWithFreshToken(context,
+                        SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT, resultReceiver).execute();
+
         }
     }
 

@@ -21,6 +21,9 @@ public class ServiceGenerator {
     private static OkHttpClient.Builder httpClient;
     private static Retrofit.Builder builder;
     private static AccessToken mToken;
+    private static final String API_URL = BuildConfig.API_URL;
+    private static final String CLIENT_ID = BuildConfig.CLIENT_ID;
+    private static final String CLIENT_SECRET = BuildConfig.CLIENT_SECRET;
 
     /**
      * Class to retrive access_token for the first time
@@ -30,7 +33,7 @@ public class ServiceGenerator {
         httpClient = new OkHttpClient.Builder();
 
         builder = new Retrofit.Builder()
-                .baseUrl(App.API_URL)
+                .baseUrl(API_URL)
                 .addConverterFactory(MoshiConverterFactory.create());
 
 //        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
@@ -65,7 +68,7 @@ public class ServiceGenerator {
         httpClient = new OkHttpClient.Builder();
 
         builder = new Retrofit.Builder()
-                .baseUrl(App.API_URL)
+                .baseUrl(API_URL)
                 .addConverterFactory(MoshiConverterFactory.create());
 
         if (accessToken != null) {
@@ -94,7 +97,8 @@ public class ServiceGenerator {
 
                 // We need a new client, since we don't want to make another call using our client with access token
                 EkylibreAPI ekylibreAPI = createService(EkylibreAPI.class);
-                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(BuildConfig.CLIENT_ID, BuildConfig.CLIENT_SECRET, mToken.getRefresh_token(), "refresh_token");
+                Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(CLIENT_ID, CLIENT_SECRET,
+                        mToken.getRefresh_token(), "refresh_token");
                 try {
                     retrofit2.Response<AccessToken> tokenResponse = call.execute();
                     if (tokenResponse.code() == 200) {

@@ -30,12 +30,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue 'string', 'api_url', '"https://api.ekylibre.com"'
-            resValue 'string', 'api_agrico', '"https://www.agriconomie.com"'
+            buildConfigField "String", "API_URL", '"https://api.ekylibre.com"'
         }
         debug {
-            resValue 'string', 'api_url', '"https://ekylibre-test.com"'
-            resValue 'string', 'api_agrico', '"https://ekylibre:ek1l1bre@preprod.agriconomie.com"'
+            buildConfigField "String", "API_URL", '"https://ekylibre-test.com"'
         }
     }
     flavorDimensions "version"
@@ -52,12 +50,13 @@ android {
         }
         agrico {
             dimension "version"
-            applicationId "com.agriconomie.android"
+            applicationId "com.ekylibre.android.agriconomie"
             versionNameSuffix "-agrico"
             buildConfigField 'boolean', 'IS_AGRICO', 'true'
             ext {
                 client_id = [debug: "1_4i9aq3clcsysos8c4k8so8kgw4g80w4okc80sowwc0w0ccscwo", release: "2_5vj3h0spce800484o4o08ws4488gcsgkwo4gcs0ocswo800sgk"]
                 client_secret = [debug: "5uc7natireo0kksc40s4gs08cow4cgs004cwsw0co4o8so0ksk", release: "4vxjutk8kzs4wowggw040ogg8gw48k4wocw84cgco8g8kggkcw"]
+                api_agrico = [debug: "https://ekylibre:ek1l1bre@preprod.agriconomie.com", release: "https://www.agriconomie.com"]
             }
         }
     }
@@ -66,6 +65,9 @@ android {
         println "Setting up CLIENT_ID ${flavor.ext.client_id[variant.buildType.name]} for variant [${variant.name}]"
         variant.buildConfigField "String", "CLIENT_ID", "\"${flavor.ext.client_id[variant.buildType.name]}\""
         variant.buildConfigField "String", "CLIENT_SECRET", "\"${flavor.ext.client_secret[variant.buildType.name]}\""
+        if (flavor.name == 'agrico') {
+            variant.buildConfigField "String", "API_AGRICO", "\"${flavor.ext.api_agrico[variant.buildType.name]}\""
+        }
     }
 }
 

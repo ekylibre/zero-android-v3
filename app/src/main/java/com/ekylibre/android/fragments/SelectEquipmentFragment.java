@@ -2,7 +2,6 @@ package com.ekylibre.android.fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,7 +32,9 @@ import com.ekylibre.android.database.models.Equipment;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -274,11 +275,12 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             new RequestDatabase(context).execute();
-            Intent intent = new Intent(context, SyncService.class);
-            intent.setAction(SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT);
-            intent.putExtra("receiver", resultReceiver);
-            context.startService(intent);
+
+            if (App.isOnline(context))
+                new PerformSyncWithFreshToken(context,
+                        SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT, resultReceiver).execute();
         }
     }
 

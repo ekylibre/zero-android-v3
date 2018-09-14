@@ -1100,8 +1100,6 @@ public class InterventionActivity extends AppCompatActivity implements
             // Save/update intervention and get returning id
             int intervention_id = (int) (long) database.dao().insert(intervention);
 
-            Timber.e("Editing intervention id %s", intervention_id);
-
             database.dao().insert(new InterventionWorkingDay(intervention_id, date, duration));
 
             Float temperature = null;
@@ -1115,7 +1113,6 @@ public class InterventionActivity extends AppCompatActivity implements
             if (temperature != null || windSpeed != null || weatherDescription != null)
                 database.dao().insert(new Weather(intervention_id, temperature, windSpeed, weatherDescription));
 
-            Timber.e(" Number of inputs: %s", inputList.size());
             for (Object item : inputList) {
                 if (item instanceof Seeds) {
                     Seeds seed = (Seeds) item;
@@ -1179,8 +1176,6 @@ public class InterventionActivity extends AppCompatActivity implements
     @Override
     public void onFragmentInteraction(Object selection) {
         if (selection != null) {
-
-            Timber.e("onFragmentInteraction --> %s", selection.toString());
 
             if (selection instanceof Materials) {
                 selectMaterialFragment.dismiss();

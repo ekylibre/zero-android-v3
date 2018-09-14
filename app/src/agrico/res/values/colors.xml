@@ -29,5 +29,6 @@
     <color name="dialogColor">@color/primary</color>
     <color name="dialogTitleColor">@color/accent</color>
     <color name="createText">@color/primary</color>
+    <color name="productionHeader">@color/primary</color>
 
 </resources>

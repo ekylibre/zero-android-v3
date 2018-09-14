@@ -23,9 +23,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-// TODO: Important ! --> Path to change according to flavor
-import com.ekylibre.android.utils.PerformSyncWithFreshToken;
-
 import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
@@ -33,6 +30,7 @@ import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
 import com.ekylibre.android.utils.Utils;
@@ -175,9 +173,11 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             }
         });
 
-        if (App.isOnline(this))
+        if (App.isOnline(this)) {
+            swipeRefreshLayout.setRefreshing(true);
             new PerformSyncWithFreshToken(this,
                     SyncService.FIRST_TIME_SYNC, resultReceiver).execute();
+        }
 
 //        BottomNavigationView navigation = findViewById(R.id.navigation);
 //        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
