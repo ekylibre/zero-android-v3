@@ -71,6 +71,8 @@ public class PerformSyncWithFreshToken extends AsyncTask<Void, Void, String> {
             token.setRefresh_token(prefs.getString("refresh_token", null));
             token.setToken_type("bearer");
 
+            Timber.i("AccessToken %s", token.getAccess_token());
+
             EkylibreAPI ekylibreAPI = ServiceGenerator.createService(EkylibreAPI.class, token);
             Call<AccessToken> call = ekylibreAPI.getRefreshAccessToken(
                     BuildConfig.CLIENT_ID, BuildConfig.CLIENT_SECRET,
@@ -81,11 +83,12 @@ public class PerformSyncWithFreshToken extends AsyncTask<Void, Void, String> {
                 if (response.isSuccessful()) {
                     AccessToken responseToken = response.body();
                     if (responseToken != null) {
+                        Timber.i("RefreshToken successful");
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("access_token", responseToken.getAccess_token())
                                 .putString("refresh_token", responseToken.getRefresh_token())
                                 .putInt("token_created_at", responseToken.getCreated_at());
-                        if (!editor.commit())
+                        if (editor.commit())
                             return responseToken.getAccess_token();
                     }
                 }
