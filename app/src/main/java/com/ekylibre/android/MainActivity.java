@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         if (App.isOnline(this)) {
             swipeRefreshLayout.setRefreshing(true);
             new PerformSyncWithFreshToken(this,
-                    SyncService.FIRST_TIME_SYNC, resultReceiver).execute();
+                    SyncService.ACTION_SYNC_ALL, resultReceiver).execute();
         }
 
 //        BottomNavigationView navigation = findViewById(R.id.navigation);

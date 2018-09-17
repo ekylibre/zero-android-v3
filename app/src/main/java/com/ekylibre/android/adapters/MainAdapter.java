@@ -3,6 +3,7 @@ package com.ekylibre.android.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -43,6 +44,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     private List<Interventions> interventionsList;
     private Context context;
+    private SharedPreferences prefs;
 
     private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("HH:mm", MainActivity.LOCALE);
 
@@ -50,13 +52,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     public MainAdapter(Context context, List<Interventions> interventionsList) {
         this.interventionsList = interventionsList;
         this.context = context;
+        this.prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AppCompatImageView itemIcon, itemSynchronized;
-        private final TextView itemProcedure, itemDate, itemCrops, itemInfos, syncTime;
-        private final View itemBackground;
+        private final TextView itemProcedure, itemDate, itemCrops, itemInfos, syncTime, pullDownMessage;
+        private final View itemBackground, pullDownIcon, cancelIcon;
 
         ViewHolder(final View itemView, int viewType) {
             super(itemView);
@@ -68,7 +71,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             itemCrops = itemView.findViewById(R.id.item_cultures);
             itemInfos = itemView.findViewById(R.id.item_infos);
             itemSynchronized = itemView.findViewById(R.id.item_synchronized);
-            syncTime = (viewType == 1) ? itemView.findViewById(R.id.last_sync) : null;
+            syncTime = (viewType == 0) ? itemView.findViewById(R.id.last_sync) : null;
+            pullDownIcon = (viewType == 0) ? itemView.findViewById(R.id.pull_down_icon) : null;
+            pullDownMessage = (viewType == 0) ? itemView.findViewById(R.id.pull_down) : null;
+            cancelIcon = (viewType == 0) ? itemView.findViewById(R.id.delete_pull_down_message) : null;
 
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(itemView.getContext(), InterventionActivity.class);
@@ -77,6 +83,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 intent.putExtra("edition", true);
                 itemView.getContext().startActivity(intent);
             });
+
         }
     }
 
@@ -85,7 +92,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     public MainAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        int layoutId = (viewType == 1) ? R.layout.item_intervention_header : R.layout.item_intervention;
+
+        int layoutId = viewType == 0 ? R.layout.item_intervention_header : R.layout.item_intervention;
+
         View view = inflater.inflate(layoutId, parent, false);
 
         return new ViewHolder(view, viewType);
@@ -98,6 +107,22 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
             holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.another_light_grey));
         } else {
             holder.itemBackground.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
+
+        if (getItemViewType(position) == 0) {
+            if (prefs.getBoolean("setting_display_helptext_sync", true)) {
+
+                holder.pullDownIcon.setVisibility(View.VISIBLE);
+                holder.pullDownMessage.setVisibility(View.VISIBLE);
+                holder.cancelIcon.setVisibility(View.VISIBLE);
+
+                holder.cancelIcon.setOnClickListener(v -> {
+                    holder.pullDownIcon.setVisibility(View.GONE);
+                    holder.pullDownMessage.setVisibility(View.GONE);
+                    holder.cancelIcon.setVisibility(View.GONE);
+                    prefs.edit().putBoolean("setting_display_helptext_sync", false).apply();
+                });
+            }
         }
 
         Interventions current = interventionsList.get(position);
@@ -220,6 +245,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        return (position == 0) ? 1 : 2;
+        return position == 0 ? 0 : 1;
     }
 }
