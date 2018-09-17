@@ -259,7 +259,7 @@
     <string name="register_an_intervention">Enregistrer une intervention</string>
     <string name="save_intervention" >Enregistrer</string>
 
-    <string name="recyclerview_nodata">Commencez à utiliser l\'application en ajoutant votre première intervention à l\'aide des boutons actions ci-dessous.</string>
+    <string name="recyclerview_nodata">Commencez à utiliser l\'application en ajoutant votre première intervention !</string>
     <string name="none">aucun</string>
     <string name="unspecified">non renseigné</string>
 
@@ -381,5 +381,7 @@
     <string name="my_cultures">Mes cultures</string>
     <string name="unknown_login_failure">Désolé, une erreur inconnue s\'est produite, veuillez contacter le support.</string>
     <string name="no_internet">Vous devez être connecté à internet pour vous identifier la première fois.</string>
+    <string name="no_parcells">Vous n\'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !</string>
+    <string name="no_internet_try_later">Vous n\'êtes pas connecté à internet. Veuillez essayer plus tard.</string>
 
 </resources>

@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
                 new PerformSyncWithFreshToken(this,
                         SyncService.ACTION_SYNC_ALL, resultReceiver).execute();
             else {
-                Toast toast = Toast.makeText(this, "Vous n'êtes pas connecté à internet. Veuillez essayer plus tard.", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(this, R.string.no_internet_try_later, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 200);
                 toast.show();
                 swipeRefreshLayout.setRefreshing(false);
@@ -297,24 +297,25 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
         protected Void doInBackground(Void... voids) {
             AppDatabase database = AppDatabase.getInstance(context);
-            interventionsList.clear();
+
+            List<Interventions> response = new ArrayList<>();
+
             switch (filter) {
 
                 case FILTER_ALL_INTERVENTIONS:
-                    interventionsList.addAll(database.dao().selectInterventions(FARM_ID));
+                    response = database.dao().selectInterventions(FARM_ID);
                     break;
 
                 case FILTER_MY_INTERVENTIONS:
                     //interventionsList = database.interventionDAO().selectInterventions();
                     break;
             }
+
+            interventionsList.clear();
+            interventionsList.addAll(response);
+
             return null;
         }
 
@@ -327,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
     private void onInterventionTypeSelected(int type) {
         if (prefs.getBoolean("no-crop", true)) {
-            Toast toast = Toast.makeText(this, "Vous n'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, R.string.no_parcells, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.BOTTOM, 0, 200);
             toast.show();
         } else {

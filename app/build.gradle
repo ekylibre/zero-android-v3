@@ -40,7 +40,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_URL", eky_api_url
-            debuggable true
+            //debuggable true
         }
         debug {
             buildConfigField "String", "API_URL", eky_debug_api_url

@@ -107,17 +107,21 @@ public class AppAuthLogin extends AppCompatActivity {
             authText.setVisibility(View.VISIBLE);
 
             if (authState.getAccessToken() != null) {
-                Timber.i("Current accessToken = %s", authState.getAccessToken());
-                Timber.i("Token millis=%s, now=%s", authState.getAccessTokenExpirationTime(), System.currentTimeMillis());
 
-                if (TimeUnit.MILLISECONDS.toMinutes(authState.getAccessTokenExpirationTime() - System.currentTimeMillis()) < 5) {
-                    Timber.i("Token needs to refresh");
-                    startWithFreshToken();
+//                Timber.i("Current accessToken = %s", authState.getAccessToken());
+//                Timber.i("Token millis=%s, now=%s", authState.getAccessTokenExpirationTime(), System.currentTimeMillis());
+//
+//                if (TimeUnit.MILLISECONDS.toMinutes(authState.getAccessTokenExpirationTime() - System.currentTimeMillis()) < 5) {
+//                    Timber.i("Token needs to refresh");
+//                    startWithFreshToken();
+//
+//                } else {
+//                    Timber.i("Token is up to date");
+//                    startApp();
+//                }
 
-                } else {
-                    Timber.i("Token is up to date");
-                    startApp();
-                }
+                startApp();
+
             } else if (authState.getLastAuthorizationResponse() != null) {
                 Timber.i("User is authorized, but no token here... asking for");
                 performTokenRequest(authState.getLastAuthorizationResponse());
