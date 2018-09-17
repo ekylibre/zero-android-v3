@@ -65,7 +65,7 @@
         android:id="@+id/delete_pull_down_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tint="@color/cancel_cross"
+        android:tint="@color/accent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/pull_down_icon"
         app:layout_constraintBottom_toBottomOf="@id/pull_down_icon"
