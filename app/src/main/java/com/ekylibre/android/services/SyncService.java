@@ -923,12 +923,12 @@ public class SyncService extends IntentService {
                             //String name = crop.productionNature().name() + " " + cal.get(Calendar.YEAR);
 
                             // Saving crop
+                            String plot = crop.plot() != null ? crop.plot().uuid() : null;
                             Crop newCrop = new Crop(
                                     crop.uuid(), crop.name(), crop.species().rawValue(), crop.productionNature().name(),
                                     crop.productionMode(), null, crop.provisionalYield(), crop.shape(),
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
-                                    crop.startDate(), crop.stopDate(), crop.plot().uuid(),
-                                    farm.id());
+                                    crop.startDate(), crop.stopDate(), plot, farm.id());
                             database.dao().insert(newCrop);
                         }
                         // TODO: delete crop & plot if deleted on server
