@@ -384,5 +384,8 @@
     <string name="no_parcells">Vous n\'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !</string>
     <string name="no_internet_try_later">Vous n\'êtes pas connecté à internet. Veuillez essayer plus tard.</string>
     <string name="sync_help_text">Pour synchroniser vos interventions,\ntirez la liste vers le bas.</string>
+    <string name="you_are_in_consult_mode">Vous êtes en mode consultation, vous ne ne pouvez modifier cette intervention car elle a été validée en ligne.</string>
+    <string name="non_authorized_mix">mélange non autorisé</string>
+    <string name="nature">Nature</string>
 
 </resources>

@@ -128,10 +128,10 @@ public class InterventionActivity extends AppCompatActivity implements
     private AppCompatSpinner harvestOutputType;
 
     // Material layout
+    private Group materialRecyclerGroup;
     private ImageView materialArrow;
     private TextView materialSummary, materialAddLabel;
     private DialogFragment selectMaterialFragment;
-    private RecyclerView materialRecyclerView;
     private RecyclerView.Adapter materialAdapter;
 
     // Equipment layout
@@ -245,10 +245,12 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // Materials
         ConstraintLayout materialLayout = findViewById(R.id.material_layout);
+        ConstraintLayout materialZone = findViewById(R.id.material_zone);
+        materialRecyclerGroup = findViewById(R.id.material_recycler_group);
         materialArrow = findViewById(R.id.material_arrow);
         materialSummary = findViewById(R.id.material_summary);
         materialAddLabel = findViewById(R.id.material_add_label);
-        materialRecyclerView = findViewById(R.id.material_recycler);
+        RecyclerView materialRecyclerView = findViewById(R.id.material_recycler);
 
         // Equipments
         ConstraintLayout equipmentZone = findViewById(R.id.equipment_zone);
@@ -282,6 +284,7 @@ public class InterventionActivity extends AppCompatActivity implements
         AppCompatImageButton snow = findViewById(R.id.weather_snow);
         AppCompatImageButton thunderstorm = findViewById(R.id.weather_thunderstorm);
 
+
         // ================================ UI SETTINGS ======================================== //
 
         // Fold all accordions
@@ -299,7 +302,6 @@ public class InterventionActivity extends AppCompatActivity implements
         switch (procedure) {
             case App.IRRIGATION:
                 irrigationLayout.setVisibility(View.VISIBLE);
-                irrigationDetail.setVisibility(View.VISIBLE);
                 break;
             case App.GROUND_WORK:
                 inputLayout.setVisibility(View.GONE);
@@ -312,6 +314,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 materialLayout.setVisibility(View.VISIBLE);
                 break;
         }
+
 
         // =============================== CROPS EVENTS ======================================== //
 
@@ -548,24 +551,41 @@ public class InterventionActivity extends AppCompatActivity implements
         });
 
         View.OnClickListener materialListener = view -> {
-            if (materialRecyclerView.getVisibility() == View.GONE) {
-                materialArrow.setVisibility(View.VISIBLE);
-                materialArrow.setRotation(180);
-                materialSummary.setVisibility(View.GONE);
-                materialAddLabel.setVisibility(View.VISIBLE);
-                materialRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                int count = materialList.size();
-                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
-                materialArrow.setRotation(0);
-                materialSummary.setVisibility(View.VISIBLE);
-                materialAddLabel.setVisibility(View.GONE);
-                materialRecyclerView.setVisibility(View.GONE);
+            int count = materialList.size();
+            if (count > 0) {
+                if (materialRecyclerGroup.getVisibility() == View.GONE) {
+                    materialArrow.setVisibility(View.VISIBLE);
+                    materialArrow.setRotation(180);
+                    materialSummary.setVisibility(View.GONE);
+                    materialAddLabel.setVisibility(View.VISIBLE);
+                    materialRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
+                    materialArrow.setRotation(0);
+                    materialSummary.setVisibility(View.VISIBLE);
+                    materialAddLabel.setVisibility(View.GONE);
+                    materialRecyclerGroup.setVisibility(View.GONE);
+                }
             }
+//            if (materialRecyclerView.getVisibility() == View.GONE) {
+//                materialArrow.setVisibility(View.VISIBLE);
+//                materialArrow.setRotation(180);
+//                materialSummary.setVisibility(View.GONE);
+//                materialAddLabel.setVisibility(View.VISIBLE);
+//                materialRecyclerView.setVisibility(View.VISIBLE);
+//            } else {
+//                int count = materialList.size();
+//                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
+//                materialArrow.setRotation(0);
+//                materialSummary.setVisibility(View.VISIBLE);
+//                materialAddLabel.setVisibility(View.GONE);
+//                materialRecyclerView.setVisibility(View.GONE);
+//            }
         };
 
         materialArrow.setOnClickListener(materialListener);
         materialSummary.setOnClickListener(materialListener);
+        materialZone.setOnClickListener(materialListener);
 
         // Fill data if editing
         if (editIntervention != null) {
@@ -579,17 +599,23 @@ public class InterventionActivity extends AppCompatActivity implements
         materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                if (materialAdapter.getItemCount() == 0) {
-                    materialArrow.performClick();
+                if (materialList.size() == 0) {
                     materialArrow.setVisibility(View.GONE);
-                    materialSummary.setVisibility(View.GONE);
-                    materialAddLabel.setVisibility(View.VISIBLE);
-                    materialRecyclerView.setVisibility(View.GONE);
+                    materialRecyclerGroup.setVisibility(View.GONE);
                 }
+//                if (materialAdapter.getItemCount() == 0) {
+//                    materialArrow.performClick();
+//                    materialArrow.setVisibility(View.GONE);
+//                    materialSummary.setVisibility(View.GONE);
+//                    materialAddLabel.setVisibility(View.VISIBLE);
+//                    materialRecyclerView.setVisibility(View.GONE);
+//                }
             }
         });
         materialRecyclerView.setAdapter(materialAdapter);
         materialAdapter.notifyDataSetChanged();
+        if (materialList.size() == 0)
+            materialRecyclerGroup.setVisibility(View.GONE);
 
 
         // ============================= EQUIPMENTS EVENTS ===================================== //
@@ -642,7 +668,6 @@ public class InterventionActivity extends AppCompatActivity implements
         equipmentAdapter.notifyDataSetChanged();
         if (equipmentList.size() == 0)
             equipmentRecyclerGroup.setVisibility(View.GONE);
-
 
 
         // =============================== PERSONS EVENTS ====================================== //
@@ -1194,7 +1219,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 selectMaterialFragment.dismiss();
                 materialList.add((Materials) selection);
                 materialAdapter.notifyDataSetChanged();
-                if (materialRecyclerView.getVisibility() == View.GONE)
+                if (materialRecyclerGroup.getVisibility() == View.GONE)
                     materialArrow.performClick();
 
             } else if (selection instanceof Equipments) {

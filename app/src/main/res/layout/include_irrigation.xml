@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:paddingTop="24dp"
-    android:paddingBottom="24dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:paddingTop="@dimen/top_bottom_include_margin"
+    android:paddingBottom="@dimen/top_bottom_include_margin"
+    android:paddingStart="@dimen/start_end_include_margin"
+    android:paddingEnd="@dimen/start_end_include_margin"
     android:background="@drawable/border_bottom">
 
     <android.support.v7.widget.AppCompatImageView
@@ -22,7 +22,7 @@
         android:id="@+id/irrigation_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="@dimen/category_header_size"
         android:textStyle="bold"
         android:textColor="@color/primary_dark"
         android:text="@string/label_irrigation"
@@ -33,19 +33,10 @@
         android:id="@+id/irrigation_summary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/start_end_include_margin"
         android:text="@string/not_provided"
         app:layout_constraintBaseline_toBaselineOf="@id/irrigation_label"
         app:layout_constraintStart_toEndOf="@+id/irrigation_label" />
-
-    <!--<android.support.v7.widget.AppCompatTextView-->
-        <!--android:id="@+id/irrigation_summary"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:text="@string/default_working_period_main_line"-->
-        <!--app:layout_constraintBaseline_toBaselineOf="@id/irrigation_label"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/irrigation_label" />-->
 
     <android.support.constraint.Group
         android:id="@+id/irrigation_detail"

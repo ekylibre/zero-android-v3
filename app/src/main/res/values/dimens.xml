@@ -3,11 +3,14 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="small_text">12sp</dimen>
+    <dimen name="category_header_size">16sp</dimen>
     <dimen name="regular_margin">12dp</dimen>
     <dimen name="small_margin">6dp</dimen>
     <dimen name="input_label_vertical_spacing">8dp</dimen>
     <dimen name="input_label_horizontal_spacing">4dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="login_layout_margin">32dp</dimen>
+    <dimen name="top_bottom_include_margin">24dp</dimen>
+    <dimen name="start_end_include_margin">16dp</dimen>
 
 </resources>
