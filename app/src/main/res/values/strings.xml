@@ -387,5 +387,7 @@
     <string name="you_are_in_consult_mode">Vous êtes en mode consultation, vous ne ne pouvez modifier cette intervention car elle a été validée en ligne.</string>
     <string name="non_authorized_mix">mélange non autorisé</string>
     <string name="nature">Nature</string>
+    <string name="celsius">°C</string>
+    <string name="km_per_hour">km/h</string>
 
 </resources>

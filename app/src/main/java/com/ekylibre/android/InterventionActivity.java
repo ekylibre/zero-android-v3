@@ -567,20 +567,6 @@ public class InterventionActivity extends AppCompatActivity implements
                     materialRecyclerGroup.setVisibility(View.GONE);
                 }
             }
-//            if (materialRecyclerView.getVisibility() == View.GONE) {
-//                materialArrow.setVisibility(View.VISIBLE);
-//                materialArrow.setRotation(180);
-//                materialSummary.setVisibility(View.GONE);
-//                materialAddLabel.setVisibility(View.VISIBLE);
-//                materialRecyclerView.setVisibility(View.VISIBLE);
-//            } else {
-//                int count = materialList.size();
-//                materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
-//                materialArrow.setRotation(0);
-//                materialSummary.setVisibility(View.VISIBLE);
-//                materialAddLabel.setVisibility(View.GONE);
-//                materialRecyclerView.setVisibility(View.GONE);
-//            }
         };
 
         materialArrow.setOnClickListener(materialListener);
@@ -603,13 +589,6 @@ public class InterventionActivity extends AppCompatActivity implements
                     materialArrow.setVisibility(View.GONE);
                     materialRecyclerGroup.setVisibility(View.GONE);
                 }
-//                if (materialAdapter.getItemCount() == 0) {
-//                    materialArrow.performClick();
-//                    materialArrow.setVisibility(View.GONE);
-//                    materialSummary.setVisibility(View.GONE);
-//                    materialAddLabel.setVisibility(View.VISIBLE);
-//                    materialRecyclerView.setVisibility(View.GONE);
-//                }
             }
         });
         materialRecyclerView.setAdapter(materialAdapter);
@@ -790,6 +769,7 @@ public class InterventionActivity extends AppCompatActivity implements
             return false;
         });
 
+
         // ================================ DESCRIPTION ======================================== //
 
         descriptionInput = findViewById(R.id.comment);
@@ -805,6 +785,7 @@ public class InterventionActivity extends AppCompatActivity implements
             descriptionEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
             descriptionEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         }
+
 
         // ================================ BOTTOM BAR ========================================= //
 

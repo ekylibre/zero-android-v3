@@ -80,7 +80,7 @@
         android:id="@+id/weather_temp_unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="°C"
+        android:text="@string/celsius"
         app:layout_constraintBaseline_toBaselineOf="@id/weather_edit_temp"
         app:layout_constraintStart_toEndOf="@id/weather_edit_temp"
         android:layout_marginStart="8dp"/>
@@ -118,7 +118,7 @@
         android:id="@+id/weather_wind_unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="km/h"
+        android:text="@string/km_per_hour"
         app:layout_constraintBaseline_toBaselineOf="@id/weather_edit_wind"
         app:layout_constraintStart_toEndOf="@id/weather_edit_wind"
         android:layout_marginStart="8dp"/>
