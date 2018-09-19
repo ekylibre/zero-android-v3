@@ -52,7 +52,6 @@ query Intervention {
         unit
       }
       operators {
-        id
         role
         person {
           id
@@ -114,9 +113,6 @@ query Farm {
       startDate
       stopDate
       surfaceArea
-      plot {
-        uuid
-      }
       shape
     }
     people {

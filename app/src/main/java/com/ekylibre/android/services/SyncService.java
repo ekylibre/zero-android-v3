@@ -914,15 +914,8 @@ public class SyncService extends IntentService {
                         editor.putBoolean("no-crop", false);
                         editor.apply();
 
-                        Calendar cal = Calendar.getInstance();
-
                         for (FarmQuery.Crop crop : crops) {
 
-                            cal.setTime(crop.stopDate());
-                            //String name = crop.productionNature().name() + " " + cal.get(Calendar.YEAR);
-
-                            // Saving crop
-                            //String plot = crop.plot() != null ? crop.plot().uuid() : null;
                             Crop newCrop = new Crop(
                                     crop.uuid(), crop.name(), crop.species().rawValue(), crop.productionNature().name(),
                                     crop.productionMode(), null, crop.provisionalYield(), crop.shape(),

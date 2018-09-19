@@ -3,6 +3,7 @@ package com.ekylibre.android;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
 import android.support.design.widget.TextInputLayout;
@@ -46,13 +47,13 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Phyto;
 import com.ekylibre.android.database.models.Weather;
 import com.ekylibre.android.database.pojos.Crops;
+import com.ekylibre.android.database.pojos.CropsByPlot;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.database.pojos.Materials;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.database.pojos.Phytos;
-import com.ekylibre.android.database.pojos.Plots;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
@@ -68,17 +69,14 @@ import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
+import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -166,8 +164,7 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Object> inputList = new ArrayList<>();
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
-    //public static List<Plots> plotList = new ArrayList<>();
-    public static List<Crops> cropList = new ArrayList<>();
+    public static List<CropsByPlot> cropList = new ArrayList<>();
     private static List<Harvest> outputList = new ArrayList<>();
     public static List<Materials> materialList = new ArrayList<>();
 
@@ -318,14 +315,15 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // =============================== CROPS EVENTS ======================================== //
 
-        // Feed plotList with all available plots
+        // Feed cropList with all available plots
+        Timber.i("cropList %s", cropList);
         if (cropList.isEmpty())
             new RequestPlotList(this).execute();
 
-//        includeCropLayout.setOnClickListener(view -> {
-//            selectCropFragment = SelectCropFragment.newInstance();
-//            selectCropFragment.show(getFragmentTransaction(), "dialog");
-//        });
+        includeCropLayout.setOnClickListener(view -> {
+            selectCropFragment = SelectCropFragment.newInstance();
+            selectCropFragment.show(getFragmentTransaction(), "dialog");
+        });
 
         // =============================== IRRIGATION EVENTS =================================== //
 
@@ -786,16 +784,16 @@ public class InterventionActivity extends AppCompatActivity implements
         // ================================ BOTTOM BAR ========================================= //
 
         Button saveButton = findViewById(R.id.button_save);
-//        saveButton.setOnClickListener(view -> new SaveIntervention(this, date).execute());
+        saveButton.setOnClickListener(view -> new SaveIntervention(this, date).execute());
 
         Button cancelButton = findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(view -> { clearDatasets(); finish(); });
 
         if (editIntervention == null) {
             // Launch crop selector
-//            selectCropFragment = SelectCropFragment.newInstance();
-//            selectCropFragment.show(getFragmentTransaction(), "dialog");
-        } else if (editIntervention.intervention.status.equals(VALIDATED)){
+            selectCropFragment = SelectCropFragment.newInstance();
+            selectCropFragment.show(getFragmentTransaction(), "dialog");
+        } else if (editIntervention.intervention.status.equals(VALIDATED)) {
             saveButton.setOnClickListener(null);
             saveButton.setBackground(getResources().getDrawable(R.drawable.background_round_corners_disabled));
             saveButton.setTextColor(getResources().getColor(R.color.secondary_text));
@@ -860,23 +858,21 @@ public class InterventionActivity extends AppCompatActivity implements
         protected Void doInBackground(Void... voids) {
 
             AppDatabase database = AppDatabase.getInstance(this.context);
-            List<Crop> cropList = database.dao().cropList(MainActivity.FARM_ID);
 
-            Map<String, List<Crop>> cropsByPlot = new HashMap<>();
+            // Get all available crops
+            List<Crop> allCrops = database.dao().cropList(MainActivity.FARM_ID);
 
-            for (Crop crop : cropList) {
-                if (cropsByPlot.containsKey(crop.name))
-                    cropsByPlot.get(crop.name).add(crop);
+            for (Crop crop : allCrops) {
+                CropsByPlot select = Iterables.find(cropList,
+                        input -> crop.name.equals(input.name),
+                        new CropsByPlot(crop.name));
+                select.crops.add(crop);
+                if (select.crops.size() == 1)
+                    cropList.add(select);
                 else
-                    cropsByPlot.put(crop.name, Collections.singletonList(crop));
+                    cropList.set(cropList.indexOf(select), select);
             }
 
-            Iterator it = cropsByPlot.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                Timber.i("Plot: %s, Crops --> [%s]", pair.getKey(), pair.getValue());
-                it.remove(); // avoids a ConcurrentModificationException
-            }
             return null;
         }
 
@@ -884,309 +880,310 @@ public class InterventionActivity extends AppCompatActivity implements
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-//            if (editIntervention != null) {
-//                int count = 0;
-//                float total = 0;
-//                for (Plots plot : plotList) {
-//                    for (Crops culture : editIntervention.crops) {
-//                        for (Crop crop : plot.crops) {
-//                            if (culture.crop.get(0).uuid.equals(crop.uuid)) {
-//                                crop.is_checked = true;
-//                                plot.plot.is_checked = true;
-//                                total += crop.surface_area;
-//                                ++count;
-//                            }
-//                        }
-//                    }
-//                }
-//                surface = total;
-//                String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
-//                cropSummaryText = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
-//                cropSummary.setText(cropSummaryText);
-//                cropAddLabel.setVisibility(View.GONE);
-//                cropSummary.setVisibility(View.VISIBLE);
-//            }
+            if (editIntervention != null) {
+                int count = 0;
+                float total = 0;
+                for (CropsByPlot plot : cropList) {
+                    for (Crops culture : editIntervention.crops) {
+                        for (Crop crop : plot.crops) {
+                            if (culture.crop.get(0).uuid.equals(crop.uuid)) {
+                                crop.is_checked = true;
+                                plot.is_checked = true;
+                                total += crop.surface_area;
+                                ++count;
+                            }
+                        }
+                    }
+                }
+                surface = total;
+                String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
+                cropSummaryText = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
+                cropSummary.setText(cropSummaryText);
+                cropAddLabel.setVisibility(View.GONE);
+                cropSummary.setVisibility(View.VISIBLE);
+            }
         }
     }
 
-//    private class SaveIntervention extends AsyncTask<Void, Void, Void> {
-//
-//        Context context;
-//        Date date;
-//
-//        SaveIntervention(Context context, Calendar date) {
-//            this.context = context;
-//            this.date = date.getTime();
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//
-//            // Check at least one crop is selected
-//            int cropCount = 0;
-//            for (Plots plotWithCrops : plotList) {
-//                for (Crop culture : plotWithCrops.crops) {
-//                    if (culture.is_checked) {
-//                        ++cropCount;
-//                        if (date.compareTo(culture.start_date) < 0 || date.compareTo(culture.stop_date) >= 0) {
-//                            cancel(true);
-//                            Toast toast = Toast.makeText(context, R.string.date_not_corresponding_to_crop, Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                            toast.show();
-//                        }
-//                    }
-//                }
-//            }
-//            if (cropCount == 0) {
-//                cancel(true);
-//                Toast toast = Toast.makeText(context, R.string.you_have_to_select_a_crop, Toast.LENGTH_LONG);
-//                toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                toast.show();
-//            }
-//
-//            switch (procedure) {
-//
-//                case App.CROP_PROTECTION:
-//                    if (!inputList.isEmpty()) {
-//                        for (Object input : inputList) {
-//                            if (input instanceof Phytos) {
-//                                if (((Phytos) input).inter.quantity <= 0) {
-//                                    cancel(true);
-//                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_quantity, Toast.LENGTH_LONG);
-//                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                                    toast.show();
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        cancel(true);
-//                        Toast toast = Toast.makeText(context, R.string.you_have_to_enter_phyto, Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                        toast.show();
-//                    }
-//                    break;
-//
-//                case App.IMPLANTATION:
-//                    HashSet<String> productionNature = new HashSet<>();
-//                    outerLoop:
-//                    for (Plots plot : plotList) {
-//                        for (Crop crop : plot.crops) {
-//                            if (crop.is_checked) {
-//                                if (productionNature.isEmpty() || productionNature.contains(crop.specie)) {
-//                                    productionNature.add(crop.specie);
-//                                } else {
-//                                    cancel(true);
-//                                    Toast toast = Toast.makeText(context, R.string.implantation_have_to_be_on_same_crop_nature, Toast.LENGTH_LONG);
-//                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                                    toast.show();
-//                                    break outerLoop;
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    if (!inputList.isEmpty()) {
-//                        for (Object input : inputList) {
-//                            if (input instanceof Seeds) {
-//                                if (((Seeds) input).inter.quantity <= 0) {
-//                                    cancel(true);
-//                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_seed_quantity, Toast.LENGTH_LONG);
-//                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                                    toast.show();
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        cancel(true);
-//                        Toast toast = Toast.makeText(context, R.string.you_must_select_seed, Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                        toast.show();
-//                    }
-//                    break;
-//
-//                case App.FERTILIZATION:
-//                    if (!inputList.isEmpty()) {
-//                        for (Object input : inputList) {
-//                            if (input instanceof Fertilizers) {
-//                                if (((Fertilizers) input).inter.quantity <= 0) {
-//                                    cancel(true);
-//                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_a_product_quantity, Toast.LENGTH_LONG);
-//                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                                    toast.show();
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        cancel(true);
-//                        Toast toast = Toast.makeText(context, R.string.you_must_select_a_fertilizer, Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                        toast.show();
-//                    }
-//                    break;
-//
-//                case App.IRRIGATION:
-//                    if (irrigationQuantityEdit.getText().toString().equals("0") || irrigationQuantityEdit.getText().toString().isEmpty()) {
-//                        cancel(true);
-//                        Toast toast = Toast.makeText(context, R.string.you_must_enter_a_water_volume, Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                        toast.show();
-//                    }
-//                    break;
-//
-//                case App.HARVEST:
-//                    if (!outputList.isEmpty()) {
-//                        for (Harvest harvest : outputList) {
-//                            if (harvest.quantity == null || harvest.quantity <= 0) {
-//                                cancel(true);
-//                                Toast toast = Toast.makeText(context, R.string.you_must_enter_harvest_quantity, Toast.LENGTH_LONG);
-//                                toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                                toast.show();
-//                            }
-//                        }
-//                    } else {
-//                        cancel(true);
-//                        Toast toast = Toast.makeText(context, R.string.you_must_create_a_harvest_load, Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.BOTTOM, 0, 200);
-//                        toast.show();
-//                    }
-//                    break;
-//            }
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//
-//            AppDatabase database = AppDatabase.getInstance(context);
-//
-//            Intervention intervention;
-//
-//            if (editIntervention != null) {
-//
-//                // We are editing an existing intervention
-//                Timber.i("Intervention edition");
-//
-//                // Symplify intervention object
-//                intervention = editIntervention.intervention;
-//
-//                // Deletes relations
-//                database.dao().delete(editIntervention.workingDays.get(0));
-//
-//                // Deletes weather relation if exists
-//                if (!editIntervention.weather.isEmpty()) database.dao().delete(editIntervention.weather.get(0));
-//
-//                for (Crops crop : editIntervention.crops)
-//                    database.dao().delete(crop.inter);
-//                for (Persons person : editIntervention.persons)
-//                    database.dao().delete(person.inter);
-//                for (Phytos phyto : editIntervention.phytos)
-//                    database.dao().delete(phyto.inter);
-//                for (Seeds seed : editIntervention.seeds)
-//                    database.dao().delete(seed.inter);
-//                for (Fertilizers fertilizer : editIntervention.fertilizers)
-//                    database.dao().delete(fertilizer.inter);
-//                for (Materials material : editIntervention.materials)
-//                    database.dao().delete(material.inter);
-//                for (Equipments equipment : editIntervention.equipments)
-//                    database.dao().delete(equipment.inter);
-//                for (Harvest harvest : editIntervention.harvests)
-//                    database.dao().delete(harvest);
-//
-//                // Set status to updated
-//                if (intervention.status.equals(SYNCED))
-//                    intervention.setStatus(UPDATED);
-//
-//            } else {
-//                // Creates a new intervention
-//                intervention = new Intervention();
-//                intervention.setType(procedure);
-//                intervention.setFarm(MainActivity.FARM_ID);
-//                intervention.setStatus(CREATED);
-//            }
-//
-//            if (procedure.equals(App.IRRIGATION)) {
-//                intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
-//                intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
-//            }
-//
-//            String comment = descriptionEditText.getText().toString();
-//            if (!comment.isEmpty())
-//                intervention.comment = comment;
-//
-//            // Save/update intervention and get returning id
-//            int intervention_id = (int) (long) database.dao().insert(intervention);
-//
-//            database.dao().insert(new InterventionWorkingDay(intervention_id, date, duration));
-//
-//            Float temperature = null;
-//            if (!temperatureEditText.getText().toString().isEmpty())
-//                temperature = Float.valueOf(temperatureEditText.getText().toString());
-//
-//            Float windSpeed = null;
-//            if (!windSpeedEditText.getText().toString().isEmpty())
-//                windSpeed = Float.valueOf(windSpeedEditText.getText().toString());
-//
-//            if (temperature != null || windSpeed != null || weatherDescription != null)
-//                database.dao().insert(new Weather(intervention_id, temperature, windSpeed, weatherDescription));
-//
-//            for (Object item : inputList) {
-//                if (item instanceof Seeds) {
-//                    Seeds seed = (Seeds) item;
-//                    seed.inter.intervention_id =  intervention_id;
-//                    database.dao().insert(seed.inter);
-//                }
-//                else if (item instanceof Phytos) {
-//                    Phytos phyto = (Phytos) item;
-//                    phyto.inter.intervention_id = intervention_id;
-//                    database.dao().insert(phyto.inter);
-//                    Timber.i("Phyto #%s", phyto.phyto.get(0).id);
-//                }
-//                else if (item instanceof Fertilizers) {
-//                    Fertilizers ferti = (Fertilizers) item;
-//                    ferti.inter.intervention_id = intervention_id;
-//                    database.dao().insert(ferti.inter);
-//                }
-//            }
-//
-//            for (Equipments item : equipmentList) {
-//                item.inter.intervention_id = intervention_id;
-//                database.dao().insert(item.inter);
-//            }
-//
-//            for (Persons item : personList) {
-//                item.inter.intervention_id = intervention_id;
-//                database.dao().insert(item.inter);
-//            }
-//
-//            for (Plots plot : plotList) {
-//                for (Crop crop : plot.crops)
-//                    if (crop.is_checked)
-//                        database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
-//            }
-//
-//            for (Harvest harvest : outputList) {
-//                Timber.i("harvest id_storage == %s", harvest.id_storage);
-//                harvest.type = Enums.OUTPUT_TYPES.get(harvestOutputType.getSelectedItemPosition());
-//                harvest.intervention_id = intervention_id;
-//                database.dao().insert(harvest);
-//            }
-//            //database.dao().insert(outputList.toArray(new Harvest[outputList.size()]));  // Bulk insert
-//
-//            for (Materials item : materialList) {
-//                item.inter.intervention_id = intervention_id;
-//                database.dao().insert(item.inter);
-//            }
-//
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//            super.onPostExecute(aVoid);
-//            clearDatasets();
-//            finish();
-//        }
-//    }
+    private class SaveIntervention extends AsyncTask<Void, Void, Void> {
+
+        Context context;
+        Date date;
+
+        SaveIntervention(Context context, Calendar date) {
+            this.context = context;
+            this.date = date.getTime();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // Check at least one crop is selected
+            int cropCount = 0;
+            for (CropsByPlot plot : cropList) {
+                for (Crop culture : plot.crops) {
+                    if (culture.is_checked) {
+                        ++cropCount;
+                        if (date.compareTo(culture.start_date) < 0 || date.compareTo(culture.stop_date) >= 0) {
+                            cancel(true);
+                            Toast toast = Toast.makeText(context, R.string.date_not_corresponding_to_crop, Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.BOTTOM, 0, 200);
+                            toast.show();
+                        }
+                    }
+                }
+            }
+            if (cropCount == 0) {
+                cancel(true);
+                Toast toast = Toast.makeText(context, R.string.you_have_to_select_a_crop, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                toast.show();
+            }
+
+            switch (procedure) {
+
+                case App.CROP_PROTECTION:
+                    if (!inputList.isEmpty()) {
+                        for (Object input : inputList) {
+                            if (input instanceof Phytos) {
+                                if (((Phytos) input).inter.quantity <= 0) {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_quantity, Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, R.string.you_have_to_enter_phyto, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
+                case App.IMPLANTATION:
+                    HashSet<String> productionNature = new HashSet<>();
+                    outerLoop:
+                    for (CropsByPlot plot : cropList) {
+                        for (Crop crop : plot.crops) {
+                            if (crop.is_checked) {
+                                if (productionNature.isEmpty() || productionNature.contains(crop.specie)) {
+                                    productionNature.add(crop.specie);
+                                } else {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, R.string.implantation_have_to_be_on_same_crop_nature, Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                    break outerLoop;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!inputList.isEmpty()) {
+                        for (Object input : inputList) {
+                            if (input instanceof Seeds) {
+                                if (((Seeds) input).inter.quantity <= 0) {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_seed_quantity, Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, R.string.you_must_select_seed, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
+                case App.FERTILIZATION:
+                    if (!inputList.isEmpty()) {
+                        for (Object input : inputList) {
+                            if (input instanceof Fertilizers) {
+                                if (((Fertilizers) input).inter.quantity <= 0) {
+                                    cancel(true);
+                                    Toast toast = Toast.makeText(context, R.string.you_have_to_enter_a_product_quantity, Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, R.string.you_must_select_a_fertilizer, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
+                case App.IRRIGATION:
+                    if (irrigationQuantityEdit.getText().toString().equals("0") || irrigationQuantityEdit.getText().toString().isEmpty()) {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, R.string.you_must_enter_a_water_volume, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+
+                case App.HARVEST:
+                    if (!outputList.isEmpty()) {
+                        for (Harvest harvest : outputList) {
+                            if (harvest.quantity == null || harvest.quantity <= 0) {
+                                cancel(true);
+                                Toast toast = Toast.makeText(context, R.string.you_must_enter_harvest_quantity, Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                                toast.show();
+                            }
+                        }
+                    } else {
+                        cancel(true);
+                        Toast toast = Toast.makeText(context, R.string.you_must_create_a_harvest_load, Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, 200);
+                        toast.show();
+                    }
+                    break;
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            AppDatabase database = AppDatabase.getInstance(context);
+
+            Intervention intervention;
+
+            if (editIntervention != null) {
+
+                // We are editing an existing intervention
+                Timber.i("Intervention edition");
+
+                // Symplify intervention object
+                intervention = editIntervention.intervention;
+
+                // Deletes relations
+                database.dao().delete(editIntervention.workingDays.get(0));
+
+                // Deletes weather relation if exists
+                if (!editIntervention.weather.isEmpty()) database.dao().delete(editIntervention.weather.get(0));
+
+                for (Crops crop : editIntervention.crops)
+                    database.dao().delete(crop.inter);
+                for (Persons person : editIntervention.persons)
+                    database.dao().delete(person.inter);
+                for (Phytos phyto : editIntervention.phytos)
+                    database.dao().delete(phyto.inter);
+                for (Seeds seed : editIntervention.seeds)
+                    database.dao().delete(seed.inter);
+                for (Fertilizers fertilizer : editIntervention.fertilizers)
+                    database.dao().delete(fertilizer.inter);
+                for (Materials material : editIntervention.materials)
+                    database.dao().delete(material.inter);
+                for (Equipments equipment : editIntervention.equipments)
+                    database.dao().delete(equipment.inter);
+                for (Harvest harvest : editIntervention.harvests)
+                    database.dao().delete(harvest);
+
+                // Set status to updated
+                if (intervention.status.equals(SYNCED))
+                    intervention.setStatus(UPDATED);
+
+            } else {
+                // Creates a new intervention
+                intervention = new Intervention();
+                intervention.setType(procedure);
+                intervention.setFarm(MainActivity.FARM_ID);
+                intervention.setStatus(CREATED);
+            }
+
+            if (procedure.equals(App.IRRIGATION)) {
+                intervention.setWater_quantity(Integer.valueOf(irrigationQuantityEdit.getText().toString()));
+                intervention.setWater_unit(Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition()).key);
+            }
+
+            String comment = descriptionEditText.getText().toString();
+            if (!comment.isEmpty())
+                intervention.comment = comment;
+
+            // Save/update intervention and get returning id
+            int intervention_id = (int) (long) database.dao().insert(intervention);
+
+            database.dao().insert(new InterventionWorkingDay(intervention_id, date, duration));
+
+            Float temperature = null;
+            if (!temperatureEditText.getText().toString().isEmpty())
+                temperature = Float.valueOf(temperatureEditText.getText().toString());
+
+            Float windSpeed = null;
+            if (!windSpeedEditText.getText().toString().isEmpty())
+                windSpeed = Float.valueOf(windSpeedEditText.getText().toString());
+
+            if (temperature != null || windSpeed != null || weatherDescription != null)
+                database.dao().insert(new Weather(intervention_id, temperature, windSpeed, weatherDescription));
+
+            for (Object item : inputList) {
+                if (item instanceof Seeds) {
+                    Seeds seed = (Seeds) item;
+                    seed.inter.intervention_id =  intervention_id;
+                    database.dao().insert(seed.inter);
+                }
+                else if (item instanceof Phytos) {
+                    Phytos phyto = (Phytos) item;
+                    phyto.inter.intervention_id = intervention_id;
+                    database.dao().insert(phyto.inter);
+                    Timber.i("Phyto #%s", phyto.phyto.get(0).id);
+                }
+                else if (item instanceof Fertilizers) {
+                    Fertilizers ferti = (Fertilizers) item;
+                    ferti.inter.intervention_id = intervention_id;
+                    database.dao().insert(ferti.inter);
+                }
+            }
+
+            for (Equipments item : equipmentList) {
+                item.inter.intervention_id = intervention_id;
+                database.dao().insert(item.inter);
+            }
+
+            for (Persons item : personList) {
+                item.inter.intervention_id = intervention_id;
+                database.dao().insert(item.inter);
+            }
+
+            for (CropsByPlot plot : cropList) {
+                for (Crop crop : plot.crops)
+                    if (crop.is_checked)
+                        database.dao().insert(new InterventionCrop(intervention_id, crop.uuid, crop.work_area_percentage));
+            }
+
+            for (Harvest harvest : outputList) {
+                Timber.i("harvest id_storage == %s", harvest.id_storage);
+                harvest.type = Enums.OUTPUT_TYPES.get(harvestOutputType.getSelectedItemPosition());
+                harvest.intervention_id = intervention_id;
+                database.dao().insert(harvest);
+            }
+            // Bulk insert (not used)
+            //database.dao().insert(outputList.toArray(new Harvest[outputList.size()]));
+
+            for (Materials item : materialList) {
+                item.inter.intervention_id = intervention_id;
+                database.dao().insert(item.inter);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            clearDatasets();
+            finish();
+        }
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -1225,9 +1222,9 @@ public class InterventionActivity extends AppCompatActivity implements
                 }
 
             } else {
-//                if (selectCropFragment != null && selectCropFragment.isVisible())
-//                    selectCropFragment.dismiss();
-                List<Plots> plots = (List<Plots>) selection;
+                if (selectCropFragment != null && selectCropFragment.isVisible())
+                    selectCropFragment.dismiss();
+                List<CropsByPlot> plots = (List<CropsByPlot>) selection;
                 if (!plots.isEmpty()) {
                     if (cropSummaryText.equals(this.getString(R.string.no_crop_selected))) {
                         cropSummary.setVisibility(View.GONE);
@@ -1238,8 +1235,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         cropSummary.setVisibility(View.VISIBLE);
                     }
                     // Erase plotList with new one from selection
-                    //plotList = plots;
-                    // TODO: decomment below
+                    cropList = plots;
                 }
             }
         }

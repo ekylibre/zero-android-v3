@@ -15,9 +15,9 @@ import android.widget.TextView;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.pojos.CropsByPlot;
 import com.ekylibre.android.fragments.SelectCropFragment;
 import com.ekylibre.android.database.models.Crop;
-import com.ekylibre.android.database.pojos.Plots;
 import com.mapbox.api.staticmap.v1.MapboxStaticMap;
 import com.squareup.picasso.Picasso;
 
@@ -32,9 +32,9 @@ import static com.mapbox.api.staticmap.v1.StaticMapCriteria.LIGHT_STYLE;
 public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.ViewHolder> {
 
     private Context context;
-    private List<Plots> dataset;
+    private List<CropsByPlot> dataset;
 
-    public SelectCropAdapter(Context context, List<Plots> dataset, SelectCropFragment.OnFragmentInteractionListener fragmentListener) {
+    public SelectCropAdapter(Context context, List<CropsByPlot> dataset, SelectCropFragment.OnFragmentInteractionListener fragmentListener) {
         this.context = context;
         this.dataset = dataset;
     }
@@ -59,14 +59,16 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
 
         }
 
-        void display(Plots item) {
+        void display(CropsByPlot plot) {
 
-            plotCheckBox.setText(item.plot.name);
-            plotCheckBox.setChecked(item.plot.is_checked);
-            plotArea.setText(String.format(MainActivity.LOCALE, "%.1f ha", item.plot.surface_area));
+            Timber.i("Plot %s", plot);
+
+            plotCheckBox.setText(plot.name);
+            plotCheckBox.setChecked(plot.is_checked);
+            plotArea.setText(String.format(MainActivity.LOCALE, "%.1f ha", plot.getSurface(false)));
 
             // Display all crops associated to a plot
-            displayCrops(item);
+            displayCrops(plot);
             updateTotal();
 
             // Accordion control
@@ -86,32 +88,32 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                 boolean isChecked = plotCheckBox.isChecked();
 
                 // Save action (checked/unchecked) to dataset item plot and crops
-                item.plot.is_checked = isChecked;
+                plot.is_checked = isChecked;
 
-                for (Crop crop : item.crops)
+                for (Crop crop : plot.crops)
                     crop.is_checked = isChecked;
 
                 // Updates crops display
-                displayCrops(item);
+                displayCrops(plot);
 
                 // Updates surface area total
                 updateTotal();
             });
         }
 
-        void displayCrops(Plots item) {
+        void displayCrops(CropsByPlot plot) {
 
             // First remove all childs view
             cropContainer.removeAllViews();
 
             int index = 0;
-            for (Crop crop : item.crops) {
+            for (Crop crop : plot.crops) {
 
                 // Inflate crom item layout
                 View child = inflater.inflate(R.layout.item_crop, null);
 
                 // Set bottom border if not latest element
-                if (++index < item.crops.size())
+                if (++index < plot.crops.size())
                     child.setBackgroundResource(R.drawable.border_bottom_lightgrey);
 
                 ConstraintLayout cropLayout = child.findViewById(R.id.item_crop_layout);
@@ -152,17 +154,17 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                     // Save action (checked/unchecked) to dataset item crop and update total
                     crop.is_checked = isChecked;
                     int cropSelected = 0;
-                    for (Crop mCrop : item.crops) {
+                    for (Crop mCrop : plot.crops) {
                         if (mCrop.is_checked)
                             cropSelected++;
                     }
                     if (cropSelected > 0) {
                         plotCheckBox.setChecked(true);
-                        item.plot.is_checked = true;
+                        plot.is_checked = true;
                     }
                     else {
                         plotCheckBox.setChecked(false);
-                        item.plot.is_checked = false;
+                        plot.is_checked = false;
                     }
                     updateTotal();
                 });
@@ -185,7 +187,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
             float total = 0;
             int count = 0;
 
-            for (Plots plot : dataset)
+            for (CropsByPlot plot : dataset)
                 for (Crop crop : plot.crops)
                     if (crop.is_checked) {
                         total += crop.surface_area;

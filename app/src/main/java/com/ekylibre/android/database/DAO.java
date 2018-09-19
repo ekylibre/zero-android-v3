@@ -138,9 +138,9 @@ public interface DAO {
     /**
      *    Plot list
      */
-    @Transaction
-    @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
-    List<Plots> plotList(String farmId);
+//    @Transaction
+//    @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
+//    List<Plots> plotList(String farmId);
 
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
     List<Crop> cropList(String farmId);

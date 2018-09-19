@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.SelectCropAdapter;
-import com.ekylibre.android.database.pojos.Plots;
+import com.ekylibre.android.database.pojos.CropsByPlot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class SelectCropFragment extends DialogFragment {
     private OnFragmentInteractionListener fragmentListener;
     public static TextView totalTextView;
 
-    public List<Plots> dataset;
+    public List<CropsByPlot> dataset;
 
     public SelectCropFragment() {
     }
