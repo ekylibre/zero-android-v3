@@ -41,7 +41,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/pull_down"
         android:layout_marginTop="16dp"
-        android:tint="@color/accent"
+        android:tint="@color/helpTextMessage"
         app:srcCompat="@drawable/ic_arrow_downward"
         android:visibility="gone" />
 
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:text="@string/sync_help_text"
         android:lines="2"
-        android:textColor="@color/accent"
+        android:textColor="@color/helpTextMessage"
         android:textStyle="italic"
         app:layout_constraintStart_toEndOf="@id/pull_down_icon"
         app:layout_constraintEnd_toStartOf="@id/delete_pull_down_message"
@@ -65,7 +65,7 @@
         android:id="@+id/delete_pull_down_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tint="@color/accent"
+        android:tint="@color/helpTextMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/pull_down_icon"
         app:layout_constraintBottom_toBottomOf="@id/pull_down_icon"

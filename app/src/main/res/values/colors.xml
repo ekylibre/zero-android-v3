@@ -30,5 +30,6 @@
     <color name="dialogTitleColor">@color/white</color>
     <color name="createText">@color/accent</color>
     <color name="productionHeader">@color/accent</color>
+    <color name="helpTextMessage">@color/primary</color>
 
 </resources>
