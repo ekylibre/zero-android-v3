@@ -33,7 +33,6 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
-import com.ekylibre.android.database.models.Plot;
 import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Storage;
@@ -895,15 +894,15 @@ public class SyncService extends IntentService {
                     ////////////////////
                     // Processing plots
                     ////////////////////
-                    List<FarmQuery.Plot> plots = farm.plots();
-                    if (plots != null) {
-                        Timber.i("Fetching plots...");
-                        for (FarmQuery.Plot plot : plots) {
-                            Plot newPlot = new Plot(plot.uuid(), plot.name(), null,
-                                    Float.valueOf(plot.surfaceArea().split(" ")[0]), null, null, null, farm.id());
-                            database.dao().insert(newPlot);
-                        }
-                    }
+//                    List<FarmQuery.Plot> plots = farm.plots();
+//                    if (plots != null) {
+//                        Timber.i("Fetching plots...");
+//                        for (FarmQuery.Plot plot : plots) {
+//                            Plot newPlot = new Plot(plot.uuid(), plot.name(), null,
+//                                    Float.valueOf(plot.surfaceArea().split(" ")[0]), null, null, null, farm.id());
+//                            database.dao().insert(newPlot);
+//                        }
+//                    }
 
                     /////////////////////////////////////////
                     // Processing crops and associated plots
@@ -923,12 +922,12 @@ public class SyncService extends IntentService {
                             //String name = crop.productionNature().name() + " " + cal.get(Calendar.YEAR);
 
                             // Saving crop
-                            String plot = crop.plot() != null ? crop.plot().uuid() : null;
+                            //String plot = crop.plot() != null ? crop.plot().uuid() : null;
                             Crop newCrop = new Crop(
                                     crop.uuid(), crop.name(), crop.species().rawValue(), crop.productionNature().name(),
                                     crop.productionMode(), null, crop.provisionalYield(), crop.shape(),
                                     Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
-                                    crop.startDate(), crop.stopDate(), plot, farm.id());
+                                    crop.startDate(), crop.stopDate(), null, farm.id());
                             database.dao().insert(newCrop);
                         }
                         // TODO: delete crop & plot if deleted on server

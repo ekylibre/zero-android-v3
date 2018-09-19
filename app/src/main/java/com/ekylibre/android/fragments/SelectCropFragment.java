@@ -50,7 +50,7 @@ public class SelectCropFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        dataset = InterventionActivity.plotList;
+        dataset = InterventionActivity.cropList;
 
         // Disables AppBar
         Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
