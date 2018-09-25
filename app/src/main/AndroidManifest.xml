@@ -17,29 +17,28 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop" />
         <activity
             android:name=".InterventionActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan" />
-
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".InfoActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".LiveActivity" />
-
-        <activity android:name=".InfoActivity" />
-
 
         <!-- SERVICES -->
 
         <service android:name=".services.SyncService" />
-
         <service
             android:name=".services.LocationService"
             android:enabled="true" />
-
         <service
             android:name=".services.OneShotLocationIntentService"
             android:exported="false" />
 
+        <activity android:name=".ConsultActivity"></activity>
     </application>
 
 </manifest>

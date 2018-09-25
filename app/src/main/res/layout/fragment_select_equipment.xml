@@ -8,19 +8,19 @@
     tools:context="com.ekylibre.android.fragments.SelectMaterialFragment"
     android:background="@color/background">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title="@string/selecting_tools"
             app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
             app:titleTextColor="@color/dialogTitleColor"
             android:background="@color/dialogColor"/>
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <android.support.v7.widget.SearchView
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/search_equipment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:background="@drawable/field_search"
         app:queryBackground="@android:color/transparent"/>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/equipment_dialog_create_new"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
         android:textColor="@color/createText"
         android:visibility="visible"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/equipment_dialog_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

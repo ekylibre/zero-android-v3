@@ -1,7 +1,7 @@
 package com.ekylibre.android.database.pojos;
 
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Relation;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Plot;

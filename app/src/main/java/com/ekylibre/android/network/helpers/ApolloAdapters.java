@@ -1,11 +1,10 @@
 package com.ekylibre.android.network.helpers;
 
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apollographql.apollo.response.CustomTypeAdapter;
 import com.apollographql.apollo.response.CustomTypeValue;
-import com.ekylibre.android.MainActivity;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 

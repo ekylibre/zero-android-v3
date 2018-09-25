@@ -1,10 +1,10 @@
 package com.ekylibre.android.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +83,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
             });
 
             // Plot CheckBox onChecked
-            plotCheckBox.setOnClickListener(view -> {
+            View.OnClickListener listener = view -> {
 
                 boolean isChecked = plotCheckBox.isChecked();
 
@@ -98,7 +98,19 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
 
                 // Updates surface area total
                 updateTotal();
-            });
+            };
+
+            if (InterventionActivity.editIntervention == null) {
+                plotCheckBox.setOnClickListener(listener);
+            } else {
+                if (InterventionActivity.validated) {
+                    if (cropContainer.getVisibility() == View.GONE) {
+                        itemView.performClick();
+                        itemView.setOnClickListener(null);
+                    }
+                    plotCheckBox.setClickable(false);
+                }
+            }
         }
 
         void displayCrops(CropsByPlot plot) {
@@ -150,7 +162,7 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                 Picasso.get().load(imageUrl)
                         .placeholder(R.drawable.icon_parcel).into(cropMap);
 
-                cropCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                CheckBox.OnCheckedChangeListener checkListener = ((buttonView, isChecked) -> {
                     // Save action (checked/unchecked) to dataset item crop and update total
                     crop.is_checked = isChecked;
                     int cropSelected = 0;
@@ -169,13 +181,22 @@ public class SelectCropAdapter extends RecyclerView.Adapter<SelectCropAdapter.Vi
                     updateTotal();
                 });
 
-                cropLayout.setOnClickListener(view -> {
+                View.OnClickListener cropListener = (view -> {
                     if (crop.is_checked) {
                         cropCheckBox.setChecked(false);
                     } else {
                         cropCheckBox.setChecked(true);
                     }
                 });
+
+                if (InterventionActivity.editIntervention == null) {
+                    cropCheckBox.setOnCheckedChangeListener(checkListener);
+                    cropLayout.setOnClickListener(cropListener);
+                } else {
+                    if (InterventionActivity.validated) {
+                        cropCheckBox.setVisibility(View.GONE);
+                    }
+                }
 
                 // Add rendered view to container layout
                 cropContainer.addView(child);

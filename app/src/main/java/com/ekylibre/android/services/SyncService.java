@@ -33,7 +33,6 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Material;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.models.Phyto;
-import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
@@ -78,7 +77,6 @@ import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.Enums;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -450,7 +448,7 @@ public class SyncService extends IntentService {
                     }
                 });
             }
-        } else Timber.d("No intervention to delete");
+        } else Timber.i("No intervention to delete");
     }
 
 
@@ -853,7 +851,7 @@ public class SyncService extends IntentService {
      */
     private void getFarm() {
 
-        database.dao().insert(new Point(new Date().getTime(), 0, 0, 0, 0, null, 0));
+        //database.dao().insert(new Point(new Date().getTime(), 0, 0, 0, 0, null, 0));
 
         List<Integer> personEkyIdList = database.dao().personEkiIdList();
         List<Integer> phytoEkyIdList = database.dao().phytoEkiIdList();
@@ -933,38 +931,34 @@ public class SyncService extends IntentService {
                     // Processing people
                     /////////////////////
                     List<FarmQuery.person> people = farm.people();
-                    if (people != null) {
-                        Timber.i("Fetching people...");
+                    Timber.i("Fetching people...");
 
-                        for (FarmQuery.person person : people) {
+                    for (FarmQuery.person person : people) {
 
-                            String firstName = (person.firstName() != null) ? person.firstName() : "";
+                        String firstName = (person.firstName() != null) ? person.firstName() : "";
 
-                            // Save or update Person
-                            if (personEkyIdList.contains(Integer.valueOf(person.id()))) {
-                                database.dao().updatePerson(firstName, person.lastName(), person.id());
-                            } else {
-                                Timber.d("	Create person #%s", person.id());
-                                database.dao().insert(new Person(Integer.valueOf(person.id()), firstName, person.lastName(), farm.id()));
-                            }
+                        // Save or update Person
+                        if (personEkyIdList.contains(Integer.valueOf(person.id()))) {
+                            database.dao().updatePerson(firstName, person.lastName(), person.id());
+                        } else {
+                            Timber.d("	Create person #%s", person.id());
+                            database.dao().insert(new Person(Integer.valueOf(person.id()), firstName, person.lastName(), farm.id()));
                         }
-                        // TODO: delete person if deleted on server --> or mark status deleted ?
                     }
+                    // TODO: delete person if deleted on server --> or mark status deleted ?
 
                     /////////////////////////
                     // Processing equipments
                     /////////////////////////
                     List<FarmQuery.Equipment> equipments = farm.equipments();
-                    if (equipments != null) {
-                        Timber.i("Fetching equipments...");
-                        for (FarmQuery.Equipment equipment : equipments) {
+                    Timber.i("Fetching equipments...");
+                    for (FarmQuery.Equipment equipment : equipments) {
 
-                            int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
-                            if (result != 1) {
-                                Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
-                                database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                        equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
-                            }
+                        int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
+                        if (result != 1) {
+                            Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
+                            database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
+                                    equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
                         }
                     }
 
@@ -976,15 +970,13 @@ public class SyncService extends IntentService {
                     // Processing storages
                     ///////////////////////
                     List<FarmQuery.Storage> storages = farm.storages();
-                    if (storages != null) {
-                        Timber.i("Fetching storages...");
-                        for (FarmQuery.Storage storage : storages) {
-                            Timber.d("	Create/update storage #%s", storage.id());
-                            database.dao().insert(new Storage(
-                                    Integer.valueOf(storage.id()),
-                                    storage.name(),
-                                    storage.type().rawValue()));
-                        }
+                    Timber.i("Fetching storages...");
+                    for (FarmQuery.Storage storage : storages) {
+                        Timber.d("	Create/update storage #%s", storage.id());
+                        database.dao().insert(new Storage(
+                                Integer.valueOf(storage.id()),
+                                storage.name(),
+                                storage.type().rawValue()));
                     }
                     Enums.generateStorages(database);
 
@@ -992,90 +984,88 @@ public class SyncService extends IntentService {
                     // Processing articles
                     ///////////////////////
                     List<FarmQuery.Article> articles = farm.articles();
-                    if (articles != null) {
-                        Timber.i("Fetching articles...");
+                    Timber.i("Fetching articles...");
 
-                        for (FarmQuery.Article article : articles) {
+                    for (FarmQuery.Article article : articles) {
 
-                            int ekyId = Integer.valueOf(article.id());
-                            String articleName = article.name();
-                            String articleUnit = article.unit().rawValue();
+                        int ekyId = Integer.valueOf(article.id());
+                        String articleName = article.name();
+                        String articleUnit = article.unit().rawValue();
 
-                            if (article.type() == ArticleTypeEnum.CHEMICAL) {
+                        if (article.type() == ArticleTypeEnum.CHEMICAL) {
 
-                                if (article.referenceID() != null) {
-                                    Timber.d("	Assign ekyId to phyto #%s", article.referenceID());
-                                    database.dao().setPhytoEkyId(ekyId, Integer.valueOf(article.referenceID()));  // article.name().split(" - ")[0] + "%"
+                            if (article.referenceID() != null) {
+                                Timber.d("	Assign ekyId to phyto #%s", article.referenceID());
+                                database.dao().setPhytoEkyId(ekyId, Integer.valueOf(article.referenceID()));  // article.name().split(" - ")[0] + "%"
 
-                                } else {
-                                    if (!phytoEkyIdList.contains(ekyId)) {
-                                        Timber.d("	Create phyto #%s", article.id());
-                                        Integer newId = database.dao().lastPhytosanitaryId();
-                                        newId = newId != null ? ++newId : 100000;
-                                        database.dao().insert(new Phyto(newId, ekyId, articleName,
-                                                null, article.marketingAuthorizationNumber(), null,
-                                                null, null, false, true, articleUnit));
-                                    }
-                                    else {
-                                        // TODO: manage existing article without ekyId
-                                    }
+                            } else {
+                                if (!phytoEkyIdList.contains(ekyId)) {
+                                    Timber.d("	Create phyto #%s", article.id());
+                                    Integer newId = database.dao().lastPhytosanitaryId();
+                                    newId = newId != null ? ++newId : 100000;
+                                    database.dao().insert(new Phyto(newId, ekyId, articleName,
+                                            null, article.marketingAuthorizationNumber(), null,
+                                            null, null, false, true, articleUnit));
+                                }
+                                else {
+                                    // TODO: manage existing article without ekyId
                                 }
                             }
+                        }
 
-                            if (article.type() == ArticleTypeEnum.SEED) {
+                        if (article.type() == ArticleTypeEnum.SEED) {
 
-                                if (article.referenceID() != null) {
-                                    Timber.d("	Assign ekyId to seed #%s", article.referenceID());
-                                    database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceID());
+                            if (article.referenceID() != null) {
+                                Timber.d("	Assign ekyId to seed #%s", article.referenceID());
+                                database.dao().setSeedEkyId(Integer.valueOf(article.id()), article.referenceID());
 
-                                } else {
-                                    if (!seedEkyIdList.contains(ekyId)) {
-                                        Integer newId = database.dao().lastSeedId();
-                                        newId = newId != null ? ++newId : 1;
-                                        String specie = article.species() != null ? article.species().rawValue().toLowerCase() : null;
-                                        String variety;
-                                        if (article.variety() == null || article.variety().isEmpty()) {
-                                            variety = articleName;
-                                        } else {
-                                            variety = article.variety();
-                                        }
-                                        Timber.i("Seed id:%s ekyId:%s specie:%s variety:%s", newId, article.id(), specie, variety);
-                                        database.dao().insert(new Seed(newId, ekyId, specie, variety, false, true, articleUnit));
+                            } else {
+                                if (!seedEkyIdList.contains(ekyId)) {
+                                    Integer newId = database.dao().lastSeedId();
+                                    newId = newId != null ? ++newId : 1;
+                                    String specie = article.species() != null ? article.species().rawValue().toLowerCase() : null;
+                                    String variety;
+                                    if (article.variety() == null || article.variety().isEmpty()) {
+                                        variety = articleName;
+                                    } else {
+                                        variety = article.variety();
                                     }
+                                    Timber.i("Seed id:%s ekyId:%s specie:%s variety:%s", newId, article.id(), specie, variety);
+                                    database.dao().insert(new Seed(newId, ekyId, specie, variety, false, true, articleUnit));
                                 }
                             }
+                        }
 
-                            if (article.type() == ArticleTypeEnum.FERTILIZER) {
+                        if (article.type() == ArticleTypeEnum.FERTILIZER) {
 
-                                if (article.referenceID() != null) {
-                                    Timber.d("	Assign ekyId to fertilizer #%s", article.referenceID());
-                                    database.dao().setFertilizerEkyId(ekyId, article.referenceID());
+                            if (article.referenceID() != null) {
+                                Timber.d("	Assign ekyId to fertilizer #%s", article.referenceID());
+                                database.dao().setFertilizerEkyId(ekyId, article.referenceID());
 
-                                } else {
-                                    if (!fertiEkyIdList.contains(ekyId)) {
-                                        Integer newId = database.dao().lastFertilizerId();
-                                        Timber.i("Last Ferti id %s", newId);
-                                        newId = newId != null ? ++newId : 1000;
-                                        Timber.i("Fertilizer id:%s ekyId:%s name:%s", newId, ekyId, articleName);
-                                        database.dao().insert(new Fertilizer(newId, ekyId, null,
-                                                articleName, null, null, null, null, null,
-                                                null, null, null, false, true, articleUnit));
-                                    }
+                            } else {
+                                if (!fertiEkyIdList.contains(ekyId)) {
+                                    Integer newId = database.dao().lastFertilizerId();
+                                    Timber.i("Last Ferti id %s", newId);
+                                    newId = newId != null ? ++newId : 1000;
+                                    Timber.i("Fertilizer id:%s ekyId:%s name:%s", newId, ekyId, articleName);
+                                    database.dao().insert(new Fertilizer(newId, ekyId, null,
+                                            articleName, null, null, null, null, null,
+                                            null, null, null, false, true, articleUnit));
                                 }
                             }
+                        }
 
-                            if (article.type() == ArticleTypeEnum.MATERIAL) {
+                        if (article.type() == ArticleTypeEnum.MATERIAL) {
 
-                                if (materialEkyIdList.contains(ekyId)) {
-                                    Material material = database.dao().getMaterialByEkyId(ekyId);
-                                    material.name = articleName;
-                                    material.unit = articleUnit;
-                                    database.dao().insert(material);
-                                } else {
-                                    database.dao().insert(new Material(
-                                            Integer.valueOf(article.id()), article.name(),
-                                            null, article.unit().rawValue()));
-                                }
+                            if (materialEkyIdList.contains(ekyId)) {
+                                Material material = database.dao().getMaterialByEkyId(ekyId);
+                                material.name = articleName;
+                                material.unit = articleUnit;
+                                database.dao().insert(material);
+                            } else {
+                                database.dao().insert(new Material(
+                                        Integer.valueOf(article.id()), article.name(),
+                                        null, article.unit().rawValue()));
                             }
                         }
                     }
@@ -1085,7 +1075,11 @@ public class SyncService extends IntentService {
             }
         };
 
-        apolloClient.query(FarmQuery.builder().build()).enqueue(farmCallback);
+        apolloClient.query(
+                FarmQuery.builder()
+                        .modifiedSince(MainActivity.lastSyncTime)
+                        .build())
+                .enqueue(farmCallback);
     }
 
     /**
@@ -1116,245 +1110,242 @@ public class SyncService extends IntentService {
                     InterventionQuery.Farm farm = data.farms().get(0);
                     List<InterventionQuery.Intervention> interventions = farm.interventions();
 
-                    if (interventions != null) {
+                    Timber.i("Fetching interventions...");
 
-                        Timber.i("Fetching interventions...");
+                    // Building list of remote intervention IDs
+                    for (InterventionQuery.Intervention inter : interventions)
+                        remoteInterventionList.add(Integer.valueOf(inter.id()));
 
-                        // Building list of remote intervention IDs
-                        for (InterventionQuery.Intervention inter : interventions)
-                            remoteInterventionList.add(Integer.valueOf(inter.id()));
+//                    // Deletes local Intervention not present online
+//                    for (Integer ekyId : interventionEkyIdList)
+//                        if (!remoteInterventionList.contains(ekyId))
+//                            database.dao().deleteIntervention(ekyId);
 
-                        // Deletes local Intervention not present online
-                        for (Integer ekyId : interventionEkyIdList)
-                            if (!remoteInterventionList.contains(ekyId))
-                                database.dao().deleteIntervention(ekyId);
+                    int id;
 
-                        int id;
+                    for (InterventionQuery.Intervention inter : interventions) {
 
-                        for (InterventionQuery.Intervention inter : interventions) {
+                        // Check intervention doesn't exists locally
+                        if (!interventionEkyIdList.contains(Integer.valueOf(inter.id()))) {
 
-                            // Check intervention doesn't exists locally
-                            if (!interventionEkyIdList.contains(Integer.valueOf(inter.id()))) {
+                            Timber.d("|-- save new intervention #%s", inter.id());
 
-                                Timber.d("|-- save new intervention #%s", inter.id());
+                            Intervention newInter = new Intervention();
 
-                                Intervention newInter = new Intervention();
+                            // Set general data
+                            newInter.setFarm(farm.id());
+                            newInter.setEky_id(Integer.valueOf(inter.id()));
+                            newInter.setType(inter.type().toString());
 
-                                // Set general data
-                                newInter.setFarm(farm.id());
-                                newInter.setEky_id(Integer.valueOf(inter.id()));
-                                newInter.setType(inter.type().toString());
+                            // Set status
+                            String status = inter.validatedAt() != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;
+                            newInter.setStatus(status);
 
-                                // Set status
-                                String status = inter.validatedAt() != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;
-                                newInter.setStatus(status);
+                            // Setting water values if present
+                            Long waterQuantity = inter.waterQuantity();
+                            InterventionWaterVolumeUnitEnum waterUnit = inter.waterUnit();
+                            if (waterQuantity != null && waterUnit != null) {
+                                newInter.setWater_quantity(waterQuantity.intValue());
+                                newInter.setWater_unit(waterUnit.rawValue());
+                            }
 
-                                // Setting water values if present
-                                Long waterQuantity = inter.waterQuantity();
-                                InterventionWaterVolumeUnitEnum waterUnit = inter.waterUnit();
-                                if (waterQuantity != null && waterUnit != null) {
-                                    newInter.setWater_quantity(waterQuantity.intValue());
-                                    newInter.setWater_unit(waterUnit.rawValue());
+                            // Set description is present
+                            String comment = inter.description();
+                            if (comment != null)
+                                newInter.comment = comment;
+
+                            // Write Intervention and get fallback id
+                            id = (int) database.dao().insert(newInter);
+
+                        } else {
+
+                            Timber.d("|-- update intervention #%s", inter.id());
+
+                            // Get actual local Intervention and proceed update
+                            Interventions existingInter = database.dao().getIntervention(Integer.parseInt(inter.id()));
+
+                            existingInter.intervention.type = inter.type().rawValue();
+
+                            Date validatedAt = inter.validatedAt();
+                            existingInter.intervention.status = validatedAt != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;
+
+                            Long waterQuantity = inter.waterQuantity();
+                            InterventionWaterVolumeUnitEnum waterUnit = inter.waterUnit();
+                            if (waterQuantity != null && waterUnit != null) {
+                                existingInter.intervention.water_quantity = waterQuantity.intValue();
+                                existingInter.intervention.water_unit = waterUnit.rawValue();
+                            }
+
+                            // Set description is present
+                            String comment = inter.description();
+                            if (comment != null)
+                                existingInter.intervention.comment = comment;
+
+                            // Upsert modified Intervention in database
+                            database.dao().insert(existingInter.intervention);
+
+                            // Set id for next use
+                            id = existingInter.intervention.id;
+
+                            // Cleaning non unique primary key relations
+                            if (!existingInter.workingDays.isEmpty())
+                                database.dao().delete(existingInter.workingDays.get(0));
+                            for (Crops crop : existingInter.crops)
+                                database.dao().delete(crop.inter);
+                            for (Persons person : existingInter.persons)
+                                database.dao().delete(person.inter);
+                            for (Phytos phyto : existingInter.phytos)
+                                database.dao().delete(phyto.inter);
+                            for (Seeds seed : existingInter.seeds)
+                                database.dao().delete(seed.inter);
+                            for (Fertilizers fertilizer : existingInter.fertilizers)
+                                database.dao().delete(fertilizer.inter);
+                            for (Materials material : existingInter.materials)
+                                database.dao().delete(material.inter);
+                            for (Equipments equipment : existingInter.equipments)
+                                database.dao().delete(equipment.inter);
+                            for (Harvest harvest : existingInter.harvests)
+                                database.dao().delete(harvest);
+                        }
+
+                        //////////////////////
+                        // Saving WorkingDays
+                        //////////////////////
+                        for (InterventionQuery.WorkingDay workingDay : inter.workingDays()) {
+                            Date executionDate = workingDay.executionDate();
+                            Double duration = workingDay.hourDuration();
+                            if (executionDate != null && duration != null)
+                                database.dao().insert(new InterventionWorkingDay(id, executionDate, workingDay.hourDuration().floatValue()));
+                        }
+
+                        //////////////////////////
+                        // Saving Crops (targets)
+                        //////////////////////////
+                        for (InterventionQuery.Target target : inter.targets()) {
+                            Long workingPercentage = target.workingPercentage();
+                            database.dao().insert(new InterventionCrop(id, target.crop().uuid(), workingPercentage.intValue()));
+                        }
+
+                        ////////////////////
+                        // Saving Operators
+                        ////////////////////
+                        List<InterventionQuery.Operator> operators = inter.operators();
+                        if (operators != null) {
+                            for (InterventionQuery.Operator operator : operators) {
+                                InterventionQuery.Person person = operator.person();
+                                if (person != null) {
+                                    boolean isDiver = operator.role() == OperatorRoleEnum.DRIVER;
+                                    int personId = database.dao().getPersonId(Integer.valueOf(person.id()));
+                                    database.dao().insert(new InterventionPerson(id, personId, isDiver));
                                 }
+                            }
+                        }
 
-                                // Set description is present
-                                String comment = inter.description();
-                                if (comment != null)
-                                    newInter.comment = comment;
+                        //////////////////
+                        // Saving Weather
+                        //////////////////
+                        InterventionQuery.Weather weather = inter.weather();
+                        if (weather != null) {
+                            Double temperature = weather.temperature();
+                            Float temp = temperature != null ? temperature.floatValue() : null;
+                            Double windSpeed = weather.windSpeed();
+                            Float wind = windSpeed != null ? windSpeed.floatValue() : null;
+                            WeatherEnum description = weather.description();
+                            String desc = description != null ? description.rawValue() : null;
+                            if (temp != null || wind != null || desc != null)
+                                database.dao().insert(new Weather(id, temp, wind, desc));
+                        }
 
-                                // Write Intervention and get fallback id
-                                id = (int) database.dao().insert(newInter);
-
-                            } else {
-
-                                Timber.d("|-- update intervention #%s", inter.id());
-
-                                // Get actual local Intervention and proceed update
-                                Interventions existingInter = database.dao().getIntervention(Integer.parseInt(inter.id()));
-
-                                existingInter.intervention.type = inter.type().rawValue();
-
-                                Date validatedAt = inter.validatedAt();
-                                existingInter.intervention.status = validatedAt != null ? InterventionActivity.VALIDATED : InterventionActivity.SYNCED;
-
-                                Long waterQuantity = inter.waterQuantity();
-                                InterventionWaterVolumeUnitEnum waterUnit = inter.waterUnit();
-                                if (waterQuantity != null && waterUnit != null) {
-                                    existingInter.intervention.water_quantity = waterQuantity.intValue();
-                                    existingInter.intervention.water_unit = waterUnit.rawValue();
+                        /////////////////////
+                        // Saving Equipments
+                        /////////////////////
+                        List<InterventionQuery.Tool> tools = inter.tools();
+                        if (tools != null) {
+                            for (InterventionQuery.Tool tool : tools) {
+                                if (tool.equipment() != null) {
+                                    int equipmentId = database.dao().getEquipmentId(Integer.valueOf(tool.equipment().id()));
+                                    database.dao().insert(new InterventionEquipment(id, equipmentId));
                                 }
-
-                                // Set description is present
-                                String comment = inter.description();
-                                if (comment != null)
-                                    existingInter.intervention.comment = comment;
-
-                                // Upsert modified Intervention in database
-                                database.dao().insert(existingInter.intervention);
-
-                                // Set id for next use
-                                id = existingInter.intervention.id;
-
-                                // Cleaning non unique primary key relations
-                                if (!existingInter.workingDays.isEmpty())
-                                    database.dao().delete(existingInter.workingDays.get(0));
-                                for (Crops crop : existingInter.crops)
-                                    database.dao().delete(crop.inter);
-                                for (Persons person : existingInter.persons)
-                                    database.dao().delete(person.inter);
-                                for (Phytos phyto : existingInter.phytos)
-                                    database.dao().delete(phyto.inter);
-                                for (Seeds seed : existingInter.seeds)
-                                    database.dao().delete(seed.inter);
-                                for (Fertilizers fertilizer : existingInter.fertilizers)
-                                    database.dao().delete(fertilizer.inter);
-                                for (Materials material : existingInter.materials)
-                                    database.dao().delete(material.inter);
-                                for (Equipments equipment : existingInter.equipments)
-                                    database.dao().delete(equipment.inter);
-                                for (Harvest harvest : existingInter.harvests)
-                                    database.dao().delete(harvest);
                             }
+                        }
 
-                            //////////////////////
-                            // Saving WorkingDays
-                            //////////////////////
-                            for (InterventionQuery.WorkingDay workingDay : inter.workingDays()) {
-                                Date executionDate = workingDay.executionDate();
-                                Double duration = workingDay.hourDuration();
-                                if (executionDate != null && duration != null)
-                                    database.dao().insert(new InterventionWorkingDay(id, executionDate, workingDay.hourDuration().floatValue()));
-                            }
+                        /////////////////
+                        // Saving Inputs
+                        /////////////////
+                        List<InterventionQuery.Input> inputs = inter.inputs();
+                        if (inputs != null) {
+                            for (InterventionQuery.Input input : inputs) {
 
-                            //////////////////////////
-                            // Saving Crops (targets)
-                            //////////////////////////
-                            for (InterventionQuery.Target target : inter.targets()) {
-                                Long workingPercentage = target.workingPercentage();
-                                database.dao().insert(new InterventionCrop(id, target.crop().uuid(), workingPercentage.intValue()));
-                            }
+                                InterventionQuery.Article article = input.article();
+                                if (article != null) {
 
-                            ////////////////////
-                            // Saving Operators
-                            ////////////////////
-                            List<InterventionQuery.Operator> operators = inter.operators();
-                            if (operators != null) {
-                                for (InterventionQuery.Operator operator : operators) {
-                                    InterventionQuery.Person person = operator.person();
-                                    if (person != null) {
-                                        boolean isDiver = operator.role() == OperatorRoleEnum.DRIVER;
-                                        int personId = database.dao().getPersonId(Integer.valueOf(person.id()));
-                                        database.dao().insert(new InterventionPerson(id, personId, isDiver));
+                                    Timber.i("article %s", article.id());
+
+                                    int ekyId = Integer.valueOf(article.id());
+                                    Double quantity = input.quantity();
+                                    float qtt = quantity != null ? quantity.floatValue() : 0;
+                                    String articleUnit = input.unit().rawValue();
+                                    String referenceId = article.referenceID();
+                                    int articleId;
+
+                                    if (article.type().equals(ArticleTypeEnum.CHEMICAL)) {
+                                        if (referenceId != null) // TODO: waiting for API to support null
+                                            articleId = Integer.valueOf(referenceId);
+                                        else
+                                            articleId = database.dao().getPhytoId(ekyId);
+                                        database.dao().insert(new InterventionPhytosanitary(qtt, articleUnit, id, articleId));
+
+                                    } else if (article.type().equals(ArticleTypeEnum.SEED)) {
+                                        if (referenceId != null)
+                                            articleId = Integer.valueOf(referenceId);
+                                        else
+                                            articleId = database.dao().getSeedId(ekyId);
+
+                                        database.dao().insert(new InterventionSeed(qtt, articleUnit, id, articleId));
+
+                                    } else if (article.type().equals(ArticleTypeEnum.FERTILIZER)) {
+                                        if (referenceId != null)
+                                            articleId = Integer.valueOf(referenceId);
+                                        else
+                                            articleId = database.dao().getFertilizerId(ekyId);
+
+                                        database.dao().insert(new InterventionFertilizer(qtt, articleUnit, id, articleId));
+
+                                    } else if (article.type().equals(ArticleTypeEnum.MATERIAL)) {
+                                        articleId = database.dao().getMaterialByEkyId(ekyId).id;
+                                        database.dao().insert(new InterventionMaterial((int) qtt, articleUnit, id, articleId, false));
                                     }
                                 }
                             }
+                        }
 
-                            //////////////////
-                            // Saving Weather
-                            //////////////////
-                            InterventionQuery.Weather weather = inter.weather();
-                            if (weather != null) {
-                                Double temperature = weather.temperature();
-                                Float temp = temperature != null ? temperature.floatValue() : null;
-                                Double windSpeed = weather.windSpeed();
-                                Float wind = windSpeed != null ? windSpeed.floatValue() : null;
-                                WeatherEnum description = weather.description();
-                                String desc = description != null ? description.rawValue() : null;
-                                if (temp != null || wind != null || desc != null)
-                                    database.dao().insert(new Weather(id, temp, wind, desc));
-                            }
-
-                            /////////////////////
-                            // Saving Equipments
-                            /////////////////////
-                            List<InterventionQuery.Tool> tools = inter.tools();
-                            if (tools != null) {
-                                for (InterventionQuery.Tool tool : tools) {
-                                    if (tool.equipment() != null) {
-                                        int equipmentId = database.dao().getEquipmentId(Integer.valueOf(tool.equipment().id()));
-                                        database.dao().insert(new InterventionEquipment(id, equipmentId));
-                                    }
-                                }
-                            }
-
-                            /////////////////
-                            // Saving Inputs
-                            /////////////////
-                            List<InterventionQuery.Input> inputs = inter.inputs();
-                            if (inputs != null) {
-                                for (InterventionQuery.Input input : inputs) {
-
-                                    InterventionQuery.Article article = input.article();
-                                    if (article != null) {
-
-                                        Timber.i("article %s", article.id());
-
-                                        int ekyId = Integer.valueOf(article.id());
-                                        Double quantity = input.quantity();
-                                        float qtt = quantity != null ? quantity.floatValue() : 0;
-                                        String articleUnit = input.unit().rawValue();
-                                        String referenceId = article.referenceID();
-                                        int articleId;
-
-                                        if (article.type().equals(ArticleTypeEnum.CHEMICAL)) {
-                                            if (referenceId != null) // TODO: waiting for API to support null
-                                                articleId = Integer.valueOf(referenceId);
-                                            else
-                                                articleId = database.dao().getPhytoId(ekyId);
-                                            database.dao().insert(new InterventionPhytosanitary(qtt, articleUnit, id, articleId));
-
-                                        } else if (article.type().equals(ArticleTypeEnum.SEED)) {
-                                            if (referenceId != null)
-                                                articleId = Integer.valueOf(referenceId);
-                                            else
-                                                articleId = database.dao().getSeedId(ekyId);
-
-                                            database.dao().insert(new InterventionSeed(qtt, articleUnit, id, articleId));
-
-                                        } else if (article.type().equals(ArticleTypeEnum.FERTILIZER)) {
-                                            if (referenceId != null)
-                                                articleId = Integer.valueOf(referenceId);
-                                            else
-                                                articleId = database.dao().getFertilizerId(ekyId);
-
-                                            database.dao().insert(new InterventionFertilizer(qtt, articleUnit, id, articleId));
-
-                                        } else if (article.type().equals(ArticleTypeEnum.MATERIAL)) {
-                                            articleId = database.dao().getMaterialByEkyId(ekyId).id;
-                                            database.dao().insert(new InterventionMaterial((int) qtt, articleUnit, id, articleId, false));
-                                        }
-                                    }
-                                }
-                            }
-
-                            /////////////////////////////
-                            // Saving Outputs (harvests)
-                            /////////////////////////////
-                            List<InterventionQuery.Output> outputs = inter.outputs();
-                            Boolean globalOutputs = inter.globalOutputs();
-                            if (outputs != null) {
-                                for (InterventionQuery.Output output : outputs) {
-                                    if (globalOutputs != null && !globalOutputs) {
-                                        List<InterventionQuery.Load> loads = output.loads();
-                                        if (loads != null) {
-                                            for (InterventionQuery.Load load : loads) {
-                                                if (load.quantity() > 0) {
-                                                    InterventionQuery.Storage storage = load.storage();
-                                                    Integer storageId = storage != null ? Integer.valueOf(storage.id()) : null;
-                                                    HarvestLoadUnitEnum unit = load.unit();
-                                                    String quantityUnit = unit != null ? unit.toString() : null;
-                                                    database.dao().insert(new Harvest(id, (float) load.quantity(), quantityUnit, storageId, load.number(), output.nature().toString()));
-                                                }
+                        /////////////////////////////
+                        // Saving Outputs (harvests)
+                        /////////////////////////////
+                        List<InterventionQuery.Output> outputs = inter.outputs();
+                        Boolean globalOutputs = inter.globalOutputs();
+                        if (outputs != null) {
+                            for (InterventionQuery.Output output : outputs) {
+                                if (globalOutputs != null && !globalOutputs) {
+                                    List<InterventionQuery.Load> loads = output.loads();
+                                    if (loads != null) {
+                                        for (InterventionQuery.Load load : loads) {
+                                            if (load.quantity() > 0) {
+                                                InterventionQuery.Storage storage = load.storage();
+                                                Integer storageId = storage != null ? Integer.valueOf(storage.id()) : null;
+                                                HarvestLoadUnitEnum unit = load.unit();
+                                                String quantityUnit = unit != null ? unit.toString() : null;
+                                                database.dao().insert(new Harvest(id, (float) load.quantity(), quantityUnit, storageId, load.number(), output.nature().toString()));
                                             }
                                         }
-                                    } else {
-                                        InterventionOutputUnitEnum globalUnit = output.unit();
-                                        String quantityUnit = globalUnit != null ? globalUnit.toString() : null;
-                                        Double quantity = output.quantity();
-                                        //Integer storageId = output.s != null ? Integer.valueOf(storage.id()) : null;
-                                        float qtt = quantity != null ? quantity.floatValue() : 0;
-                                        database.dao().insert(new Harvest(id, qtt, quantityUnit, null, null, output.nature().toString()));
                                     }
+                                } else {
+                                    InterventionOutputUnitEnum globalUnit = output.unit();
+                                    String quantityUnit = globalUnit != null ? globalUnit.toString() : null;
+                                    Double quantity = output.quantity();
+                                    //Integer storageId = output.s != null ? Integer.valueOf(storage.id()) : null;
+                                    float qtt = quantity != null ? quantity.floatValue() : 0;
+                                    database.dao().insert(new Harvest(id, qtt, quantityUnit, null, null, output.nature().toString()));
                                 }
                             }
                         }
@@ -1364,6 +1355,9 @@ public class SyncService extends IntentService {
                 receiver.send(DONE, new Bundle());
             }
         };
-        apolloClient.query(InterventionQuery.builder().build()).enqueue(interventionCallback);
+        apolloClient.query(InterventionQuery.builder()
+                .modifiedSince(MainActivity.lastSyncTime)
+                .build())
+                .enqueue(interventionCallback);
     }
 }

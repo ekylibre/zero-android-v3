@@ -1,7 +1,7 @@
 package com.ekylibre.android.network;
 
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apollographql.apollo.ApolloClient;
 import com.ekylibre.android.BuildConfig;

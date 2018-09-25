@@ -8,8 +8,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -167,8 +167,6 @@ public class AppAuthLogin extends AppCompatActivity {
                     }
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("firstName", data.profile.firstName);
-                    editor.putString("lastName", data.profile.lastName);
                     editor.putString("current-farm-name", data.farms().get(farmPosition).label);
                     editor.putString("current-farm-id", data.farms().get(farmPosition).id);
                     editor.apply();

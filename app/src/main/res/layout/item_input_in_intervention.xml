@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@null"
     android:padding="8dp"> <!-- "@drawable/item_shape"     android:focusable="true"  android:focusableInTouchMode="true" -->
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="@id/item_name"
         app:srcCompat="@drawable/icon_grain" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:singleLine="true"/>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_name_more"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         app:layout_constraintEnd_toStartOf="@id/item_delete"
         android:singleLine="true"/>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_quantity_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
         android:text="@string/quantity"
         app:layout_constraintBaseline_toBaselineOf="@id/item_quantity_edit" />
 
-    <android.support.v7.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/item_quantity_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
         app:layout_constraintTop_toBottomOf="@id/item_name"
         android:selectAllOnFocus="true" />
 
-    <android.support.v7.widget.AppCompatSpinner
+    <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/item_unit_spinner"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -86,7 +86,7 @@
         <!--app:layout_constraintStart_toStartOf="@id/item_quantity_edit"-->
         <!--android:visibility="gone"/>-->
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -95,13 +95,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_clear" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/item_dose_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="item_dose_max,item_dose_message" />
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_dose_max"
         android:layout_width="20dp"
         android:layout_height="20dp"
@@ -111,7 +111,7 @@
         app:layout_constraintTop_toBottomOf="@id/item_quantity_edit"
         app:srcCompat="@drawable/icon_dot" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_dose_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
         android:text="dose invalide"
         android:textColor="@color/error" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -129,4 +129,4 @@
         app:layout_constraintTop_toBottomOf="@id/item_dose_max"
         app:layout_constraintStart_toStartOf="@id/item_quantity_edit"/>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

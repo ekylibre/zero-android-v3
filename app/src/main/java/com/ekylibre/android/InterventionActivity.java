@@ -3,20 +3,20 @@ package com.ekylibre.android;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.Group;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Group;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -77,11 +77,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import timber.log.Timber;
 
 import static com.ekylibre.android.utils.Utils.decimalFormat;
 import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorized;
+import static com.ekylibre.android.utils.Utils.getEditTextToFloat;
 
 
 public class InterventionActivity extends AppCompatActivity implements
@@ -175,18 +177,23 @@ public class InterventionActivity extends AppCompatActivity implements
     private Calendar date = Calendar.getInstance();
     private float duration = 7f;
     private String weatherDescription;
-    private Interventions editIntervention;
+    public static Interventions editIntervention;
+    public static boolean validated = false;
     private InputMethodManager keyboardManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intervention);
 
+        // Clear all datasets
+        clearDatasets();
+
         if (getIntent().getBooleanExtra("edition", false)) {
             editIntervention = MainActivity.interventionsList.get(getIntent().getIntExtra("intervention_id", -1));
+            validated = editIntervention.intervention.status.equals(VALIDATED);
             procedure = editIntervention.intervention.type;
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } else {
             procedure = getIntent().getStringExtra("procedure");
         }
@@ -319,9 +326,8 @@ public class InterventionActivity extends AppCompatActivity implements
         // =============================== CROPS EVENTS ======================================== //
 
         // Feed cropList with all available plots
-        Timber.i("cropList %s", cropList);
-        if (cropList.isEmpty())
-            new RequestPlotList(this).execute();
+//        if (cropList.isEmpty())
+        new RequestPlotList(this).execute();
 
         includeCropLayout.setOnClickListener(view -> {
             selectCropFragment = SelectCropFragment.newInstance();
@@ -332,17 +338,6 @@ public class InterventionActivity extends AppCompatActivity implements
 
         ArrayAdapter irrigationUnitsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, Units.IRRIGATION_UNITS_L10N);
         irrigationUnitSpinner.setAdapter(irrigationUnitsAdapter);
-
-        if (editIntervention != null) {
-            if (editIntervention.intervention.type.equals(App.IRRIGATION)) {
-                Integer volume = editIntervention.intervention.water_quantity;
-                irrigationQuantityEdit.setText(String.valueOf(volume));
-                Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
-                irrigationUnitSpinner.setSelection(Units.IRRIGATION_UNITS.indexOf(unit));
-                irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.getName()));
-            }
-        }
 
         View.OnClickListener irrigationListener = view -> {
             if (irrigationDetail.getVisibility() == View.GONE) {
@@ -358,34 +353,64 @@ public class InterventionActivity extends AppCompatActivity implements
 
         irrigationLayout.setOnClickListener(irrigationListener);
 
-        irrigationQuantityEdit.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            @Override public void onTextChanged(CharSequence charSequence, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable editable) {
-                if (!editable.toString().equals("0") && editable.length() != 0) {
-                    Integer volume = Integer.valueOf(editable.toString());
-                    Unit unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition());
-                    irrigationTotal.setText(composeIrrigationMessage(unit, volume));
-                    irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                    irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.name));
-                } else {
-                    irrigationTotal.setText(R.string.quantity_cannot_be_null);
-                    irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
-                }
+        if (editIntervention != null) {
+            if (editIntervention.intervention.type.equals(App.IRRIGATION)) {
+                Integer volume = editIntervention.intervention.water_quantity;
+                irrigationQuantityEdit.setText(String.valueOf(volume));
+                Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
+                irrigationUnitSpinner.setSelection(Units.IRRIGATION_UNITS.indexOf(unit));
+                irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
+                irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.getName()));
             }
-        });
+        }
 
-        irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String quantityEditText = irrigationQuantityEdit.getText().toString();
-                if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
-                    Integer volume = Integer.valueOf(quantityEditText);
-                    Unit unit = Units.IRRIGATION_UNITS.get(position);
-                    irrigationTotal.setText(composeIrrigationMessage(unit, volume));
+        if (InterventionActivity.validated) {
+            irrigationQuantityEdit.setFocusable(false);
+            irrigationQuantityEdit.setEnabled(false);
+            irrigationUnitSpinner.setEnabled(false);
+            irrigationTotal.setVisibility(View.GONE);
+        }
+        else {
+            irrigationQuantityEdit.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 }
-            }
-        });
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    if (!editable.toString().equals("0") && editable.length() != 0) {
+                        Integer volume = Integer.valueOf(editable.toString());
+                        Unit unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition());
+                        irrigationTotal.setText(composeIrrigationMessage(unit, volume));
+                        irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
+                        irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.name));
+                    } else {
+                        irrigationTotal.setText(R.string.quantity_cannot_be_null);
+                        irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
+                    }
+                }
+            });
+
+            irrigationUnitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String quantityEditText = irrigationQuantityEdit.getText().toString();
+                    if (!quantityEditText.isEmpty() && Integer.valueOf(quantityEditText) != 0) {
+                        Integer volume = Integer.valueOf(quantityEditText);
+                        Unit unit = Units.IRRIGATION_UNITS.get(position);
+                        irrigationTotal.setText(composeIrrigationMessage(unit, volume));
+                    }
+                }
+            });
+        }
 
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
@@ -396,7 +421,7 @@ public class InterventionActivity extends AppCompatActivity implements
             workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), decimalFormat.format(duration)));
         }
 
-        workingPeriodEditDuration.setText(String.valueOf(duration));
+        workingPeriodEditDuration.setText(decimalFormat.format(duration));
         workingPeriodEditDate.setText(DateTools.display(date.getTime()));
 
 
@@ -436,74 +461,87 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ============================== INPUTS EVENTS ======================================== //
 
-        inputAddLabel.setOnClickListener(view -> {
-            selectInputFragment = SelectInputFragment.newInstance();
-            selectInputFragment.show(getFragmentTransaction(), "dialog");
-        });
-
-        View.OnClickListener inputListener = view -> {
-            int count = inputList.size();
-            if (count > 0) {
-                if (inputRecyclerGroup.getVisibility() == View.GONE) {
-                    inputArrow.setVisibility(View.VISIBLE);
-                    inputArrow.setRotation(180);
-                    inputSummary.setVisibility(View.GONE);
-                    inputAddLabel.setVisibility(View.VISIBLE);
-                    inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
-                } else {
-                    inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
-                    inputArrow.setRotation(0);
-                    inputSummary.setVisibility(View.VISIBLE);
-                    inputAddLabel.setVisibility(View.GONE);
-                    inputRecyclerGroup.setVisibility(View.GONE);
-                    phytoMixWarning.setVisibility(View.GONE);
-                }
-            }
-        };
-
-        inputArrow.setOnClickListener(inputListener);
-        inputSummary.setOnClickListener(inputListener);
-        inputZone.setOnClickListener(inputListener);
-
         // Fill data if editing
         if (editIntervention != null) {
             inputList.addAll(editIntervention.phytos);
             inputList.addAll(editIntervention.seeds);
             inputList.addAll(editIntervention.fertilizers);
-            inputArrow.performClick();
         }
 
-        inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        inputRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        inputAdapter = new InputAdapter(this, inputList);
-        inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                phytoMixWarning.setVisibility(View.GONE);
-                if (inputList.size() == 0) {
-                    inputArrow.setVisibility(View.GONE);
-                    inputRecyclerGroup.setVisibility(View.GONE);
-                }
-                else if (inputList.size() >= 2) {
-                    // Phyto warnings
-                    List<Integer> codes = new ArrayList<>();
-                    for (Object input : inputList) {
-                        if (input instanceof Phytos) {
-                            Phyto phyto = ((Phytos) input).phyto.get(0);
-                            if (phyto != null && phyto.mix_category_code != null)
-                                codes.add(phyto.mix_category_code);
-                        }
+        if (validated && inputList.isEmpty()) {
+            inputLayout.setVisibility(View.GONE);
+        }
+        else {
+
+            inputAddLabel.setOnClickListener(view -> {
+                selectInputFragment = SelectInputFragment.newInstance();
+                selectInputFragment.show(getFragmentTransaction(), "dialog");
+            });
+
+            View.OnClickListener inputListener = view -> {
+                int count = inputList.size();
+                if (count > 0) {
+                    if (inputRecyclerGroup.getVisibility() == View.GONE) {
+                        inputArrow.setVisibility(View.VISIBLE);
+                        inputArrow.setRotation(180);
+                        inputSummary.setVisibility(View.GONE);
+                        if (!validated)
+                            inputAddLabel.setVisibility(View.VISIBLE);
+                        inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
+                    } else {
+                        inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
+                        inputArrow.setRotation(0);
+                        inputSummary.setVisibility(View.VISIBLE);
+                        inputAddLabel.setVisibility(View.GONE);
+                        inputRecyclerGroup.setVisibility(View.GONE);
+                        phytoMixWarning.setVisibility(View.GONE);
                     }
-                    if (codes.size() >= 2)
-                        if (!mixIsAuthorized(codes))
-                            phytoMixWarning.setVisibility(View.VISIBLE);
+                }
+            };
+
+            inputArrow.setOnClickListener(inputListener);
+            inputSummary.setOnClickListener(inputListener);
+            inputZone.setOnClickListener(inputListener);
+
+            if (editIntervention != null) {
+                inputArrow.performClick();
+                if (validated) {
+                    inputAddLabel.setVisibility(View.GONE);
                 }
             }
-        });
-        inputRecyclerView.setAdapter(inputAdapter);
-        inputAdapter.notifyDataSetChanged();
-        if (inputList.size() == 0)
-            inputRecyclerGroup.setVisibility(View.GONE);
+
+            inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            inputRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+            inputAdapter = new InputAdapter(this, inputList);
+            inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onChanged() {
+                    phytoMixWarning.setVisibility(View.GONE);
+                    if (inputList.size() == 0) {
+                        inputArrow.setVisibility(View.GONE);
+                        inputRecyclerGroup.setVisibility(View.GONE);
+                    } else if (inputList.size() >= 2) {
+                        // Phyto warnings
+                        List<Integer> codes = new ArrayList<>();
+                        for (Object input : inputList) {
+                            if (input instanceof Phytos) {
+                                Phyto phyto = ((Phytos) input).phyto.get(0);
+                                if (phyto != null && phyto.mix_category_code != null)
+                                    codes.add(phyto.mix_category_code);
+                            }
+                        }
+                        if (codes.size() >= 2)
+                            if (!mixIsAuthorized(codes))
+                                phytoMixWarning.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+            inputRecyclerView.setAdapter(inputAdapter);
+            inputAdapter.notifyDataSetChanged();
+            if (inputList.size() == 0)
+                inputRecyclerGroup.setVisibility(View.GONE);
+
+        }
 
 
         // ================================ HARVEST EVENTS ===================================== //
@@ -545,165 +583,258 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ============================== MATERIALS EVENTS ===================================== //
 
-        materialAddLabel.setOnClickListener(view -> {
-            selectMaterialFragment = SelectMaterialFragment.newInstance();
-            selectMaterialFragment.show(getFragmentTransaction(), "dialog");
-        });
-
-        View.OnClickListener materialListener = view -> {
-            int count = materialList.size();
-            if (count > 0) {
-                if (materialRecyclerGroup.getVisibility() == View.GONE) {
-                    materialArrow.setVisibility(View.VISIBLE);
-                    materialArrow.setRotation(180);
-                    materialSummary.setVisibility(View.GONE);
-                    materialAddLabel.setVisibility(View.VISIBLE);
-                    materialRecyclerGroup.setVisibility(View.VISIBLE);
-                } else {
-                    materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
-                    materialArrow.setRotation(0);
-                    materialSummary.setVisibility(View.VISIBLE);
-                    materialAddLabel.setVisibility(View.GONE);
-                    materialRecyclerGroup.setVisibility(View.GONE);
-                }
-            }
-        };
-
-        materialArrow.setOnClickListener(materialListener);
-        materialSummary.setOnClickListener(materialListener);
-        materialZone.setOnClickListener(materialListener);
-
-        // Fill data if editing
         if (editIntervention != null) {
             materialList.addAll(editIntervention.materials);
-            materialArrow.performClick();
         }
+        if (validated && materialList.isEmpty()) {
+            materialLayout.setVisibility(View.GONE);
+        }
+        else {
 
-        materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        materialAdapter = new MaterialAdapter(this, materialList);
-        materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                if (materialList.size() == 0) {
-                    materialArrow.setVisibility(View.GONE);
-                    materialRecyclerGroup.setVisibility(View.GONE);
+            materialAddLabel.setOnClickListener(view -> {
+                selectMaterialFragment = SelectMaterialFragment.newInstance();
+                selectMaterialFragment.show(getFragmentTransaction(), "dialog");
+            });
+
+            View.OnClickListener materialListener = view -> {
+                int count = materialList.size();
+                if (count > 0) {
+                    if (materialRecyclerGroup.getVisibility() == View.GONE) {
+                        materialArrow.setVisibility(View.VISIBLE);
+                        materialArrow.setRotation(180);
+                        materialSummary.setVisibility(View.GONE);
+                        if (!validated)
+                            materialAddLabel.setVisibility(View.VISIBLE);
+                        materialRecyclerGroup.setVisibility(View.VISIBLE);
+                    } else {
+                        materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
+                        materialArrow.setRotation(0);
+                        materialSummary.setVisibility(View.VISIBLE);
+                        materialAddLabel.setVisibility(View.GONE);
+                        materialRecyclerGroup.setVisibility(View.GONE);
+                    }
+                }
+            };
+
+            materialArrow.setOnClickListener(materialListener);
+            materialSummary.setOnClickListener(materialListener);
+            materialZone.setOnClickListener(materialListener);
+
+            // Fill data if editing
+            if (editIntervention != null) {
+                materialArrow.performClick();
+                if (validated) {
+                    materialAddLabel.setVisibility(View.GONE);
                 }
             }
-        });
-        materialRecyclerView.setAdapter(materialAdapter);
-        materialAdapter.notifyDataSetChanged();
-        if (materialList.size() == 0)
-            materialRecyclerGroup.setVisibility(View.GONE);
 
+            materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+            materialAdapter = new MaterialAdapter(this, materialList);
+            materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onChanged() {
+                    if (materialList.size() == 0) {
+                        materialArrow.setVisibility(View.GONE);
+                        materialRecyclerGroup.setVisibility(View.GONE);
+                    }
+                }
+            });
+            materialRecyclerView.setAdapter(materialAdapter);
+            materialAdapter.notifyDataSetChanged();
+            if (materialList.size() == 0)
+                materialRecyclerGroup.setVisibility(View.GONE);
 
+        }
         // ============================= EQUIPMENTS EVENTS ===================================== //
-
-        equipmentAddLabel.setOnClickListener(view -> {
-            selectEquipmentFragment = SelectEquipmentFragment.newInstance();
-            selectEquipmentFragment.show(getFragmentTransaction(), "dialog");
-        });
-
-        View.OnClickListener equipmentListener = view -> {
-            int count = equipmentList.size();
-            if (count > 0) {
-                if (equipmentRecyclerGroup.getVisibility() == View.GONE) {
-                    equipmentArrow.setVisibility(View.VISIBLE);
-                    equipmentArrow.setRotation(180);
-                    equipmentSummary.setVisibility(View.GONE);
-                    equipmentAddLabel.setVisibility(View.VISIBLE);
-                    equipmentRecyclerGroup.setVisibility(View.VISIBLE);
-                } else {
-                    equipmentSummary.setText(getResources().getQuantityString(R.plurals.equipments, count, count));
-                    equipmentArrow.setRotation(0);
-                    equipmentSummary.setVisibility(View.VISIBLE);
-                    equipmentAddLabel.setVisibility(View.GONE);
-                    equipmentRecyclerGroup.setVisibility(View.GONE);
-                }
-            }
-        };
-
-        equipmentArrow.setOnClickListener(equipmentListener);
-        equipmentSummary.setOnClickListener(equipmentListener);
-        equipmentZone.setOnClickListener(equipmentListener);
 
         if (editIntervention != null) {
             equipmentList.addAll(editIntervention.equipments);
-            equipmentArrow.performClick();
         }
+        if (validated && equipmentList.isEmpty()) {
+            findViewById(R.id.equipment_layout).setVisibility(View.GONE);
+        }
+        else {
 
-        equipmentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        equipmentAdapter = new EquipmentAdapter(this, equipmentList);
-        equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override public void onChanged() {
-                if (equipmentList.size() == 0) {
-                    equipmentArrow.setVisibility(View.GONE);
-                    equipmentRecyclerGroup.setVisibility(View.GONE);
+            equipmentAddLabel.setOnClickListener(view -> {
+                selectEquipmentFragment = SelectEquipmentFragment.newInstance();
+                selectEquipmentFragment.show(getFragmentTransaction(), "dialog");
+            });
+
+            View.OnClickListener equipmentListener = view -> {
+                int count = equipmentList.size();
+                if (count > 0) {
+                    if (equipmentRecyclerGroup.getVisibility() == View.GONE) {
+                        equipmentArrow.setVisibility(View.VISIBLE);
+                        equipmentArrow.setRotation(180);
+                        equipmentSummary.setVisibility(View.GONE);
+                        if (!validated)
+                            equipmentAddLabel.setVisibility(View.VISIBLE);
+                        equipmentRecyclerGroup.setVisibility(View.VISIBLE);
+                    } else {
+                        equipmentSummary.setText(getResources().getQuantityString(R.plurals.equipments, count, count));
+                        equipmentArrow.setRotation(0);
+                        equipmentSummary.setVisibility(View.VISIBLE);
+                        equipmentAddLabel.setVisibility(View.GONE);
+                        equipmentRecyclerGroup.setVisibility(View.GONE);
+                    }
+                }
+            };
+
+            equipmentArrow.setOnClickListener(equipmentListener);
+            equipmentSummary.setOnClickListener(equipmentListener);
+            equipmentZone.setOnClickListener(equipmentListener);
+
+            if (editIntervention != null) {
+                equipmentArrow.performClick();
+                if (validated) {
+                    equipmentAddLabel.setVisibility(View.GONE);
                 }
             }
-        });
-        equipmentRecyclerView.setAdapter(equipmentAdapter);
-        equipmentAdapter.notifyDataSetChanged();
-        if (equipmentList.size() == 0)
-            equipmentRecyclerGroup.setVisibility(View.GONE);
+
+            equipmentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+            equipmentAdapter = new EquipmentAdapter(this, equipmentList);
+            equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onChanged() {
+                    if (equipmentList.size() == 0) {
+                        equipmentArrow.setVisibility(View.GONE);
+                        equipmentRecyclerGroup.setVisibility(View.GONE);
+                    }
+                }
+            });
+            equipmentRecyclerView.setAdapter(equipmentAdapter);
+            equipmentAdapter.notifyDataSetChanged();
+            if (equipmentList.size() == 0)
+                equipmentRecyclerGroup.setVisibility(View.GONE);
+        }
 
 
         // =============================== PERSONS EVENTS ====================================== //
 
-        personAddLabel.setOnClickListener(view -> {
-            selectPersonFragment = SelectPersonFragment.newInstance();
-            selectPersonFragment.show(getFragmentTransaction(), "dialog");
-        });
-
-        View.OnClickListener personListener = view -> {
-            int count = personList.size();
-            if (count > 0) {
-                if (personRecyclerGroup.getVisibility() == View.GONE) {
-                    personArrow.setVisibility(View.VISIBLE);
-                    personArrow.setRotation(180);
-                    personSummary.setVisibility(View.GONE);
-                    personAddLabel.setVisibility(View.VISIBLE);
-                    personRecyclerGroup.setVisibility(View.VISIBLE);
-                } else {
-                    personSummary.setText(getResources().getQuantityString(R.plurals.persons, count, count));
-                    personArrow.setRotation(0);
-                    personSummary.setVisibility(View.VISIBLE);
-                    personAddLabel.setVisibility(View.GONE);
-                    personRecyclerGroup.setVisibility(View.GONE);
-                }
-            }
-        };
-
-        personArrow.setOnClickListener(personListener);
-        personSummary.setOnClickListener(personListener);
-        personZone.setOnClickListener(personListener);
-
-
         if (editIntervention != null) {
             personList.addAll(editIntervention.persons);
-            personArrow.performClick();
         }
 
-        personRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        personRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        personAdapter = new PersonAdapter(personList);
-        personAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                if (personList.size() == 0) {
-                    personArrow.setVisibility(View.GONE);
-                    personRecyclerGroup.setVisibility(View.GONE);
+        if (validated && personList.isEmpty()) {
+            findViewById(R.id.person_layout).setVisibility(View.GONE);
+        }
+        else {
+            personAddLabel.setOnClickListener(view -> {
+                selectPersonFragment = SelectPersonFragment.newInstance();
+                selectPersonFragment.show(getFragmentTransaction(), "dialog");
+            });
+
+            View.OnClickListener personListener = view -> {
+                int count = personList.size();
+                if (count > 0) {
+                    if (personRecyclerGroup.getVisibility() == View.GONE) {
+                        personArrow.setVisibility(View.VISIBLE);
+                        personArrow.setRotation(180);
+                        personSummary.setVisibility(View.GONE);
+                        if (!validated)
+                            personAddLabel.setVisibility(View.VISIBLE);
+                        personRecyclerGroup.setVisibility(View.VISIBLE);
+                    } else {
+                        personSummary.setText(getResources().getQuantityString(R.plurals.persons, count, count));
+                        personArrow.setRotation(0);
+                        personSummary.setVisibility(View.VISIBLE);
+                        personAddLabel.setVisibility(View.GONE);
+                        personRecyclerGroup.setVisibility(View.GONE);
+                    }
+                }
+            };
+
+            personArrow.setOnClickListener(personListener);
+            personSummary.setOnClickListener(personListener);
+            personZone.setOnClickListener(personListener);
+
+
+            if (editIntervention != null) {
+                personArrow.performClick();
+                if (validated) {
+                    personAddLabel.setVisibility(View.GONE);
                 }
             }
-        });
-        personRecyclerView.setAdapter(personAdapter);
-        personAdapter.notifyDataSetChanged();
-        if (personList.size() == 0)
-            personRecyclerGroup.setVisibility(View.GONE);
+
+            personRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            personRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+            personAdapter = new PersonAdapter(personList);
+            personAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onChanged() {
+                    if (personList.size() == 0) {
+                        personArrow.setVisibility(View.GONE);
+                        personRecyclerGroup.setVisibility(View.GONE);
+                    }
+                }
+            });
+            personRecyclerView.setAdapter(personAdapter);
+            personAdapter.notifyDataSetChanged();
+            if (personList.size() == 0)
+                personRecyclerGroup.setVisibility(View.GONE);
+        }
 
 
         // =============================== WEATHER EVENTS ====================================== //
+
+        // Generates all click listeners
+        weatherIcons = Arrays.asList(brokenClouds, clearSky, fewClouds, lightRain, mist, showerRain, snow, thunderstorm);
+        weatherEnum = Arrays.asList(WeatherEnum.BROKEN_CLOUDS.rawValue(), WeatherEnum.CLEAR_SKY.rawValue(), WeatherEnum.FEW_CLOUDS.rawValue(), WeatherEnum.LIGHT_RAIN.rawValue(), WeatherEnum.MIST.rawValue(), WeatherEnum.SHOWER_RAIN.rawValue(), WeatherEnum.SNOW.rawValue(), WeatherEnum.THUNDERSTORM.rawValue());
+
+        if (validated) {
+            temperatureEditText.setFocusable(false);
+            temperatureEditText.setEnabled(false);
+            windSpeedEditText.setFocusable(false);
+            windSpeedEditText.setEnabled(false);
+
+        } else {
+
+            for (AppCompatImageButton weatherIcon : weatherIcons) {
+                weatherIcon.setOnClickListener(view -> selectWeatherIcon(weatherIcon));
+            }
+
+            temperatureEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable temp) {
+                    Editable wind = windSpeedEditText.getText();
+                    weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
+                }
+            });
+
+            windSpeedEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable wind) {
+                    Editable temp = temperatureEditText.getText();
+                    weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
+                }
+            });
+
+            windSpeedEditText.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE){
+                    windSpeedEditText.clearFocus();
+                    keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+                return false;
+            });
+        }
 
         weatherLayout.setOnClickListener(view -> {
             if (weatherDetail.getVisibility() == View.GONE) {
@@ -717,57 +848,28 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         });
 
-        temperatureEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            @Override
-            public void afterTextChanged(Editable temp) {
-                Editable wind = windSpeedEditText.getText();
-                weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
-            }
-        });
-
-        windSpeedEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-            @Override
-            public void afterTextChanged(Editable wind) {
-                Editable temp = temperatureEditText.getText();
-                weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
-            }
-        });
-
-        // Generates all click listeners
-        weatherIcons = Arrays.asList(brokenClouds, clearSky, fewClouds, lightRain, mist, showerRain, snow, thunderstorm);
-        weatherEnum = Arrays.asList(WeatherEnum.BROKEN_CLOUDS.rawValue(), WeatherEnum.CLEAR_SKY.rawValue(), WeatherEnum.FEW_CLOUDS.rawValue(), WeatherEnum.LIGHT_RAIN.rawValue(), WeatherEnum.MIST.rawValue(), WeatherEnum.SHOWER_RAIN.rawValue(), WeatherEnum.SNOW.rawValue(), WeatherEnum.THUNDERSTORM.rawValue());
-        for (AppCompatImageButton weatherIcon : weatherIcons) {
-            weatherIcon.setOnClickListener(view -> selectWeatherIcon(weatherIcon));
-        }
-
         if (editIntervention != null) {
             if (!editIntervention.weather.isEmpty()) {
-                if (editIntervention.weather.get(0).temperature != null)
-                    temperatureEditText.setText(String.valueOf(editIntervention.weather.get(0).temperature));
-                if (editIntervention.weather.get(0).wind_speed != null)
-                    windSpeedEditText.setText(String.valueOf(editIntervention.weather.get(0).wind_speed));
-                if (editIntervention.weather.get(0).description != null) {
-                    weatherDescription = editIntervention.weather.get(0).description;
-                    selectWeatherIcon(weatherIcons.get(weatherEnum.indexOf(weatherDescription)));
+                Weather weather = editIntervention.weather.get(0);
+                String weatherTemp = "";
+                String weatherWind = "";
+
+                if (weather.temperature != null) {
+                    weatherTemp = decimalFormat.format(weather.temperature);
+                    temperatureEditText.setText(weatherTemp);
                 }
+                if (weather.wind_speed != null) {
+                    weatherWind = decimalFormat.format(weather.wind_speed);
+                    windSpeedEditText.setText(weatherWind);
+                }
+                if (weather.description != null)
+                    selectWeatherIcon(weatherIcons.get(weatherEnum.indexOf(weather.description)));
+                weatherSummary.setText(weatherSummaryText(weatherTemp, weatherWind));
+                weatherLayout.performClick();
+            } else {
+                weatherArrow.setVisibility(View.GONE);
             }
         }
-
-        windSpeedEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE){
-                windSpeedEditText.clearFocus();
-                keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-            return false;
-        });
 
 
         // ================================ DESCRIPTION ======================================== //
@@ -776,8 +878,10 @@ public class InterventionActivity extends AppCompatActivity implements
         descriptionEditText = descriptionInput.getEditText();
 
         if (editIntervention != null) {
-            if (editIntervention.intervention.comment != null && descriptionEditText != null) {
+            if (editIntervention.intervention.comment != null && descriptionEditText != null)
                 descriptionEditText.setText(editIntervention.intervention.comment);
+            if (validated) {
+                Objects.requireNonNull(descriptionEditText).setEnabled(false);
             }
         }
 
@@ -789,25 +893,34 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ================================ BOTTOM BAR ========================================= //
 
-        Button saveButton = findViewById(R.id.button_save);
-        saveButton.setOnClickListener(view -> new SaveIntervention(this, date).execute());
+        if (validated) {
+            findViewById(R.id.lock_message_layout).setVisibility(View.VISIBLE);
+            findViewById(R.id.nav_layout).setVisibility(View.GONE);
 
-        Button cancelButton = findViewById(R.id.button_cancel);
-        cancelButton.setOnClickListener(view -> { clearDatasets(); finish(); });
+        } else {
+            Button saveButton = findViewById(R.id.button_save);
+            saveButton.setOnClickListener(view -> new SaveIntervention(this, date).execute());
 
-        if (editIntervention == null) {
-            // Launch crop selector
-            selectCropFragment = SelectCropFragment.newInstance();
-            selectCropFragment.show(getFragmentTransaction(), "dialog");
-        } else if (editIntervention.intervention.status.equals(VALIDATED)) {
-            saveButton.setOnClickListener(null);
-            saveButton.setBackground(getResources().getDrawable(R.drawable.background_round_corners_disabled));
-            saveButton.setTextColor(getResources().getColor(R.color.secondary_text));
-            saveButton.setOnClickListener(view -> {
-                Toast toast = Toast.makeText(this, "Cette intervention n'est pas modifiable", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, 200);
-                toast.show();
+            Button cancelButton = findViewById(R.id.button_cancel);
+            cancelButton.setOnClickListener(view -> {
+                clearDatasets();
+                finish();
             });
+
+            if (editIntervention == null) {
+                // Launch crop selector
+                selectCropFragment = SelectCropFragment.newInstance();
+                selectCropFragment.show(getFragmentTransaction(), "dialog");
+            } else if (validated) {
+                saveButton.setOnClickListener(null);
+                saveButton.setBackground(getResources().getDrawable(R.drawable.background_round_corners_disabled));
+                saveButton.setTextColor(getResources().getColor(R.color.secondary_text));
+                saveButton.setOnClickListener(view -> {
+                    Toast toast = Toast.makeText(this, "Cette intervention n'est pas modifiable", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, 200);
+                    toast.show();
+                });
+            }
         }
 
     }
@@ -815,13 +928,16 @@ public class InterventionActivity extends AppCompatActivity implements
     private String weatherSummaryText(String temp, String wind) {
         StringBuilder sb = new StringBuilder();
 
-        if (temp.isEmpty() && wind.isEmpty()) {
+        String mTemp = temp.replace(",", ".");
+        String mWind = wind.replace(",", ".");
+
+        if (mTemp.isEmpty() && mWind.isEmpty()) {
             sb.append(getText(R.string.not_provided));
         } else {
             sb.append(String.format("Temp.: %s °C",
-                    temp.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(temp))));
+                    mTemp.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(mTemp))));
             sb.append(String.format(" | vent: %s km/h",
-                    wind.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(wind))));
+                    mWind.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(mWind))));
         }
         return sb.toString();
     }
@@ -863,10 +979,15 @@ public class InterventionActivity extends AppCompatActivity implements
         @Override
         protected Void doInBackground(Void... voids) {
 
+            cropList.clear();
             AppDatabase database = AppDatabase.getInstance(this.context);
 
             // Get all available crops
-            List<Crop> allCrops = database.dao().cropList(MainActivity.FARM_ID);
+            List<Crop> allCrops;
+            if (editIntervention != null && validated)
+                allCrops = database.dao().cropListForIntervention(editIntervention.intervention.id);
+            else
+                allCrops = database.dao().cropList(MainActivity.FARM_ID);
 
             for (Crop crop : allCrops) {
                 CropsByPlot select = Iterables.find(cropList,
@@ -1122,11 +1243,11 @@ public class InterventionActivity extends AppCompatActivity implements
 
             Float temperature = null;
             if (!temperatureEditText.getText().toString().isEmpty())
-                temperature = Float.valueOf(temperatureEditText.getText().toString());
+                temperature = getEditTextToFloat(temperatureEditText);
 
             Float windSpeed = null;
             if (!windSpeedEditText.getText().toString().isEmpty())
-                windSpeed = Float.valueOf(windSpeedEditText.getText().toString());
+                windSpeed = getEditTextToFloat(windSpeedEditText);
 
             if (temperature != null || windSpeed != null || weatherDescription != null)
                 database.dao().insert(new Weather(intervention_id, temperature, windSpeed, weatherDescription));
@@ -1307,7 +1428,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (editIntervention != null && !editIntervention.intervention.status.equals(VALIDATED)) {
+        if (editIntervention != null && !validated) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.intervention, menu);
         }
@@ -1323,7 +1444,7 @@ public class InterventionActivity extends AppCompatActivity implements
                 builder.setMessage(R.string.confirm_deleting_intervention);
                 builder.setNegativeButton("non", (dialog, i) -> dialog.cancel());
                 builder.setPositiveButton("oui", (dialog, i) -> {
-                    if (!editIntervention.intervention.status.equals(VALIDATED)) {
+                    if (!validated) {
                         new DeleteCurrentIntervention(this).execute();
                         clearDatasets();
                         finish();

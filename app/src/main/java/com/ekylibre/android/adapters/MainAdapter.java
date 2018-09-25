@@ -5,11 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.ImageViewCompat;
-import android.support.v7.widget.AppCompatImageView;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +34,6 @@ import com.ekylibre.android.utils.Units;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
-
-import timber.log.Timber;
 
 import static com.ekylibre.android.utils.Utils.decimalFormat;
 
@@ -156,7 +154,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         }
 
         String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
-        String totalString = String.format(MainActivity.LOCALE, "%s • %s ha", cropCount, decimalFormat.format(total));
+        String totalString = String.format("%s • %s ha", cropCount, decimalFormat.format(total));
         holder.itemCrops.setText(totalString);
 
         // Display input by nature

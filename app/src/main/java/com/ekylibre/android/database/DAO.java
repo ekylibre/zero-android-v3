@@ -1,12 +1,12 @@
 package com.ekylibre.android.database;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Transaction;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Transaction;
 
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.database.models.Crop;
@@ -24,9 +24,7 @@ import com.ekylibre.android.database.models.Point;
 import com.ekylibre.android.database.models.Seed;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.database.models.Weather;
-import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.Interventions;
-import com.ekylibre.android.database.pojos.Plots;
 import com.ekylibre.android.database.pojos.SimpleInterventions;
 import com.ekylibre.android.database.relations.InterventionCrop;
 import com.ekylibre.android.database.relations.InterventionEquipment;
@@ -36,9 +34,7 @@ import com.ekylibre.android.database.relations.InterventionPerson;
 import com.ekylibre.android.database.relations.InterventionPhytosanitary;
 import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.database.relations.InterventionWorkingDay;
-import com.mapbox.geojson.Polygon;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -144,6 +140,12 @@ public interface DAO {
 
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
     List<Crop> cropList(String farmId);
+
+    @Query("SELECT * FROM " + InterventionCrop.TABLE_NAME +
+            " JOIN " + Crop.TABLE_NAME + " ON " + InterventionCrop.COLUMN_CROP_ID + " = " + Crop.COLUMN_UUID +
+            " WHERE " + InterventionCrop.COLUMN_INTERVENTION_ID + " = :id")
+    List<Crop> cropListForIntervention(int id);
+
 
 
     /**

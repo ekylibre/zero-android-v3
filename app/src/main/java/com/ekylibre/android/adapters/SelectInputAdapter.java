@@ -4,10 +4,10 @@ package com.ekylibre.android.adapters;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.constraint.Group;
-import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.Group;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,12 +42,10 @@ import static com.ekylibre.android.utils.PhytosanitaryMiscibility.mixIsAuthorize
 
 public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ServiceResultReceiver.Receiver {
 
-    private static final String TAG = "SelectInputAdapter";
     public static final int SEED = 0, PHYTO = 1, FERTI = 2;
 
     private Context context;
     private List<Object> inputList;
-    private List<Integer> phytoList;
     private SelectInputFragment.OnFragmentInteractionListener fragmentListener;
 
     public SelectInputAdapter(List<Object> inputList, Context context, SelectInputFragment.OnFragmentInteractionListener fragmentListener) {

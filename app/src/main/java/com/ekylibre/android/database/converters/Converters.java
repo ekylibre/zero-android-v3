@@ -1,7 +1,7 @@
 package com.ekylibre.android.database.converters;
 
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import com.ekylibre.android.MainActivity;
 

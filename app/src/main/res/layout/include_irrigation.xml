@@ -1,4 +1,4 @@
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content"
@@ -9,7 +9,7 @@
     android:paddingEnd="@dimen/start_end_include_margin"
     android:background="@drawable/border_bottom">
 
-    <android.support.v7.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/irrigation_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/icon_arrow_down"
         android:animateLayoutChanges="true"/>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/irrigation_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/irrigation_summary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         app:layout_constraintBaseline_toBaselineOf="@id/irrigation_label"
         app:layout_constraintStart_toEndOf="@+id/irrigation_label" />
 
-    <android.support.constraint.Group
+    <androidx.constraintlayout.widget.Group
         android:id="@+id/irrigation_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
         android:visibility="visible"/>
 
     <!-- Detailed view below -->
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/irrigation_quantity_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         android:text="@string/volume"
         app:layout_constraintBaseline_toBaselineOf="@id/irrigation_quantity_edit" />
 
-    <android.support.v7.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/irrigation_quantity_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
         app:layout_constraintTop_toBottomOf="@id/irrigation_label"
         android:selectAllOnFocus="true" />
 
-    <android.support.v7.widget.AppCompatSpinner
+    <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/irrigation_unit_spinner"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -85,7 +85,7 @@
         app:layout_constraintTop_toTopOf="@id/irrigation_quantity_edit"
         app:layout_constraintBottom_toBottomOf="@id/irrigation_quantity_edit" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/irrigation_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,4 +96,4 @@
         app:layout_constraintStart_toStartOf="@id/irrigation_quantity_edit"/>
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

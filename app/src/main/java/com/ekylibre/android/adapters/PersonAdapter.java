@@ -2,16 +2,17 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Persons;
 
@@ -43,25 +44,33 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder
             driverSwitch = itemView.findViewById(R.id.person_is_driver);
             deleteImageView = itemView.findViewById(R.id.person_delete);
 
-            deleteImageView.setOnClickListener(view -> {
-                Context context = itemView.getRootView().getContext();
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(R.string.delete_person_prompt);
-                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
-                    int position = getAdapterPosition();
-                    dataset.remove(position);
-                    //notifyItemRemoved(position);
-                    notifyDataSetChanged();
+            if (InterventionActivity.validated) {
+                deleteImageView.setVisibility(View.GONE);
+//                quantityEditText.setFocusable(false);
+//                quantityEditText.setEnabled(false);
+                driverSwitch.setEnabled(false);
+            }
+            else {
+                deleteImageView.setOnClickListener(view -> {
+                    Context context = itemView.getRootView().getContext();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(R.string.delete_person_prompt);
+                    builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                    builder.setPositiveButton(R.string.yes, (dialog, i) -> {
+                        int position = getAdapterPosition();
+                        dataset.remove(position);
+                        //notifyItemRemoved(position);
+                        notifyDataSetChanged();
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            });
 
-            driverSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-                Persons person = dataset.get(getAdapterPosition());
-                person.inter.is_driver = compoundButton.isChecked();
-            });
+                driverSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+                    Persons person = dataset.get(getAdapterPosition());
+                    person.inter.is_driver = compoundButton.isChecked();
+                });
+            }
         }
 
         void display(Persons item) {

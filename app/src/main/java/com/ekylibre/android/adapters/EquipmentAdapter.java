@@ -2,15 +2,16 @@ package com.ekylibre.android.adapters;
 
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.utils.Enums;
@@ -43,18 +44,22 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
             typeTextView = itemView.findViewById(R.id.equipment_type);
             deleteImageView = itemView.findViewById(R.id.equipment_delete);
 
-            deleteImageView.setOnClickListener(view -> {
-                Context context = itemView.getRootView().getContext();
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(R.string.delete_equipment_prompt);
-                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
-                    dataset.remove(getAdapterPosition());
-                    notifyDataSetChanged();  //notifyItemRemoved(position);
+            if (InterventionActivity.validated) {
+                deleteImageView.setVisibility(View.GONE);
+            } else {
+                deleteImageView.setOnClickListener(view -> {
+                    Context context = itemView.getRootView().getContext();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(R.string.delete_equipment_prompt);
+                    builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                    builder.setPositiveButton(R.string.yes, (dialog, i) -> {
+                        dataset.remove(getAdapterPosition());
+                        notifyDataSetChanged();  //notifyItemRemoved(position);
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            });
+            }
         }
 
         void display(Equipments item) {

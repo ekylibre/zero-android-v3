@@ -1,18 +1,16 @@
 package com.ekylibre.android.database.relations;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-import android.support.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.annotation.NonNull;
 
 import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.models.Seed;
-import com.ekylibre.android.utils.Unit;
-import com.ekylibre.android.utils.Units;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static androidx.room.ForeignKey.CASCADE;
 
 
 @Entity(tableName = InterventionOutput.TABLE_NAME, foreignKeys = {

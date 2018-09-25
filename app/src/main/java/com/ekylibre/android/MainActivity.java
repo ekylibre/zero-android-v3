@@ -7,12 +7,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Timber.e("onCreate()");
 
         // Generates localized string lists for spinners
         generateUnitLists();
@@ -190,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
 
         try {
             lastSyncTime = LAST_SYNC.parse(prefs.getString("last-sync-time", "2018-01-01 12:00"));
+            Timber.i("LastSyncTime %s", lastSyncTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
