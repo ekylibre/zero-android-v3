@@ -497,8 +497,7 @@ public class InterventionActivity extends AppCompatActivity implements
                     inputArrow.setVisibility(View.VISIBLE);
                     inputArrow.setRotation(180);
                     inputSummary.setVisibility(View.GONE);
-                    if (!validated)
-                        inputAddLabel.setVisibility(View.VISIBLE);
+                    if (!validated) inputAddLabel.setVisibility(View.VISIBLE);
                     inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
                 } else {
                     inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
@@ -552,8 +551,10 @@ public class InterventionActivity extends AppCompatActivity implements
             String summary = getResources().getQuantityString(R.plurals.inputs, inputListSize, inputListSize);
             inputSummary.setText(summary);
         } else {
-            inputSummary.setVisibility(View.GONE);
-            inputAddLabel.setVisibility(View.VISIBLE);
+            if (!validated) {
+                inputSummary.setVisibility(View.GONE);
+                inputAddLabel.setVisibility(View.VISIBLE);
+            }
             inputRecyclerGroup.setVisibility(View.GONE);
         }
 
@@ -867,6 +868,24 @@ public class InterventionActivity extends AppCompatActivity implements
         weatherIcons = Arrays.asList(brokenClouds, clearSky, fewClouds, lightRain, mist, showerRain, snow, thunderstorm);
         weatherEnum = Arrays.asList(WeatherEnum.BROKEN_CLOUDS.rawValue(), WeatherEnum.CLEAR_SKY.rawValue(), WeatherEnum.FEW_CLOUDS.rawValue(), WeatherEnum.LIGHT_RAIN.rawValue(), WeatherEnum.MIST.rawValue(), WeatherEnum.SHOWER_RAIN.rawValue(), WeatherEnum.SNOW.rawValue(), WeatherEnum.THUNDERSTORM.rawValue());
 
+        // UI defaults
+        weatherArrow.setVisibility(View.VISIBLE);
+        weatherSummary.setVisibility(View.VISIBLE);
+
+        View.OnClickListener weatherListener = view -> {
+            if (weatherDetail.getVisibility() == View.GONE) {
+                weatherDetail.setVisibility(View.VISIBLE);
+                weatherSummary.setVisibility(View.GONE);
+                weatherArrow.setRotation(180);
+            } else {
+                weatherDetail.setVisibility(View.GONE);
+                weatherSummary.setVisibility(View.VISIBLE);
+                weatherArrow.setRotation(0);
+            }
+        };
+
+        weatherLayout.setOnClickListener(weatherListener);
+
         if (validated) {
             temperatureEditText.setFocusable(false);
             temperatureEditText.setEnabled(false);
@@ -875,37 +894,24 @@ public class InterventionActivity extends AppCompatActivity implements
 
         } else {
 
-            for (AppCompatImageButton weatherIcon : weatherIcons) {
+
+            // Set listeners
+            for (AppCompatImageButton weatherIcon : weatherIcons)
                 weatherIcon.setOnClickListener(view -> selectWeatherIcon(weatherIcon));
-            }
 
             temperatureEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable temp) {
+                @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                @Override public void afterTextChanged(Editable temp) {
                     Editable wind = windSpeedEditText.getText();
                     weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
                 }
             });
 
             windSpeedEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable wind) {
+                @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                @Override public void afterTextChanged(Editable wind) {
                     Editable temp = temperatureEditText.getText();
                     weatherSummary.setText(weatherSummaryText(temp.toString(), wind.toString()));
                 }
@@ -920,24 +926,11 @@ public class InterventionActivity extends AppCompatActivity implements
             });
         }
 
-        weatherLayout.setOnClickListener(view -> {
-            if (weatherDetail.getVisibility() == View.GONE) {
-                weatherDetail.setVisibility(View.VISIBLE);
-                weatherSummary.setVisibility(View.GONE);
-                weatherArrow.setRotation(180);
-            } else {
-                weatherDetail.setVisibility(View.GONE);
-                weatherSummary.setVisibility(View.VISIBLE);
-                weatherArrow.setRotation(0);
-            }
-        });
-
         if (editIntervention != null) {
             if (!editIntervention.weather.isEmpty()) {
                 Weather weather = editIntervention.weather.get(0);
                 String weatherTemp = "";
                 String weatherWind = "";
-
                 if (weather.temperature != null) {
                     weatherTemp = decimalFormat.format(weather.temperature);
                     temperatureEditText.setText(weatherTemp);
@@ -949,9 +942,9 @@ public class InterventionActivity extends AppCompatActivity implements
                 if (weather.description != null)
                     selectWeatherIcon(weatherIcons.get(weatherEnum.indexOf(weather.description)));
                 weatherSummary.setText(weatherSummaryText(weatherTemp, weatherWind));
-                weatherLayout.performClick();
-            } else {
+            } else if (validated) {
                 weatherArrow.setVisibility(View.GONE);
+                weatherLayout.setOnClickListener(null);
             }
         }
 
@@ -1018,9 +1011,9 @@ public class InterventionActivity extends AppCompatActivity implements
         if (mTemp.isEmpty() && mWind.isEmpty()) {
             sb.append(getText(R.string.not_provided));
         } else {
-            sb.append(String.format("Temp.: %s °C",
+            sb.append(String.format("Temp: %s °C",
                     mTemp.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(mTemp))));
-            sb.append(String.format(" | vent: %s km/h",
+            sb.append(String.format(" • vent: %s km/h",
                     mWind.isEmpty() ? "--" : decimalFormat.format(Float.valueOf(mWind))));
         }
         return sb.toString();
