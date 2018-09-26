@@ -3,7 +3,6 @@ package com.ekylibre.android;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Group;
 import com.google.android.material.textfield.TextInputLayout;
@@ -97,7 +96,6 @@ public class InterventionActivity extends AppCompatActivity implements
     public static final String UPDATED = "updated";
     public static final String SYNCED = "synced";
     public static final String VALIDATED = "validated";
-    public static final String DELETED = "deleted";  // TODO: use it
 
     // Crops layout
     private TextView cropSummary, cropAddLabel;
@@ -125,9 +123,11 @@ public class InterventionActivity extends AppCompatActivity implements
     private RecyclerView.Adapter inputAdapter;
 
     // Harvest layout
-    private RecyclerView.Adapter harvestAdapter;
-    private Group harvestDetail;
+    private Group harvestRecyclerGroup;
+    private ImageView harvestArrow;
+    private TextView harvestSummary, harvestAddLabel;
     private AppCompatSpinner harvestOutputType;
+    private RecyclerView.Adapter harvestAdapter;
 
     // Material layout
     private Group materialRecyclerGroup;
@@ -167,18 +167,19 @@ public class InterventionActivity extends AppCompatActivity implements
     public static List<Equipments> equipmentList = new ArrayList<>();
     public static List<Persons> personList = new ArrayList<>();
     public static List<CropsByPlot> cropList = new ArrayList<>();
-    private static List<Harvest> outputList = new ArrayList<>();
+    public static List<Harvest> outputList = new ArrayList<>();
     public static List<Materials> materialList = new ArrayList<>();
 
     public static float surface = 0f;
     public static String procedure;
     public static String cropSummaryText;
+    public static Interventions editIntervention;
+    public static boolean validated = false;
 
     private Calendar date = Calendar.getInstance();
     private float duration = 7f;
     private String weatherDescription;
-    public static Interventions editIntervention;
-    public static boolean validated = false;
+
     private InputMethodManager keyboardManager;
 
     @Override
@@ -191,11 +192,25 @@ public class InterventionActivity extends AppCompatActivity implements
 
         if (getIntent().getBooleanExtra("edition", false)) {
             editIntervention = MainActivity.interventionsList.get(getIntent().getIntExtra("intervention_id", -1));
+
+            // Set all intervention details
+            duration = editIntervention.workingDays.get(0).hour_duration;
+            date.setTime(editIntervention.workingDays.get(0).execution_date);
+            inputList.addAll(editIntervention.phytos);
+            inputList.addAll(editIntervention.seeds);
+            inputList.addAll(editIntervention.fertilizers);
+            outputList.addAll(editIntervention.harvests);
+            equipmentList.addAll(editIntervention.equipments);
+            materialList.addAll(editIntervention.materials);
+            personList.addAll(editIntervention.persons);
+
             validated = editIntervention.intervention.status.equals(VALIDATED);
             procedure = editIntervention.intervention.type;
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } else {
+        }
+        else {
             procedure = getIntent().getStringExtra("procedure");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
 
         setTitle(getResources().getIdentifier(procedure, "string", getPackageName()));
@@ -209,10 +224,11 @@ public class InterventionActivity extends AppCompatActivity implements
         // ================================ LAYOUT ============================================= //
 
         // Crops
-        ConstraintLayout includeCropLayout = findViewById(R.id.include_crops_layout);
+        ConstraintLayout cropLayout = findViewById(R.id.include_crops_layout);
         cropAddLabel = findViewById(R.id.crops_add_label);
         cropSummary = findViewById(R.id.crops_summary);
         cropSummary.setText(this.getString(R.string.select_crops));
+        ImageView cropEditIcon = findViewById(R.id.edit_crop_list);
 
         // Irrigation
         ConstraintLayout irrigationLayout = findViewById(R.id.irrigation_layout);
@@ -244,11 +260,13 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // Harvest layout
         ConstraintLayout harvestLayout = findViewById(R.id.harvest_layout);
-        ImageView harvestArrow = findViewById(R.id.harvest_arrow);
-        TextView harvestAddLabel = findViewById(R.id.harvest_add_label);
-        RecyclerView harvestRecyclerView = findViewById(R.id.harvest_recycler);
-        harvestDetail = findViewById(R.id.harvest_detail);
+        ConstraintLayout harvestZone = findViewById(R.id.harvest_zone);
+        harvestRecyclerGroup = findViewById(R.id.harvest_recycler_group);
+        harvestArrow = findViewById(R.id.harvest_arrow);
+        harvestSummary = findViewById(R.id.harvest_summary);
+        harvestAddLabel = findViewById(R.id.harvest_add_label);
         harvestOutputType = findViewById(R.id.harvest_output_spinner);
+        RecyclerView harvestRecyclerView = findViewById(R.id.harvest_recycler);
 
         // Materials
         ConstraintLayout materialLayout = findViewById(R.id.material_layout);
@@ -298,7 +316,6 @@ public class InterventionActivity extends AppCompatActivity implements
         irrigationDetail.setVisibility(View.GONE);
         workingPeriodDetail.setVisibility(View.GONE);
         weatherDetail.setVisibility(View.GONE);
-        harvestDetail.setVisibility(View.GONE);
 
         // Default state of conditional parameters depending on current procedure
         irrigationLayout.setVisibility(View.GONE);
@@ -326,13 +343,15 @@ public class InterventionActivity extends AppCompatActivity implements
         // =============================== CROPS EVENTS ======================================== //
 
         // Feed cropList with all available plots
-//        if (cropList.isEmpty())
         new RequestPlotList(this).execute();
 
-        includeCropLayout.setOnClickListener(view -> {
+        cropLayout.setOnClickListener(view -> {
             selectCropFragment = SelectCropFragment.newInstance();
             selectCropFragment.show(getFragmentTransaction(), "dialog");
         });
+
+        if (validated)
+            cropEditIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_eye));
 
         // =============================== IRRIGATION EVENTS =================================== //
 
@@ -351,26 +370,27 @@ public class InterventionActivity extends AppCompatActivity implements
             }
         };
 
-        irrigationLayout.setOnClickListener(irrigationListener);
-
         if (editIntervention != null) {
             if (editIntervention.intervention.type.equals(App.IRRIGATION)) {
                 Integer volume = editIntervention.intervention.water_quantity;
-                irrigationQuantityEdit.setText(String.valueOf(volume));
                 Unit unit = Units.getUnit(editIntervention.intervention.water_unit);
+                irrigationQuantityEdit.setText(String.valueOf(volume));
                 irrigationUnitSpinner.setSelection(Units.IRRIGATION_UNITS.indexOf(unit));
                 irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.getName()));
+                irrigationSummary.setText(String.format("volume • %s %s", decimalFormat.format(volume), unit.getName()));
             }
         }
 
-        if (InterventionActivity.validated) {
-            irrigationQuantityEdit.setFocusable(false);
-            irrigationQuantityEdit.setEnabled(false);
-            irrigationUnitSpinner.setEnabled(false);
-            irrigationTotal.setVisibility(View.GONE);
+        if (validated) {
+//            irrigationQuantityEdit.setFocusable(false);
+//            irrigationQuantityEdit.setEnabled(false);
+//            irrigationUnitSpinner.setEnabled(false);
+//            irrigationTotal.setVisibility(View.GONE);
+            irrigationArrow.setVisibility(View.GONE);
         }
         else {
+            irrigationLayout.setOnClickListener(irrigationListener);
+
             irrigationQuantityEdit.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -387,7 +407,7 @@ public class InterventionActivity extends AppCompatActivity implements
                         Unit unit = Units.IRRIGATION_UNITS.get(irrigationUnitSpinner.getSelectedItemPosition());
                         irrigationTotal.setText(composeIrrigationMessage(unit, volume));
                         irrigationTotal.setTextColor(getResources().getColor(R.color.secondary_text));
-                        irrigationSummary.setText(String.format("Volume • %s %s", decimalFormat.format(volume), unit.name));
+                        irrigationSummary.setText(String.format("volume • %s %s", decimalFormat.format(volume), unit.name));
                     } else {
                         irrigationTotal.setText(R.string.quantity_cannot_be_null);
                         irrigationTotal.setTextColor(getResources().getColor(R.color.warning));
@@ -415,366 +435,430 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // ========================== WORKING PERIOD EVENTS ==================================== //
 
-        if (editIntervention != null) {
-            duration = editIntervention.workingDays.get(0).hour_duration;
-            date.setTime(editIntervention.workingDays.get(0).execution_date);
+        if (editIntervention != null)
             workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), decimalFormat.format(duration)));
+
+        if (validated) {
+            workingPeriodArrow.setVisibility(View.GONE);
         }
+        else {
+            // Default values
+            workingPeriodEditDuration.setText(decimalFormat.format(duration));
+            workingPeriodEditDate.setText(DateTools.display(date.getTime()));
 
-        workingPeriodEditDuration.setText(decimalFormat.format(duration));
-        workingPeriodEditDate.setText(DateTools.display(date.getTime()));
-
-
-        View.OnClickListener workingPeriodListener = view -> {
-            if (workingPeriodSummary.getVisibility() == View.VISIBLE) {
-                workingPeriodArrow.setRotation(180);
-                workingPeriodSummary.setVisibility(View.GONE);
-                workingPeriodDetail.setVisibility(View.VISIBLE);
-            } else {
-                workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), decimalFormat.format(duration)));
-                workingPeriodArrow.setRotation(0);
-                workingPeriodSummary.setVisibility(View.VISIBLE);
-                workingPeriodDetail.setVisibility(View.GONE);
-            }
-        };
-
-//        workingPeriodSummary.setOnClickListener(workingPeriodListener);
-//        workingPeriodArrow.setOnClickListener(workingPeriodListener);
-        workingPeriodLayout.setOnClickListener(workingPeriodListener);
-        workingPeriodEditDate.setOnClickListener(view -> datePicker());
-
-        workingPeriodEditDuration.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE){
-                String editText = workingPeriodEditDuration.getText().toString();
-                if (editText.isEmpty())
-                    return true;
-                else {
-                    duration = Float.parseFloat(editText);
-                    workingPeriodDurationUnit.setText(getResources().getQuantityString(R.plurals.hours, (int) duration));
-                    workingPeriodEditDuration.clearFocus();
-                    keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            // Define accordion listener
+            View.OnClickListener workingPeriodListener = view -> {
+                if (workingPeriodSummary.getVisibility() == View.VISIBLE) {
+                    workingPeriodArrow.setRotation(180);
+                    workingPeriodSummary.setVisibility(View.GONE);
+                    workingPeriodDetail.setVisibility(View.VISIBLE);
+                } else {
+                    workingPeriodSummary.setText(String.format("%s • %s h", DateTools.display(date.getTime()), decimalFormat.format(duration)));
+                    workingPeriodArrow.setRotation(0);
+                    workingPeriodSummary.setVisibility(View.VISIBLE);
+                    workingPeriodDetail.setVisibility(View.GONE);
                 }
-            }
-            return false;
-        });
+            };
+
+            // Attach listener
+            workingPeriodLayout.setOnClickListener(workingPeriodListener);
+            workingPeriodSummary.setOnClickListener(workingPeriodListener);
+            workingPeriodArrow.setOnClickListener(workingPeriodListener);
+            workingPeriodEditDate.setOnClickListener(view -> datePicker());
+            workingPeriodEditDuration.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    String editText = workingPeriodEditDuration.getText().toString();
+                    if (editText.isEmpty())
+                        return true;
+                    else {
+                        duration = Float.parseFloat(editText);
+                        workingPeriodDurationUnit.setText(getResources().getQuantityString(R.plurals.hours, (int) duration));
+                        workingPeriodEditDuration.clearFocus();
+                        keyboardManager.hideSoftInputFromWindow(workingPeriodEditDuration.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+                }
+                return false;
+            });
+        }
 
 
         // ============================== INPUTS EVENTS ======================================== //
 
-        // Fill data if editing
-        if (editIntervention != null) {
-            inputList.addAll(editIntervention.phytos);
-            inputList.addAll(editIntervention.seeds);
-            inputList.addAll(editIntervention.fertilizers);
+        // UI defaults
+        inputArrow.setVisibility(View.VISIBLE);
+        inputSummary.setVisibility(View.VISIBLE);
+        inputAddLabel.setVisibility(View.GONE);
+
+        // Define accordion listener
+        View.OnClickListener inputListener = view -> {
+            int count = inputList.size();
+            if (count > 0) {
+                if (inputRecyclerGroup.getVisibility() == View.GONE) {
+                    inputArrow.setVisibility(View.VISIBLE);
+                    inputArrow.setRotation(180);
+                    inputSummary.setVisibility(View.GONE);
+                    if (!validated)
+                        inputAddLabel.setVisibility(View.VISIBLE);
+                    inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
+                } else {
+                    inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
+                    inputArrow.setRotation(0);
+                    inputSummary.setVisibility(View.VISIBLE);
+                    inputAddLabel.setVisibility(View.GONE);
+                    inputRecyclerGroup.setVisibility(View.GONE);
+                    phytoMixWarning.setVisibility(View.GONE);
+                }
+            }
+        };
+
+        // Attach accordion listener
+        inputZone.setOnClickListener(inputListener);
+        inputSummary.setOnClickListener(inputListener);
+        inputArrow.setOnClickListener(inputListener);
+
+        // Define and attach RecyclerView
+        inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        inputRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        inputAdapter = new InputAdapter(this, inputList);
+        inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                phytoMixWarning.setVisibility(View.GONE);
+                if (inputList.size() == 0) {
+                    inputArrow.setVisibility(View.GONE);
+                    inputRecyclerGroup.setVisibility(View.GONE);
+                } else if (inputList.size() >= 2) {
+                    // Phyto warnings
+                    List<Integer> codes = new ArrayList<>();
+                    for (Object input : inputList) {
+                        if (input instanceof Phytos) {
+                            Phyto phyto = ((Phytos) input).phyto.get(0);
+                            if (phyto != null && phyto.mix_category_code != null)
+                                codes.add(phyto.mix_category_code);
+                        }
+                    }
+                    if (codes.size() >= 2)
+                        if (!mixIsAuthorized(codes))
+                            phytoMixWarning.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        inputRecyclerView.setAdapter(inputAdapter);
+        inputAdapter.notifyDataSetChanged();
+
+        // inputListSize on create
+        int inputListSize = inputList.size();
+        if (inputListSize > 0) {
+            String summary = getResources().getQuantityString(R.plurals.inputs, inputListSize, inputListSize);
+            inputSummary.setText(summary);
+        } else {
+            inputSummary.setVisibility(View.GONE);
+            inputAddLabel.setVisibility(View.VISIBLE);
+            inputRecyclerGroup.setVisibility(View.GONE);
         }
 
-        if (validated && inputList.isEmpty()) {
-            inputLayout.setVisibility(View.GONE);
-        }
-        else {
-
+        if (!validated)
             inputAddLabel.setOnClickListener(view -> {
                 selectInputFragment = SelectInputFragment.newInstance();
                 selectInputFragment.show(getFragmentTransaction(), "dialog");
             });
 
-            View.OnClickListener inputListener = view -> {
-                int count = inputList.size();
-                if (count > 0) {
-                    if (inputRecyclerGroup.getVisibility() == View.GONE) {
-                        inputArrow.setVisibility(View.VISIBLE);
-                        inputArrow.setRotation(180);
-                        inputSummary.setVisibility(View.GONE);
-                        if (!validated)
-                            inputAddLabel.setVisibility(View.VISIBLE);
-                        inputRecyclerGroup.setVisibility(View.VISIBLE);  // TODO
-                    } else {
-                        inputSummary.setText(getResources().getQuantityString(R.plurals.inputs, count, count));
-                        inputArrow.setRotation(0);
-                        inputSummary.setVisibility(View.VISIBLE);
-                        inputAddLabel.setVisibility(View.GONE);
-                        inputRecyclerGroup.setVisibility(View.GONE);
-                        phytoMixWarning.setVisibility(View.GONE);
-                    }
-                }
-            };
-
-            inputArrow.setOnClickListener(inputListener);
-            inputSummary.setOnClickListener(inputListener);
-            inputZone.setOnClickListener(inputListener);
-
-            if (editIntervention != null) {
-                inputArrow.performClick();
-                if (validated) {
-                    inputAddLabel.setVisibility(View.GONE);
-                }
-            }
-
-            inputRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            inputRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-            inputAdapter = new InputAdapter(this, inputList);
-            inputAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onChanged() {
-                    phytoMixWarning.setVisibility(View.GONE);
-                    if (inputList.size() == 0) {
-                        inputArrow.setVisibility(View.GONE);
-                        inputRecyclerGroup.setVisibility(View.GONE);
-                    } else if (inputList.size() >= 2) {
-                        // Phyto warnings
-                        List<Integer> codes = new ArrayList<>();
-                        for (Object input : inputList) {
-                            if (input instanceof Phytos) {
-                                Phyto phyto = ((Phytos) input).phyto.get(0);
-                                if (phyto != null && phyto.mix_category_code != null)
-                                    codes.add(phyto.mix_category_code);
-                            }
-                        }
-                        if (codes.size() >= 2)
-                            if (!mixIsAuthorized(codes))
-                                phytoMixWarning.setVisibility(View.VISIBLE);
-                    }
-                }
-            });
-            inputRecyclerView.setAdapter(inputAdapter);
-            inputAdapter.notifyDataSetChanged();
-            if (inputList.size() == 0)
-                inputRecyclerGroup.setVisibility(View.GONE);
-
-        }
-
 
         // ================================ HARVEST EVENTS ===================================== //
+
+        // UI defaults
+        harvestArrow.setVisibility(View.VISIBLE);
+        harvestSummary.setVisibility(View.VISIBLE);
+        harvestAddLabel.setVisibility(View.GONE);
 
         ArrayAdapter outputTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Enums.OUTPUT_NAMES);
         outputTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         harvestOutputType.setAdapter(outputTypeAdapter);
 
-        if (editIntervention != null) {
-            if (!editIntervention.harvests.isEmpty()) {
-                outputList.addAll(editIntervention.harvests);
-                harvestArrow.performClick();
-                harvestOutputType.setSelection(Enums.OUTPUT_TYPES.indexOf(outputList.get(0).type));
+        // Define accordion listener
+        View.OnClickListener harvestListener = view -> {
+            int count = outputList.size();
+            if (count > 0) {
+                if (harvestRecyclerGroup.getVisibility() == View.GONE) {
+                    harvestArrow.setVisibility(View.VISIBLE);
+                    harvestArrow.setRotation(180);
+                    harvestSummary.setVisibility(View.GONE);
+                    if (!validated)
+                        harvestAddLabel.setVisibility(View.VISIBLE);
+                    harvestRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    harvestSummary.setText(getResources().getQuantityString(R.plurals.loads, count, count));
+                    harvestArrow.setRotation(0);
+                    harvestSummary.setVisibility(View.VISIBLE);
+                    harvestAddLabel.setVisibility(View.GONE);
+                    harvestRecyclerGroup.setVisibility(View.GONE);
+                }
             }
-        }
+        };
 
+        // Attach accordion listener
+        harvestZone.setOnClickListener(harvestListener);
+        harvestSummary.setOnClickListener(harvestListener);
+        harvestArrow.setOnClickListener(harvestListener);
+
+//        if (editIntervention != null) {
+//            if (!editIntervention.harvests.isEmpty()) {
+//                harvestArrow.performClick();
+//                harvestOutputType.setSelection(Enums.OUTPUT_TYPES.indexOf(outputList.get(0).type));
+//            }
+//        }
+
+        // Define and attach RecyclerView
         harvestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         harvestRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
         harvestAdapter = new OutputAdapter(this, outputList);
-        harvestRecyclerView.setAdapter(harvestAdapter);
-
         harvestAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                if (outputList.size() > 0)
-                    harvestDetail.setVisibility(View.VISIBLE);
-                else
-                    harvestDetail.setVisibility(View.GONE);
+                if (outputList.size() == 0) {
+                    harvestArrow.setVisibility(View.GONE);
+                    harvestRecyclerGroup.setVisibility(View.GONE);
+                }
             }
         });
-
-        harvestAddLabel.setOnClickListener(view -> {
-            outputList.add(new Harvest());
-            harvestAdapter.notifyDataSetChanged();
-        });
-
+        harvestRecyclerView.setAdapter(harvestAdapter);
         harvestAdapter.notifyDataSetChanged();
+
+        // inputListSize on create
+        int outputListSize = outputList.size();
+        if (outputListSize > 0) {
+            String summary = getResources().getQuantityString(R.plurals.loads, outputListSize, outputListSize);
+            harvestSummary.setText(summary);
+            harvestSummary.setVisibility(View.VISIBLE);
+            harvestAddLabel.setVisibility(View.GONE);
+            harvestOutputType.setSelection(Enums.OUTPUT_TYPES.indexOf(outputList.get(0).type));
+        } else {
+            if (!validated) {
+                harvestSummary.setVisibility(View.GONE);
+                harvestAddLabel.setVisibility(View.VISIBLE);
+            }
+            harvestRecyclerGroup.setVisibility(View.GONE);
+        }
+
+        if (validated)
+            harvestOutputType.setEnabled(false);
+        else
+            harvestAddLabel.setOnClickListener(view -> {
+                if (outputList.size() == 0) {
+                    harvestZone.performClick();
+                }
+                outputList.add(new Harvest());
+                harvestAdapter.notifyDataSetChanged();
+            });
 
 
         // ============================== MATERIALS EVENTS ===================================== //
 
-        if (editIntervention != null) {
-            materialList.addAll(editIntervention.materials);
-        }
-        if (validated && materialList.isEmpty()) {
-            materialLayout.setVisibility(View.GONE);
-        }
-        else {
+        // UI defaults
+        materialArrow.setVisibility(View.VISIBLE);
+        materialSummary.setVisibility(View.VISIBLE);
+        materialAddLabel.setVisibility(View.GONE);
 
+        // Define accordion listener
+        View.OnClickListener materialListener = view -> {
+            int count = materialList.size();
+            if (count > 0) {
+                if (materialRecyclerGroup.getVisibility() == View.GONE) {
+                    materialArrow.setVisibility(View.VISIBLE);
+                    materialArrow.setRotation(180);
+                    materialSummary.setVisibility(View.GONE);
+                    if (!validated)
+                        materialAddLabel.setVisibility(View.VISIBLE);
+                    materialRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
+                    materialArrow.setRotation(0);
+                    materialSummary.setVisibility(View.VISIBLE);
+                    materialAddLabel.setVisibility(View.GONE);
+                    materialRecyclerGroup.setVisibility(View.GONE);
+                }
+            }
+        };
+
+        // Attach accordion listener
+        materialZone.setOnClickListener(materialListener);
+        materialSummary.setOnClickListener(materialListener);
+        materialArrow.setOnClickListener(materialListener);
+
+        // Define and attach RecyclerView
+        materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        materialAdapter = new MaterialAdapter(this, materialList);
+        materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                if (materialList.size() == 0) {
+                    materialArrow.setVisibility(View.GONE);
+                    materialRecyclerGroup.setVisibility(View.GONE);
+                }
+            }
+        });
+        materialRecyclerView.setAdapter(materialAdapter);
+        materialAdapter.notifyDataSetChanged();
+
+        // inputListSize on create
+        int materialListSize = materialList.size();
+        if (materialListSize > 0) {
+            String summary = getResources().getQuantityString(R.plurals.materials, materialListSize, materialListSize);
+            materialSummary.setText(summary);
+            materialSummary.setVisibility(View.VISIBLE);
+            materialAddLabel.setVisibility(View.GONE);
+        } else {
+            if (!validated) {
+                materialSummary.setVisibility(View.GONE);
+                materialAddLabel.setVisibility(View.VISIBLE);
+            }
+            materialRecyclerGroup.setVisibility(View.GONE);
+        }
+
+        if (!validated)
             materialAddLabel.setOnClickListener(view -> {
                 selectMaterialFragment = SelectMaterialFragment.newInstance();
                 selectMaterialFragment.show(getFragmentTransaction(), "dialog");
             });
 
-            View.OnClickListener materialListener = view -> {
-                int count = materialList.size();
-                if (count > 0) {
-                    if (materialRecyclerGroup.getVisibility() == View.GONE) {
-                        materialArrow.setVisibility(View.VISIBLE);
-                        materialArrow.setRotation(180);
-                        materialSummary.setVisibility(View.GONE);
-                        if (!validated)
-                            materialAddLabel.setVisibility(View.VISIBLE);
-                        materialRecyclerGroup.setVisibility(View.VISIBLE);
-                    } else {
-                        materialSummary.setText(getResources().getQuantityString(R.plurals.materials, count, count));
-                        materialArrow.setRotation(0);
-                        materialSummary.setVisibility(View.VISIBLE);
-                        materialAddLabel.setVisibility(View.GONE);
-                        materialRecyclerGroup.setVisibility(View.GONE);
-                    }
-                }
-            };
 
-            materialArrow.setOnClickListener(materialListener);
-            materialSummary.setOnClickListener(materialListener);
-            materialZone.setOnClickListener(materialListener);
-
-            // Fill data if editing
-            if (editIntervention != null) {
-                materialArrow.performClick();
-                if (validated) {
-                    materialAddLabel.setVisibility(View.GONE);
-                }
-            }
-
-            materialRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            materialRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-            materialAdapter = new MaterialAdapter(this, materialList);
-            materialAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onChanged() {
-                    if (materialList.size() == 0) {
-                        materialArrow.setVisibility(View.GONE);
-                        materialRecyclerGroup.setVisibility(View.GONE);
-                    }
-                }
-            });
-            materialRecyclerView.setAdapter(materialAdapter);
-            materialAdapter.notifyDataSetChanged();
-            if (materialList.size() == 0)
-                materialRecyclerGroup.setVisibility(View.GONE);
-
-        }
         // ============================= EQUIPMENTS EVENTS ===================================== //
 
-        if (editIntervention != null) {
-            equipmentList.addAll(editIntervention.equipments);
-        }
-        if (validated && equipmentList.isEmpty()) {
-            findViewById(R.id.equipment_layout).setVisibility(View.GONE);
-        }
-        else {
+        // UI defaults
+        equipmentArrow.setVisibility(View.VISIBLE);
+        equipmentSummary.setVisibility(View.VISIBLE);
+        equipmentAddLabel.setVisibility(View.GONE);
 
+        // Define accordion listener
+        View.OnClickListener equipmentListener = view -> {
+            int count = equipmentList.size();
+            if (count > 0) {
+                if (equipmentRecyclerGroup.getVisibility() == View.GONE) {
+                    equipmentArrow.setVisibility(View.VISIBLE);
+                    equipmentArrow.setRotation(180);
+                    equipmentSummary.setVisibility(View.GONE);
+                    if (!validated)
+                        equipmentAddLabel.setVisibility(View.VISIBLE);
+                    equipmentRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    equipmentSummary.setText(getResources().getQuantityString(R.plurals.equipments, count, count));
+                    equipmentArrow.setRotation(0);
+                    equipmentSummary.setVisibility(View.VISIBLE);
+                    equipmentAddLabel.setVisibility(View.GONE);
+                    equipmentRecyclerGroup.setVisibility(View.GONE);
+                }
+            }
+        };
+
+        // Attach accordion listener
+        equipmentZone.setOnClickListener(equipmentListener);
+        equipmentSummary.setOnClickListener(equipmentListener);
+        equipmentArrow.setOnClickListener(equipmentListener);
+
+        // Define and attach RecyclerView
+        equipmentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        equipmentAdapter = new EquipmentAdapter(this, equipmentList);
+        equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                if (equipmentList.size() == 0) {
+                    equipmentArrow.setVisibility(View.GONE);
+                    equipmentRecyclerGroup.setVisibility(View.GONE);
+                }
+            }
+        });
+        equipmentRecyclerView.setAdapter(equipmentAdapter);
+        equipmentAdapter.notifyDataSetChanged();
+
+        // inputListSize on create
+        int equipmentListSize = equipmentList.size();
+        if (equipmentListSize > 0) {
+            String summary = getResources().getQuantityString(R.plurals.equipments, equipmentListSize, equipmentListSize);
+            equipmentSummary.setText(summary);
+        } else {
+            if (!validated) {
+                equipmentSummary.setVisibility(View.GONE);
+                equipmentAddLabel.setVisibility(View.VISIBLE);
+            }
+            equipmentRecyclerGroup.setVisibility(View.GONE);
+        }
+
+        if (!validated)
             equipmentAddLabel.setOnClickListener(view -> {
                 selectEquipmentFragment = SelectEquipmentFragment.newInstance();
                 selectEquipmentFragment.show(getFragmentTransaction(), "dialog");
             });
 
-            View.OnClickListener equipmentListener = view -> {
-                int count = equipmentList.size();
-                if (count > 0) {
-                    if (equipmentRecyclerGroup.getVisibility() == View.GONE) {
-                        equipmentArrow.setVisibility(View.VISIBLE);
-                        equipmentArrow.setRotation(180);
-                        equipmentSummary.setVisibility(View.GONE);
-                        if (!validated)
-                            equipmentAddLabel.setVisibility(View.VISIBLE);
-                        equipmentRecyclerGroup.setVisibility(View.VISIBLE);
-                    } else {
-                        equipmentSummary.setText(getResources().getQuantityString(R.plurals.equipments, count, count));
-                        equipmentArrow.setRotation(0);
-                        equipmentSummary.setVisibility(View.VISIBLE);
-                        equipmentAddLabel.setVisibility(View.GONE);
-                        equipmentRecyclerGroup.setVisibility(View.GONE);
-                    }
-                }
-            };
-
-            equipmentArrow.setOnClickListener(equipmentListener);
-            equipmentSummary.setOnClickListener(equipmentListener);
-            equipmentZone.setOnClickListener(equipmentListener);
-
-            if (editIntervention != null) {
-                equipmentArrow.performClick();
-                if (validated) {
-                    equipmentAddLabel.setVisibility(View.GONE);
-                }
-            }
-
-            equipmentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            equipmentRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-            equipmentAdapter = new EquipmentAdapter(this, equipmentList);
-            equipmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onChanged() {
-                    if (equipmentList.size() == 0) {
-                        equipmentArrow.setVisibility(View.GONE);
-                        equipmentRecyclerGroup.setVisibility(View.GONE);
-                    }
-                }
-            });
-            equipmentRecyclerView.setAdapter(equipmentAdapter);
-            equipmentAdapter.notifyDataSetChanged();
-            if (equipmentList.size() == 0)
-                equipmentRecyclerGroup.setVisibility(View.GONE);
-        }
 
 
         // =============================== PERSONS EVENTS ====================================== //
 
-        if (editIntervention != null) {
-            personList.addAll(editIntervention.persons);
+        // UI defaults
+        personArrow.setVisibility(View.VISIBLE);
+        personSummary.setVisibility(View.VISIBLE);
+        personAddLabel.setVisibility(View.GONE);
+
+        // Define accordion listener
+        View.OnClickListener personListener = view -> {
+            int count = personList.size();
+            if (count > 0) {
+                if (personRecyclerGroup.getVisibility() == View.GONE) {
+                    personArrow.setVisibility(View.VISIBLE);
+                    personArrow.setRotation(180);
+                    personSummary.setVisibility(View.GONE);
+                    if (!validated) personAddLabel.setVisibility(View.VISIBLE);
+                    personRecyclerGroup.setVisibility(View.VISIBLE);
+                } else {
+                    personSummary.setText(getResources().getQuantityString(R.plurals.persons, count, count));
+                    personArrow.setRotation(0);
+                    personSummary.setVisibility(View.VISIBLE);
+                    personAddLabel.setVisibility(View.GONE);
+                    personRecyclerGroup.setVisibility(View.GONE);
+                }
+            }
+        };
+
+        // Attach accordion listener
+        personZone.setOnClickListener(personListener);
+        personSummary.setOnClickListener(personListener);
+        personArrow.setOnClickListener(personListener);
+
+        // Define and attach RecyclerView
+        personRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        personRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        personAdapter = new PersonAdapter(personList);
+        personAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                if (personList.size() == 0) {
+                    personArrow.setVisibility(View.GONE);
+                    personRecyclerGroup.setVisibility(View.GONE);
+                }
+            }
+        });
+        personRecyclerView.setAdapter(personAdapter);
+        personAdapter.notifyDataSetChanged();
+
+        // inputListSize on create
+        int peopleListSize = personList.size();
+        if (peopleListSize > 0) {
+            String summary = getResources().getQuantityString(R.plurals.persons, peopleListSize, peopleListSize);
+            personSummary.setText(summary);
+        } else {
+            if (!validated) {
+                personSummary.setVisibility(View.GONE);
+                personAddLabel.setVisibility(View.VISIBLE);
+            }
+            personRecyclerGroup.setVisibility(View.GONE);
         }
 
-        if (validated && personList.isEmpty()) {
-            findViewById(R.id.person_layout).setVisibility(View.GONE);
-        }
-        else {
+        if (!validated)
             personAddLabel.setOnClickListener(view -> {
                 selectPersonFragment = SelectPersonFragment.newInstance();
                 selectPersonFragment.show(getFragmentTransaction(), "dialog");
             });
-
-            View.OnClickListener personListener = view -> {
-                int count = personList.size();
-                if (count > 0) {
-                    if (personRecyclerGroup.getVisibility() == View.GONE) {
-                        personArrow.setVisibility(View.VISIBLE);
-                        personArrow.setRotation(180);
-                        personSummary.setVisibility(View.GONE);
-                        if (!validated)
-                            personAddLabel.setVisibility(View.VISIBLE);
-                        personRecyclerGroup.setVisibility(View.VISIBLE);
-                    } else {
-                        personSummary.setText(getResources().getQuantityString(R.plurals.persons, count, count));
-                        personArrow.setRotation(0);
-                        personSummary.setVisibility(View.VISIBLE);
-                        personAddLabel.setVisibility(View.GONE);
-                        personRecyclerGroup.setVisibility(View.GONE);
-                    }
-                }
-            };
-
-            personArrow.setOnClickListener(personListener);
-            personSummary.setOnClickListener(personListener);
-            personZone.setOnClickListener(personListener);
-
-
-            if (editIntervention != null) {
-                personArrow.performClick();
-                if (validated) {
-                    personAddLabel.setVisibility(View.GONE);
-                }
-            }
-
-            personRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            personRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-            personAdapter = new PersonAdapter(personList);
-            personAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onChanged() {
-                    if (personList.size() == 0) {
-                        personArrow.setVisibility(View.GONE);
-                        personRecyclerGroup.setVisibility(View.GONE);
-                    }
-                }
-            });
-            personRecyclerView.setAdapter(personAdapter);
-            personAdapter.notifyDataSetChanged();
-            if (personList.size() == 0)
-                personRecyclerGroup.setVisibility(View.GONE);
-        }
 
 
         // =============================== WEATHER EVENTS ====================================== //
@@ -1401,6 +1485,8 @@ public class InterventionActivity extends AppCompatActivity implements
         cropList.clear();
         outputList.clear();
         materialList.clear();
+        editIntervention = null;
+        validated = false;
     }
 
     private class GetMaxDose extends AsyncTask<Void, Void, Void> {

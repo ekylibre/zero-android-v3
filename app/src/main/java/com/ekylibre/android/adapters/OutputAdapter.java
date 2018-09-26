@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.utils.Enums;
@@ -56,58 +57,90 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
             deleteImageView = itemView.findViewById(R.id.harvest_delete);
             numberEditText = itemView.findViewById(R.id.harvest_number_edit);
 
-            deleteImageView.setOnClickListener(view -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(R.string.delete_harvest_prompt);
-                builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
-                builder.setPositiveButton(R.string.yes, (dialog, i) -> {
-                    dataset.remove(getAdapterPosition());
-                    notifyDataSetChanged();  // notifyItemRemoved(position);
+            if (InterventionActivity.validated) {
+                deleteImageView.setVisibility(View.GONE);
+                quantityEditText.setFocusable(false);
+                quantityEditText.setEnabled(false);
+                numberEditText.setFocusable(false);
+                numberEditText.setFocusable(false);
+                unitSpinner.setEnabled(false);
+                storageSpinner.setEnabled(false);
+            } else {
+                deleteImageView.setOnClickListener(view -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(R.string.delete_harvest_prompt);
+                    builder.setNegativeButton(R.string.no, (dialog, i) -> dialog.cancel());
+                    builder.setPositiveButton(R.string.yes, (dialog, i) -> {
+                        dataset.remove(getAdapterPosition());
+                        notifyDataSetChanged();  // notifyItemRemoved(position);
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            });
 
-            quantityEditText.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                @Override public void afterTextChanged(Editable editable) {
-                    if (!editable.toString().equals("0") && editable.length() != 0) {
-                        dataset.get(getAdapterPosition()).quantity = Float.valueOf(editable.toString());
+                quantityEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     }
-                }
-            });
 
-            unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override public void onNothingSelected(AdapterView<?> parent) {}
-                @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    List<Unit> units = globalOutput ? Units.GLOBAL_OUTPUT_UNITS : Units.LOAD_OUTPUT_UNITS;
-                    dataset.get(getAdapterPosition()).unit = units.get(position).key;
-                }
-            });
-
-            storageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override public void onNothingSelected(AdapterView<?> parent) {}
-                @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Timber.i("position %s", position);
-                    if (position != 0) {
-                        dataset.get(getAdapterPosition()).id_storage = Enums.STORAGE_LIST.get(position - 1).id;
-                        Timber.i("Storage id --> %s", Enums.STORAGE_LIST.get(position - 1).id);
-                    } else {
-                        dataset.get(getAdapterPosition()).id_storage = null;
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
                     }
-                }
-            });
 
-            numberEditText.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                @Override public void afterTextChanged(Editable editable) {
-                    if (editable.length() > 0) {
-                        dataset.get(getAdapterPosition()).number = editable.toString();
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if (!editable.toString().equals("0") && editable.length() != 0) {
+                            dataset.get(getAdapterPosition()).quantity = Float.valueOf(editable.toString());
+                        }
                     }
-                }
-            });
+                });
+
+                unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        List<Unit> units = globalOutput ? Units.GLOBAL_OUTPUT_UNITS : Units.LOAD_OUTPUT_UNITS;
+                        dataset.get(getAdapterPosition()).unit = units.get(position).key;
+                    }
+                });
+
+                storageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        Timber.i("position %s", position);
+                        if (position != 0) {
+                            dataset.get(getAdapterPosition()).id_storage = Enums.STORAGE_LIST.get(position - 1).id;
+                            Timber.i("Storage id --> %s", Enums.STORAGE_LIST.get(position - 1).id);
+                        } else {
+                            dataset.get(getAdapterPosition()).id_storage = null;
+                        }
+                    }
+                });
+
+                numberEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if (editable.length() > 0) {
+                            dataset.get(getAdapterPosition()).number = editable.toString();
+                        }
+                    }
+                });
+            }
         }
 
         void display(Harvest item) {

@@ -36,7 +36,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/lock_message"
-                    android:tint="@color/helpTextMessage"
+                    android:tint="@color/lockMessage"
                     app:srcCompat="@drawable/ic_lock"
                     />
 
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/you_are_in_consult_mode"
                     android:lines="2"
-                    android:textColor="@color/helpTextMessage"
+                    android:textColor="@color/lockMessage"
                     android:textStyle="italic"
                     app:layout_constraintStart_toEndOf="@id/lock_icon"
                     app:layout_constraintEnd_toEndOf="parent"

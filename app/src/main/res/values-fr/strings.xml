@@ -190,8 +190,10 @@
     <string name="materials">%d matériaux</string>
     <string name="equipment">%d équipement</string>
     <string name="equipments">%d équipements</string>
-    <string name="person">%d personne</string>
-    <string name="persons">%d personnes</string>
+    <string name="person">%d opérateur</string>
+    <string name="persons">%d opérateurs</string>
+    <string name="load">%d chargement</string>
+    <string name="loads">%d chargements</string>
     <string name="day">%d jour</string>
     <string name="days">%d jours</string>
     <string name="hour">heure</string>
@@ -262,12 +264,13 @@
     <string name="recyclerview_nodata">Commencez à utiliser l\'application en ajoutant votre première intervention !</string>
     <string name="none">aucun</string>
     <string name="unspecified">non renseigné</string>
+    <string name="not_provided">non renseignée</string>
 
     <string name="label_working_period">Temps de travail</string>
     <string name="label_inputs">Intrants</string>
     <string name="label_equipments">Equipements</string>
     <string name="label_materials">Matériaux</string>
-    <string name="label_persons">Personnes</string>
+    <string name="label_persons">Opérateurs</string>
     <string name="label_crops">Cultures</string>
     <string name="label_irrigation">Irrigation</string>
     <string name="label_weather">Météo</string>
@@ -298,28 +301,28 @@
     <string name="create_ferti_title">Création d\'un fertilisant</string>
     <string name="create_material_title">Créer un nouveau matériau</string>
     <string name="create_equipment_title">Création d\'un équipement</string>
-    <string name="create_person_title">Création d\'une personne</string>
+    <string name="create_person_title">Création d\'un opérateur</string>
 
     <string name="create_new_seed">+ Créer une nouvelle semence</string>
     <string name="create_new_phyto">+ Créer un nouveau phyto</string>
     <string name="create_new_ferti">+ Créer un nouveau fertilisant</string>
     <string name="create_new_material">+ Créer un nouveau matériau</string>
     <string name="create_new_equipment">+ Créer un nouvel équipement</string>
-    <string name="create_new_person">+ Créer une personne</string>
+    <string name="create_new_person">+ Créer un opérateur</string>
 
     <string name="selecting_crops">Sélectionnez des cultures</string>
     <string name="selecting_tools">Sélectionnez un équipement</string>
-    <string name="selecting_people">Sélectionnez une personne</string>
+    <string name="selecting_people">Sélectionnez un opérateur</string>
 
     <string name="delete_harvest_prompt">Etes-vous sûr de vouloir supprimer le chargement ?</string>
     <string name="delete_equipment_prompt">Etes-vous sûr de vouloir supprimer l\'équipement ?</string>
     <string name="delete_material_prompt">Etes-vous sûr de vouloir supprimer le matériau ?</string>
-    <string name="delete_person_prompt">Etes-vous sûr de vouloir supprimer la personne ?</string>
+    <string name="delete_person_prompt">Etes-vous sûr de vouloir supprimer l\'opérateur ?</string>
 
     <string name="add">+ Ajouter</string>
     <string name="add_equipment">+ Ajouter un équipement</string>
     <string name="add_material">+ Ajouter un matériau</string>
-    <string name="add_person">+ Ajouter une personne</string>
+    <string name="add_person">+ Ajouter un opérateur</string>
     <string name="add_load">+ Ajouter un chargement</string>
     <string name="select_crops">+ Sélectionner</string>
     <string name="no_crop_selected">Aucune sélection</string>
@@ -330,7 +333,6 @@
     <string name="chose_unit">Unité</string>
 
     <string name="temperature">Température</string>
-    <string name="not_provided">Non renseignée</string>
     <string name="wind_speed">Vitesse du vent</string>
     <string name="quantity_cannot_be_null">Quantité ne peut être nulle</string>
     <string name="stock_place">Stockage</string>
@@ -389,5 +391,7 @@
     <string name="nature">Nature</string>
     <string name="celsius">°C</string>
     <string name="km_per_hour">km/h</string>
+    <string name="ok">OK</string>
+    <string name="crop_list">Liste des cultures</string>
 
 </resources>

@@ -38,7 +38,6 @@
             android:name=".services.OneShotLocationIntentService"
             android:exported="false" />
 
-        <activity android:name=".ConsultActivity"></activity>
     </application>
 
 </manifest>

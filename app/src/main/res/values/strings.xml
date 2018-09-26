@@ -192,6 +192,8 @@
     <string name="equipments">%d equipments</string>
     <string name="person">%d person</string>
     <string name="persons">%d persons</string>
+    <string name="load">%d load</string>
+    <string name="loads">%d loads</string>
     <string name="day">%d day</string>
     <string name="days">%d days</string>
     <string name="hour">hour</string>
@@ -389,5 +391,7 @@
     <string name="nature">Nature</string>
     <string name="celsius">°C</string>
     <string name="km_per_hour">km/h</string>
+    <string name="ok">OK</string>
+    <string name="crop_list">Liste des cultures</string>
 
 </resources>

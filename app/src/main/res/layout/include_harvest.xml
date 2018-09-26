@@ -10,83 +10,91 @@
     android:paddingEnd="@dimen/start_end_include_margin"
     android:background="@drawable/border_bottom">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/harvest_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_arrow_down"
-        android:animateLayoutChanges="true"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/harvest_zone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/harvest_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="@dimen/category_header_size"
-        android:textColor="@color/primary_dark"
-        android:text="@string/label_harvest"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/harvest_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/icon_arrow_down"
+            android:animateLayoutChanges="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/harvest_summary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/start_end_include_margin"
-        android:text="@string/none"
-        app:layout_constraintBaseline_toBaselineOf="@id/harvest_label"
-        app:layout_constraintStart_toEndOf="@id/harvest_label"
-        android:visibility="gone"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/harvest_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="@dimen/category_header_size"
+            android:textColor="@color/primary_dark"
+            android:text="@string/label_harvest"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/harvest_add_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@id/harvest_label"
-        app:layout_constraintStart_toEndOf="@id/harvest_label"
-        android:layout_marginStart="16dp"
-        android:text="@string/add_load"
-        android:textAllCaps="true"
-        android:textColor="@color/action_text" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/harvest_add_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBaseline_toBaselineOf="@id/harvest_label"
+            app:layout_constraintStart_toEndOf="@id/harvest_label"
+            android:layout_marginStart="16dp"
+            android:text="@string/add_load"
+            android:textAllCaps="true"
+            android:textColor="@color/action_text" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/harvest_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/start_end_include_margin"
+            android:text="@string/none"
+            app:layout_constraintBaseline_toBaselineOf="@id/harvest_label"
+            app:layout_constraintStart_toEndOf="@id/harvest_label"
+            android:visibility="gone"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.constraintlayout.widget.Group
-        android:id="@+id/harvest_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="harvest_output_label,harvest_output_spinner,harvest_recycler"
-        android:visibility="gone"/>
+            android:id="@+id/harvest_recycler_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="harvest_output_label,harvest_output_spinner,harvest_recycler"
+            android:visibility="gone"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/harvest_output_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nature"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/harvest_output_spinner" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/harvest_output_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nature"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@id/harvest_output_spinner" />
 
-    <androidx.appcompat.widget.AppCompatSpinner
-        android:id="@+id/harvest_output_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/border_edittext"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:padding="6dp"
-        app:layout_constraintStart_toEndOf="@id/harvest_output_label"
-        app:layout_constraintTop_toBottomOf="@id/harvest_label" />
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/harvest_output_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_edittext"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:padding="6dp"
+            app:layout_constraintStart_toEndOf="@id/harvest_output_label"
+            app:layout_constraintTop_toBottomOf="@id/harvest_zone" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/harvest_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/harvest_output_spinner"
-        android:background="@drawable/border_input_list"
-        tools:listitem="@layout/item_harvest" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/harvest_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/harvest_output_spinner"
+            android:background="@drawable/border_input_list"
+            tools:listitem="@layout/item_harvest" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

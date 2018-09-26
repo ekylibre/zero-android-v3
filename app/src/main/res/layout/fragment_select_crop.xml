@@ -6,21 +6,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.ekylibre.android.fragments.SelectMaterialFragment"
-    android:background="@color/background"
-    style="@style/NoActionBar">
+    android:background="@color/background">
+        <!--style="@style/NoActionBar"-->
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!--<com.google.android.material.appbar.AppBarLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/app_bar">-->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/app_bar">
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/selecting_crops"
-            app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
-            app:titleTextColor="@color/dialogTitleColor"
-            android:background="@color/dialogColor"/>
-    </com.google.android.material.appbar.AppBarLayout>
+        app:title="@string/selecting_crops"
+        app:titleTextAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        app:titleTextColor="@color/dialogTitleColor"
+        android:background="@color/dialogColor"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/crop_dialog_recycler"
@@ -29,7 +29,7 @@
         tools:listitem="@layout/item_plot"
         android:scrollbars="vertical"
         android:background="@drawable/border_top"
-        app:layout_constraintTop_toBottomOf="@id/app_bar"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toTopOf="@id/nav_layout"/>
 
 

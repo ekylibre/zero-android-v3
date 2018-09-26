@@ -41,4 +41,9 @@
         <item quantity="other">@string/crops</item>
     </plurals>
 
+    <plurals name="loads">
+        <item quantity="one">@string/load</item>
+        <item quantity="other">@string/loads</item>
+    </plurals>
+
 </resources>

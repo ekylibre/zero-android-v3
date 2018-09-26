@@ -1,8 +1,11 @@
 package com.ekylibre.android.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +24,6 @@ import com.ekylibre.android.database.pojos.CropsByPlot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class SelectCropFragment extends DialogFragment {
@@ -53,7 +55,8 @@ public class SelectCropFragment extends DialogFragment {
         dataset = InterventionActivity.cropList;
 
         // Disables AppBar
-        Objects.requireNonNull(getDialog().getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
+        if (getDialog().getWindow() != null)
+            getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         View inflatedView = inflater.inflate(R.layout.fragment_select_crop, container, false);
 
@@ -70,8 +73,11 @@ public class SelectCropFragment extends DialogFragment {
             adapter.notifyItemRangeRemoved(0, dataset.size());
         });
 
-        if (InterventionActivity.validated)
-            validateButton.setText("OK");
+        if (InterventionActivity.validated) {
+            validateButton.setText(R.string.ok);
+            Toolbar toolbar = inflatedView.findViewById(R.id.toolbar);
+            toolbar.setTitle(getString(R.string.crop_list));
+        }
 
         return inflatedView;
     }
@@ -79,7 +85,6 @@ public class SelectCropFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-
         Window window = getDialog().getWindow();
         if (window != null)
             window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);

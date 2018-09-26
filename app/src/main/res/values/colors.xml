@@ -31,5 +31,6 @@
     <color name="createText">@color/accent</color>
     <color name="productionHeader">@color/accent</color>
     <color name="helpTextMessage">@color/accent</color>
+    <color name="lockMessage">@color/warning</color>
 
 </resources>
