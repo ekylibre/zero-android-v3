@@ -201,6 +201,9 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
             itemUnitSpinner.setAdapter(spinnerAdapter);
             itemUnitSpinner.setSelection(unitsKey.indexOf(currentUnit));
 
+            if (quantity > 0)
+                updateTotal();
+
         }
 
         void updateTotal() {
