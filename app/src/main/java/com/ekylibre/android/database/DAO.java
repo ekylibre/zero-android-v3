@@ -395,6 +395,28 @@ public interface DAO {
     List<Crop> selectCrop();
 
 
+    /**
+     * Storages
+     */
+    @Query("UPDATE " + Storage.TABLE_NAME + " SET name = :name, type = :type WHERE " + Storage.COLUMN_ID_EKY + " = :ekyId")
+    void updateStorage(String name, String type, int ekyId);
+
+    @Query("SELECT " + Storage.COLUMN_ID + " FROM " + Storage.TABLE_NAME + " WHERE " + Storage.COLUMN_ID_EKY + " = :ekyId")
+    int getStorageId(int ekyId);
+
+    @Query("SELECT " + Storage.COLUMN_ID_EKY + " FROM " + Storage.TABLE_NAME + " WHERE " + Storage.COLUMN_ID_EKY + " NOT NULL")
+    List<Integer> storageEkiIdList();
+
+    @Query("SELECT " + Storage.COLUMN_ID_EKY + " FROM " + Storage.TABLE_NAME + " WHERE storage_id = :id")
+    Integer getStorageEkiId(int id);
+
+    @Query("SELECT * FROM " + Storage.TABLE_NAME + " WHERE " + Storage.COLUMN_ID_EKY + " IS NULL")
+    List<Storage> getStoragesWithoutEkyId();
+
+    @Query("UPDATE " + Storage.TABLE_NAME + " SET " + Storage.COLUMN_ID_EKY + " = :ekyId WHERE " + Storage.COLUMN_ID + " = :id")
+    void setStorageEkyId(int id, int ekyId);
+
+
 
 //    @Query("SELECT * FROM " + ProductionNature.TABLE_NAME + " ORDER BY " + ProductionNature.COLUMN_HUMAN_NAME_FRA)
 //    List<ProductionNature> selectProductionNature();

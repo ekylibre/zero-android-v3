@@ -7,6 +7,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import android.content.Context;
+import android.database.Cursor;
+
 import androidx.annotation.NonNull;
 
 import com.ekylibre.android.database.converters.DateConverter;
@@ -63,7 +65,7 @@ import timber.log.Timber;
             Point.class
         },
         exportSchema = false,
-        version = 5
+        version = 6
 )
 @TypeConverters(
         { DateConverter.class, PolygonConverter.class }
@@ -79,15 +81,11 @@ public abstract class AppDatabase extends RoomDatabase {
     public static synchronized AppDatabase getInstance(Context context) {
         if (database == null)
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
-                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5)
+                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,
+                            MIGRATION_4_5, MIGRATION_5_6)
                     .build();
         return database;
     }
-
-    public static synchronized void revokeInstance() {
-        database = null;
-    }
-
 
     /**
      * Manage migrations
@@ -134,30 +132,52 @@ public abstract class AppDatabase extends RoomDatabase {
     };
 
     private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
-    @Override
-    public void migrate(@NonNull SupportSQLiteDatabase database) {
-        database.execSQL("CREATE TABLE temp_crops (crop_uuid TEXT NOT NULL, name TEXT, specie TEXT, " +
-                        "production_nature TEXT, production_mode TEXT, production_output TEXT, " +
-                        "provisional_yield TEXT, shape TEXT, surface_area REAL NOT NULL, " +
-                        "centroid TEXT, start_date TEXT, stop_date TEXT, plot_uuid TEXT, farm TEXT, " +
-                        "PRIMARY KEY(crop_uuid))");
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE temp_crops (crop_uuid TEXT NOT NULL, name TEXT, specie TEXT, " +
+                            "production_nature TEXT, production_mode TEXT, production_output TEXT, " +
+                            "provisional_yield TEXT, shape TEXT, surface_area REAL NOT NULL, " +
+                            "centroid TEXT, start_date TEXT, stop_date TEXT, plot_uuid TEXT, farm TEXT, " +
+                            "PRIMARY KEY(crop_uuid))");
 
-        database.execSQL("INSERT INTO temp_crops (crop_uuid, name, specie, production_nature, " +
-                "production_mode, production_output, provisional_yield, shape, surface_area, " +
-                "centroid, start_date, stop_date, plot_uuid, farm) " +
-                "SELECT crop_uuid, name, specie, " +
-                "production_nature, production_mode, production_output, provisional_yield, shape," +
-                "surface_area, centroid, start_date, stop_date, plot, farm FROM crops");
+            database.execSQL("INSERT INTO temp_crops (crop_uuid, name, specie, production_nature, " +
+                    "production_mode, production_output, provisional_yield, shape, surface_area, " +
+                    "centroid, start_date, stop_date, plot_uuid, farm) " +
+                    "SELECT crop_uuid, name, specie, " +
+                    "production_nature, production_mode, production_output, provisional_yield, shape," +
+                    "surface_area, centroid, start_date, stop_date, plot, farm FROM crops");
 
-        database.execSQL("DROP TABLE crops;");
+            database.execSQL("DROP TABLE crops;");
 
-        database.execSQL("ALTER TABLE temp_crops RENAME TO crops");
+            database.execSQL("ALTER TABLE temp_crops RENAME TO crops");
 
-        database.execSQL("CREATE INDEX index_crops_farm ON crops (farm)");
-        database.execSQL("CREATE INDEX index_crops_name ON crops (name)");
+            database.execSQL("CREATE INDEX index_crops_farm ON crops (farm)");
+            database.execSQL("CREATE INDEX index_crops_name ON crops (name)");
         }
-};
+    };
 
+    private static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+
+            Cursor cursor = database.query("SELECT farm_id FROM farms LIMIT 1");
+            cursor.moveToFirst();
+            String farmId = cursor.getString(cursor.getColumnIndex("farm_id"));
+
+//            database.execSQL("ALTER TABLE storages ADD COLUMN storage_id_eky INTEGER DEFAULT NULL");
+//            database.execSQL("ALTER TABLE storages ADD COLUMN farm TEXT DEFAULT '" + farmId + "'");
+
+            database.execSQL("CREATE TABLE temp_storages (storage_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT, type TEXT, storage_id_eky INTEGER, farm TEXT)");
+
+            database.execSQL("INSERT INTO temp_storages (name, type, storage_id_eky, farm)" +
+                    "SELECT name, type, storage_id, '" + farmId + "' FROM storages");
+
+            database.execSQL("DROP TABLE storages");
+
+            database.execSQL("ALTER TABLE temp_storages RENAME TO storages");
+        }
+    };
 
     /**
      * Populate database with initial Lexicon data

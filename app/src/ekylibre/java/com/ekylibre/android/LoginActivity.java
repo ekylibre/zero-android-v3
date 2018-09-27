@@ -251,6 +251,7 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.putString("current-farm-name", data.farms().get(farmPosition).label);
                                     editor.putString("current-farm-id", data.farms().get(farmPosition).id);
                                     editor.putBoolean("is_authenticated", true);
+                                    editor.putBoolean("no-crop", true);
                                     editor.apply();
 
                                     // Finish the login activity

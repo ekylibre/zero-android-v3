@@ -101,7 +101,6 @@ query Farm (
       species
       productionNature {
         name
-        specie
       }
       productionMode
       provisionalYield

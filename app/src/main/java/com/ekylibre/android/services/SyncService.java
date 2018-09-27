@@ -22,6 +22,7 @@ import com.ekylibre.android.PushArticleMutation;
 import com.ekylibre.android.PushEquipmentMutation;
 import com.ekylibre.android.PushInterMutation;
 import com.ekylibre.android.PushPersonMutation;
+import com.ekylibre.android.PushStorageMutation;
 import com.ekylibre.android.UpdateInterMutation;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Crop;
@@ -72,6 +73,7 @@ import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.InterventionWaterVolumeUnitEnum;
 import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.OperatorRoleEnum;
+import com.ekylibre.android.type.StorageTypeEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.Enums;
@@ -143,6 +145,7 @@ public class SyncService extends IntentService {
                 pushArticle();
                 pushEquipment();
                 pushPerson();
+                pushStorage();
                 pushDeleteIntervention();
                 pushUpdateIntervention();  // TODO: merge update and create in one method
                 pushCreateIntervention();
@@ -151,6 +154,51 @@ public class SyncService extends IntentService {
                 //receiver.send(DONE, new Bundle());
                 break;
         }
+    }
+
+    /**
+     * create person and equipment mutation
+     */
+    private void pushStorage() {
+
+        List<Storage> newStorages = database.dao().getStoragesWithoutEkyId();
+
+        if (!newStorages.isEmpty()) {
+            for (Storage storage : newStorages) {
+
+                PushStorageMutation pushStorage = PushStorageMutation.builder()
+                        .farmId(storage.farm)
+                        .name(storage.name)
+                        .type(StorageTypeEnum.safeValueOf(storage.type))
+                        .build();
+
+                apolloClient.mutate(pushStorage).enqueue(new ApolloCall.Callback<PushStorageMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushStorageMutation.Data> response) {
+                        if (!response.hasErrors()) {
+                            PushStorageMutation.Data data = response.data();
+                            if (data != null) {
+                                PushStorageMutation.CreateStorage mutation = data.createStorage();
+                                if (mutation != null) {
+                                    PushStorageMutation.Storage mStorage = mutation.storage();
+                                    if (mStorage != null) {
+                                        database.dao().setStorageEkyId(storage.id, Integer.valueOf(mStorage.id()));
+                                        Timber.i("Storage #%s successfully created !", mStorage.id());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        } else Timber.i("No new Storage to push");
     }
 
     /**
@@ -583,12 +631,15 @@ public class SyncService extends IntentService {
                             .windSpeed(weather.wind_speed != null ? Double.valueOf(weather.wind_speed) : null).build();
 
                 for (Harvest harvest : updatableInter.harvests) {
+                    Integer storageEkyId = null;
+                    if (harvest.id_storage != null)
+                        storageEkyId = database.dao().getStorageEkiId(harvest.id_storage);
                     loadUpdates.add(HarvestLoadAttributes.builder()
                             .number(harvest.number)
                             .quantity(harvest.quantity)
                             .netQuantity((double) harvest.quantity)
                             .unit(HarvestLoadUnitEnum.valueOf(harvest.unit))
-                            .storageID(harvest.id_storage != null ? String.valueOf(harvest.id_storage) : null).build());
+                            .storageID(String.valueOf(storageEkyId)).build());
                 }
                 if (!loadUpdates.isEmpty()) {
                     outputUpdate.add(InterventionOutputAttributes.builder()
@@ -699,7 +750,10 @@ public class SyncService extends IntentService {
                             .netQuantity((double) harvest.quantity)
                             .unit(HarvestLoadUnitEnum.valueOf(harvest.unit));
                     if (harvest.number != null) loadBuilder.number(harvest.number);
-                    if (harvest.id_storage != null) loadBuilder.storageID(String.valueOf(harvest.id_storage));
+                    if (harvest.id_storage != null) {
+                        int storageEkyId = database.dao().getStorageEkiId(harvest.id_storage);
+                        loadBuilder.storageID(String.valueOf(storageEkyId));
+                    }
                     loads.add(loadBuilder.build());
                 }
                 if (!loads.isEmpty()) {
@@ -858,7 +912,7 @@ public class SyncService extends IntentService {
         List<Integer> seedEkyIdList = database.dao().seedEkiIdList();
         List<Integer> fertiEkyIdList = database.dao().fertilizerEkiIdList();
         List<Integer> materialEkyIdList = database.dao().materialEkiIdList();
-
+        List<Integer> storageEkyIdList = database.dao().storageEkiIdList();
         ApolloCall.Callback<FarmQuery.Data> farmCallback = new ApolloCall.Callback<FarmQuery.Data>() {
 
             @Override
@@ -906,7 +960,7 @@ public class SyncService extends IntentService {
                     // Processing crops and associated plots
                     /////////////////////////////////////////
                     List<FarmQuery.Crop> crops = farm.crops();
-                    if (crops != null) {
+                    if (!crops.isEmpty()) {
                         Timber.i("Fetching crops...");
 
                         editor.putBoolean("no-crop", false);
@@ -922,9 +976,6 @@ public class SyncService extends IntentService {
                             database.dao().insert(newCrop);
                         }
                         // TODO: delete crop & plot if deleted on server
-                    } else {
-                        editor.putBoolean("no-crop", true);
-                        editor.apply();
                     }
 
                     /////////////////////
@@ -972,11 +1023,14 @@ public class SyncService extends IntentService {
                     List<FarmQuery.Storage> storages = farm.storages();
                     Timber.i("Fetching storages...");
                     for (FarmQuery.Storage storage : storages) {
-                        Timber.d("	Create/update storage #%s", storage.id());
-                        database.dao().insert(new Storage(
-                                Integer.valueOf(storage.id()),
-                                storage.name(),
-                                storage.type().rawValue()));
+                        int ekyId = Integer.valueOf(storage.id());
+                        String name = storage.name();
+                        String type = storage.type().rawValue();
+                        if (storageEkyIdList.contains(ekyId)) {
+                            database.dao().updateStorage(name, type, ekyId);
+                        } else {
+                            database.dao().insert(new Storage(ekyId, name, type, farm.id()));
+                        }
                     }
                     Enums.generateStorages(database);
 
@@ -1332,7 +1386,9 @@ public class SyncService extends IntentService {
                                         for (InterventionQuery.Load load : loads) {
                                             if (load.quantity() > 0) {
                                                 InterventionQuery.Storage storage = load.storage();
-                                                Integer storageId = storage != null ? Integer.valueOf(storage.id()) : null;
+                                                Integer storageId = null;
+                                                if (storage != null)
+                                                    storageId = database.dao().getStorageId(Integer.valueOf(storage.id()));
                                                 HarvestLoadUnitEnum unit = load.unit();
                                                 String quantityUnit = unit != null ? unit.toString() : null;
                                                 database.dao().insert(new Harvest(id, (float) load.quantity(), quantityUnit, storageId, load.number(), output.nature().toString()));

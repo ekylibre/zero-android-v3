@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -31,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -641,16 +643,17 @@ public class InterventionActivity extends AppCompatActivity implements
             harvestRecyclerGroup.setVisibility(View.GONE);
         }
 
-        if (validated)
+        if (validated) {
             harvestOutputType.setEnabled(false);
-        else
+        }
+        else {
             harvestAddLabel.setOnClickListener(view -> {
-                if (outputList.size() == 0) {
-                    harvestZone.performClick();
-                }
+                boolean firstTime = outputList.size() == 0;
                 outputList.add(new Harvest());
                 harvestAdapter.notifyDataSetChanged();
+                if (firstTime) harvestZone.performClick();
             });
+        }
 
 
         // ============================== MATERIALS EVENTS ===================================== //

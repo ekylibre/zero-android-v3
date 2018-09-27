@@ -21,8 +21,6 @@ import java.util.List;
 
 public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder> {
 
-    private static final String TAG = PersonAdapter.class.getName();
-
     private List<Persons> dataset;
 
     public PersonAdapter(List<Persons> dataset) {

@@ -146,6 +146,27 @@ mutation pushPerson(
   }
 }
 
+mutation pushStorage(
+  $farmId: ID!,
+  $type: StorageTypeEnum,
+  $name: String!,
+) {
+  createStorage(
+    input: {
+      storage: {
+        farmID: $farmId
+        type: $type
+        name: $name
+      }
+    }
+  ) {
+    errors,
+    storage {
+      id
+    }
+  }
+}
+
 mutation deleteInter(
   $id: ID!,
   $farmId: ID!

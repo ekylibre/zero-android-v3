@@ -6,31 +6,43 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SpinnerAdapter;
 
 import com.ekylibre.android.InterventionActivity;
+import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
+import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Harvest;
+import com.ekylibre.android.database.models.Storage;
+import com.ekylibre.android.services.SyncService;
+import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
 import timber.log.Timber;
 
+import static com.ekylibre.android.utils.Utils.decimalFormat;
+
 
 public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder> {
-
-    private static final String TAG = "OutputAdapter";
 
     private Context context;
     private List<Harvest> dataset;
@@ -42,9 +54,10 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView deleteImageView;
+        ImageView deleteImageView, createStorage;
         EditText quantityEditText, numberEditText;
         AppCompatSpinner unitSpinner, storageSpinner;
+        ArrayAdapter storageSpinnerAdapter;
 
         boolean globalOutput = false;
 
@@ -56,6 +69,7 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
             storageSpinner = itemView.findViewById(R.id.harvest_storage_spinner);
             deleteImageView = itemView.findViewById(R.id.harvest_delete);
             numberEditText = itemView.findViewById(R.id.harvest_number_edit);
+            createStorage = itemView.findViewById(R.id.create_storage);
 
             if (InterventionActivity.validated) {
                 deleteImageView.setVisibility(View.GONE);
@@ -77,6 +91,8 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 });
+
+                createStorage.setOnClickListener(view -> createStorageDialog());
 
                 quantityEditText.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -147,7 +163,7 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
 
             // Quantity field
             if (item.quantity != null)
-                quantityEditText.setText(String.valueOf(item.quantity));
+                quantityEditText.setText(decimalFormat.format(item.quantity));
 
             // Quantity unit selector
             Unit currentUnit = Units.getUnit(item.unit);
@@ -167,15 +183,81 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
                 unitSpinner.setSelection(unitList.indexOf(currentUnit.name));
 
             // Storage selector
-            ArrayAdapter storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, Enums.STORAGE_LIST_NAMES);
+            storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, Enums.STORAGE_LIST_NAMES);
             storageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             storageSpinner.setAdapter(storageSpinnerAdapter);
             Timber.i("storage #%s", item.id_storage);
-            if (item.id_storage != null) {
+            if (item.id_storage != null)
                 storageSpinner.setSelection(Enums.getIndex(item.id_storage) + 1);
-            }
 
             numberEditText.setText(item.number);
+        }
+
+        private void createStorageDialog() {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_create_storage,null);
+
+//        TextInputLayout til = dialogView.findViewById(R.id.create_person_lastname);
+//        til.setError("You need to enter a name");
+
+            AppCompatSpinner spinner = dialogView.findViewById(R.id.create_storage_type_spinner);
+            ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.STORAGE_TYPE_NAMES);
+            spinner.setAdapter(spinnerAdapter);
+
+            builder.setView(dialogView);
+            builder.setNegativeButton("Annuler", (dialog, i) -> dialog.cancel());
+            builder.setPositiveButton("Créer", (dialog, i) -> {
+                //new CreateNewPerson(context, dialogView).execute();
+                new CreateNewStorage(context, dialogView).execute();
+                dialog.dismiss();
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            // Adjust dialog window to wrap content horizontally
+            Window window = dialog.getWindow();
+            if (window != null)
+                window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        }
+
+        class CreateNewStorage extends AsyncTask<Void, Void, Void> {
+
+            Context context;
+            View dialogView;
+
+            CreateNewStorage(Context context, View dialogView) {
+                this.context = context;
+                this.dialogView = dialogView;
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                TextInputLayout textInputLayout = dialogView.findViewById(R.id.create_storage_name);
+                String name = textInputLayout.getEditText().getText().toString();
+
+                AppCompatSpinner spinner = dialogView.findViewById(R.id.create_storage_type_spinner);
+                String type = Enums.STORAGE_TYPE_VALUES.get(spinner.getSelectedItemPosition());
+
+                AppDatabase database = AppDatabase.getInstance(context);
+                database.dao().insert(new Storage(null, name, type, MainActivity.FARM_ID));
+                Enums.generateStorages(database);
+                Timber.i(Enums.STORAGE_LIST_NAMES.toString());
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                storageSpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, Enums.STORAGE_LIST_NAMES);
+                storageSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                storageSpinner.setAdapter(storageSpinnerAdapter);
+            }
         }
     }
 
@@ -195,4 +277,7 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
     public int getItemCount() {
         return dataset.size();
     }
+
+
+
 }

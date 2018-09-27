@@ -239,6 +239,7 @@
     <!-- Storage types -->
     <string name="HEAP">tas</string>
     <string name="SILO">silo</string>
+    <string name="BUILDING">bâtiment</string>
 
     <string name="organic">Organique</string>
     <string name="mineral">Minéral</string>
@@ -393,5 +394,6 @@
     <string name="km_per_hour">km/h</string>
     <string name="ok">OK</string>
     <string name="crop_list">Liste des cultures</string>
+    <string name="create_storage_title">Création d\'un lieu de stockage</string>
 
 </resources>

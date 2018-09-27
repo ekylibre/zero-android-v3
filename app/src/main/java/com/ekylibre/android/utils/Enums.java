@@ -11,6 +11,8 @@ import com.ekylibre.android.type.InterventionOutputTypeEnum;
 import com.ekylibre.android.type.SpecieEnum;
 import com.ekylibre.android.type.StorageTypeEnum;
 
+import org.apache.commons.text.WordUtils;
+
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,7 +103,7 @@ public class Enums {
         STORAGE_TYPE_ENUMS.remove(StorageTypeEnum.$UNKNOWN);
         for (StorageTypeEnum item : STORAGE_TYPE_ENUMS) {
             STORAGE_TYPE_VALUES.add(item.rawValue());
-            STORAGE_TYPE_NAMES.add(translate(context, item.rawValue()));
+            STORAGE_TYPE_NAMES.add(WordUtils.capitalize(translate(context, item.rawValue())));
         }
     }
 
