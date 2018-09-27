@@ -27,7 +27,7 @@
             android:imeOptions="actionDone"
             android:inputType="textCapSentences"
             android:maxLines="1"
-            android:hint="Nom"/>
+            android:hint="@string/name"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -40,7 +40,6 @@
         android:id="@+id/create_storage_type_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:prompt="@string/chose_nature"
-        android:entries="@array/fertilizer_nature"/>
+        android:prompt="@string/chose_nature" />
 
 </LinearLayout>

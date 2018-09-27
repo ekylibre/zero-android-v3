@@ -106,7 +106,7 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
                     @Override
                     public void afterTextChanged(Editable editable) {
                         if (!editable.toString().equals("0") && editable.length() != 0) {
-                            dataset.get(getAdapterPosition()).quantity = Float.valueOf(editable.toString());
+                            dataset.get(getAdapterPosition()).quantity = Float.valueOf(editable.toString().replace(",", "."));
                         }
                     }
                 });
