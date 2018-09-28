@@ -6,8 +6,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -15,6 +18,7 @@ import com.ekylibre.android.database.converters.DateConverter;
 import com.ekylibre.android.database.converters.PolygonConverter;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.database.models.EquipmentType;
 import com.ekylibre.android.database.models.Farm;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Harvest;
@@ -57,7 +61,7 @@ import timber.log.Timber;
             Seed.class, InterventionSeed.class,
             Fertilizer.class, InterventionFertilizer.class,
             Material.class, InterventionMaterial.class,
-            Equipment.class, InterventionEquipment.class,
+            Equipment.class, InterventionEquipment.class, EquipmentType.class,
             Person.class, InterventionPerson.class,
             Weather.class,
             Harvest.class, Storage.class,
@@ -65,11 +69,9 @@ import timber.log.Timber;
             Point.class
         },
         exportSchema = false,
-        version = 6
+        version = 7
 )
-@TypeConverters(
-        { DateConverter.class, PolygonConverter.class }
-)
+@TypeConverters({DateConverter.class, PolygonConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     // Entities tables
@@ -78,11 +80,14 @@ public abstract class AppDatabase extends RoomDatabase {
     // Database instance
     private static AppDatabase database;
 
-    public static synchronized AppDatabase getInstance(Context context) {
+    private static Context context;
+
+    public static synchronized AppDatabase getInstance(Context ctx) {
+        context = ctx;
         if (database == null)
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
                     .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,
-                            MIGRATION_4_5, MIGRATION_5_6)
+                            MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .build();
         return database;
     }
@@ -164,9 +169,6 @@ public abstract class AppDatabase extends RoomDatabase {
             cursor.moveToFirst();
             String farmId = cursor.getString(cursor.getColumnIndex("farm_id"));
 
-//            database.execSQL("ALTER TABLE storages ADD COLUMN storage_id_eky INTEGER DEFAULT NULL");
-//            database.execSQL("ALTER TABLE storages ADD COLUMN farm TEXT DEFAULT '" + farmId + "'");
-
             database.execSQL("CREATE TABLE temp_storages (storage_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "name TEXT, type TEXT, storage_id_eky INTEGER, farm TEXT)");
 
@@ -176,6 +178,56 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("DROP TABLE storages");
 
             database.execSQL("ALTER TABLE temp_storages RENAME TO storages");
+        }
+    };
+
+    private static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+
+            Timber.e("MIGRATION_6_7");
+
+            // Create new table
+            database.execSQL(
+                    "CREATE TABLE equipment_types (id INTEGER PRIMARY KEY, name TEXT, " +
+                            "field_1_name TEXT, field_1_unit TEXT, field_2_name TEXT, " +
+                            "field_2_unit TEXT, type TEXT)"
+            );
+
+            // Load Equipment types and more from Lexicon
+            Moshi moshi = new Moshi.Builder().build();
+            Type type = Types.newParameterizedType(List.class, EquipmentType.class);
+            JsonAdapter<List<EquipmentType>> equipmentAdapter = moshi.adapter(type);
+            String json;
+
+            // Load and insert data into table
+            try {
+                InputStream inputStream = context.getAssets().open("lexicon/equipments.json");
+                byte[] buffer = new byte[inputStream.available()];
+                int bytesRead = inputStream.read(buffer);
+                inputStream.close();
+
+                if (bytesRead != buffer.length) Timber.e("Error while reading file");
+
+                json = new String(buffer, "UTF-8");
+
+                List<EquipmentType> equipmentTypes = equipmentAdapter.fromJson(json);
+                if (equipmentTypes != null)
+                    for (EquipmentType equipmentType : equipmentTypes) {
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put("id", equipmentType.id);
+                        contentValues.put("name", equipmentType.name);
+                        contentValues.put("field_1_name", equipmentType.field_1_name);
+                        contentValues.put("field_1_unit", equipmentType.field_1_unit);
+                        contentValues.put("field_2_name", equipmentType.field_2_name);
+                        contentValues.put("field_2_unit", equipmentType.field_2_unit);
+                        contentValues.put("type", equipmentType.type);
+                        database.insert("equipment_types", SQLiteDatabase.CONFLICT_IGNORE, contentValues);
+                    }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     };
 
@@ -190,57 +242,63 @@ public abstract class AppDatabase extends RoomDatabase {
             database = AppDatabase.getInstance(context);
             Moshi moshi = new Moshi.Builder().build();
 
-
             // Load phytosanitary products from Lexicon
             json = readJsonFromAssets(context, "lexicon/phytosanitary_products.json");
             Type type = Types.newParameterizedType(List.class, Phyto.class);
-            JsonAdapter<List<Phyto>> adapter1 = moshi.adapter(type);
-            List<Phyto> list1 = adapter1.fromJson(json);
-            for (Phyto item : list1) {
-                item.registered = true;
-                item.used = false;
-                item.unit = "LITER";
+            JsonAdapter<List<Phyto>> phytoAdapter = moshi.adapter(type);
+            if (json != null) {
+                List<Phyto> phytos = phytoAdapter.fromJson(json);
+                if (phytos != null) {
+                    for (Phyto item : phytos) {
+                        item.registered = true;
+                        item.used = false;
+                        item.unit = "LITER";
+                    }
+                    database.dao().insert(phytos.toArray(new Phyto[0]));
+                }
             }
-            database.dao().insert(list1.toArray(new Phyto[list1.size()]));
 
             // Load fertilizers from Lexicon
             json = readJsonFromAssets(context, "lexicon/fertilizers.json");
             type = Types.newParameterizedType(List.class, Fertilizer.class);
-            JsonAdapter<List<Fertilizer>> adapter4 = moshi.adapter(type);
-            List<Fertilizer> list4 = adapter4.fromJson(json);
-            for (Fertilizer item : list4) {
-                item.registered = true;
-                item.used = false;
-                item.unit = "KILOGRAM";
+            JsonAdapter<List<Fertilizer>> fertilizerAdapter = moshi.adapter(type);
+            if (json != null) {
+                List<Fertilizer> fertilizers = fertilizerAdapter.fromJson(json);
+                if (fertilizers != null) {
+                    for (Fertilizer item : fertilizers) {
+                        item.registered = true;
+                        item.used = false;
+                        item.unit = "KILOGRAM";
+                    }
+                    database.dao().insert(fertilizers.toArray(new Fertilizer[0]));
+                }
             }
-            database.dao().insert(list4.toArray(new Fertilizer[list4.size()]));
 
             // Load phytosanitary max dose usage from Lexicon
             json = readJsonFromAssets(context, "lexicon/phytosanitary_doses.json");
             type = Types.newParameterizedType(List.class, PhytoDose.class);
-            JsonAdapter<List<PhytoDose>> adapter5 = moshi.adapter(type);
-            List<PhytoDose> list5 = adapter5.fromJson(json);
-            database.dao().insert(list5.toArray(new PhytoDose[list5.size()]));
-
-            // Load species from Open Nomenclature
-//            json = readJsonFromAssets(context, "lexicon/species.json");
-//            nature = Types.newParameterizedType(List.class, Specie.class);
-//            JsonAdapter<List<Specie>> adapter2 = moshi.adapter(nature);
-//            List<Specie> list2 = adapter2.fromJson(json);
-//            database.specieDAO().insert(list2.toArray(new Specie[list2.size()]));
+            JsonAdapter<List<PhytoDose>> dosesAdapter = moshi.adapter(type);
+            if (json != null) {
+                List<PhytoDose> doses = dosesAdapter.fromJson(json);
+                if (doses != null)
+                    database.dao().insert(doses.toArray(new PhytoDose[0]));
+            }
 
             // Load seeds from Lexicon
-            json = readJsonFromAssets(context, "lexicon/seeds.json");
             type = Types.newParameterizedType(List.class, Seed.class);
-            JsonAdapter<List<Seed>> adapter3 = moshi.adapter(type);
-            List<Seed> list3 = adapter3.fromJson(json);
-            for (Seed item : list3) {
-                item.registered = true;
-                item.used = false;
-                item.unit = "KILOGRAM";
+            json = readJsonFromAssets(context, "lexicon/seeds.json");
+            JsonAdapter<List<Seed>> seedAdapter = moshi.adapter(type);
+            if (json != null) {
+                List<Seed> seeds = seedAdapter.fromJson(json);
+                if (seeds != null) {
+                    for (Seed seed : seeds) {
+                        seed.registered = true;
+                        seed.used = false;
+                        seed.unit = "KILOGRAM";
+                    }
+                    database.dao().insert(seeds.toArray(new Seed[0]));
+                }
             }
-            database.dao().insert(list3.toArray(new Seed[list3.size()]));
-
 
             Timber.e("Reference data inserted !");
 
@@ -249,7 +307,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     }
 
-    private String readJsonFromAssets(Context context, String fileName) {
+    private static String readJsonFromAssets(Context context, String fileName) {
 
         try {
             InputStream inputStream = context.getAssets().open(fileName);
@@ -268,27 +326,3 @@ public abstract class AppDatabase extends RoomDatabase {
         return null;
     }
 }
-
-
-//        if (plantDAO().count() == 0) {
-//            Plant plant = new Plant();
-//            beginTransaction();
-//            try {
-//                plant.ek_id = 1043;
-//                plant.variety = "Culture d’orge de printemps";
-//                plant.variety = "hordeum_distichum";
-//                plant.user = "remidechazelles@gmail.com - https://zero.ekylibre-test.farm";
-//                plantDAO().insert(plant);
-//                setTransactionSuccessful();
-//            } finally {
-//                endTransaction();
-//            }
-//        }
-
-//    private static AppDatabase create(final Context context) {
-//        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
-//    }
-
-
-
-

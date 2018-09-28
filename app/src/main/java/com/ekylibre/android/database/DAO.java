@@ -11,6 +11,7 @@ import androidx.room.Transaction;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
+import com.ekylibre.android.database.models.EquipmentType;
 import com.ekylibre.android.database.models.Farm;
 import com.ekylibre.android.database.models.Fertilizer;
 import com.ekylibre.android.database.models.Harvest;
@@ -44,46 +45,45 @@ public interface DAO {
     /**
      *    Insert queries
      */
-
-
     @Insert void insert(Phyto... phytos);
     @Insert void insert(PhytoDose... doses);
     @Insert void insert(Seed... seeds);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Fertilizer... fertilizers);
+    @Insert void insert(Point... points);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Intervention intervention);  // return id as long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Weather... weather);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Storage... storages);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... persons);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... plots);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... crops);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Farm... farms);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Equipment equipment);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Material... materials);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Weather... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Storage... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Person... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Plot... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Farm... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Equipment item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Material... items);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Fertilizer... items);
+//    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(EquipmentType... items);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay interventionWorkingDay);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed interventionSeeds);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPhytosanitary interventionPhytosanitary);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionFertilizer interventionFertilizers);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionMaterial interventionMaterial);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionEquipment interventionEquipments);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPerson interventionPerson);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop interventionCrop);
-    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Harvest harvests);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPhytosanitary item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionFertilizer item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionMaterial item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionEquipment item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionPerson item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionCrop item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Harvest item);
 
-    @Delete void delete(InterventionWorkingDay... workingDays);
-    @Delete void delete(InterventionSeed... seeds);
-    @Delete void delete(InterventionPhytosanitary... phytosanitaries);
-    @Delete void delete(InterventionFertilizer... fertilizers);
-    @Delete void delete(InterventionMaterial... materials);
-    @Delete void delete(InterventionEquipment... equipment);
-    @Delete void delete(InterventionPerson... people);
-    @Delete void delete(InterventionCrop... crops);
-    @Delete void delete(Weather... weather);
-    @Delete void delete(Harvest... harvests);
-    @Insert void insert(Point... points);
-    @Delete void delete(Equipment... equipment);
+    @Delete void delete(InterventionWorkingDay... items);
+    @Delete void delete(InterventionSeed... items);
+    @Delete void delete(InterventionPhytosanitary... items);
+    @Delete void delete(InterventionFertilizer... items);
+    @Delete void delete(InterventionMaterial... items);
+    @Delete void delete(InterventionEquipment... items);
+    @Delete void delete(InterventionPerson... items);
+    @Delete void delete(InterventionCrop... items);
+    @Delete void delete(Weather... items);
+    @Delete void delete(Harvest... items);
+    @Delete void delete(Equipment... items);
 
     @Delete void delete(Intervention intervention);
 

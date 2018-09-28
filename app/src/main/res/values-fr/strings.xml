@@ -269,7 +269,7 @@
 
     <string name="label_working_period">Temps de travail</string>
     <string name="label_inputs">Intrants</string>
-    <string name="label_equipments">Equipements</string>
+    <string name="label_equipments">Équipements</string>
     <string name="label_materials">Matériaux</string>
     <string name="label_persons">Opérateurs</string>
     <string name="label_crops">Cultures</string>
@@ -315,10 +315,10 @@
     <string name="selecting_tools">Sélectionnez un équipement</string>
     <string name="selecting_people">Sélectionnez un opérateur</string>
 
-    <string name="delete_harvest_prompt">Etes-vous sûr de vouloir supprimer le chargement ?</string>
-    <string name="delete_equipment_prompt">Etes-vous sûr de vouloir supprimer l\'équipement ?</string>
-    <string name="delete_material_prompt">Etes-vous sûr de vouloir supprimer le matériau ?</string>
-    <string name="delete_person_prompt">Etes-vous sûr de vouloir supprimer l\'opérateur ?</string>
+    <string name="delete_harvest_prompt">Êtes-vous sûr de vouloir supprimer le chargement ?</string>
+    <string name="delete_equipment_prompt">Êtes-vous sûr de vouloir supprimer l\'équipement ?</string>
+    <string name="delete_material_prompt">Êtes-vous sûr de vouloir supprimer le matériau ?</string>
+    <string name="delete_person_prompt">Êtes-vous sûr de vouloir supprimer l\'opérateur ?</string>
 
     <string name="add">+ Ajouter</string>
     <string name="add_equipment">+ Ajouter un équipement</string>
@@ -340,10 +340,10 @@
     <string name="number">Numéro</string>
     <string name="name">Nom</string>
     <string name="welcome_text"><![CDATA[Bienvenue dans l\'application mobile Clic&Farm ! \nPour commencer, identifiez-vous avec votre compte Ekylibre…]]></string>
-    <string name="delete_input_prompt">Etes-vous sûr de vouloir supprimer l\'intrant ?</string>
+    <string name="delete_input_prompt">Êtes-vous sûr de vouloir supprimer l\'intrant ?</string>
     <string name="no">non</string>
     <string name="yes">oui</string>
-    <string name="sync_failure">Echec de la synchronisation…</string>
+    <string name="sync_failure">Échec de la synchronisation…</string>
     <string name="network_failure">Erreur de connexion, votre smartphone n\'est peut-être pas connecté. Veuillez réessayer plus tard.</string>
     <string name="login_failure">Identifiant inconnu ou mot de passe incorrect. Veuillez réessayer.</string>
     <string name="loading_initial_data">Chargement des données de référence…</string>

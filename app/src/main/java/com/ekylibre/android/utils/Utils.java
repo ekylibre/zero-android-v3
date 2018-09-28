@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Rémi de Chazelles on 04/09/18.
@@ -20,6 +21,10 @@ public class Utils {
     public static Float getEditTextToFloat(EditText editText) {
         String text = editText.getText().toString().replace(",", ".");
         return Float.valueOf(text);
+    }
+
+    public static Float cleanFloat(Float value) {
+        return Float.valueOf(String.format(Locale.ENGLISH, "%.2f", value));
     }
 
     public static void sleep(int time) {
@@ -43,33 +48,4 @@ public class Utils {
         return date == null ? null : ISO8601.format(date);
     }
 
-//    public void setupUI(View view, Activity activity) {
-//
-//        // Set up touch listener for non-text box views to hide keyboard.
-//        if (!(view instanceof EditText)) {
-//            view.setOnTouchListener((v, event) -> {
-//                hideSoftKeyboard(activity);
-//                v.performClick();
-//                return false;
-//            });
-//        }
-//
-//        //If a layout container, iterate over children and seed recursion.
-//        if (view instanceof ViewGroup) {
-//            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-//                View innerView = ((ViewGroup) view).getChildAt(i);
-//                setupUI(innerView, activity);
-//            }
-//        }
-//    }
-//
-//    private static void hideSoftKeyboard(Activity activity) {
-//        InputMethodManager inputMethodManager =
-//                (InputMethodManager) activity.getSystemService(
-//                        Activity.INPUT_METHOD_SERVICE);
-//        if (inputMethodManager != null) {
-//            inputMethodManager.hideSoftInputFromWindow(
-//                    Objects.requireNonNull(activity.getCurrentFocus()).getWindowToken(), 0);
-//        }
-//    }
 }

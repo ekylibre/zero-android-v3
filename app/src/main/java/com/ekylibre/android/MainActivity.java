@@ -4,6 +4,8 @@ package com.ekylibre.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,6 +39,8 @@ import com.ekylibre.android.utils.Utils;
 
 import com.jakewharton.processphoenix.ProcessPhoenix;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -180,6 +184,35 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
             new PerformSyncWithFreshToken(this,
                     SyncService.ACTION_SYNC_ALL, resultReceiver).execute();
         }
+
+//        try {
+//            InputStream is = mngr.open("lexicon/equipments.json");
+//            StringBuilder sb = new StringBuilder();
+//            int data = is.read();
+//            while(data != -1) {
+//                sb.append((char) data);
+//                data = is.read();
+//            }
+//            Timber.e(sb.toString());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+//        try {
+//            Timber.e("Assets");
+//
+//            InputStream inputStream = mngr.open("lexicon/equipments.json");
+//            byte[] buffer = new byte[inputStream.available()];
+//            int bytesRead = inputStream.read(buffer);
+//            inputStream.close();
+//
+//            if (bytesRead != buffer.length) Timber.e("Error while reading file");
+//
+//            Timber.e(new String(buffer, "UTF-8"));
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 //        BottomNavigationView navigation = findViewById(R.id.navigation);
 //        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);

@@ -77,10 +77,12 @@ import com.ekylibre.android.type.StorageTypeEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -566,7 +568,7 @@ public class SyncService extends IntentService {
 
                     inputUpdates.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
-                            .quantity(phyto.inter.quantity)
+                            .quantity(Utils.cleanFloat(phyto.inter.quantity))
                             .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
                 }
 
@@ -584,7 +586,7 @@ public class SyncService extends IntentService {
 
                     inputUpdates.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
-                            .quantity(seed.inter.quantity)
+                            .quantity(Utils.cleanFloat(seed.inter.quantity))
                             .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
                 }
 
@@ -602,7 +604,7 @@ public class SyncService extends IntentService {
 
                     inputUpdates.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
-                            .quantity(fertilizer.inter.quantity)
+                            .quantity(Utils.cleanFloat(fertilizer.inter.quantity))
                             .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
                 }
 
@@ -636,7 +638,7 @@ public class SyncService extends IntentService {
                         storageEkyId = database.dao().getStorageEkiId(harvest.id_storage);
                     loadUpdates.add(HarvestLoadAttributes.builder()
                             .number(harvest.number)
-                            .quantity(harvest.quantity)
+                            .quantity(Utils.cleanFloat(harvest.quantity))
                             .netQuantity((double) harvest.quantity)
                             .unit(HarvestLoadUnitEnum.valueOf(harvest.unit))
                             .storageID(String.valueOf(storageEkyId)).build());
@@ -787,7 +789,7 @@ public class SyncService extends IntentService {
 
                     inputs.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
-                            .quantity(phyto.inter.quantity)
+                            .quantity(Utils.cleanFloat(phyto.inter.quantity))
                             .unit(ArticleAllUnitEnum.safeValueOf(phyto.inter.unit)).build());
                 }
 
@@ -805,7 +807,7 @@ public class SyncService extends IntentService {
 
                     inputs.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
-                            .quantity(seed.inter.quantity)
+                            .quantity(Utils.cleanFloat(seed.inter.quantity))
                             .unit(ArticleAllUnitEnum.safeValueOf(seed.inter.unit)).build());
                 }
 
@@ -823,7 +825,7 @@ public class SyncService extends IntentService {
 
                     inputs.add(InterventionInputAttributes.builder()
                             .article(articleBuilder.build())
-                            .quantity(fertilizer.inter.quantity)
+                            .quantity(Utils.cleanFloat(fertilizer.inter.quantity))
                             .unit(ArticleAllUnitEnum.safeValueOf(fertilizer.inter.unit)).build());
                 }
 
