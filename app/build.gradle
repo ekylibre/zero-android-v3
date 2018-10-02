@@ -15,8 +15,8 @@ android {
         applicationId "com.ekylibre.android"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 13
-        versionName "0.9.9"
+        versionCode 14
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -107,8 +107,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     api 'com.google.guava:guava:25.1-android'
     // Room database
-    implementation 'androidx.room:room-runtime:2.0.0-rc01'
-    annotationProcessor 'androidx.room:room-compiler:2.0.0-rc01'
+    implementation 'androidx.room:room-runtime:2.0.0'
+    annotationProcessor 'androidx.room:room-compiler:2.0.0'
     // Retrofit & Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'

@@ -73,6 +73,7 @@ import com.ekylibre.android.type.InterventionTypeEnum;
 import com.ekylibre.android.type.InterventionWaterVolumeUnitEnum;
 import com.ekylibre.android.type.InterventionWorkingDayAttributes;
 import com.ekylibre.android.type.OperatorRoleEnum;
+import com.ekylibre.android.type.SpecieEnum;
 import com.ekylibre.android.type.StorageTypeEnum;
 import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
@@ -261,7 +262,7 @@ public class SyncService extends IntentService {
                         .farmId(equipment.farmId)
                         .type(EquipmentTypeEnum.safeValueOf(equipment.type))
                         .name(equipment.name)
-                        .number(equipment.number).build();
+                        .number(equipment.number.isEmpty() ? null : equipment.number).build();
 
                 apolloClient.mutate(pushEquipment).enqueue(new ApolloCall.Callback<PushEquipmentMutation.Data>() {
                     @Override
@@ -355,7 +356,9 @@ public class SyncService extends IntentService {
                         .farmId(MainActivity.FARM_ID)
                         .type(ArticleTypeEnum.SEED)
                         .name(String.format("%s %s", specie, seed.variety))
-                        .unit(ArticleUnitEnum.KILOGRAM)
+                        .specie(SpecieEnum.valueOf(seed.specie))
+                        .variety(seed.variety)
+                        .unit(ArticleUnitEnum.valueOf(seed.unit))
                         .build();
 
                 apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
@@ -1011,7 +1014,8 @@ public class SyncService extends IntentService {
                         if (result != 1) {
                             Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
                             database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                    equipment.name(), equipment.type() != null ? equipment.type().rawValue() : null, equipment.number(), farm.id()));
+                                    equipment.name(), equipment.type() == null ? null : equipment.type().rawValue(),
+                                    equipment.number(), farm.id()));
                         }
                     }
 

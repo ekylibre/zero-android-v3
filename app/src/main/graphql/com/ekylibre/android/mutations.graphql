@@ -106,7 +106,9 @@ mutation pushArticle(
   $farmId: ID!,
   $unit: ArticleUnitEnum!,
   $name: String!,
-  $type: ArticleTypeEnum!
+  $type: ArticleTypeEnum!,
+  $specie: SpecieEnum,
+  $variety: String
 ) {
   createArticle(
     input: {
@@ -115,6 +117,8 @@ mutation pushArticle(
         unit: $unit
         name: $name
         nature: $type
+        species: $specie
+        variety: $variety
       }
     }
   ) {
