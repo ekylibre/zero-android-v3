@@ -29,12 +29,19 @@ public class Equipment {
 
     public String farmId;
 
-    public Equipment(Integer eky_id, String name, String type, String number, String farmId) {
+    public String field1Value;
+
+    public String field2Value;
+
+    public Equipment(Integer eky_id, String name, String type, String number, String farmId, String field1Value, String field2Value) {
         this.eky_id = eky_id;
         this.name = name;
         this.type = type;
         this.number = number;
         this.farmId = farmId;
+        this.field1Value = field1Value;
+        this.field2Value = field2Value;
+
     }
 
 

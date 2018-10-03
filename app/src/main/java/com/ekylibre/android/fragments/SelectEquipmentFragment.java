@@ -269,7 +269,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
             String number = numberTextInput.getEditText().getText().toString();
 
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Equipment(null, name, type, number, MainActivity.FARM_ID));
+            database.dao().insert(new Equipment(null, name, type, number, MainActivity.FARM_ID, null, null));
 
             return null;
         }

@@ -129,6 +129,7 @@ query Farm (
       name
       type
       number
+      indicators
     }
   }
 }

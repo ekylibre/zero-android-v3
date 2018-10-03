@@ -518,7 +518,7 @@ public class SyncService extends IntentService {
             }
 
             while (apolloClient.activeCallsCount() > 0) {
-                Timber.i("Waiting for Apollo response...");
+                Timber.i("-- waiting for Apollo response...");
                 Utils.sleep(100);
             }
         }
@@ -560,7 +560,7 @@ public class SyncService extends IntentService {
                 .enqueue(deletedInterventionsCallback);
 
         while (apolloClient.activeCallsCount() > 0) {
-            Timber.i("Waiting for Apollo response...");
+            Timber.i("-- waiting for Apollo response...");
             Utils.sleep(100);
         }
 
@@ -761,7 +761,7 @@ public class SyncService extends IntentService {
             }
 
             while (apolloClient.activeCallsCount() > 0) {
-                Timber.i("Waiting for Apollo response...");
+                Timber.i("-- waiting for Apollo response...");
                 Utils.sleep(100);
             }
         }
@@ -968,7 +968,7 @@ public class SyncService extends IntentService {
             }
 
             while (apolloClient.activeCallsCount() > 0) {
-                Timber.i("Waiting for Apollo response...");
+                Timber.i("-- waiting for Apollo response...");
                 Utils.sleep(100);
             }
         }
@@ -1083,6 +1083,16 @@ public class SyncService extends IntentService {
                     Timber.i("Fetching equipments...");
                     for (FarmQuery.Equipment equipment : equipments) {
 
+                        String indicator1 = null;
+                        String indicator2 = null;
+                        if (equipment.indicators() != null && !equipment.indicators().isEmpty()) {
+                            String[] indicators = equipment.indicators().split("\\|");
+                            indicator1 = indicators[0].split(":")[1];
+                            Timber.i("Indicators size = %s", indicators.length);
+                            if (indicators.length == 2)
+                                indicator2 = indicators[1].split(":")[1];
+                        }
+
                         int result = database.dao().setEquipmentEkyId(Integer.valueOf(equipment.id()), equipment.name());
                         if (result != 1) {
                             Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
@@ -1090,13 +1100,9 @@ public class SyncService extends IntentService {
                                     equipment.name(),
                                     equipment.type() == null ? null : equipment.type().rawValue(),
                                     equipment.number() == null ? null : (equipment.number().isEmpty() ? null : equipment.number()),
-                                    farm.id()));
+                                    farm.id(), indicator1, indicator2));
                         }
                     }
-
-                    Timber.i("Equipment list");
-                    for (Equipment eq : database.dao().selectEquipment())
-                        Timber.i("    -> %s | %s | %s", eq.id, eq.eky_id, eq.name);
 
                     ///////////////////////
                     // Processing storages
@@ -1217,7 +1223,7 @@ public class SyncService extends IntentService {
                 .enqueue(farmCallback);
 
         while (apolloClient.activeCallsCount() > 0) {
-            Timber.i("Waiting for Apollo response...");
+            Timber.i("-- waiting for Apollo response...");
             Utils.sleep(100);
         }
 
@@ -1420,9 +1426,7 @@ public class SyncService extends IntentService {
 
                                 InterventionQuery.Article article = input.article();
                                 if (article != null) {
-
-                                    Timber.i("article %s", article.id());
-
+                                    
                                     int ekyId = Integer.valueOf(article.id());
                                     Double quantity = input.quantity();
                                     float qtt = quantity != null ? quantity.floatValue() : 0;

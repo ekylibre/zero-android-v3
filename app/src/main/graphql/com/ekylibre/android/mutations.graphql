@@ -83,7 +83,9 @@ mutation pushEquipment(
   $farmId: ID!,
   $type: EquipmentTypeEnum!,
   $name: String!,
-  $number: String
+  $number: String,
+  $indicator1: String,
+  $indicator2: String
 ) {
   createEquipment(
     input: {
@@ -92,6 +94,8 @@ mutation pushEquipment(
         type: $type
         name: $name
         number: $number
+        field1Value: $indicator1
+        field2Value: $indicator2
       }
     }
   ) {
