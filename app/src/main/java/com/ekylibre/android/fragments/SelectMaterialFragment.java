@@ -34,6 +34,8 @@ import com.ekylibre.android.utils.Units;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.ekylibre.android.services.SyncService.CREATE_ARTICLE_DONE;
+
 
 public class SelectMaterialFragment extends DialogFragment implements ServiceResultReceiver.Receiver {
 
@@ -192,13 +194,15 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
             new RequestDatabase(context).execute();
 
             if (App.isOnline(context))
-                new PerformSyncWithFreshToken(context, SyncService.ACTION_CREATE_ARTICLE, resultReceiver).execute();
+                new PerformSyncWithFreshToken(context,
+                        SyncService.CREATE_ARTICLE, resultReceiver).execute();
         }
     }
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        new RequestDatabase(context).execute();
+        if (resultCode == CREATE_ARTICLE_DONE)
+            new RequestDatabase(context).execute();
     }
 
     /**

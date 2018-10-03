@@ -1132,6 +1132,9 @@ public class InterventionActivity extends AppCompatActivity implements
                 for (Crop culture : plot.crops) {
                     if (culture.is_checked) {
                         ++cropCount;
+                        Timber.i("date = %s", date);
+                        Timber.i("start_date = %s | stop_date = %s", culture.start_date, culture.stop_date);
+                        Timber.i("compare to = %s | %s", date.compareTo(culture.start_date), date.compareTo(culture.stop_date));
                         if (date.compareTo(culture.start_date) < 0 || date.compareTo(culture.stop_date) >= 0) {
                             cancel(true);
                             Toast toast = Toast.makeText(context, R.string.date_not_corresponding_to_crop, Toast.LENGTH_LONG);

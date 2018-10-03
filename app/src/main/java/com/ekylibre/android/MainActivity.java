@@ -27,7 +27,6 @@ import com.ekylibre.android.adapters.MainAdapter;
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.pojos.Interventions;
 import com.ekylibre.android.services.ServiceResultReceiver;
-import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.PerformSyncWithFreshToken;
@@ -45,6 +44,17 @@ import java.util.List;
 import java.util.Locale;
 
 import timber.log.Timber;
+
+import static com.ekylibre.android.services.SyncService.ACTION_SYNC_ALL;
+import static com.ekylibre.android.services.SyncService.DONE;
+import static com.ekylibre.android.services.SyncService.FAILED;
+import static com.ekylibre.android.services.SyncService.PUSH_ARTICLES_DONE;
+import static com.ekylibre.android.services.SyncService.PUSH_EQUIPMENTS;
+import static com.ekylibre.android.services.SyncService.PUSH_EQUIPMENTS_DONE;
+import static com.ekylibre.android.services.SyncService.PUSH_PEOPLE;
+import static com.ekylibre.android.services.SyncService.PUSH_PEOPLE_DONE;
+import static com.ekylibre.android.services.SyncService.PUSH_STORAGES;
+import static com.ekylibre.android.services.SyncService.PUSH_STORAGES_DONE;
 
 
 public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver {
@@ -166,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         swipeRefreshLayout.setOnRefreshListener(() -> {
             if (App.isOnline(this))
                 new PerformSyncWithFreshToken(this,
-                        SyncService.ACTION_SYNC_ALL, resultReceiver).execute();
+                        ACTION_SYNC_ALL, resultReceiver).execute();
             else {
                 Toast toast = Toast.makeText(this, R.string.no_internet_try_later, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 200);
@@ -178,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         if (App.isOnline(this)) {
             swipeRefreshLayout.setRefreshing(true);
             new PerformSyncWithFreshToken(this,
-                    SyncService.ACTION_SYNC_ALL, resultReceiver).execute();
+                    ACTION_SYNC_ALL, resultReceiver).execute();
         }
 
 //        BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -275,17 +285,36 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         if (swipeRefreshLayout.isRefreshing())
             swipeRefreshLayout.setRefreshing(false);
 
-        if (resultCode == SyncService.DONE) {
-            Timber.i("Synchronization done");
-            lastSyncTime = new Date();
-            prefs.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
-            new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
-        }
-        else if (resultCode == SyncService.FAILED) { //R.string.sync_failure
-            String message = bundle.getString("message");
-            Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.BOTTOM, 0, 200);
-            toast.show();
+        switch (resultCode) {
+            case DONE:
+                Timber.i("Synchronization done");
+                lastSyncTime = new Date();
+                prefs.edit().putString("last-sync-time", LAST_SYNC.format(lastSyncTime)).apply();
+                new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
+                break;
+
+            case FAILED:
+                String message = bundle.getString("message");
+                Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, 200);
+                toast.show();
+                break;
+
+            case PUSH_ARTICLES_DONE:
+                new PerformSyncWithFreshToken(this, PUSH_EQUIPMENTS, resultReceiver).execute();
+                break;
+
+            case PUSH_EQUIPMENTS_DONE:
+                new PerformSyncWithFreshToken(this, PUSH_PEOPLE, resultReceiver).execute();
+                break;
+
+            case PUSH_PEOPLE_DONE:
+                new PerformSyncWithFreshToken(this, PUSH_STORAGES, resultReceiver).execute();
+                break;
+
+            case PUSH_STORAGES_DONE:
+                //new PerformSyncWithFreshToken(this, ACTION_SYNC_ALL, resultReceiver).execute();
+                break;
         }
     }
 

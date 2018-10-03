@@ -14,6 +14,7 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
 import com.ekylibre.android.DeleteInterMutation;
+import com.ekylibre.android.DeletedInterventionsQuery;
 import com.ekylibre.android.FarmQuery;
 import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.InterventionQuery;
@@ -83,7 +84,6 @@ import com.ekylibre.android.utils.Utils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
@@ -96,10 +96,29 @@ public class SyncService extends IntentService {
     public static final int DONE = 10;
     public static final int FAILED = 11;
 
+    public static final int PUSH_ARTICLES_DONE = 12;
+    public static final int PUSH_EQUIPMENTS_DONE = 13;
+    public static final int PUSH_PEOPLE_DONE = 14;
+    public static final int PUSH_STORAGES_DONE = 15;
+
+    public static final int CREATE_ARTICLE_DONE = 16;
+    public static final int CREATE_EQUIPMENT_DONE = 17;
+    public static final int CREATE_PERSON_DONE = 18;
+    public static final int CREATE_STORAGE_DONE = 19;
+
     public static final String ACTION_SYNC_ALL = "com.ekylibre.android.services.action.SYNC_PULL";
     public static final String FIRST_TIME_SYNC = "com.ekylibre.android.services.action.FIRST_TIME_SYNC";
-    public static final String ACTION_CREATE_PERSON_AND_EQUIPMENT = "com.ekylibre.android.services.action.CREATE_PERS_AND_EQUIP";
-    public static final String ACTION_CREATE_ARTICLE = "com.ekylibre.android.services.action.CREATE_ARTICLES";
+
+    public static final String PUSH_ARTICLES = "com.ekylibre.android.services.action.PUSH_ARTICLES";
+    public static final String PUSH_EQUIPMENTS = "com.ekylibre.android.services.action.PUSH_EQUIPMENTS";
+    public static final String PUSH_PEOPLE = "com.ekylibre.android.services.action.PUSH_PEOPLE";
+    public static final String PUSH_STORAGES = "com.ekylibre.android.services.action.PUSH_STORAGES";
+
+    public static final String CREATE_ARTICLE = "com.ekylibre.android.services.action.CREATE_ARTICLE";
+    public static final String CREATE_EQUIPMENT = "com.ekylibre.android.services.action.CREATE_EQUIPMENT";
+    public static final String CREATE_PERSON = "com.ekylibre.android.services.action.CREATE_PEOPLE";
+    public static final String CREATE_STORAGE = "com.ekylibre.android.services.action.CREATE_STORAGE";
+
 
     private static SharedPreferences prefs;
     private AppDatabase database;
@@ -133,170 +152,18 @@ public class SyncService extends IntentService {
                 getFarm();
                 break;
 
-            case ACTION_CREATE_PERSON_AND_EQUIPMENT:
-                pushEquipment();
-                pushPerson();
-                break;
-
-            case ACTION_CREATE_ARTICLE:
-                pushArticle();
-                break;
-
             case ACTION_SYNC_ALL:
 
-                // Mutations (order is important)
+                // Start with articles and continue automagically
                 pushArticle();
                 pushEquipment();
                 pushPerson();
                 pushStorage();
                 pushDeleteIntervention();
-                pushUpdateIntervention();  // TODO: merge update and create in one method
-                pushCreateIntervention();
 
                 // Action done -> now called in code
                 //receiver.send(DONE, new Bundle());
                 break;
-        }
-    }
-
-    /**
-     * create person and equipment mutation
-     */
-    private void pushStorage() {
-
-        List<Storage> newStorages = database.dao().getStoragesWithoutEkyId();
-
-        if (!newStorages.isEmpty()) {
-            for (Storage storage : newStorages) {
-
-                PushStorageMutation pushStorage = PushStorageMutation.builder()
-                        .farmId(storage.farm)
-                        .name(storage.name)
-                        .type(StorageTypeEnum.safeValueOf(storage.type))
-                        .build();
-
-                apolloClient.mutate(pushStorage).enqueue(new ApolloCall.Callback<PushStorageMutation.Data>() {
-                    @Override
-                    public void onResponse(@Nonnull Response<PushStorageMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushStorageMutation.Data data = response.data();
-                            if (data != null) {
-                                PushStorageMutation.CreateStorage mutation = data.createStorage();
-                                if (mutation != null) {
-                                    PushStorageMutation.Storage mStorage = mutation.storage();
-                                    if (mStorage != null) {
-                                        database.dao().setStorageEkyId(storage.id, Integer.valueOf(mStorage.id()));
-                                        Timber.i("Storage #%s successfully created !", mStorage.id());
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e) {
-                        Timber.e(e.getLocalizedMessage());
-                        MainActivity.ITEMS_TO_SYNC = true;
-                        receiver.send(FAILED, new Bundle());
-                    }
-                });
-            }
-        } else Timber.i("No new Storage to push");
-    }
-
-    /**
-     * create person and equipment mutation
-     */
-    private void pushPerson() {
-
-        List<Person> newPersons = database.dao().getPersonsWithoutEkyId();
-
-        if (!newPersons.isEmpty()) {
-            for (Person person : newPersons) {
-
-                PushPersonMutation pushPerson = PushPersonMutation.builder()
-                        .farmId(person.farm_id)
-                        .firstName(person.first_name)
-                        .lastName(person.last_name).build();
-
-                apolloClient.mutate(pushPerson).enqueue(new ApolloCall.Callback<PushPersonMutation.Data>() {
-                    @Override
-                    public void onResponse(@Nonnull Response<PushPersonMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushPersonMutation.Data data = response.data();
-                            if (data != null) {
-                                PushPersonMutation.CreatePerson mutation = data.createPerson();
-                                if (mutation != null) {
-                                    PushPersonMutation.Person pers = mutation.person();
-                                    if (pers != null && !pers.id().equals("")) {
-                                        database.dao().setPersonEkyId(person.id, Integer.valueOf(pers.id()));
-                                        Timber.i("Person #%s successfully created !", pers.id());
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e) {
-                        Timber.e(e.getLocalizedMessage());
-                        MainActivity.ITEMS_TO_SYNC = true;
-                        receiver.send(FAILED, new Bundle());
-                    }
-                });
-            }
-        } else Timber.i("No new Person to push");
-    }
-
-    /**
-     * create person and equipment mutation
-     */
-    private void pushEquipment() {
-
-        List<Equipment> newEquipments = database.dao().getEquipmentWithoutEkyId();
-
-        if (!newEquipments.isEmpty()) {
-            for (Equipment equipment : newEquipments) {
-
-                PushEquipmentMutation pushEquipment = PushEquipmentMutation.builder()
-                        .farmId(equipment.farmId)
-                        .type(EquipmentTypeEnum.safeValueOf(equipment.type))
-                        .name(equipment.name)
-                        .number(equipment.number.isEmpty() ? null : equipment.number).build();
-
-                apolloClient.mutate(pushEquipment).enqueue(new ApolloCall.Callback<PushEquipmentMutation.Data>() {
-                    @Override
-                    public void onResponse(@Nonnull Response<PushEquipmentMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushEquipmentMutation.Data responseData = response.data();
-                            if (responseData != null) {
-                                PushEquipmentMutation.CreateEquipment mutation = responseData.createEquipment();
-                                if (mutation != null && mutation.equipment() != null) {
-                                    if (!mutation.equipment().id().equals("")) {
-                                        database.dao().setEquipmentEkyId(equipment.id, mutation.equipment().id());
-                                        Timber.i("Equipment #%s successfully created", mutation.equipment().id());
-                                        if (ACTION.equals(ACTION_CREATE_PERSON_AND_EQUIPMENT)) {
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("name", equipment.name);
-                                            bundle.putInt("remote_id", Integer.valueOf(mutation.equipment().id()));
-                                            receiver.send(DONE, bundle);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e) {
-                        Timber.e(e.getLocalizedMessage());
-                        MainActivity.ITEMS_TO_SYNC = true;
-                        receiver.send(FAILED, new Bundle());
-                    }
-                });
-            }
-        } else {
-            Timber.i("No new Equipment to push");
         }
     }
 
@@ -313,7 +180,6 @@ public class SyncService extends IntentService {
 
         if (!phytosWithoutEkyId.isEmpty()) {
             for (Phyto phyto : phytosWithoutEkyId) {
-
                 PushArticleMutation articleMutation = PushArticleMutation.builder()
                         .farmId(MainActivity.FARM_ID)
                         .type(ArticleTypeEnum.CHEMICAL)
@@ -324,18 +190,21 @@ public class SyncService extends IntentService {
                 apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
                     @Override
                     public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushArticleMutation.Data data = response.data();
-                            if (data != null) {
-                                PushArticleMutation.CreateArticle mutation = data.createArticle();
-                                if (mutation != null) {
-                                    PushArticleMutation.Article article = mutation.article();
-                                    if (article != null) {
-                                        database.dao().setPhytoEkyId(Integer.valueOf(article.id()), phyto.id);
-                                        Timber.i("Custom phyto #%s successfully created", article.id());
-                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
-                                            receiver.send(DONE, new Bundle());
-                                    }}}}}
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createArticle() != null
+                                && response.data().createArticle().article() != null) {
+
+                            PushArticleMutation.Article article = response.data().createArticle().article();
+                            database.dao().setPhytoEkyId(Integer.valueOf(article.id()), phyto.id);
+                            Timber.i("Phyto #%s successfully created", article.id());
+
+                            // If case, send result to Fragment who initiate the creation
+                            if (ACTION.equals(CREATE_ARTICLE))
+                                receiver.send(DONE, new Bundle());
+                        }
+                    }
+
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Timber.e(e.getLocalizedMessage());
@@ -349,8 +218,8 @@ public class SyncService extends IntentService {
         if (!seedsWithoutEkyId.isEmpty()) {
             for (Seed seed : seedsWithoutEkyId) {
 
-                String specie = getResources().getString(getResources().getIdentifier(seed.specie.toUpperCase(), "string", getPackageName()));
-
+                String specie = getResources().getString(getResources().getIdentifier(
+                        seed.specie.toUpperCase(), "string", getPackageName()));
 
                 PushArticleMutation articleMutation = PushArticleMutation.builder()
                         .farmId(MainActivity.FARM_ID)
@@ -364,18 +233,20 @@ public class SyncService extends IntentService {
                 apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
                     @Override
                     public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushArticleMutation.Data data = response.data();
-                            if (data != null) {
-                                PushArticleMutation.CreateArticle mutation = data.createArticle();
-                                if (mutation != null) {
-                                    PushArticleMutation.Article article = mutation.article();
-                                    if (article != null) {
-                                        database.dao().setSeedEkyId(Integer.valueOf(article.id()), String.valueOf(seed.id));
-                                        Timber.i("Custom seed #%s successfully created", article.id());
-                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
-                                            receiver.send(DONE, new Bundle());
-                                    }}}}}
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createArticle() != null
+                                && response.data().createArticle().article() != null) {
+
+                            PushArticleMutation.Article article = response.data().createArticle().article();
+                            database.dao().setSeedEkyId(Integer.valueOf(article.id()), String.valueOf(seed.id));
+                            Timber.i("Custom seed #%s successfully created", article.id());
+
+                            if (ACTION.equals(CREATE_ARTICLE))
+                                receiver.send(DONE, new Bundle());
+                        }
+                    }
+
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Timber.e(e.getLocalizedMessage());
@@ -388,7 +259,6 @@ public class SyncService extends IntentService {
 
         if (!fertilizersWithoutEkyId.isEmpty()) {
             for (Fertilizer fertilizer : fertilizersWithoutEkyId) {
-
                 PushArticleMutation articleMutation = PushArticleMutation.builder()
                         .farmId(MainActivity.FARM_ID)
                         .type(ArticleTypeEnum.FERTILIZER)
@@ -399,20 +269,20 @@ public class SyncService extends IntentService {
                 apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
                     @Override
                     public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushArticleMutation.Data data = response.data();
-                            if (data != null) {
-                                PushArticleMutation.CreateArticle mutation = data.createArticle();
-                                if (mutation != null) {
-                                    PushArticleMutation.Article article = mutation.article();
-                                    if (article != null) {
-                                        fertilizer.eky_id = Integer.valueOf(article.id());
-                                        database.dao().insert(fertilizer);
-                                        //database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), String.valueOf(fertilizer.id));
-                                        Timber.i("Custom fertilizer #%s successfully created", article.id());
-                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
-                                            receiver.send(DONE, new Bundle());
-                                    }}}}}
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createArticle() != null
+                                && response.data().createArticle().article() != null) {
+
+                            PushArticleMutation.Article article = response.data().createArticle().article();
+                            fertilizer.eky_id = Integer.valueOf(article.id());
+                            database.dao().insert(fertilizer);
+                            //database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), String.valueOf(fertilizer.id));
+                            Timber.i("Custom fertilizer #%s successfully created", article.id());
+
+                            if (ACTION.equals(CREATE_ARTICLE))
+                                receiver.send(DONE, new Bundle());
+                        }}
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Timber.e(e.getLocalizedMessage());
@@ -425,7 +295,6 @@ public class SyncService extends IntentService {
 
         if (!materialWithoutEkyId.isEmpty()) {
             for (Material material : materialWithoutEkyId) {
-
                 PushArticleMutation articleMutation = PushArticleMutation.builder()
                         .farmId(MainActivity.FARM_ID)
                         .type(ArticleTypeEnum.MATERIAL)
@@ -436,23 +305,161 @@ public class SyncService extends IntentService {
                 apolloClient.mutate(articleMutation).enqueue(new ApolloCall.Callback<PushArticleMutation.Data>() {
                     @Override
                     public void onResponse(@Nonnull Response<PushArticleMutation.Data> response) {
-                        if (!response.hasErrors()) {
-                            PushArticleMutation.Data data = response.data();
-                            if (data != null) {
-                                PushArticleMutation.CreateArticle mutation = data.createArticle();
-                                if (mutation != null) {
-                                    PushArticleMutation.Article article = mutation.article();
-                                    if (article != null) {
-                                        material.eky_id = Integer.valueOf(article.id());
-                                        database.dao().insert(material);
-                                        Timber.i("Custom material #%s successfully created", article.id());
-                                        if (ACTION.equals(ACTION_CREATE_ARTICLE))
-                                            receiver.send(DONE, new Bundle());
-                                    }}}}}
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createArticle() != null
+                                && response.data().createArticle().article() != null) {
+
+                            PushArticleMutation.Article article = response.data().createArticle().article();
+                            material.eky_id = Integer.valueOf(article.id());
+                            database.dao().insert(material);
+                            Timber.i("Custom material #%s successfully created", article.id());
+
+                            if (ACTION.equals(CREATE_ARTICLE))
+                                receiver.send(DONE, new Bundle());
+                        }
+                    }
                     @Override
                     public void onFailure(@Nonnull ApolloException e) {
                         Timber.e(e.getLocalizedMessage());
                         MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        }
+    }
+
+
+    /**
+     * Create Equipment mutation
+     */
+    private void pushEquipment() {
+
+        List<Equipment> newEquipments = database.dao().getEquipmentWithoutEkyId();
+        if (newEquipments.isEmpty()) {
+            Timber.i("No new Equipment to push");
+        } else {
+            for (Equipment equipment : newEquipments) {
+                PushEquipmentMutation pushEquipment = PushEquipmentMutation.builder()
+                        .farmId(equipment.farmId)
+                        .type(EquipmentTypeEnum.safeValueOf(equipment.type))
+                        .name(equipment.name)
+                        .number(equipment.number.isEmpty() ? null : equipment.number).build();
+
+                apolloClient.mutate(pushEquipment).enqueue(new ApolloCall.Callback<PushEquipmentMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushEquipmentMutation.Data> response) {
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createEquipment() != null
+                                && response.data().createEquipment().equipment() != null) {
+
+                            String ekyId = response.data().createEquipment().equipment().id();
+
+                            database.dao().setEquipmentEkyId(equipment.id, ekyId);
+                            Timber.i("Equipment #%s successfully created", ekyId);
+
+                            // Send result to Fragment who initiate the creation
+                            if (ACTION.equals(CREATE_EQUIPMENT)) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("name", equipment.name);
+                                bundle.putInt("remote_id", Integer.valueOf(ekyId));
+                                receiver.send(DONE, bundle);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        }
+    }
+
+
+    /**
+     * Create Person mutation
+     */
+    private void pushPerson() {
+
+        List<Person> newPersons = database.dao().getPersonsWithoutEkyId();
+        if (newPersons.isEmpty()) {
+            Timber.i("No new Person to push");
+        } else {
+            for (Person person : newPersons) {
+                PushPersonMutation pushPerson = PushPersonMutation.builder()
+                        .farmId(person.farm_id)
+                        .firstName(person.first_name)
+                        .lastName(person.last_name).build();
+
+                apolloClient.mutate(pushPerson).enqueue(new ApolloCall.Callback<PushPersonMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushPersonMutation.Data> response) {
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createPerson() != null
+                                && response.data().createPerson().person() != null) {
+
+                            PushPersonMutation.Person mPerson = response.data().createPerson().person();
+                            database.dao().setPersonEkyId(person.id, Integer.valueOf(mPerson.id()));
+                            Timber.i("Person #%s successfully created !", mPerson.id());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        receiver.send(FAILED, new Bundle());
+                    }
+                });
+            }
+        }
+    }
+
+
+    /**
+     * create person and equipment mutation
+     */
+    private void pushStorage() {
+
+        List<Storage> storages = database.dao().getStoragesWithoutEkyId();
+        if (storages.isEmpty()) {
+            Timber.i("No new Storage to push");
+        } else {
+            for (Storage storage : storages) {
+                PushStorageMutation pushStorage = PushStorageMutation.builder()
+                        .farmId(storage.farm)
+                        .name(storage.name)
+                        .type(StorageTypeEnum.safeValueOf(storage.type))
+                        .build();
+
+                apolloClient.mutate(pushStorage).enqueue(new ApolloCall.Callback<PushStorageMutation.Data>() {
+                    @Override
+                    public void onResponse(@Nonnull Response<PushStorageMutation.Data> response) {
+                        if (!response.hasErrors()
+                                && response.data() != null
+                                && response.data().createStorage() != null
+                                && response.data().createStorage().storage() != null) {
+
+                            PushStorageMutation.Storage mStorage = response.data().createStorage().storage();
+                            database.dao().setStorageEkyId(storage.id, Integer.valueOf(mStorage.id()));
+                            Timber.i("Storage #%s successfully created !", mStorage.id());
+                        }
+                        // Go back to MainActivity and notify action is done
+                        //receiver.send(PUSH_STORAGES_DONE, new Bundle());
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        Timber.e(e.getLocalizedMessage());
+                        MainActivity.ITEMS_TO_SYNC = true;
+                        // Go back to MainActivity and notify action failed
                         receiver.send(FAILED, new Bundle());
                     }
                 });
@@ -468,7 +475,9 @@ public class SyncService extends IntentService {
 
         List<Interventions> deletableIntervention = database.dao().getDeletableInterventions(MainActivity.FARM_ID);
 
-        if (!deletableIntervention.isEmpty()) {
+        if (deletableIntervention.isEmpty()) {
+            Timber.i("No intervention to delete");
+        } else {
             for (Interventions deletableInter : deletableIntervention) {
 
                 DeleteInterMutation deleteInter = DeleteInterMutation.builder()
@@ -501,7 +510,55 @@ public class SyncService extends IntentService {
                     }
                 });
             }
-        } else Timber.i("No intervention to delete");
+
+            while (apolloClient.activeCallsCount() > 0) {
+                Timber.i("Waiting for Apollo response...");
+                Utils.sleep(100);
+            }
+        }
+
+        // Continue to Delete interventions
+        pullDeleteIntervention();
+    }
+
+
+    /**
+     * update intervention mutation
+     */
+    private void pullDeleteIntervention() {
+
+        Timber.i("Check for remotly deleted interventions");
+        ApolloCall.Callback<DeletedInterventionsQuery.Data> deletedInterventionsCallback =
+                new ApolloCall.Callback<DeletedInterventionsQuery.Data>() {
+
+                    @Override
+                    public void onResponse(@Nonnull Response<DeletedInterventionsQuery.Data> response) {
+                        DeletedInterventionsQuery.Data data = response.data();
+                        if (data != null && data.farms().get(0) != null) {
+                            List<DeletedInterventionsQuery.DeletedIntervention>
+                                    deletedInterventions = data.farms().get(0).deletedInterventions();
+                            for (DeletedInterventionsQuery.DeletedIntervention intervention : deletedInterventions) {
+                                Timber.i("Deleting intervention #%s", intervention.id());
+                                database.dao().deleteIntervention(Integer.valueOf(intervention.id()));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {}
+                };
+
+        apolloClient.query(DeletedInterventionsQuery.builder()
+                .modifiedSince(MainActivity.lastSyncTime)
+                .build())
+                .enqueue(deletedInterventionsCallback);
+
+        while (apolloClient.activeCallsCount() > 0) {
+            Timber.i("Waiting for Apollo response...");
+            Utils.sleep(100);
+        }
+
+        pushUpdateIntervention();
     }
 
 
@@ -512,8 +569,9 @@ public class SyncService extends IntentService {
 
         List<Interventions> updatableInterventions = database.dao().getUpdatableInterventions(MainActivity.FARM_ID);
 
-        if (!updatableInterventions.isEmpty()) {
-
+        if (updatableInterventions.isEmpty()) {
+            Timber.i("No interventions to udate");
+        } else {
             List<InterventionTargetAttributes> targetUpdates;
             List<InterventionWorkingDayAttributes> workingDayUpdate;
             List<InterventionInputAttributes> inputUpdates;
@@ -695,7 +753,15 @@ public class SyncService extends IntentService {
                 // Hack avoiding false positive error TODO: correct this
                 database.dao().setInterventionSynced(updatableInter.intervention.id);
             }
+
+            while (apolloClient.activeCallsCount() > 0) {
+                Timber.i("Waiting for Apollo response...");
+                Utils.sleep(100);
+            }
         }
+
+        //receiver.send(DONE, new Bundle());
+        pushCreateIntervention();
     }
 
 
@@ -895,13 +961,14 @@ public class SyncService extends IntentService {
                 });
             }
 
-            // Continue to global sync
-            getFarm();
-
-        } else {
-            // Continue to global sync
-            getFarm();
+            while (apolloClient.activeCallsCount() > 0) {
+                Timber.i("Waiting for Apollo response...");
+                Utils.sleep(100);
+            }
         }
+
+        // Continue to global sync
+        getFarm();
     }
 
 
@@ -1014,8 +1081,10 @@ public class SyncService extends IntentService {
                         if (result != 1) {
                             Timber.i("	Create equipment #%s %s %s %s %s", equipment.id(), equipment.name(), equipment.type(), equipment.number(), farm.id());
                             database.dao().insert(new Equipment(Integer.valueOf(equipment.id()),
-                                    equipment.name(), equipment.type() == null ? null : equipment.type().rawValue(),
-                                    equipment.number(), farm.id()));
+                                    equipment.name(),
+                                    equipment.type() == null ? null : equipment.type().rawValue(),
+                                    equipment.number() == null ? null : (equipment.number().isEmpty() ? null : equipment.number()),
+                                    farm.id()));
                         }
                     }
 
@@ -1130,7 +1199,7 @@ public class SyncService extends IntentService {
                         }
                     }
 
-                    getInterventions();
+                    //getInterventions();
                 }
             }
         };
@@ -1140,6 +1209,13 @@ public class SyncService extends IntentService {
                         .modifiedSince(MainActivity.lastSyncTime)
                         .build())
                 .enqueue(farmCallback);
+
+        while (apolloClient.activeCallsCount() > 0) {
+            Timber.i("Waiting for Apollo response...");
+            Utils.sleep(100);
+        }
+
+        getInterventions();
     }
 
     /**
@@ -1148,7 +1224,7 @@ public class SyncService extends IntentService {
     private void getInterventions() {
 
         List<Integer> interventionEkyIdList = database.dao().interventionsEkiIdList();
-        List<Integer> remoteInterventionList = new ArrayList<>();
+        //List<Integer> remoteInterventionList = new ArrayList<>();
 
         ApolloCall.Callback<InterventionQuery.Data> interventionCallback = new ApolloCall.Callback<InterventionQuery.Data>() {
 
@@ -1173,8 +1249,8 @@ public class SyncService extends IntentService {
                     Timber.i("Fetching interventions...");
 
                     // Building list of remote intervention IDs
-                    for (InterventionQuery.Intervention inter : interventions)
-                        remoteInterventionList.add(Integer.valueOf(inter.id()));
+//                    for (InterventionQuery.Intervention inter : interventions)
+//                        remoteInterventionList.add(Integer.valueOf(inter.id()));
 
 //                    // Deletes local Intervention not present online
 //                    for (Integer ekyId : interventionEkyIdList)

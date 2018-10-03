@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.ekylibre.android.services.SyncService.CREATE_PERSON_DONE;
+
 
 public class SelectPersonFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
@@ -172,6 +174,8 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
 //                }
 //            }
 //        }
+        if (resultCode == CREATE_PERSON_DONE)
+            new RequestDatabase(context).execute();
     }
 
     class CreateNewPerson extends AsyncTask<Void, Void, Void> {
@@ -210,7 +214,7 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
 
             if (App.isOnline(context))
                 new PerformSyncWithFreshToken(context,
-                        SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT, resultReceiver).execute();
+                        SyncService.CREATE_PERSON, resultReceiver).execute();
 
         }
     }

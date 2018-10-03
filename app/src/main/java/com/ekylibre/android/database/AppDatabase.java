@@ -231,6 +231,13 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    private static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("UPDATE equipments SET number = NULL WHERE number = '';");
+        }
+    };
+
     /**
      * Populate database with initial Lexicon data
      */

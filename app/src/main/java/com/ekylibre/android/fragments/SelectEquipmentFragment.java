@@ -42,6 +42,8 @@ import java.util.Objects;
 
 import timber.log.Timber;
 
+import static com.ekylibre.android.services.SyncService.CREATE_EQUIPMENT_DONE;
+
 
 public class SelectEquipmentFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
 
@@ -201,7 +203,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
 
-        if (resultCode == SyncService.DONE) {
+        if (resultCode == CREATE_EQUIPMENT_DONE) {
             String name = resultData.getString("name", null);
             int remote_id = resultData.getInt("remote_id", 0);
 
@@ -280,7 +282,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
 
             if (App.isOnline(context))
                 new PerformSyncWithFreshToken(context,
-                        SyncService.ACTION_CREATE_PERSON_AND_EQUIPMENT, resultReceiver).execute();
+                        SyncService.CREATE_EQUIPMENT, resultReceiver).execute();
         }
     }
 

@@ -34,7 +34,6 @@ import com.ekylibre.android.database.pojos.Fertilizers;
 import com.ekylibre.android.database.pojos.Phytos;
 import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.services.ServiceResultReceiver;
-import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.PerformSyncWithFreshToken;
@@ -42,12 +41,11 @@ import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import timber.log.Timber;
+import static com.ekylibre.android.services.SyncService.CREATE_ARTICLE;
+import static com.ekylibre.android.services.SyncService.CREATE_ARTICLE_DONE;
 
 
 public class SelectInputFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
-
-    private static final String TAG = SelectInputFragment.class.getName();
 
     private static final int SEED = 0, PHYTO = 1, FERTI = 2;
     private static final int MIN_SEARCH_SIZE = 2;
@@ -269,7 +267,8 @@ public class SelectInputFragment extends DialogFragment implements ServiceResult
 //            database.dao().setPhytoEkyId(remote_id, local_id);
 //        }
 
-        new RequestDatabase(context).execute();
+        if (resultCode == CREATE_ARTICLE_DONE)
+            new RequestDatabase(context).execute();
     }
 
     /**
@@ -358,7 +357,7 @@ public class SelectInputFragment extends DialogFragment implements ServiceResult
 
             if (App.isOnline(context))
                 new PerformSyncWithFreshToken(context,
-                        SyncService.ACTION_CREATE_ARTICLE, resultReceiver).execute();
+                        CREATE_ARTICLE, resultReceiver).execute();
         }
     }
 

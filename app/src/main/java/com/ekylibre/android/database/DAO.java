@@ -147,7 +147,6 @@ public interface DAO {
     List<Crop> cropListForIntervention(int id);
 
 
-
     /**
      *    Interventions (POJO)
      */

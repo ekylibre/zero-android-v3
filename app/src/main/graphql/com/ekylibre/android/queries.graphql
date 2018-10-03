@@ -6,6 +6,16 @@ query Profile {
   }
 }
 
+query DeletedInterventions (
+  $modifiedSince: Date
+  ){
+  farms {
+    deletedInterventions (modifiedSince: $modifiedSince) {
+      id
+    }
+  }
+}
+
 query Intervention (
   $modifiedSince: Date
   ){
