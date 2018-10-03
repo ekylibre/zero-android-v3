@@ -48,14 +48,6 @@ import timber.log.Timber;
 import static com.ekylibre.android.services.SyncService.ACTION_SYNC_ALL;
 import static com.ekylibre.android.services.SyncService.DONE;
 import static com.ekylibre.android.services.SyncService.FAILED;
-import static com.ekylibre.android.services.SyncService.PUSH_ARTICLES_DONE;
-import static com.ekylibre.android.services.SyncService.PUSH_EQUIPMENTS;
-import static com.ekylibre.android.services.SyncService.PUSH_EQUIPMENTS_DONE;
-import static com.ekylibre.android.services.SyncService.PUSH_PEOPLE;
-import static com.ekylibre.android.services.SyncService.PUSH_PEOPLE_DONE;
-import static com.ekylibre.android.services.SyncService.PUSH_STORAGES;
-import static com.ekylibre.android.services.SyncService.PUSH_STORAGES_DONE;
-
 
 public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver {
 
@@ -298,22 +290,6 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
                 Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, 200);
                 toast.show();
-                break;
-
-            case PUSH_ARTICLES_DONE:
-                new PerformSyncWithFreshToken(this, PUSH_EQUIPMENTS, resultReceiver).execute();
-                break;
-
-            case PUSH_EQUIPMENTS_DONE:
-                new PerformSyncWithFreshToken(this, PUSH_PEOPLE, resultReceiver).execute();
-                break;
-
-            case PUSH_PEOPLE_DONE:
-                new PerformSyncWithFreshToken(this, PUSH_STORAGES, resultReceiver).execute();
-                break;
-
-            case PUSH_STORAGES_DONE:
-                //new PerformSyncWithFreshToken(this, ACTION_SYNC_ALL, resultReceiver).execute();
                 break;
         }
     }

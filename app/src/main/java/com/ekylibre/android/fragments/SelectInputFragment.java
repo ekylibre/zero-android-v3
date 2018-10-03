@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.ekylibre.android.services.SyncService.CREATE_ARTICLE;
-import static com.ekylibre.android.services.SyncService.CREATE_ARTICLE_DONE;
+import static com.ekylibre.android.services.SyncService.DONE;
 
 
 public class SelectInputFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
@@ -267,7 +267,7 @@ public class SelectInputFragment extends DialogFragment implements ServiceResult
 //            database.dao().setPhytoEkyId(remote_id, local_id);
 //        }
 
-        if (resultCode == CREATE_ARTICLE_DONE)
+        if (resultCode == DONE)
             new RequestDatabase(context).execute();
     }
 

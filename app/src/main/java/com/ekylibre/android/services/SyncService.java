@@ -93,38 +93,22 @@ import timber.log.Timber;
 
 public class SyncService extends IntentService {
 
-    public static final int DONE = 10;
-    public static final int FAILED = 11;
-
-    public static final int PUSH_ARTICLES_DONE = 12;
-    public static final int PUSH_EQUIPMENTS_DONE = 13;
-    public static final int PUSH_PEOPLE_DONE = 14;
-    public static final int PUSH_STORAGES_DONE = 15;
-
-    public static final int CREATE_ARTICLE_DONE = 16;
-    public static final int CREATE_EQUIPMENT_DONE = 17;
-    public static final int CREATE_PERSON_DONE = 18;
-    public static final int CREATE_STORAGE_DONE = 19;
-
     public static final String ACTION_SYNC_ALL = "com.ekylibre.android.services.action.SYNC_PULL";
     public static final String FIRST_TIME_SYNC = "com.ekylibre.android.services.action.FIRST_TIME_SYNC";
-
-    public static final String PUSH_ARTICLES = "com.ekylibre.android.services.action.PUSH_ARTICLES";
-    public static final String PUSH_EQUIPMENTS = "com.ekylibre.android.services.action.PUSH_EQUIPMENTS";
-    public static final String PUSH_PEOPLE = "com.ekylibre.android.services.action.PUSH_PEOPLE";
-    public static final String PUSH_STORAGES = "com.ekylibre.android.services.action.PUSH_STORAGES";
 
     public static final String CREATE_ARTICLE = "com.ekylibre.android.services.action.CREATE_ARTICLE";
     public static final String CREATE_EQUIPMENT = "com.ekylibre.android.services.action.CREATE_EQUIPMENT";
     public static final String CREATE_PERSON = "com.ekylibre.android.services.action.CREATE_PEOPLE";
     public static final String CREATE_STORAGE = "com.ekylibre.android.services.action.CREATE_STORAGE";
 
+    public static final int DONE = 10;
+    public static final int FAILED = 11;
 
     private static SharedPreferences prefs;
     private AppDatabase database;
     private ApolloClient apolloClient;
     private ResultReceiver receiver;
-    private String ACTION;
+    private String action;
 
 
     public SyncService() {
@@ -136,7 +120,7 @@ public class SyncService extends IntentService {
 
         Timber.i("Starting SyncService");
 
-        ACTION = Objects.requireNonNull(intent.getAction());
+        action = Objects.requireNonNull(intent.getAction());
         receiver = intent.getParcelableExtra("receiver");
         String accessToken = Objects.requireNonNull(intent.getStringExtra("accessToken"));
 
@@ -146,10 +130,26 @@ public class SyncService extends IntentService {
         apolloClient = GraphQLClient.getApolloClient(accessToken);
 
         // Route action to function
-        switch (ACTION) {
+        switch (action) {
 
             case FIRST_TIME_SYNC:
                 getFarm();
+                break;
+
+            case CREATE_ARTICLE:
+                pushArticle();
+                break;
+
+            case CREATE_EQUIPMENT:
+                pushEquipment();
+                break;
+
+            case CREATE_PERSON:
+                pushPerson();
+                break;
+
+            case CREATE_STORAGE:
+                pushStorage();
                 break;
 
             case ACTION_SYNC_ALL:
@@ -200,7 +200,7 @@ public class SyncService extends IntentService {
                             Timber.i("Phyto #%s successfully created", article.id());
 
                             // If case, send result to Fragment who initiate the creation
-                            if (ACTION.equals(CREATE_ARTICLE))
+                            if (action.equals(CREATE_ARTICLE))
                                 receiver.send(DONE, new Bundle());
                         }
                     }
@@ -242,7 +242,7 @@ public class SyncService extends IntentService {
                             database.dao().setSeedEkyId(Integer.valueOf(article.id()), String.valueOf(seed.id));
                             Timber.i("Custom seed #%s successfully created", article.id());
 
-                            if (ACTION.equals(CREATE_ARTICLE))
+                            if (action.equals(CREATE_ARTICLE))
                                 receiver.send(DONE, new Bundle());
                         }
                     }
@@ -280,7 +280,7 @@ public class SyncService extends IntentService {
                             //database.dao().setFertilizerEkyId(Integer.valueOf(article.id()), String.valueOf(fertilizer.id));
                             Timber.i("Custom fertilizer #%s successfully created", article.id());
 
-                            if (ACTION.equals(CREATE_ARTICLE))
+                            if (action.equals(CREATE_ARTICLE))
                                 receiver.send(DONE, new Bundle());
                         }}
                     @Override
@@ -315,7 +315,7 @@ public class SyncService extends IntentService {
                             database.dao().insert(material);
                             Timber.i("Custom material #%s successfully created", article.id());
 
-                            if (ACTION.equals(CREATE_ARTICLE))
+                            if (action.equals(CREATE_ARTICLE))
                                 receiver.send(DONE, new Bundle());
                         }
                     }
@@ -361,7 +361,7 @@ public class SyncService extends IntentService {
                             Timber.i("Equipment #%s successfully created", ekyId);
 
                             // Send result to Fragment who initiate the creation
-                            if (ACTION.equals(CREATE_EQUIPMENT)) {
+                            if (action.equals(CREATE_EQUIPMENT)) {
                                 Bundle bundle = new Bundle();
                                 bundle.putString("name", equipment.name);
                                 bundle.putInt("remote_id", Integer.valueOf(ekyId));
@@ -408,6 +408,9 @@ public class SyncService extends IntentService {
                             PushPersonMutation.Person mPerson = response.data().createPerson().person();
                             database.dao().setPersonEkyId(person.id, Integer.valueOf(mPerson.id()));
                             Timber.i("Person #%s successfully created !", mPerson.id());
+
+                            if (action.equals(CREATE_PERSON))
+                                receiver.send(DONE, new Bundle());
                         }
                     }
 
@@ -450,6 +453,9 @@ public class SyncService extends IntentService {
                             PushStorageMutation.Storage mStorage = response.data().createStorage().storage();
                             database.dao().setStorageEkyId(storage.id, Integer.valueOf(mStorage.id()));
                             Timber.i("Storage #%s successfully created !", mStorage.id());
+
+                            if (action.equals(CREATE_STORAGE))
+                                receiver.send(DONE, new Bundle());
                         }
                         // Go back to MainActivity and notify action is done
                         //receiver.send(PUSH_STORAGES_DONE, new Bundle());

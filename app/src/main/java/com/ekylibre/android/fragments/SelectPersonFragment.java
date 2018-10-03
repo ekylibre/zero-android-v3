@@ -26,7 +26,6 @@ import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.Person;
 import com.ekylibre.android.database.pojos.Persons;
 import com.ekylibre.android.services.ServiceResultReceiver;
-import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 
@@ -34,7 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.ekylibre.android.services.SyncService.CREATE_PERSON_DONE;
+import static com.ekylibre.android.services.SyncService.CREATE_PERSON;
+import static com.ekylibre.android.services.SyncService.DONE;
 
 
 public class SelectPersonFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
@@ -174,7 +174,7 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
 //                }
 //            }
 //        }
-        if (resultCode == CREATE_PERSON_DONE)
+        if (resultCode == DONE)
             new RequestDatabase(context).execute();
     }
 
@@ -214,7 +214,7 @@ public class SelectPersonFragment extends DialogFragment implements ServiceResul
 
             if (App.isOnline(context))
                 new PerformSyncWithFreshToken(context,
-                        SyncService.CREATE_PERSON, resultReceiver).execute();
+                        CREATE_PERSON, resultReceiver).execute();
 
         }
     }

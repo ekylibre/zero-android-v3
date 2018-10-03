@@ -42,7 +42,7 @@ import java.util.Objects;
 
 import timber.log.Timber;
 
-import static com.ekylibre.android.services.SyncService.CREATE_EQUIPMENT_DONE;
+import static com.ekylibre.android.services.SyncService.DONE;
 
 
 public class SelectEquipmentFragment extends DialogFragment implements ServiceResultReceiver.Receiver{
@@ -203,7 +203,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
 
-        if (resultCode == CREATE_EQUIPMENT_DONE) {
+        if (resultCode == DONE) {
             String name = resultData.getString("name", null);
             int remote_id = resultData.getInt("remote_id", 0);
 
