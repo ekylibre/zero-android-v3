@@ -230,6 +230,18 @@
     <string name="METER">meter</string>
     <string name="UNITY">unity</string>
     <string name="THOUSAND">thousand</string>
+    <string name="FRENCH_HORSEPOWER">french horsepower</string>
+
+    <!-- Equipment indicators -->
+    <string name="plowshare_count">Number of plowshares</string>
+    <string name="motor_power">Motor Power</string>
+    <string name="application_width">Application width</string>
+    <string name="rows_count">Number of rows</string>
+    <string name="nominal_storable_net_volume">Net storage volume</string>
+    <string name="nominal_storable_net_mass">Net storage mass</string>
+    <string name="diameter">Diameter</string>
+    <string name="width">Width</string>
+    <string name="length">Length</string>
 
     <!-- Output types -->
     <string name="STRAW">straw</string>

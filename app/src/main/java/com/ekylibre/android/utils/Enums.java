@@ -3,8 +3,10 @@ package com.ekylibre.android.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 
 import com.ekylibre.android.database.AppDatabase;
+import com.ekylibre.android.database.models.EquipmentType;
 import com.ekylibre.android.database.models.Storage;
 import com.ekylibre.android.type.EquipmentTypeEnum;
 import com.ekylibre.android.type.InterventionOutputTypeEnum;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import timber.log.Timber;
 
 
 public class Enums {
@@ -47,7 +51,7 @@ public class Enums {
     // Custom lists
     public static List<Storage> STORAGE_LIST = new ArrayList<>();
     public static List<String> STORAGE_LIST_NAMES = new ArrayList<>();
-
+    public static HashMap<String, EquipmentType> INDICATORS_MAP = new HashMap<>();
 
     public static void generateStorages(AppDatabase database) {
 
@@ -105,6 +109,22 @@ public class Enums {
             STORAGE_TYPE_VALUES.add(item.rawValue());
             STORAGE_TYPE_NAMES.add(WordUtils.capitalize(translate(context, item.rawValue())));
         }
+
+        // Following request authorized in main thread
+        AppDatabase database = AppDatabase.getInstance(context);
+        List<EquipmentType> equipmentTypes = database.dao().getEquipmentIndicators();
+
+//        Thread thread = new Thread() {
+//            @Override
+//            public void run() {
+//                equipmentTypes = database.dao().getEquipmentIndicators();
+//            }
+//        };
+//        thread.start();
+        // Generates Map with translations for Equipment indicators
+
+        for (EquipmentType et : equipmentTypes)
+            INDICATORS_MAP.put(et.type, et);
     }
 
     private static String translate(Context ctx, String rawValue) {

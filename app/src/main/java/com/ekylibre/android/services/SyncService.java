@@ -218,8 +218,7 @@ public class SyncService extends IntentService {
         if (!seedsWithoutEkyId.isEmpty()) {
             for (Seed seed : seedsWithoutEkyId) {
 
-                String specie = getResources().getString(getResources().getIdentifier(
-                        seed.specie.toUpperCase(), "string", getPackageName()));
+                String specie = Utils.getTranslation(this, seed.specie.toUpperCase());
 
                 PushArticleMutation articleMutation = PushArticleMutation.builder()
                         .farmId(MainActivity.FARM_ID)
@@ -345,7 +344,10 @@ public class SyncService extends IntentService {
                         .farmId(equipment.farmId)
                         .type(EquipmentTypeEnum.safeValueOf(equipment.type))
                         .name(equipment.name)
-                        .number(equipment.number.isEmpty() ? null : equipment.number).build();
+                        .number(equipment.number.isEmpty() ? null : equipment.number)
+                        .indicator1(equipment.field1Value)
+                        .indicator2(equipment.field2Value)
+                        .build();
 
                 apolloClient.mutate(pushEquipment).enqueue(new ApolloCall.Callback<PushEquipmentMutation.Data>() {
                     @Override

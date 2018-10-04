@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Group;
+
+import com.ekylibre.android.utils.Utils;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -213,7 +215,7 @@ public class InterventionActivity extends AppCompatActivity implements
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
 
-        setTitle(getResources().getIdentifier(procedure, "string", getPackageName()));
+        setTitle(Utils.getTranslation(this, procedure));
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
 //        getSupportActionBar().setLogo(getResources().getIdentifier("procedure_" + procedure.toLowerCase(), "drawable", getPackageName()));
 //        getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -1027,7 +1029,7 @@ public class InterventionActivity extends AppCompatActivity implements
         } else {
             message = String.format(MainActivity.LOCALE,
                     "Soit %.1f %s", volume * surface * unit.surface_factor,
-                    getString(getResources().getIdentifier(unit.quantity_key_only, "string", getPackageName())));
+                    Utils.getTranslation(this, unit.quantity_key_only));
         }
         return message;
     };
@@ -1130,9 +1132,6 @@ public class InterventionActivity extends AppCompatActivity implements
                 for (Crop culture : plot.crops) {
                     if (culture.is_checked) {
                         ++cropCount;
-                        Timber.i("date = %s", date);
-                        Timber.i("start_date = %s | stop_date = %s", culture.start_date, culture.stop_date);
-                        Timber.i("compare to = %s | %s", date.compareTo(culture.start_date), date.compareTo(culture.stop_date));
                         if (date.compareTo(culture.start_date) < 0 || date.compareTo(culture.stop_date) >= 0) {
                             cancel(true);
                             Toast toast = Toast.makeText(context, R.string.date_not_corresponding_to_crop, Toast.LENGTH_LONG);

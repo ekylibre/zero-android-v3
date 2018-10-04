@@ -1,5 +1,7 @@
 package com.ekylibre.android.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.widget.EditText;
 
 import com.ekylibre.android.MainActivity;
@@ -33,6 +35,21 @@ public class Utils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getTranslation(Context ctx, String string) {
+        String translation;
+        try {
+            translation = ctx.getString(ctx.getResources().getIdentifier(string, "string", ctx.getPackageName()));
+        } catch (Resources.NotFoundException e) {
+            translation = string;
+        }
+
+        return translation;
+    }
+
+    public static int getResId(Context ctx, String string, String type) {
+        return ctx.getResources().getIdentifier(string, type, ctx.getPackageName());
     }
 
 

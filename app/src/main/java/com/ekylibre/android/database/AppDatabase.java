@@ -88,6 +88,7 @@ public abstract class AppDatabase extends RoomDatabase {
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
                     .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,
                             MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                    .allowMainThreadQueries()
                     .build();
         return database;
     }
@@ -308,6 +309,16 @@ public abstract class AppDatabase extends RoomDatabase {
                     }
                     database.dao().insert(seeds.toArray(new Seed[0]));
                 }
+            }
+
+            // Load seeds from Lexicon
+            type = Types.newParameterizedType(List.class, EquipmentType.class);
+            json = readJsonFromAssets(context, "lexicon/equipments.json");
+            JsonAdapter<List<EquipmentType>> equipmentAdapter = moshi.adapter(type);
+            if (json != null) {
+                List<EquipmentType> equipmentTypes = equipmentAdapter.fromJson(json);
+                if (equipmentTypes != null)
+                    database.dao().insert(equipmentTypes.toArray(new EquipmentType[0]));
             }
 
             Timber.e("Reference data inserted !");

@@ -130,10 +130,8 @@ public class OutputAdapter extends RecyclerView.Adapter<OutputAdapter.ViewHolder
 
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        Timber.i("position %s", position);
                         if (position != 0) {
                             dataset.get(getAdapterPosition()).id_storage = Enums.STORAGE_LIST.get(position - 1).id;
-                            Timber.i("Storage id --> %s", Enums.STORAGE_LIST.get(position - 1).id);
                         } else {
                             dataset.get(getAdapterPosition()).id_storage = null;
                         }

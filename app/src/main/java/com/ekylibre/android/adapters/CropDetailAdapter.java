@@ -28,6 +28,7 @@ import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.App;
 import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.Units;
+import com.ekylibre.android.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -93,8 +94,8 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
         }
 
         Interventions current = interventionsList.get(position);
-        holder.itemIcon.setImageResource(context.getResources().getIdentifier("procedure_" + current.intervention.type.toLowerCase(), "drawable", context.getPackageName()));
-        holder.itemProcedure.setText(context.getResources().getIdentifier(current.intervention.type, "string", context.getPackageName()));
+        holder.itemIcon.setImageResource(Utils.getResId(context,"procedure_" + current.intervention.type.toLowerCase(), "drawable"));
+        holder.itemProcedure.setText(Utils.getTranslation(context, current.intervention.type));
         holder.itemDate.setText(DateTools.display(current.workingDays.get(0).execution_date));
 
         switch (current.intervention.status) {
@@ -142,7 +143,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
                     Seed seed = s.seed.get(0);
                     String specie;
                     if (seed.specie != null)
-                        specie = context.getResources().getString(context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName()));
+                        specie = Utils.getTranslation(context, seed.specie.toUpperCase());
                     else
                         specie = seed.variety;
                     sb.append(specie).append(" • ");
@@ -188,7 +189,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
             case App.HARVEST:
                 if (current.harvests.size() > 0) {
                     for (Harvest harvest : current.harvests) {
-                        sb.append(context.getString(context.getResources().getIdentifier(harvest.type, "string", context.getPackageName()))).append(" • ");
+                        sb.append(Utils.getTranslation(context, harvest.type)).append(" • ");
                         sb.append(String.format(MainActivity.LOCALE, "%.1f %s", harvest.quantity, Objects.requireNonNull(Units.getUnit(harvest.unit)).name));
                         sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
                         if (current.harvests.indexOf(harvest) + 1 != current.harvests.size()) sb.append("\n");

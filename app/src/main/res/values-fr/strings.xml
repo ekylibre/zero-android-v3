@@ -230,6 +230,18 @@
     <string name="METER">mètre</string>
     <string name="UNITY">unité</string>
     <string name="THOUSAND">millier</string>
+    <string name="FRENCH_HORSEPOWER">Cheval-vapeur français (ch)</string>
+
+    <!-- Equipment indicators -->
+    <string name="plowshare_count">Nombre de socs</string>
+    <string name="motor_power">Puissance du moteur</string>
+    <string name="application_width">Largeur de travail</string>
+    <string name="rows_count">Nombre de rangs</string>
+    <string name="nominal_storable_net_volume">Capacité de stockage volumique nominale</string>
+    <string name="nominal_storable_net_mass">Capacité de stockage massique nominale</string>
+    <string name="diameter">Diamètre</string>
+    <string name="width">Largeur</string>
+    <string name="length">Longueur</string>
 
     <!-- Output types -->
     <string name="STRAW">paille</string>

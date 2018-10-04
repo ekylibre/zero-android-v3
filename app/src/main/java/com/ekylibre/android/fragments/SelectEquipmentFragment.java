@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.ekylibre.android.database.models.EquipmentType;
+import com.ekylibre.android.type.EquipmentTypeEnum;
+import com.ekylibre.android.utils.Utils;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -39,8 +43,6 @@ import com.ekylibre.android.utils.PerformSyncWithFreshToken;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import timber.log.Timber;
 
 import static com.ekylibre.android.services.SyncService.DONE;
 
@@ -146,7 +148,7 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
         new RequestDatabase(context).execute();
     }
 
-    public void createEquipmentDialog() {
+    private void createEquipmentDialog() {
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_equipment, null);
@@ -154,10 +156,13 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
         TextInputLayout nameTextInput = dialogView.findViewById(R.id.create_equipment_name);
         AppCompatImageView typeIcon = dialogView.findViewById(R.id.create_equipment_icon);
 
+        TextInputLayout field1TextInput = dialogView.findViewById(R.id.create_equipment_field1);
+        TextInputLayout field2TextInput = dialogView.findViewById(R.id.create_equipment_field2);
+
         builder.setView(dialogView);
         builder.setNegativeButton(R.string.cancel, (dialog, i) -> dialog.cancel());
         builder.setPositiveButton(R.string.create, (dialog, i) -> {
-            // pass
+            // pass, but needed for dialog.getButton()
         });
 
         androidx.appcompat.app.AlertDialog dialog = builder.create();
@@ -184,20 +189,43 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
         ArrayAdapter spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Enums.EQUIMPMENT_NAMES);
         spinner.setAdapter(spinnerAdapter);
 
-        Timber.i("Equipment type = tool_%s", Enums.EQUIMPMENT_TYPES.get(0).toLowerCase());
-        typeIcon.setImageResource(getResources().getIdentifier(
-                "tool_" + Enums.EQUIMPMENT_TYPES.get(0).toLowerCase(), "drawable", context.getPackageName()));
+        typeIcon.setImageResource(
+                Utils.getResId(context,"tool_" + Enums.EQUIMPMENT_TYPES.get(0).toLowerCase(), "drawable"));
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
-                typeIcon.setImageResource(getResources().getIdentifier(
-                        "tool_" + Enums.EQUIMPMENT_TYPES.get(pos).toLowerCase(),
-                        "drawable", context.getPackageName()));
+
+                String type = Enums.EQUIMPMENT_TYPES.get(pos).toLowerCase();
+                typeIcon.setImageResource(Utils.getResId(context,"tool_" + type, "drawable"));
+
+                EquipmentType et = Enums.INDICATORS_MAP.get(type);
+
+//                AppDatabase database = AppDatabase.getInstance(context);
+//                EquipmentType equipmentType = database.dao().getEquipmentIndicators(type);
+                //EquipmentType et = new EquipmentType(15, "aze", "width", "meter", null, null, "plow");
+
+                if (et.field_1_name != null) {
+                    field1TextInput.setHint(Utils.getTranslation(context, et.field_1_name));
+                    field1TextInput.setHelperText(Utils.getTranslation(context, et.field_1_unit.toUpperCase()));
+                    field1TextInput.setVisibility(View.VISIBLE);
+                } else {
+                    field1TextInput.setVisibility(View.GONE);
+                }
+
+                if (et.field_2_name != null) {
+                    field2TextInput.setHint(Utils.getTranslation(context, et.field_2_name));
+                    //field2TextInput.setHelperText(Utils.getTranslation(context, et.field_2_unit.toUpperCase()));
+                    field2TextInput.setVisibility(View.VISIBLE);
+                } else {
+                    field2TextInput.setVisibility(View.GONE);
+                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+
+
     }
 
     @Override
@@ -268,8 +296,16 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
             TextInputLayout numberTextInput = dialogView.findViewById(R.id.create_equipment_number);
             String number = numberTextInput.getEditText().getText().toString();
 
+            TextInputLayout field1 = dialogView.findViewById(R.id.create_equipment_field1);
+            String value1 = field1.getEditText().getText().toString();
+
+            TextInputLayout field2 = dialogView.findViewById(R.id.create_equipment_field2);
+            String value2 = field2.getEditText().getText().toString();
+
             AppDatabase database = AppDatabase.getInstance(context);
-            database.dao().insert(new Equipment(null, name, type, number, MainActivity.FARM_ID, null, null));
+            database.dao().insert(new Equipment(null, name, type, number, MainActivity.FARM_ID,
+                    value1.isEmpty() ? null : value1,
+                    value2.isEmpty() ? null : value2));
 
             return null;
         }

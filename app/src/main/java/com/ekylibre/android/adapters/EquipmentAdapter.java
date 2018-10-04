@@ -15,6 +15,7 @@ import com.ekylibre.android.InterventionActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.pojos.Equipments;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.Utils;
 
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.View
             if (item.equipment.get(0).number != null && !item.equipment.get(0).number.isEmpty())
                 sb.append(String.format(" #%s", item.equipment.get(0).number));
             typeTextView.setText(sb);
-            Integer iconRessource = context.getResources().getIdentifier("tool_" + item.equipment.get(0).type.toLowerCase(), "drawable", context.getPackageName());
+            Integer iconRessource = Utils.getResId(context,"tool_" + item.equipment.get(0).type.toLowerCase(), "drawable");
             if (iconRessource != 0)
                 iconImageView.setImageResource(iconRessource);
         }

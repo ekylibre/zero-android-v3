@@ -18,6 +18,7 @@ import com.ekylibre.android.adapters.CropInfo.ListItem;
 import com.ekylibre.android.adapters.CropInfo.ProductionItem;
 import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.utils.RecyclerViewClickListener;
+import com.ekylibre.android.utils.Utils;
 
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if (currentItem.getInterventions().size() > 0) {
                 interContainer.setVisibility(View.VISIBLE);
                 for (Intervention intervention : currentItem.getInterventions()) {
-                    int ressourceId = context.getResources().getIdentifier("procedure_" + intervention.type.toLowerCase(), "drawable", context.getPackageName());
+                    int ressourceId = Utils.getResId(context,"procedure_" + intervention.type.toLowerCase(), "drawable");
 
                     ImageView imageView = new ImageView(context);
                     imageView.setImageResource(ressourceId);

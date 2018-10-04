@@ -27,6 +27,7 @@ import com.ekylibre.android.database.pojos.Seeds;
 import com.ekylibre.android.utils.QuantityConverter;
 import com.ekylibre.android.utils.Unit;
 import com.ekylibre.android.utils.Units;
+import com.ekylibre.android.utils.Utils;
 
 import java.util.List;
 
@@ -263,7 +264,7 @@ public class InputAdapter extends RecyclerView.Adapter<InputAdapter.ViewHolder> 
                 Seed seed = item.seed.get(0);
                 String speciL10n = "";
                 if (seed.specie != null)
-                    speciL10n = context.getString(context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName()));
+                    speciL10n = Utils.getTranslation(context, seed.specie.toUpperCase());
                 holder.display(R.drawable.icon_seed, speciL10n, seed.variety, item.inter.quantity, item.inter.unit);
                 break;
 

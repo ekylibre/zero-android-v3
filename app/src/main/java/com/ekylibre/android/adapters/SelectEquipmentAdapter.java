@@ -22,8 +22,6 @@ import java.util.List;
 
 public class SelectEquipmentAdapter extends RecyclerView.Adapter<SelectEquipmentAdapter.ViewHolder> {
 
-    private static final String TAG = "SelectEquipmentAdapter";
-
     private List<Integer> selectedEquipments;
     private List<Equipment> dataset;
     private Context context;

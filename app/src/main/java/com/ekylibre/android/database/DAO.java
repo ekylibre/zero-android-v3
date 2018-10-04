@@ -59,9 +59,9 @@ public interface DAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Crop... items);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Farm... items);
     @Insert(onConflict = OnConflictStrategy.REPLACE) long insert(Equipment item);
+    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(EquipmentType... item);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Material... items);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(Fertilizer... items);
-//    @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(EquipmentType... items);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionWorkingDay item);
     @Insert(onConflict = OnConflictStrategy.REPLACE) void insert(InterventionSeed item);
@@ -153,7 +153,7 @@ public interface DAO {
     @Transaction
     @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " + " JOIN " + InterventionWorkingDay.TABLE_NAME +
             " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
-            " WHERE status != 'deleted' AND farm = :farmId ORDER BY execution_date DESC, intervention_id_eky DESC")
+            " WHERE status != 'deleted' AND farm = :farmId ORDER BY execution_date DESC, intervention_id DESC")
     List<Interventions> selectInterventions(String farmId);
 
     @Transaction
@@ -414,6 +414,9 @@ public interface DAO {
 
     @Query("UPDATE " + Storage.TABLE_NAME + " SET " + Storage.COLUMN_ID_EKY + " = :ekyId WHERE " + Storage.COLUMN_ID + " = :id")
     void setStorageEkyId(int id, int ekyId);
+
+    @Query("SELECT * FROM " + EquipmentType.TABLE_NAME)
+    List<EquipmentType> getEquipmentIndicators();
 
 
 

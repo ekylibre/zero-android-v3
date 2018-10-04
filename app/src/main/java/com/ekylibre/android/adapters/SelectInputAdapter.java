@@ -30,6 +30,7 @@ import com.ekylibre.android.database.relations.InterventionSeed;
 import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.services.SyncService;
 import com.ekylibre.android.utils.Enums;
+import com.ekylibre.android.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -218,8 +219,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 String specie = seed.variety;
                 if (seed.specie != null) {
                     if (Enums.SPECIE_TYPES.contains(seed.specie.toUpperCase())) {
-                        int res = context.getResources().getIdentifier(seed.specie.toUpperCase(), "string", context.getPackageName());
-                        specie = context.getString(res);
+                        specie = Utils.getTranslation(context, seed.specie.toUpperCase());
                     }
                 }
                 seedViewHolder.seedSpecie.setText(specie);
@@ -286,8 +286,7 @@ public class SelectInputAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 fertiViewHolder.fertiName.setText(fertilizer.label_fra);
                 String type = "";
                 if (fertilizer.nature != null) {
-                    int res = context.getResources().getIdentifier(fertilizer.nature, "string", context.getPackageName());
-                    type = context.getString(res);
+                    type = Utils.getTranslation(context, fertilizer.nature);
                 }
                 fertiViewHolder.fertiType.setText(type);
                 fertiViewHolder.fertiFavorite.setVisibility((fertilizer.eky_id != null) ? View.VISIBLE : View.GONE);
