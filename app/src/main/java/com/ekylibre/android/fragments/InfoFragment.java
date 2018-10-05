@@ -39,7 +39,7 @@ public class InfoFragment extends DialogFragment {
 
     private CropItem cropItem;
 
-    private List<Interventions> interventionsList;
+    public static List<Interventions> interventionsList;
     private List<Integer> interIDs;
 
 

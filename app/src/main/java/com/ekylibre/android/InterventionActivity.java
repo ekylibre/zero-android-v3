@@ -2,10 +2,14 @@ package com.ekylibre.android;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+
+import androidx.appcompat.app.ActionBar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Group;
 
+import com.ekylibre.android.fragments.InfoFragment;
 import com.ekylibre.android.utils.Utils;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.DialogFragment;
@@ -183,6 +187,16 @@ public class InterventionActivity extends AppCompatActivity implements
     private String weatherDescription;
 
     private InputMethodManager keyboardManager;
+    private boolean cropDetail;
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        if (cropDetail)
+            onBackPressed();
+        else
+            super.onSupportNavigateUp();
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,8 +206,18 @@ public class InterventionActivity extends AppCompatActivity implements
         // Clear all datasets
         clearDatasets();
 
-        if (getIntent().getBooleanExtra("edition", false)) {
-            editIntervention = MainActivity.interventionsList.get(getIntent().getIntExtra("intervention_id", -1));
+        Intent incomIntent = getIntent();
+        ActionBar toolbar = getSupportActionBar();
+
+        if (incomIntent.getBooleanExtra("edition", false)) {
+
+            cropDetail = incomIntent.getBooleanExtra("cropDetail", false);
+            int incomId = incomIntent.getIntExtra("intervention_id", -1);
+
+            if (cropDetail)
+                editIntervention = InfoFragment.interventionsList.get(incomId);
+            else
+                editIntervention = MainActivity.interventionsList.get(incomId);
 
             // Set all intervention details
             duration = editIntervention.workingDays.get(0).hour_duration;
@@ -208,11 +232,12 @@ public class InterventionActivity extends AppCompatActivity implements
 
             validated = editIntervention.intervention.status.equals(VALIDATED);
             procedure = editIntervention.intervention.type;
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        else {
+
+            toolbar.setDisplayHomeAsUpEnabled(true);
+
+        } else {
             procedure = getIntent().getStringExtra("procedure");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toolbar.setDisplayHomeAsUpEnabled(false);
         }
 
         setTitle(Utils.getTranslation(this, procedure));

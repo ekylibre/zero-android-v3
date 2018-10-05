@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ekylibre.android.InterventionActivity;
-import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.database.models.Harvest;
 import com.ekylibre.android.database.models.Seed;
@@ -30,18 +29,16 @@ import com.ekylibre.android.utils.DateTools;
 import com.ekylibre.android.utils.Units;
 import com.ekylibre.android.utils.Utils;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
+
+import static com.ekylibre.android.MainActivity.LOCALE;
 
 
 public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.ViewHolder> {
 
     private List<Interventions> interventionsList;
     private Context context;
-
-    private static SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("HH:mm", MainActivity.LOCALE);
-
 
     public CropDetailAdapter(Context context, List<Interventions> interventionsList) {
         this.interventionsList = interventionsList;
@@ -69,6 +66,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
                 Intent intent = new Intent(itemView.getContext(), InterventionActivity.class);
                 intent.putExtra("intervention_id", getAdapterPosition());
                 intent.putExtra("edition", true);
+                intent.putExtra("cropDetail", true);
                 itemView.getContext().startActivity(intent);
             });
         }
@@ -122,7 +120,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
         }
 
         String cropCount = context.getResources().getQuantityString(R.plurals.crops, count, count);
-        String totalString = String.format(MainActivity.LOCALE, "%s • %.1f ha", cropCount, total);
+        String totalString = String.format(LOCALE, "%s • %.1f ha", cropCount, total);
         holder.itemCrops.setText(totalString);
 
         // Display input by nature
@@ -132,7 +130,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
             case App.CROP_PROTECTION:
                 for (Phytos p : current.phytos) {
                     sb.append(p.phyto.get(0).name).append(" • ");
-                    sb.append(String.format(MainActivity.LOCALE, "%.1f", p.inter.quantity)).append(" ");
+                    sb.append(String.format(LOCALE, "%.1f", p.inter.quantity)).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(p.inter.unit)).name);
                     if (current.phytos.indexOf(p) + 1 != current.phytos.size()) sb.append("\n");
                 }
@@ -147,7 +145,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
                     else
                         specie = seed.variety;
                     sb.append(specie).append(" • ");
-                    sb.append(String.format(MainActivity.LOCALE, "%.1f", s.inter.quantity)).append(" ");
+                    sb.append(String.format(LOCALE, "%.1f", s.inter.quantity)).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(s.inter.unit)).name);
                     if (current.seeds.indexOf(s) + 1 != current.seeds.size()) sb.append("\n");
                 }
@@ -156,7 +154,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
             case App.FERTILIZATION:
                 for (Fertilizers f : current.fertilizers) {
                     sb.append(f.fertilizer.get(0).label_fra).append(" • ");
-                    sb.append(String.format(MainActivity.LOCALE, "%.1f", f.inter.quantity)).append(" ");
+                    sb.append(String.format(LOCALE, "%.1f", f.inter.quantity)).append(" ");
                     sb.append(Objects.requireNonNull(Units.getUnit(f.inter.unit)).name);
                     if (current.fertilizers.indexOf(f) + 1 != current.fertilizers.size()) sb.append("\n");
                 }
@@ -190,7 +188,7 @@ public class CropDetailAdapter extends RecyclerView.Adapter<CropDetailAdapter.Vi
                 if (current.harvests.size() > 0) {
                     for (Harvest harvest : current.harvests) {
                         sb.append(Utils.getTranslation(context, harvest.type)).append(" • ");
-                        sb.append(String.format(MainActivity.LOCALE, "%.1f %s", harvest.quantity, Objects.requireNonNull(Units.getUnit(harvest.unit)).name));
+                        sb.append(String.format(LOCALE, "%.1f %s", harvest.quantity, Objects.requireNonNull(Units.getUnit(harvest.unit)).name));
                         sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
                         if (current.harvests.indexOf(harvest) + 1 != current.harvests.size()) sb.append("\n");
                     }
