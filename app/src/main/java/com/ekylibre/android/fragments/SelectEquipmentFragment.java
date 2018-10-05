@@ -18,6 +18,8 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
+import timber.log.Timber;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -201,24 +203,20 @@ public class SelectEquipmentFragment extends DialogFragment implements ServiceRe
 
                 EquipmentType et = Enums.INDICATORS_MAP.get(type);
 
-//                AppDatabase database = AppDatabase.getInstance(context);
-//                EquipmentType equipmentType = database.dao().getEquipmentIndicators(type);
-                //EquipmentType et = new EquipmentType(15, "aze", "width", "meter", null, null, "plow");
+                if (et != null) {
+                    if (et.field_1_name != null) {
+                        field1TextInput.setHint(Utils.getTranslation(context, et.field_1_name));
+                        field1TextInput.setHelperText(Utils.getTranslation(context, et.field_1_unit.toUpperCase()));
+                        field1TextInput.setVisibility(View.VISIBLE);
+                    } else
+                        field1TextInput.setVisibility(View.GONE);
 
-                if (et.field_1_name != null) {
-                    field1TextInput.setHint(Utils.getTranslation(context, et.field_1_name));
-                    field1TextInput.setHelperText(Utils.getTranslation(context, et.field_1_unit.toUpperCase()));
-                    field1TextInput.setVisibility(View.VISIBLE);
-                } else {
-                    field1TextInput.setVisibility(View.GONE);
-                }
-
-                if (et.field_2_name != null) {
-                    field2TextInput.setHint(Utils.getTranslation(context, et.field_2_name));
-                    //field2TextInput.setHelperText(Utils.getTranslation(context, et.field_2_unit.toUpperCase()));
-                    field2TextInput.setVisibility(View.VISIBLE);
-                } else {
-                    field2TextInput.setVisibility(View.GONE);
+                    if (et.field_2_name != null) {
+                        field2TextInput.setHint(Utils.getTranslation(context, et.field_2_name));
+                        field2TextInput.setVisibility(View.VISIBLE);
+                        //field2TextInput.setHelperText(Utils.getTranslation(context, et.field_2_unit.toUpperCase()));
+                    } else
+                        field2TextInput.setVisibility(View.GONE);
                 }
             }
             @Override
