@@ -81,6 +81,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 //intent.putExtra("nature", TYPE);
                 intent.putExtra("intervention_id", getAdapterPosition());
                 intent.putExtra("edition", true);
+                intent.putExtra("cropDetail", false);
                 itemView.getContext().startActivity(intent);
             });
 

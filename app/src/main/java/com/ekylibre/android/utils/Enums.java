@@ -74,45 +74,57 @@ public class Enums {
 
     public static void buildEnumsTranslation(Context context) {
 
-        Map<String,String> equimpment_map = new HashMap<>();
-        Map<String,String> sorted_equimpment_map;
-        EQUIMPMENT_ENUMS.remove(EquipmentTypeEnum.$UNKNOWN);
-        for (EquipmentTypeEnum item : EQUIMPMENT_ENUMS) {
-            equimpment_map.put(item.rawValue(), translate(context, item.rawValue()));
-        }
-        sorted_equimpment_map = sortMapByValues(equimpment_map);
-        for (Map.Entry<String,String> entry : sorted_equimpment_map.entrySet()) {
-            EQUIMPMENT_TYPES.add(entry.getKey());
-            EQUIMPMENT_NAMES.add(entry.getValue());
-        }
-
-        OUTPUT_ENUMS.remove(InterventionOutputTypeEnum.$UNKNOWN);
-        for (InterventionOutputTypeEnum item : OUTPUT_ENUMS) {
-            OUTPUT_TYPES.add(item.rawValue());
-            OUTPUT_NAMES.add(translate(context, item.rawValue()));
+        if (EQUIMPMENT_NAMES.isEmpty()) {
+            Map<String, String> equimpment_map = new HashMap<>();
+            Map<String, String> sorted_equimpment_map;
+            EQUIMPMENT_ENUMS.remove(EquipmentTypeEnum.$UNKNOWN);
+            for (EquipmentTypeEnum item : EQUIMPMENT_ENUMS) {
+                equimpment_map.put(item.rawValue(), translate(context, item.rawValue()));
+            }
+            sorted_equimpment_map = sortMapByValues(equimpment_map);
+            for (Map.Entry<String, String> entry : sorted_equimpment_map.entrySet()) {
+                EQUIMPMENT_TYPES.add(entry.getKey());
+                EQUIMPMENT_NAMES.add(entry.getValue());
+            }
         }
 
-        Map<String,String> specie_map = new HashMap<>();
-        Map<String,String> sorted_specie_map;
-        SPECIE_ENUMS.remove(SpecieEnum.$UNKNOWN);
-        for (SpecieEnum item : SPECIE_ENUMS) {
-            specie_map.put(item.rawValue(), translate(context, item.rawValue()));
-        }
-        sorted_specie_map = sortMapByValues(specie_map);
-        for (Map.Entry<String,String> entry : sorted_specie_map.entrySet()) {
-            SPECIE_TYPES.add(entry.getKey());
-            SPECIE_NAMES.add(entry.getValue());
+        if (OUTPUT_NAMES.isEmpty()) {
+            OUTPUT_ENUMS.remove(InterventionOutputTypeEnum.$UNKNOWN);
+            for (InterventionOutputTypeEnum item : OUTPUT_ENUMS) {
+                OUTPUT_TYPES.add(item.rawValue());
+                OUTPUT_NAMES.add(translate(context, item.rawValue()));
+            }
         }
 
-        STORAGE_TYPE_ENUMS.remove(StorageTypeEnum.$UNKNOWN);
-        for (StorageTypeEnum item : STORAGE_TYPE_ENUMS) {
-            STORAGE_TYPE_VALUES.add(item.rawValue());
-            STORAGE_TYPE_NAMES.add(WordUtils.capitalize(translate(context, item.rawValue())));
+        if (SPECIE_NAMES.isEmpty()) {
+            Map<String, String> specie_map = new HashMap<>();
+            Map<String, String> sorted_specie_map;
+            SPECIE_ENUMS.remove(SpecieEnum.$UNKNOWN);
+            for (SpecieEnum item : SPECIE_ENUMS) {
+                specie_map.put(item.rawValue(), translate(context, item.rawValue()));
+            }
+            sorted_specie_map = sortMapByValues(specie_map);
+            for (Map.Entry<String, String> entry : sorted_specie_map.entrySet()) {
+                SPECIE_TYPES.add(entry.getKey());
+                SPECIE_NAMES.add(entry.getValue());
+            }
         }
 
-        // Following request authorized in main thread
-        AppDatabase database = AppDatabase.getInstance(context);
-        List<EquipmentType> equipmentTypes = database.dao().getEquipmentIndicators();
+        if (STORAGE_TYPE_NAMES.isEmpty()) {
+            STORAGE_TYPE_ENUMS.remove(StorageTypeEnum.$UNKNOWN);
+            for (StorageTypeEnum item : STORAGE_TYPE_ENUMS) {
+                STORAGE_TYPE_VALUES.add(item.rawValue());
+                STORAGE_TYPE_NAMES.add(WordUtils.capitalize(translate(context, item.rawValue())));
+            }
+        }
+
+        if (INDICATORS_MAP.isEmpty()) {
+            // Following request authorized in main thread
+            AppDatabase database = AppDatabase.getInstance(context);
+            List<EquipmentType> equipmentTypes = database.dao().getEquipmentIndicators();
+            for (EquipmentType et : equipmentTypes)
+                INDICATORS_MAP.put(et.type, et);
+        }
 
 //        Thread thread = new Thread() {
 //            @Override
@@ -122,9 +134,6 @@ public class Enums {
 //        };
 //        thread.start();
         // Generates Map with translations for Equipment indicators
-
-        for (EquipmentType et : equipmentTypes)
-            INDICATORS_MAP.put(et.type, et);
     }
 
     private static String translate(Context ctx, String rawValue) {

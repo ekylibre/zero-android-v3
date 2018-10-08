@@ -205,6 +205,7 @@ public class InterventionActivity extends AppCompatActivity implements
 
         // Clear all datasets
         clearDatasets();
+        editIntervention = null;
 
         Intent incomIntent = getIntent();
         ActionBar toolbar = getSupportActionBar();
@@ -378,7 +379,7 @@ public class InterventionActivity extends AppCompatActivity implements
         });
 
         if (validated)
-            cropEditIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_eye));
+            cropEditIcon.setImageResource(R.drawable.ic_eye);
 
         // =============================== IRRIGATION EVENTS =================================== //
 
@@ -1506,7 +1507,6 @@ public class InterventionActivity extends AppCompatActivity implements
         cropList.clear();
         outputList.clear();
         materialList.clear();
-        editIntervention = null;
         validated = false;
     }
 
@@ -1579,6 +1579,7 @@ public class InterventionActivity extends AppCompatActivity implements
         @Override
         protected Void doInBackground(Void... voids) {
             AppDatabase database = AppDatabase.getInstance(context);
+            Timber.e("Delete intervention %s", editIntervention);
             database.dao().setDeleted(editIntervention.intervention.id);
             return null;
         }
