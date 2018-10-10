@@ -292,8 +292,6 @@
     <string name="duration">Duration</string>
 
     <string name="add_input">+ Add an input</string>
-    <string name="default_input_name">Blé dur</string>
-    <string name="default_input_name_more">Tablur</string>
     <string name="quantity">Quantity</string>
     <string name="default_quantity_value">0</string>
     <string name="default_unit">kg</string>

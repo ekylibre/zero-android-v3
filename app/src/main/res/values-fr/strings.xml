@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- All uppercase strings are reference key, do not change them -->
 
@@ -257,7 +257,8 @@
     <string name="mineral">Minéral</string>
 
     <!-- App strings -->
-    <string name="app_name">Clic&amp;Farm</string>
+    <string name="app_name" tools:override="true">Clic&amp;Farm</string>
+    <string name="welcome_text"><![CDATA[Bienvenue dans l\'application mobile Clic&Farm ! \nPour commencer, identifiez-vous avec votre compte Ekylibre…]]></string>
     <string name="nav_button">nav</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Mot de passe</string>
@@ -266,6 +267,8 @@
     <string name="cancel">Annuler</string>
     <string name="validate">Valider</string>
     <string name="delete">Supprimer</string>
+    <string name="no">non</string>
+    <string name="yes">oui</string>
 
     <string name="starting_intervention_text" >Commencer une intervention de…</string>
     <string name="finishing_intervention_text" >Enregistrer une intervention de…</string>
@@ -293,8 +296,6 @@
     <string name="duration">Durée</string>
 
     <string name="add_input">+ Ajouter un intrant</string>
-    <string name="default_input_name">Blé dur</string>
-    <string name="default_input_name_more">Tablur</string>
     <string name="quantity">Quantité</string>
     <string name="default_quantity_value">0</string>
     <string name="default_unit">kg</string>
@@ -348,10 +349,8 @@
     <string name="stock_place">Stockage</string>
     <string name="number">Numéro</string>
     <string name="name">Nom</string>
-    <string name="welcome_text"><![CDATA[Bienvenue dans l\'application mobile Clic&Farm ! \nPour commencer, identifiez-vous avec votre compte Ekylibre…]]></string>
     <string name="delete_input_prompt">Êtes-vous sûr de vouloir supprimer l\'intrant ?</string>
-    <string name="no">non</string>
-    <string name="yes">oui</string>
+
     <string name="sync_failure">Échec de la synchronisation…</string>
     <string name="network_failure">Erreur de connexion, votre smartphone n\'est peut-être pas connecté. Veuillez réessayer plus tard.</string>
     <string name="login_failure">Identifiant inconnu ou mot de passe incorrect. Veuillez réessayer.</string>
@@ -404,7 +403,7 @@
     <string name="ok">OK</string>
     <string name="crop_list">Liste des cultures</string>
     <string name="create_storage_title">Création d\'un lieu de stockage</string>
-    <string name="waiting_for_gps">Recherche d\'une position GPS...</string>
+    <string name="waiting_for_gps">Recherche d\'une position GPS…</string>
     <string name="brand">Marque</string>
     <string name="mmaid_number">N° AMM</string>
     <string name="reentry_delay">Délai de ré-entrée</string>

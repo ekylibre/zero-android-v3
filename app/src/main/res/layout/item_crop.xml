@@ -17,8 +17,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/icon_parcel"
-        android:tint="@color/grey"/>
+        app:srcCompat="@drawable/icon_parcel" />
 
     <!--app:srcCompat="@drawable/icon_parcel"-->
     <!--android:tint="@color/secondary_text"-->

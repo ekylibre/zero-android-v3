@@ -55,7 +55,6 @@
         android:id="@+id/create_material_unit_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/unit_values"
         android:prompt="@string/chose_unit" />
 
 </LinearLayout>
