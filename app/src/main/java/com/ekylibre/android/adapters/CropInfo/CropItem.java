@@ -1,6 +1,7 @@
 package com.ekylibre.android.adapters.CropInfo;
 
 import com.ekylibre.android.database.models.Intervention;
+import com.mapbox.geojson.Point;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,8 @@ public class CropItem extends ListItem {
     private Date startDate;
     private Date stopDate;
     private String yield;
+    private Double distance;
+    private Point centroid;
     private List<Intervention> interventions;
 
     public String getName() {
@@ -75,6 +78,22 @@ public class CropItem extends ListItem {
         this.yield = yield;
     }
 
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+
+    public Point getCentroid() {
+        return centroid;
+    }
+
+    public void setCentroid(Point centroid) {
+        this.centroid = centroid;
+    }
+
     public List<Intervention> getInterventions() {
         return interventions;
     }
@@ -86,5 +105,17 @@ public class CropItem extends ListItem {
     @Override
     public int getType() {
         return TYPE_CROP;
+    }
+
+    public CropItem(String name, String UUID, String production, float surface, Date startDate, Date stopDate, String yield, Point centroid, List<Intervention> interventions) {
+        this.name = name;
+        this.UUID = UUID;
+        this.production = production;
+        this.surface = surface;
+        this.startDate = startDate;
+        this.stopDate = stopDate;
+        this.yield = yield;
+        this.centroid = centroid;
+        this.interventions = interventions;
     }
 }

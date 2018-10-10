@@ -9,12 +9,14 @@ import androidx.room.migration.Migration;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
 import com.ekylibre.android.database.converters.DateConverter;
+import com.ekylibre.android.database.converters.PointConverter;
 import com.ekylibre.android.database.converters.PolygonConverter;
 import com.ekylibre.android.database.models.Crop;
 import com.ekylibre.android.database.models.Equipment;
@@ -52,6 +54,8 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 @Database(
         entities = {
@@ -69,9 +73,9 @@ import timber.log.Timber;
             Point.class
         },
         exportSchema = false,
-        version = 8
+        version = 9
 )
-@TypeConverters({DateConverter.class, PolygonConverter.class})
+@TypeConverters({DateConverter.class, PolygonConverter.class, PointConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     // Entities tables
@@ -86,8 +90,8 @@ public abstract class AppDatabase extends RoomDatabase {
         context = ctx;
         if (database == null)
             database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db")
-                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,
-                            MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4, MIGRATION_4_5,
+                            MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
                     .allowMainThreadQueries()
                     .build();
         return database;
@@ -235,10 +239,18 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-
             database.execSQL("UPDATE equipments SET number = NULL WHERE number = '';");
             database.execSQL("ALTER TABLE equipments ADD COLUMN field1Value TEXT DEFAULT NULL");
             database.execSQL("ALTER TABLE equipments ADD COLUMN field2Value TEXT DEFAULT NULL");
+        }
+    };
+
+    private static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Timber.i("Apply MIGRATION_8_9");
+            SharedPreferences prefs = context.getSharedPreferences("prefs", MODE_PRIVATE);
+            prefs.edit().putString("last-sync-time", "2000-01-01 00:00").apply();
         }
     };
 

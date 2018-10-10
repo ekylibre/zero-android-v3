@@ -36,6 +36,7 @@
         <service
             android:name=".services.OneShotLocationIntentService"
             android:exported="false" />
+        <service android:name=".services.SimpleLocationService" />
 
     </application>
 

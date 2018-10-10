@@ -1,24 +1,25 @@
 package com.ekylibre.android;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Handler;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.ekylibre.android.adapters.CropInfo.CropItem;
 import com.ekylibre.android.adapters.CropInfo.ListItem;
@@ -30,12 +31,11 @@ import com.ekylibre.android.database.models.Intervention;
 import com.ekylibre.android.database.pojos.Crops;
 import com.ekylibre.android.database.pojos.SimpleInterventions;
 import com.ekylibre.android.fragments.InfoFragment;
-import com.ekylibre.android.services.LocationService;
-import com.ekylibre.android.services.OneShotLocationIntentService;
-import com.ekylibre.android.services.ServiceResultReceiver;
 import com.ekylibre.android.database.converters.Converters;
+import com.ekylibre.android.services.SimpleLocationService;
 import com.ekylibre.android.utils.RecyclerViewClickListener;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -45,23 +45,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import timber.log.Timber;
 
-public class InfoActivity extends AppCompatActivity
-        implements InfoFragment.OnFragmentInteractionListener, ServiceResultReceiver.Receiver {
 
-    private static final int FILTER_BY_PRODUCTION = 0;
-    private static final int FILTER_BY_PROXIMITY = 1;
+public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFragmentInteractionListener {
 
-    private HashMap<String, Multimap> map;
-    private List<ListItem> dataset;
-    private RecyclerView.Adapter adapter;
+    public static final int FILTER_BY_PRODUCTION = 0;
+    public static final int FILTER_BY_PROXIMITY = 1;
+    public static int latestFilter = FILTER_BY_PRODUCTION;
+    public static List<ListItem> dataset;
+    public static RecyclerView.Adapter adapter;
+
+    private TreeMap<String, Multimap> map;
     private Intent serviceIntent;
-    private ServiceResultReceiver resultReceiver;
-    private Location currentLocation;
-
-    public int latestFilter = FILTER_BY_PRODUCTION;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +69,9 @@ public class InfoActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle("Mes cultures");
 
-        map = new HashMap<>();
+        Timber.i("OnCreate()");
+
+        map = new TreeMap<>();  // The map containing all crops with all infos for each
         dataset = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.crop_info_recycler);
 
@@ -104,40 +104,55 @@ public class InfoActivity extends AppCompatActivity
         adapter = new CropInfoAdapter(this, dataset, listener);
         recyclerView.setAdapter(adapter);
 
-        serviceIntent = new Intent(this, LocationService.class);
-        resultReceiver = new ServiceResultReceiver(new Handler());
-        resultReceiver.setReceiver(this);
-
+        serviceIntent = new Intent(this, SimpleLocationService.class);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        new RequestCropList(this).execute();
+        new RequestCropList().execute();
+        if (latestFilter == FILTER_BY_PROXIMITY && !isServiceRunning())
+            startService(serviceIntent);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isServiceRunning())
+            stopService(serviceIntent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isServiceRunning())
+            stopService(serviceIntent);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if (isServiceRunning())
+            stopService(serviceIntent);
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onSupportNavigateUp();
+        if (isServiceRunning())
+            stopService(serviceIntent);
+        return true;
+    }
 
-
-    private class RequestCropList extends AsyncTask<Void, Void, List<SimpleInterventions>> {
+    @SuppressLint("StaticFieldLeak")
+    public class RequestCropList extends AsyncTask<Void, Void, List<SimpleInterventions>> {
 
         Context context;
         String farm;
 
-
-        RequestCropList(final Context context) {
-            this.context = context;
+        RequestCropList() {
+            this.context = getApplicationContext();
             this.farm = MainActivity.FARM_ID;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
         }
 
         protected List<SimpleInterventions> doInBackground(Void... voids) {
@@ -145,102 +160,83 @@ public class InfoActivity extends AppCompatActivity
             return database.dao().getSimpleInterventionList(farm);
         }
 
+        @SuppressWarnings("unchecked")
         protected void onPostExecute(List<SimpleInterventions> result) {
 
             dataset.clear();
 
-            if (latestFilter == FILTER_BY_PRODUCTION) {
+            for (SimpleInterventions item : result) {
+                for (Crops inter : item.crops) {
 
-                for (SimpleInterventions item : result) {
-                    for (Crops inter : item.crops) {
+                    // Get production nature from crop and build string
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(inter.crop.get(0).production_nature);
+                    if (inter.crop.get(0).production_mode.equals("Organic farming"))
+                        sb.append(" bio");
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(inter.crop.get(0).stop_date);
+                    sb.append(" ").append(cal.get(Calendar.YEAR));
 
-                        // Get production nature from crop
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(inter.crop.get(0).production_nature);
-                        if (inter.crop.get(0).production_mode.equals("Agriculture biologique"))
-                            sb.append(" bio");
-                        Calendar cal = Calendar.getInstance();
-                        cal.setTime(inter.crop.get(0).stop_date);
-                        sb.append(" ").append(cal.get(Calendar.YEAR));
-
-                        if (map.containsKey(sb.toString())) {
-                            Multimap<Crop, Intervention> multimap = map.get(sb.toString());
-                            multimap.put(inter.crop.get(0), item.intervention);
-                        } else {
-                            Multimap<Crop, Intervention> multimap = ArrayListMultimap.create();
-                            multimap.put(inter.crop.get(0), item.intervention);
-                            map.put(sb.toString(), multimap);
-                        }
+                    // Create on add crop for respective entry (production)
+                    if (map.containsKey(sb.toString())) {
+                        Multimap<Crop, Intervention> multimap = map.get(sb.toString());
+                        multimap.put(inter.crop.get(0), item.intervention);
+                    } else {
+                        Multimap<Crop, Intervention> multimap = ArrayListMultimap.create();
+                        multimap.put(inter.crop.get(0), item.intervention);
+                        map.put(sb.toString(), multimap);
                     }
-                }
-
-                Iterator it = map.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry) it.next();
-
-                    ProductionItem header = new ProductionItem();
-                    header.setName(pair.getKey().toString());
-                    dataset.add(header);
-
-                    Multimap<Crop, Intervention> cropsInProd = (Multimap) pair.getValue();
-                    for (Crop crop : cropsInProd.keySet()) {
-                        CropItem cropItem = new CropItem();
-                        cropItem.setName(crop.name);
-                        cropItem.setProduction(crop.production_nature);
-                        cropItem.setSurface(crop.surface_area);
-                        cropItem.setStartDate(crop.start_date);
-                        cropItem.setStopDate(crop.stop_date);
-                        cropItem.setYield(crop.provisional_yield);
-                        cropItem.setInterventions((List) cropsInProd.get(crop));
-                        cropItem.setUUID(crop.uuid);
-                        dataset.add(cropItem);
-                    }
-                    it.remove();
                 }
             }
 
-//            else {
-//
-//                for (SimpleInterventions item : result) {
-//                    for (Crops inter : item.crops) {
-//
-//                        TurfMeasurement.distance(currentLocation, inter.crop.get(0).shape, TurfConstants.UNIT_METERS);
-//
-//                    }
-//                }
-//
-//            }
+            Iterator it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
 
+                // Add header to the dataset
+                ProductionItem header = new ProductionItem();
+                header.setName(pair.getKey().toString());
+                dataset.add(header);
 
+                // Add child items to this header
+                Multimap<Crop, Intervention> cropsInProd = (Multimap) pair.getValue();
+                for (Crop crop : cropsInProd.keySet()) {
+                    List<Intervention> interList = new ArrayList<>(cropsInProd.get(crop));
+                    CropItem cropItem = new CropItem(crop.name, crop.uuid, crop.production_nature,
+                            crop.surface_area, crop.start_date, crop.stop_date,
+                            crop.provisional_yield, crop.centroid, interList);
+                    dataset.add(cropItem);
+                }
+                it.remove();
+            }
             adapter.notifyDataSetChanged();
-
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.crop_activity, menu);
-//        if (latestFilter == FILTER_BY_PRODUCTION) {
-//            menu.findItem(R.id.filter_by_production).setEnabled(false);
-//            menu.findItem(R.id.filter_by_proximity).setEnabled(true);
-//        } else {
-//            menu.findItem(R.id.filter_by_production).setEnabled(true);
-//            menu.findItem(R.id.filter_by_proximity).setEnabled(false);
-//        }
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.crop_activity, menu);
+        boolean status = latestFilter == FILTER_BY_PRODUCTION;
+        menu.findItem(R.id.filter_by_production).setEnabled(!status);
+        menu.findItem(R.id.filter_by_proximity).setEnabled(status);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.filter_by_production:
                 latestFilter = FILTER_BY_PRODUCTION;
-                new RequestCropList(this).execute();
-                this.invalidateOptionsMenu();
+                if (isServiceRunning())
+                    stopService(serviceIntent);
+                new RequestCropList().execute();
+                invalidateOptionsMenu();
                 return true;
 
             case R.id.filter_by_proximity:
+
                 latestFilter = FILTER_BY_PROXIMITY;
 
                 if (ContextCompat.checkSelfPermission(InfoActivity.this,
@@ -248,14 +244,12 @@ public class InfoActivity extends AppCompatActivity
                     ActivityCompat.requestPermissions(InfoActivity.this,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 } else {
+                    if (!isServiceRunning()) {
+                        startService(serviceIntent);
+                    } else
+                        Timber.i("Service is already running...");
 
-                    // Request one location
-                    Intent intent = new Intent(getBaseContext(), OneShotLocationIntentService.class);
-                    intent.setAction(OneShotLocationIntentService.SINGLE_UPDATE);
-                    intent.putExtra("receiver", resultReceiver);
-                    startService(intent);
-
-                    this.invalidateOptionsMenu();
+                    invalidateOptionsMenu();
                 }
                 return true;
 
@@ -264,21 +258,13 @@ public class InfoActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-
-        if (resultCode == OneShotLocationIntentService.OK) {
-
-            Double lat = resultData.getDouble("latitude");
-            Double lon = resultData.getDouble("longitude");
-            currentLocation = new Location(LocationManager.GPS_PROVIDER);
-            currentLocation.setLatitude(lat);
-            currentLocation.setLongitude(lon);
-            new RequestCropList(this).execute();
-
-        }
-
-
+    private boolean isServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (manager != null)
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+                if (SimpleLocationService.class.getName().equals(service.service.getClassName()))
+                    return true;
+        return false;
     }
 
     @Override
@@ -299,9 +285,13 @@ public class InfoActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    new RequestCropList(this).execute();
-                else
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (!isServiceRunning())
+                        startService(serviceIntent);
+                } else {
+                    latestFilter = FILTER_BY_PROXIMITY;
+                    invalidateOptionsMenu();
+                }
                     // Snackbar.make(mainLayout, "Permission denied", Snackbar.LENGTH_LONG).show();
                 break;
         }

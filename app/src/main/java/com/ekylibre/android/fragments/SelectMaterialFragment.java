@@ -130,7 +130,7 @@ public class SelectMaterialFragment extends DialogFragment implements ServiceRes
         new RequestDatabase(context).execute();
     }
 
-    public void createMaterialDialog() {
+    private void createMaterialDialog() {
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
         View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_create_material, null);

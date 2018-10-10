@@ -224,9 +224,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
                 if (current.harvests.size() > 0) {
                     for (Harvest harvest : current.harvests) {
                         sb.append(Utils.getTranslation(context, harvest.type)).append(" • ")
-                                .append(decimalFormat.format(harvest.quantity)).append(" ")
-                                .append( Objects.requireNonNull(Units.getUnit(harvest.unit)).name)
-                                .setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+                                .append(decimalFormat.format(harvest.quantity));
+                        if (harvest.unit != null)
+                            sb.append(" ").append(Units.getUnit(harvest.unit).name);
+                        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
                         if (current.harvests.indexOf(harvest) + 1 != current.harvests.size()) sb.append("\n");
                     }
                 }

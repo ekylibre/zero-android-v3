@@ -11,11 +11,15 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/crop_info_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="@color/primary_dark"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/crop_info_dist"
         app:layout_constraintTop_toTopOf="parent"
+        android:ellipsize="end"
+        android:maxLines="1"
         tools:text="La Renambrie #3" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -23,17 +27,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
-        android:textColor="@color/primary"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/accent"
         app:layout_constraintStart_toEndOf="@id/crop_info_name"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/crop_info_area"
+        app:layout_constraintBaseline_toBaselineOf="@id/crop_info_name"
+        app:layout_constraintHorizontal_chainStyle="packed"
         tools:text="356 m" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/crop_info_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBaseline_toBaselineOf="@id/crop_name"
+        app:layout_constraintBaseline_toBaselineOf="@id/crop_info_name"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
         tools:text="17,5 ha" />
 
     <androidx.appcompat.widget.LinearLayoutCompat

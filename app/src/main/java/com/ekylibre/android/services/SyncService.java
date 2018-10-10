@@ -80,6 +80,7 @@ import com.ekylibre.android.type.WeatherAttributes;
 import com.ekylibre.android.type.WeatherEnum;
 import com.ekylibre.android.utils.Enums;
 import com.ekylibre.android.utils.Utils;
+import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -1051,7 +1052,7 @@ public class SyncService extends IntentService {
                             Crop newCrop = new Crop(
                                     crop.uuid(), crop.name(), crop.species().rawValue(), crop.productionNature().name(),
                                     crop.productionMode(), null, crop.provisionalYield(), crop.shape(),
-                                    Float.valueOf(crop.surfaceArea().split(" ")[0]), null,
+                                    Float.valueOf(crop.surfaceArea().split(" ")[0]), crop.centroid(),
                                     crop.startDate(), crop.stopDate(), null, farm.id());
                             database.dao().insert(newCrop);
                         }

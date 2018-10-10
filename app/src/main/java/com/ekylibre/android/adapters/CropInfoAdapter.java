@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ekylibre.android.InfoActivity;
 import com.ekylibre.android.MainActivity;
 import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.CropInfo.CropItem;
@@ -21,6 +22,9 @@ import com.ekylibre.android.utils.RecyclerViewClickListener;
 import com.ekylibre.android.utils.Utils;
 
 import java.util.List;
+
+import static com.ekylibre.android.InfoActivity.FILTER_BY_PROXIMITY;
+import static com.ekylibre.android.MainActivity.LOCALE;
 
 
 public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -47,7 +51,7 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     class CropViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView nameTextView, areaTextView;
+        TextView nameTextView, areaTextView, distTextView;
         LinearLayoutCompat interContainer;
         CropItem currentItem;
         RecyclerViewClickListener itemListener;
@@ -60,6 +64,7 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             nameTextView = itemView.findViewById(R.id.crop_info_name);
             areaTextView = itemView.findViewById(R.id.crop_info_area);
             interContainer = itemView.findViewById(R.id.crop_info_inter_container);
+            distTextView = itemView.findViewById(R.id.crop_info_dist);
 
             itemView.setOnClickListener(this);
 
@@ -74,7 +79,19 @@ public class CropInfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             String name = currentItem.getName().split(" \\| ")[0];
             nameTextView.setText(name);
-            areaTextView.setText(String.format(MainActivity.LOCALE, "%.1f ha", currentItem.getSurface()));
+            areaTextView.setText(String.format(LOCALE, "%.1f ha", currentItem.getSurface()));
+
+            int visibility = InfoActivity.latestFilter == FILTER_BY_PROXIMITY ? View.VISIBLE : View.GONE;
+            distTextView.setVisibility(visibility);
+            Double dist = currentItem.getDistance();
+            if (dist != null) {
+                String string;
+                if (dist > 1100)
+                    string = String.format(LOCALE, "%.1f km", dist / 1000);
+                else
+                    string = String.format(LOCALE, "%.0f m", dist);
+                distTextView.setText(string);
+            }
 
             interContainer.removeAllViews();
 

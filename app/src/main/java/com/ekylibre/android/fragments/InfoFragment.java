@@ -37,8 +37,6 @@ public class InfoFragment extends DialogFragment {
     private OnFragmentInteractionListener fragmentListener;
     private RecyclerView.Adapter adapter;
 
-    private CropItem cropItem;
-
     public static List<Interventions> interventionsList;
     private List<Integer> interIDs;
 
@@ -78,8 +76,6 @@ public class InfoFragment extends DialogFragment {
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            cropItem = new CropItem();
-            cropItem.setUUID(bundle.getString("uuid"));
             interIDs = bundle.getIntegerArrayList("interventionsIDs");
             //String[] fullName = bundle.getString("full_name").split(" \\| ");
             //Timber.i(fullName.toString());

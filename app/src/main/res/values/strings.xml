@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- All uppercase strings are reference key, do not change them -->
 
@@ -15,7 +15,6 @@
     <string name="BRASSICA_RAPA_RAPA">BRASSICA_RAPA_RAPA</string>
     <string name="CAPSICUM">CAPSICUM</string>
     <string name="CHAMAEMELUM">CHAMAEMELUM</string>
-
     <string name="CORIANDRUM_SATIVUM">CORIANDRUM_SATIVUM</string>
     <string name="CUCUMIS_SATIVUS_GHERKIN">CUCUMIS_SATIVUS_GHERKIN</string>
     <string name="CUCURBITA_MAXIMA_POTIMARRON">CUCURBITA_MAXIMA_POTIMARRON</string>
@@ -257,7 +256,7 @@
     <string name="mineral">Mineral</string>
 
     <!-- App strings -->
-    <string name="app_name">Clic&amp;Farm</string>
+    <string name="app_name" tools:override="true">Clic&amp;Farm</string>
     <string name="nav_button">nav button</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -357,10 +356,10 @@
     <string name="authenticating">Authenticating, please wait…</string>
     <string name="create">Créer</string>
     <string name="volume">Volume</string>
-    <string name="volume_cannot_be_null">Le volume ne peut être nul</string>
-    <string name="finish">Terminer</string>
+    <string name="volume_cannot_be_null">Volume cannot be zero</string>
+    <string name="finish">Finish</string>
     <string name="pause">Pause</string>
-    <string name="speed">Vitesse</string>
+    <string name="speed">Speed</string>
     <string name="working_width"><![CDATA[Largeur de\ntravail]]></string>
     <string name="worked_area">"Surface\ntravaillée"</string>
     <string name="preparation">Préparation</string>
@@ -382,9 +381,9 @@
     <string name="you_must_create_a_harvest_load">Vous devez ajouter un chargement pour créer une récolte !</string>
     <string name="confirm_deleting_intervention">Etes-vous sûr de vouloir supprimer l\'intervention ?</string>
     <string name="start_online_with_crops">Vous n\'avez aucune parcelle assolée. Rendez-vous en ligne pour commencer !</string>
-    <string name="title">Titre</string>
-    <string name="first_name">Prénom</string>
-    <string name="last_name">Nom de famille</string>
+    <string name="title">Title</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
     <string name="equipment_name_not_available">Ce nom d\'équipement est déjà utilisé. Veuillez en choisir un autre</string>
     <string name="equipment_name_is_empty">Le nom de l\'équipement ne peut être vide</string>
     <string name="disconnect_prompt">Est-vous sûr de vouloir vous déconnecter ? Toutes données non synchronisées seront perdues.</string>
@@ -402,7 +401,7 @@
     <string name="ok">OK</string>
     <string name="crop_list">Liste des cultures</string>
     <string name="create_storage_title">Création d\'un lieu de stockage</string>
-    <string name="waiting_for_gps">Recherche d\'une position GPS...</string>
+    <string name="waiting_for_gps">Recherche d\'une position GPS…</string>
     <string name="brand">Marque</string>
     <string name="mmaid_number">N° AMM</string>
     <string name="reentry_delay">Délai de ré-entrée</string>

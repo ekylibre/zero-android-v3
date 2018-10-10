@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
 import com.mapbox.geojson.Polygon;
+import com.mapbox.geojson.Point;
 
 import java.util.Date;
 
@@ -51,7 +52,7 @@ public class Crop {
 
     public float surface_area;
 
-    public String centroid;
+    public Point centroid;
 
     public Date start_date;
 
@@ -71,7 +72,7 @@ public class Crop {
 
     public Crop(@NonNull String uuid, String name, String specie, String production_nature,
                 String production_mode, String production_output, String provisional_yield,
-                Polygon shape, float surface_area, String centroid, Date start_date, Date stop_date,
+                Polygon shape, float surface_area, Point centroid, Date start_date, Date stop_date,
                 String plot_uuid, String farm) {
 
         this.uuid = uuid;

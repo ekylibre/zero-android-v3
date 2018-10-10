@@ -48,7 +48,7 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
             List<Point> lngLats = new ArrayList<>();
             for (String point : points) {
                 String[] lngLat = point.split(",");
-                lngLats.add(Point.fromLngLat(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0])));
+                lngLats.add(Point.fromLngLat(Double.parseDouble(lngLat[0]), Double.parseDouble(lngLat[1])));
             }
             return Polygon.fromLngLats(Collections.singletonList(lngLats));
         }
@@ -85,15 +85,16 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
 
         @Override
         public Point decode(CustomTypeValue value) {
-            String json = value.value.toString();
-            return Point.fromJson(json);
+            String string = value.value.toString();
+            String[] lngLat = string.substring(1, string.length()-1).split(",");
+            return Point.fromLngLat(Double.parseDouble(lngLat[0]), Double.parseDouble(lngLat[1]));
         }
 
         @NonNull
         @Override
         public CustomTypeValue encode(@NonNull Point value) {
-
-            return CustomTypeValue.fromRawValue(value.toJson());
+            String point = "[" + value.latitude() + "," + value.longitude() + "]";
+            return CustomTypeValue.fromRawValue(point);
         }
     };
 }

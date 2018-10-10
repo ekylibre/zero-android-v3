@@ -163,10 +163,16 @@ public interface DAO {
             " ORDER BY execution_date DESC")
     List<Interventions> selectInterventionsByInterIDs(List<Integer> interIDs);
 
+//    @Transaction
+//    @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +
+//            " JOIN " + InterventionWorkingDay.TABLE_NAME + " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
+//            " WHERE farm = :farmId ORDER BY execution_date ASC")
+//    List<SimpleInterventions> getSimpleInterventionList(String farmId);
+
     @Transaction
     @Query("SELECT i.* FROM " + Intervention.TABLE_NAME + " AS i " +
             " JOIN " + InterventionWorkingDay.TABLE_NAME + " ON " + InterventionWorkingDay.COLUMN_INTERVENTION_ID + " = " + Intervention.COLUMN_ID +
-            " WHERE farm = :farmId ORDER BY execution_date ASC")
+            " WHERE farm = :farmId")
     List<SimpleInterventions> getSimpleInterventionList(String farmId);
 
     @Transaction

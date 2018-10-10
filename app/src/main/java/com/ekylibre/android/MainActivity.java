@@ -1,6 +1,6 @@
 package com.ekylibre.android;
 
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -49,6 +49,8 @@ import static com.ekylibre.android.services.SyncService.ACTION_SYNC_ALL;
 import static com.ekylibre.android.services.SyncService.DONE;
 import static com.ekylibre.android.services.SyncService.FAILED;
 
+
+@SuppressLint("StaticFieldLeak")
 public class MainActivity extends AppCompatActivity implements ServiceResultReceiver.Receiver {
 
     public static Locale LOCALE;
@@ -67,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     private TextView menuTitle;
     private Button startingButton;
     private Button finishingButton;
-    private TextView filterAll;
-    private TextView filterMine;
+//    private TextView filterAll;
+//    private TextView filterMine;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
@@ -105,6 +107,13 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
         // Get locale one time for the app
         LOCALE = getResources().getConfiguration().locale;
         LAST_SYNC = new SimpleDateFormat( "yyyy-MM-dd HH:mm", LOCALE);
+
+        try {
+            lastSyncTime = LAST_SYNC.parse(prefs.getString("last-sync-time", "2018-01-01 12:00"));
+            Timber.i("LastSyncTime %s", lastSyncTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         resultReceiver = new ServiceResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
@@ -192,21 +201,13 @@ public class MainActivity extends AppCompatActivity implements ServiceResultRece
     protected void onResume() {
         super.onResume();
 
-        try {
-            lastSyncTime = LAST_SYNC.parse(prefs.getString("last-sync-time", "2018-01-01 12:00"));
-            Timber.i("LastSyncTime %s", lastSyncTime);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        // TODO auto sync if lastSyncTime < now - 10min
-
         // Set Farm name as page title
         setTitle(prefs.getString("current-farm-name", "Synchronisation..."));
         FARM_ID = prefs.getString("current-farm-id", "");
 
         // Get list filter and update list
-        String filter = prefs.getString("filter", FILTER_ALL_INTERVENTIONS);
-        new UpdateList(this, filter).execute();
+        //String filter = prefs.getString("filter", FILTER_ALL_INTERVENTIONS);
+        new UpdateList(this, FILTER_ALL_INTERVENTIONS).execute();
 
     }
 

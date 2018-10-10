@@ -11,6 +11,8 @@ import android.os.ResultReceiver;
 
 import timber.log.Timber;
 
+import static android.location.LocationManager.GPS_PROVIDER;
+
 
 public class OneShotLocationIntentService extends IntentService {
 
@@ -42,7 +44,7 @@ public class OneShotLocationIntentService extends IntentService {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         try {
-            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new SingleLocationListener(), null);
+            locationManager.requestSingleUpdate(GPS_PROVIDER, new SingleLocationListener(), null);
         } catch (java.lang.SecurityException ex) {
             Timber.e("fail to request location update, ignore --> %s", ex.getMessage());
         } catch (IllegalArgumentException ex) {
