@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -25,7 +26,7 @@
             android:imeOptions="actionNext"
             android:maxLines="1"
             android:inputType="textPersonName"
-            android:hint="Nom" />
+            android:hint="@string/name" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -39,7 +40,7 @@
             android:imeOptions="actionNext"
             android:maxLines="1"
             android:inputType="textPersonName"
-            android:hint="Marque"/>
+            android:hint="@string/brand"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -53,7 +54,7 @@
             android:imeOptions="actionNext"
             android:maxLines="1"
             android:inputType="number"
-            android:hint="N° AMM"/>
+            android:hint="@string/mmaid_number"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!--<android.support.design.widget.TextInputLayout-->
@@ -73,22 +74,16 @@
         android:id="@+id/create_phyto_reentry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        app:helperText="@string/in_hours"
+        app:helperTextEnabled="true">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:maxLines="1"
             android:inputType="number"
-            android:hint="Délai de ré-entrée" />
+            android:hint="@string/reentry_delay" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="en heures"
-        android:paddingStart="4dp"
-        android:layout_marginTop="-6dp"
-        android:textColor="@color/secondary_text"/>
 
 </LinearLayout>

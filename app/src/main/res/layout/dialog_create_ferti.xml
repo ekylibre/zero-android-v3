@@ -27,7 +27,7 @@
             android:imeOptions="actionDone"
             android:inputType="textPersonName"
             android:maxLines="1"
-            android:hint="Nom"/>
+            android:hint="@string/name"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView

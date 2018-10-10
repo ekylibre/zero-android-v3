@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/regular_margin"
     android:background="?android:attr/selectableItemBackground"
     android:id="@+id/intervention_item_layout"
@@ -48,14 +48,14 @@
         android:id="@+id/item_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hier"
+        tools:text="hier"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_cultures"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12 parcelles • 37,8 ha"
+        tools:text="12 parcelles • 37,8 ha"
         app:layout_constraintStart_toEndOf="@id/item_icon"
         app:layout_constraintTop_toBottomOf="@id/item_procedure"
         android:layout_marginStart="@dimen/regular_margin"/>
@@ -72,7 +72,7 @@
         android:id="@+id/item_infos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Volume: 18m³ (0,5 m³/ha)"
+        tools:text="Volume: 18m³ (0,5 m³/ha)"
         android:textColor="@color/primary_text"
         app:layout_constraintStart_toEndOf="@id/item_icon"
         app:layout_constraintTop_toBottomOf="@id/item_cultures"

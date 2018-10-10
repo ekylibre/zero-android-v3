@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@null"
-    android:padding="8dp"> <!-- "@drawable/item_shape"     android:focusable="true"  android:focusableInTouchMode="true" -->
+    android:padding="8dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_icon"
@@ -19,7 +21,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="GLIFOPEC 450 SL"
+        tools:text="GLIFOPEC 450 SL"
         android:textColor="#000000"
         app:layout_constraintStart_toEndOf="@id/item_icon"
         app:layout_constraintTop_toTopOf="parent"
@@ -30,7 +32,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
-        android:text="Sapec Agro France SAS Monsanto SAS"
+        tools:text="Sapec Agro France SAS Monsanto SAS"
         android:textColor="#000000"
         android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@id/item_name"
@@ -118,14 +120,14 @@
         android:layout_marginStart="0dp"
         app:layout_constraintTop_toTopOf="@id/item_dose_max"
         app:layout_constraintStart_toEndOf="@id/item_dose_max"
-        android:text="dose invalide"
+        android:text="@string/invalid_dose"
         android:textColor="@color/error" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/item_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="13,5 t au total"
+        tools:text="13,5 t au total"
         app:layout_constraintTop_toBottomOf="@id/item_dose_max"
         app:layout_constraintStart_toStartOf="@id/item_quantity_edit"/>
 

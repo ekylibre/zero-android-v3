@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -13,7 +14,7 @@
         android:id="@+id/seed_variety"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tablur"
+        tools:text="Tablur"
         android:textStyle="bold"
         android:textColor="#000000"/>
 
@@ -23,7 +24,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/seed_variety"
         app:layout_constraintTop_toBottomOf="@id/seed_variety"
-        android:text="Semence de blé tendre" />
+        tools:text="Semence de blé tendre" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon_favorite"

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -25,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Massey 6700 S"
+        tools:text="Massey 6700 S"
         android:textColor="#000000"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/equipment_icon"
@@ -38,6 +39,6 @@
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toEndOf="@id/equipment_icon"
         app:layout_constraintTop_toBottomOf="@id/equipment_name"
-        android:text="Tracteur" />
+        tools:text="Tracteur" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

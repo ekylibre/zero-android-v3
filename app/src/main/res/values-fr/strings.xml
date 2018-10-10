@@ -291,9 +291,6 @@
 
     <string name="starting_date">Débuté le</string>
     <string name="duration">Durée</string>
-    <string name="default_working_period_main_line">aujourd\'hui • 7 h</string>
-    <string name="default_working_period_duration">7</string>
-    <string name="default_working_period_date">aujourd\'hui</string>
 
     <string name="add_input">+ Ajouter un intrant</string>
     <string name="default_input_name">Blé dur</string>
@@ -407,5 +404,15 @@
     <string name="ok">OK</string>
     <string name="crop_list">Liste des cultures</string>
     <string name="create_storage_title">Création d\'un lieu de stockage</string>
+    <string name="waiting_for_gps">Recherche d\'une position GPS...</string>
+    <string name="brand">Marque</string>
+    <string name="mmaid_number">N° AMM</string>
+    <string name="reentry_delay">Délai de ré-entrée</string>
+    <string name="in_hours">en heures</string>
+    <string name="variety">Variété</string>
+    <string name="provided_by_collector">Fourni par le collecteur</string>
+    <string name="invalid_dose">dose invalide</string>
+    <string name="approximate_amount">Quantité approximative</string>
+    <string name="unauthorized_mixing">mélange non autorisé</string>
 
 </resources>

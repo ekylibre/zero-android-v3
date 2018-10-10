@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Fandango S"
+        tools:text="Fandango S"
         android:textStyle="bold"
         android:textColor="#000000"
         android:lines="1" />
@@ -22,7 +23,7 @@
         android:id="@+id/phyto_company"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bayer CropScience France"
+        tools:text="Bayer CropScience France"
         android:textColor="@color/accent"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="@id/phyto_name"
@@ -50,7 +51,7 @@
         app:layout_constraintStart_toEndOf="@id/item_mix_allowed"
         app:layout_constraintTop_toBottomOf="@id/phyto_company"
         android:layout_marginStart="0dp"
-        android:text="mélange non autorisé"
+        android:text="@string/unauthorized_mixing"
         android:textColor="@color/error" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -60,8 +61,9 @@
         android:layout_marginTop="6dp"
         app:layout_constraintStart_toStartOf="@id/phyto_company"
         app:layout_constraintTop_toBottomOf="@id/item_mix_allowed"
-        android:text="N° AMM\u0020"
+        android:text="@string/mmaid_number"
         android:textStyle="italic" />
+        <!-- "N° AMM\u0020" -->
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/phyto_amm"
@@ -71,7 +73,7 @@
         app:layout_constraintStart_toEndOf="@id/phyto_amm_label"
         app:layout_constraintBaseline_toBaselineOf="@id/phyto_amm_label"
         android:textColor="#000000"
-        android:text="2060118" />
+        tools:text="2060118" />
 
     <!--<android.support.v7.widget.AppCompatTextView-->
         <!--android:id="@+id/phyto_dose_label"-->
@@ -98,7 +100,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/phyto_amm_label"
         app:layout_constraintTop_toBottomOf="@id/phyto_amm_label"
-        android:text="Délai de réentrée\u0020"
+        android:text="@string/reentry_delay"
         android:textStyle="italic" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -109,7 +111,7 @@
         app:layout_constraintStart_toEndOf="@id/phyto_delay_label"
         app:layout_constraintBaseline_toBaselineOf="@id/phyto_delay_label"
         android:textColor="#000000"
-        android:text="6 heures" />
+        tools:text="6 heures" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/icon_favorite"

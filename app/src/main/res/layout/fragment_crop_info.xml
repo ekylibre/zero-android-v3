@@ -11,7 +11,7 @@
         android:id="@+id/crop_detail_crop_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bernessard #1"
+        tools:text="Bernessard #1"
         android:textSize="22sp"
         android:textAllCaps="true"
         android:textStyle="bold"
@@ -25,7 +25,7 @@
         android:id="@+id/crop_detail_surface"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="7,3 ha"
+        tools:text="7,3 ha"
         app:layout_constraintBaseline_toBaselineOf="@id/crop_detail_crop_name"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="16dp"/>
@@ -34,7 +34,7 @@
         android:id="@+id/crop_detail_production"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Blé tendre de printemps 2018"
+        tools:text="Blé tendre de printemps 2018"
         android:singleLine="true"
         app:layout_constraintTop_toBottomOf="@id/crop_detail_crop_name"
         app:layout_constraintStart_toStartOf="@id/crop_detail_crop_name"/>
@@ -43,7 +43,7 @@
         android:id="@+id/crop_detail_periods"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Du 23/11/2017 au 05/06/2018"
+        tools:text="Du 23/11/2017 au 05/06/2018"
         app:layout_constraintTop_toBottomOf="@id/crop_detail_production"
         app:layout_constraintStart_toStartOf="@id/crop_detail_production"/>
 
@@ -51,7 +51,7 @@
         android:id="@+id/crop_detail_yield"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rendement: 86 q/ha"
+        tools:text="Rendement: 86 q/ha"
         app:layout_constraintTop_toBottomOf="@id/crop_detail_periods"
         app:layout_constraintStart_toStartOf="@id/crop_detail_periods"/>
 

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background"
@@ -12,18 +13,28 @@
         android:id="@+id/crop_info_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="La Renambrie #3"
         android:textColor="#000000"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="La Renambrie #3" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/crop_info_dist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:textColor="@color/primary"
+        app:layout_constraintStart_toEndOf="@id/crop_info_name"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="356 m" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/crop_info_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@id/crop_name"
-        android:text="17,5 ha" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="17,5 ha" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/crop_info_inter_container"
@@ -33,12 +44,5 @@
         app:layout_constraintTop_toBottomOf="@+id/crop_info_name"
         android:layout_marginTop="6dp"
         android:visibility="gone"/>
-
-    <!--<android.support.v7.widget.AppCompatImageView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:srcCompat="@drawable/procedure_care"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/crop_info_name"-->
-        <!--app:layout_constraintStart_toStartOf="parent"/>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

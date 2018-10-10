@@ -2,9 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/another_light_grey" >
+    android:background="@color/another_light_grey">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/crop_info_header"
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Carotte bio 2018"
+        tools:text="Carotte bio 2018"
         android:textSize="16sp"
         android:textStyle="bold"
         android:textAllCaps="true"

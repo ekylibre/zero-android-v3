@@ -2,33 +2,24 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/border_bottom"
     android:padding="16dp">
 
-    <!--<CheckBox-->
-        <!--android:id="@+id/plot_checkbox"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:text="La Renambrie"-->
-        <!--android:button="@android:color/transparent"-->
-        <!--android:drawableLeft="@android:drawable/checkbox_off_background"-->
-        <!--android:drawablePadding="16dp"/>-->
-
     <CheckBox
         android:id="@+id/plot_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="La Renambrie"/>
+        tools:text="La Renambrie"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/plot_area"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="17,8 ha"
+        tools:text="17,8 ha"
         android:textColor="#000000"
         app:layout_constraintBaseline_toBaselineOf="@id/plot_checkbox"
         app:layout_constraintEnd_toStartOf="@+id/plot_arrow" />

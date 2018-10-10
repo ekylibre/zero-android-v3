@@ -108,7 +108,7 @@
         android:paddingEnd="@dimen/regular_margin"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:hint="Fourni par le collecteur"
+        android:hint="@string/provided_by_collector"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@id/harvest_barrier"
         app:layout_constraintEnd_toEndOf="parent"

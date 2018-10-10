@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -25,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Jean-Michel"
+        tools:text="Jean-Michel"
         android:textColor="#000000"
         app:layout_constraintStart_toEndOf="@id/person_icon"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +35,7 @@
         android:id="@+id/person_lastname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Dupuis"
+        tools:text="Dupuis"
         android:textColor="#000000"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@id/person_firstname"

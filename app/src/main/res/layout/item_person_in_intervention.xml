@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@null"
@@ -26,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Jean-Michel"
+        tools:text="Jean-Michel"
         android:textColor="#000000"
         app:layout_constraintStart_toEndOf="@id/person_icon"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Dupuis"
+        tools:text="Dupuis"
         android:textColor="#000000"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/person_firstname"
@@ -53,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:text="Conducteur"
+        tools:text="Conducteur"
         app:layout_constraintStart_toEndOf="@id/person_is_driver"
         app:layout_constraintBaseline_toBaselineOf="@id/person_is_driver"/>
 

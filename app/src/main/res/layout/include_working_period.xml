@@ -1,6 +1,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:paddingTop="24dp"
@@ -34,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="@string/default_working_period_main_line"
+        tools:text="aujourd'hui • 7 h"
         app:layout_constraintBaseline_toBaselineOf="@id/working_period_label"
         app:layout_constraintStart_toEndOf="@+id/working_period_label" />
 
@@ -59,7 +60,7 @@
         android:id="@+id/working_period_edit_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/default_working_period_date"
+        tools:text="aujourd'hui"
         app:layout_constraintStart_toEndOf="@id/working_period_date_label"
         app:layout_constraintTop_toBottomOf="@id/working_period_label"
         android:layout_marginStart="16dp"
@@ -84,7 +85,7 @@
         android:id="@+id/working_period_edit_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/default_working_period_duration"
+        tools:text="3"
         android:inputType="numberDecimal"
         android:ems="4"
         android:maxLength="5"

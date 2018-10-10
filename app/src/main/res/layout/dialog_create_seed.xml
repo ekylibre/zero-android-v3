@@ -40,7 +40,7 @@
             android:imeOptions="actionDone"
             android:inputType="textPersonName"
             android:maxLines="1"
-            android:hint="Variété"/>
+            android:hint="@string/variety"/>
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
