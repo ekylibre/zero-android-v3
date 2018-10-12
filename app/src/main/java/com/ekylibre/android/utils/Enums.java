@@ -1,9 +1,7 @@
 package com.ekylibre.android.utils;
 
-
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 
 import com.ekylibre.android.database.AppDatabase;
 import com.ekylibre.android.database.models.EquipmentType;
@@ -27,12 +25,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import timber.log.Timber;
-
 
 public class Enums {
 
-    public static List<EquipmentTypeEnum> EQUIMPMENT_ENUMS = new ArrayList<>(Arrays.asList(EquipmentTypeEnum.values()));
+    private static List<EquipmentTypeEnum> EQUIMPMENT_ENUMS = new ArrayList<>(Arrays.asList(EquipmentTypeEnum.values()));
     public static List<String> EQUIMPMENT_TYPES = new ArrayList<>();
     public static List<String> EQUIMPMENT_NAMES = new ArrayList<>();
 
@@ -40,11 +36,11 @@ public class Enums {
     public static List<String> OUTPUT_TYPES = new ArrayList<>();
     public static List<String> OUTPUT_NAMES = new ArrayList<>();
 
-    public static List<SpecieEnum> SPECIE_ENUMS = new ArrayList<>(Arrays.asList(SpecieEnum.values()));
+    private static List<SpecieEnum> SPECIE_ENUMS = new ArrayList<>(Arrays.asList(SpecieEnum.values()));
     public static List<String> SPECIE_TYPES = new ArrayList<>();
     public static List<String> SPECIE_NAMES = new ArrayList<>();
 
-    public static List<StorageTypeEnum> STORAGE_TYPE_ENUMS = new ArrayList<>(Arrays.asList(StorageTypeEnum.values()));
+    private static List<StorageTypeEnum> STORAGE_TYPE_ENUMS = new ArrayList<>(Arrays.asList(StorageTypeEnum.values()));
     public static List<String> STORAGE_TYPE_VALUES = new ArrayList<>();
     public static List<String> STORAGE_TYPE_NAMES = new ArrayList<>();
 

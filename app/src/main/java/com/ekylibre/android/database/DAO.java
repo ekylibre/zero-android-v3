@@ -87,9 +87,6 @@ public interface DAO {
 
     @Delete void delete(Intervention intervention);
 
-    /**
-     *    Crops selection list
-     */
 //    @Transaction @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE start_date < :now AND stop_date > :now")
 //    List<CropWithPlots> listCropWithPlots(long now);
 
@@ -132,19 +129,20 @@ public interface DAO {
 
 
     /**
-     *    Plot list
+     *    Crop list
      */
-//    @Transaction
-//    @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
-//    List<Plots> plotList(String farmId);
-
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
     List<Crop> cropList(String farmId);
 
-    @Query("SELECT * FROM " + InterventionCrop.TABLE_NAME +
-            " JOIN " + Crop.TABLE_NAME + " ON " + InterventionCrop.COLUMN_CROP_ID + " = " + Crop.COLUMN_UUID +
+    @Query("SELECT c.crop_uuid, c.name, c.specie, c.production_nature, c.production_mode, production_output, provisional_yield, " +
+            "c.shape, c.centroid, c.surface_area, c.start_date, c.stop_date, c.farm, c.plot_uuid FROM " + Crop.TABLE_NAME + " c " +
+            " JOIN " + InterventionCrop.TABLE_NAME + " ON " + InterventionCrop.COLUMN_CROP_ID + " = " + Crop.COLUMN_UUID +
             " WHERE " + InterventionCrop.COLUMN_INTERVENTION_ID + " = :id")
     List<Crop> cropListForIntervention(int id);
+
+//    @Transaction
+//    @Query("SELECT * FROM " + Plot.TABLE_NAME + " WHERE farm = :farmId ORDER BY name")
+//    List<Plots> plotList(String farmId);
 
 
     /**
@@ -229,6 +227,7 @@ public interface DAO {
     @Query("SELECT " + Person.COLUMN_ID_EKY + " FROM " + Person.TABLE_NAME + " WHERE " + Person.COLUMN_ID_EKY + " NOT NULL")
     List<Integer> personEkiIdList();
 
+
     /**
      *    Storage
      */
@@ -272,8 +271,6 @@ public interface DAO {
 
     @Query("SELECT * FROM " + Material.TABLE_NAME + " WHERE " + Material.COLUMN_ID_EKY + " = :id")
     Material getMaterialByEkyId(Integer id);
-
-
 
 
     /**
@@ -370,7 +367,6 @@ public interface DAO {
     /**
      *    Person
      **/
-
     @Query("SELECT * FROM " + Person.TABLE_NAME + " ORDER BY first_name")
     List<Person> selectPerson();
 
@@ -390,12 +386,9 @@ public interface DAO {
     void setPersonEkyId(int id, int ekyId);
 
 
-
-
     /**
      *    Crop
      */
-
     @Query("SELECT * FROM " + Crop.TABLE_NAME + " ORDER BY name")
     List<Crop> selectCrop();
 
@@ -423,8 +416,6 @@ public interface DAO {
 
     @Query("SELECT * FROM " + EquipmentType.TABLE_NAME)
     List<EquipmentType> getEquipmentIndicators();
-
-
 
 //    @Query("SELECT * FROM " + ProductionNature.TABLE_NAME + " ORDER BY " + ProductionNature.COLUMN_HUMAN_NAME_FRA)
 //    List<ProductionNature> selectProductionNature();
