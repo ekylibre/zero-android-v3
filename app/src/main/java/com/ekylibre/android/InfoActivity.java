@@ -36,12 +36,12 @@ import com.ekylibre.android.services.SimpleLocationService;
 import com.ekylibre.android.utils.RecyclerViewClickListener;
 import com.ekylibre.android.utils.SimpleDividerItemDecoration;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +57,7 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
     public static int latestFilter = FILTER_BY_PRODUCTION;
     public static List<ListItem> dataset;
     public static RecyclerView.Adapter adapter;
+    public static Snackbar snack;
 
     private TreeMap<String, Multimap> map;
     private Intent serviceIntent;
@@ -74,6 +75,7 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
         map = new TreeMap<>();  // The map containing all crops with all infos for each
         dataset = new ArrayList<>();
         RecyclerView recyclerView = findViewById(R.id.crop_info_recycler);
+//        ConstraintLayout layout = findViewById(R.id.info_layout);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -105,22 +107,22 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
         recyclerView.setAdapter(adapter);
 
         serviceIntent = new Intent(this, SimpleLocationService.class);
+
+        snack = Snackbar.make(recyclerView, getString(R.string.gps_is_off), Snackbar.LENGTH_INDEFINITE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         new RequestCropList().execute();
-        if (latestFilter == FILTER_BY_PROXIMITY && !isServiceRunning())
-            startService(serviceIntent);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (isServiceRunning())
-            stopService(serviceIntent);
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        if (isServiceRunning())
+//            stopService(serviceIntent);
+//    }
 
     @Override
     protected void onStop() {
@@ -171,7 +173,8 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
                     // Get production nature from crop and build string
                     StringBuilder sb = new StringBuilder();
                     sb.append(inter.crop.get(0).production_nature);
-                    if (inter.crop.get(0).production_mode.equals("Organic farming"))
+                    String mode = inter.crop.get(0).production_mode;
+                    if (mode.equals("Agriculture biologique") || mode.equals("Organic farming") )
                         sb.append(" bio");
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(inter.crop.get(0).stop_date);
@@ -210,6 +213,9 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
                 it.remove();
             }
             adapter.notifyDataSetChanged();
+
+            if (latestFilter == FILTER_BY_PROXIMITY && !isServiceRunning())
+                startService(serviceIntent);
         }
     }
 
@@ -229,9 +235,14 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
 
             case R.id.filter_by_production:
                 latestFilter = FILTER_BY_PRODUCTION;
+                if (snack.isShown())
+                    snack.dismiss();
                 if (isServiceRunning())
                     stopService(serviceIntent);
-                new RequestCropList().execute();
+                if (dataset.isEmpty())
+                    new RequestCropList().execute();
+                else
+                    adapter.notifyDataSetChanged();
                 invalidateOptionsMenu();
                 return true;
 
@@ -245,6 +256,7 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 } else {
                     if (!isServiceRunning()) {
+                        snack.setText(getString(R.string.waiting_gps_signal)).show();
                         startService(serviceIntent);
                     } else
                         Timber.i("Service is already running...");
@@ -287,6 +299,7 @@ public class InfoActivity extends AppCompatActivity implements InfoFragment.OnFr
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (!isServiceRunning())
+                        snack.setText(getString(R.string.waiting_gps_signal)).show();
                         startService(serviceIntent);
                 } else {
                     latestFilter = FILTER_BY_PROXIMITY;

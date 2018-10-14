@@ -413,5 +413,7 @@
     <string name="invalid_dose">dose invalide</string>
     <string name="approximate_amount">Quantité approximative</string>
     <string name="unauthorized_mixing">mélange non autorisé</string>
+    <string name="gps_is_off">Le GPS de votre smartphone est éteint.</string>
+    <string name="waiting_gps_signal">En attente d\'un signal GPS…</string>
 
 </resources>

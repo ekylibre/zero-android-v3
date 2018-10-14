@@ -7,10 +7,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.Gravity;
-import android.widget.Toast;
 
 import com.ekylibre.android.InfoActivity;
+import com.ekylibre.android.R;
 import com.ekylibre.android.adapters.CropInfo.CropItem;
 import com.ekylibre.android.adapters.CropInfo.ListItem;
 import com.mapbox.geojson.Point;
@@ -19,11 +18,13 @@ import com.mapbox.turf.TurfMeasurement;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import timber.log.Timber;
 
+import static android.location.LocationProvider.AVAILABLE;
+import static android.location.LocationProvider.OUT_OF_SERVICE;
+import static android.location.LocationProvider.TEMPORARILY_UNAVAILABLE;
 import static com.ekylibre.android.InfoActivity.FILTER_BY_PROXIMITY;
 
 
@@ -91,19 +92,37 @@ public class SimpleLocationService extends Service {
         @Override
         public void onProviderDisabled(String provider) {
             Timber.i("GPS disabled");
-            Toast toast = Toast.makeText(getBaseContext(), "Le GPS de votre smartphone est éteint...", Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.BOTTOM, 0, 200);
-            toast.show();
+//            Toast toast = Toast.makeText(getBaseContext(), "Le GPS de votre smartphone est éteint...", Toast.LENGTH_LONG);
+//            toast.setGravity(Gravity.BOTTOM, 0, 200);
+//            toast.show();
+            InfoActivity.snack.setText(getString(R.string.gps_is_off)).show();
             InfoActivity.latestFilter = FILTER_BY_PROXIMITY;
         }
 
         @Override
         public void onProviderEnabled(String provider) {
             Timber.i("GPS enabled");
+            InfoActivity.snack.setText(getString(R.string.waiting_gps_signal)).show();
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            switch (status) {
+                case TEMPORARILY_UNAVAILABLE:
+                    Timber.e("LocationProvider -> TEMPORARILY_UNAVAILABLE");
+                    InfoActivity.snack.setText(getString(R.string.waiting_gps_signal)).show();
+                    break;
+                case OUT_OF_SERVICE:
+                    Timber.e("LocationProvider -> OUT_OF_SERVICE");
+                    break;
+                case AVAILABLE:
+                    Timber.e("LocationProvider -> AVAILABLE");
+                    if (InfoActivity.snack.isShown())
+                        InfoActivity.snack.dismiss();
+                    break;
+            }
+
+        }
     }
 
     LocationListener locationListener = new LocationListener(LocationManager.GPS_PROVIDER);
