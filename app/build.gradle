@@ -96,8 +96,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     // Test libraries
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-beta01'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta01'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     // Google Services, needed for fixing SSL Handshake error
     implementation 'com.google.android.gms:play-services-base:16.0.1'
     implementation 'com.google.android.material:material:1.0.0'
@@ -121,4 +121,7 @@ dependencies {
     // Flavor specific libraries for Agriconomie.com
     agricoImplementation 'net.openid:appauth:0.7.1'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.4'
+
+//    compile 'com.jakewharton.threetenabp:threetenabp:1.1.1'
+
 }
