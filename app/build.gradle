@@ -115,14 +115,14 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
     // Apollo GraphQL Client
     implementation 'com.apollographql.apollo:apollo-runtime:0.5.0'
     implementation 'com.apollographql.apollo:apollo-android-support:0.5.0'
     // Mapbox
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.2.1'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:3.3.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:3.3.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.6.5'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:4.0.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:4.0.0'
     implementation 'com.jakewharton:process-phoenix:2.0.0'
     // Flavor specific libraries for Agriconomie.com
     agricoImplementation 'net.openid:appauth:0.7.1'
