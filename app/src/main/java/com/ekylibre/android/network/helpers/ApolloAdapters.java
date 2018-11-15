@@ -2,11 +2,17 @@ package com.ekylibre.android.network.helpers;
 
 
 import androidx.annotation.NonNull;
+import timber.log.Timber;
 
 import com.apollographql.apollo.response.CustomTypeAdapter;
 import com.apollographql.apollo.response.CustomTypeValue;
+import com.google.gson.JsonArray;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,14 +49,48 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
 
         @Override
         public Polygon decode(CustomTypeValue value) {
+
             String string = value.value.toString();
-            String[] points = string.substring(3, string.length()-3).split("],\\[");
+
+//            List<List<Point>> polygons = new ArrayList<>();
+//
+            String[] polygons = string.substring(3, string.length()-3).split("]],\\[\\[");
+            // Use only outer Polygon
+            String[] points = polygons[0].split("],\\[");
+
             List<Point> lngLats = new ArrayList<>();
             for (String point : points) {
                 String[] lngLat = point.split(",");
                 lngLats.add(Point.fromLngLat(Double.parseDouble(lngLat[0]), Double.parseDouble(lngLat[1])));
             }
             return Polygon.fromLngLats(Collections.singletonList(lngLats));
+
+
+            // JSON test
+
+//            JSONObject json = new JSONObject();
+//            try {
+//                JSONObject array = new JSONObject(value.toString());
+//                Timber.e(array.toString());
+//                json.put("coordinates", array);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            Timber.e(json.toString());
+//            return Polygon.fromJson(json.toString());
+
+
+            // Old way
+//
+//            String string = value.value.toString();
+//            String[] points = string.substring(3, string.length()-3).split("],\\[");
+//            List<Point> lngLats = new ArrayList<>();
+//            for (String point : points) {
+//                String[] lngLat = point.split(",");
+//                lngLats.add(Point.fromLngLat(Double.parseDouble(lngLat[0]), Double.parseDouble(lngLat[1])));
+//            }
+//            return Polygon.fromLngLats(Collections.singletonList(lngLats));
+
         }
 
         @NonNull
@@ -60,20 +100,18 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
             List<List<Point>> coordinates = value.coordinates();
             StringBuilder sb = new StringBuilder();
             sb.append("[");
-            if (coordinates != null) {
-                int j = 0;
-                for (List<Point> lngLats : coordinates) {
-                    int i = 0;
-                    sb.append("[");
-                    for (Point point : lngLats) {
-                        sb.append(String.format("[%s,%s]", point.longitude(), point.latitude()));
-                        if(i++ < lngLats.size() - 1)
-                            sb.append(",");
-                    }
-                    sb.append("]");
-                    if(j++ < coordinates.size() - 1)
+            int j = 0;
+            for (List<Point> lngLats : coordinates) {
+                int i = 0;
+                sb.append("[");
+                for (Point point : lngLats) {
+                    sb.append(String.format("[%s,%s]", point.longitude(), point.latitude()));
+                    if(i++ < lngLats.size() - 1)
                         sb.append(",");
                 }
+                sb.append("]");
+                if(j++ < coordinates.size() - 1)
+                    sb.append(",");
             }
             sb.append("]");
             return CustomTypeValue.fromRawValue(sb.toString());
