@@ -63,10 +63,10 @@ public class LoginActivityTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText.perform(replaceText("rdechazelles@ekylibre.com"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText(BuildConfig.TEST_LOGIN), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
-                allOf(withText("rdechazelles@ekylibre.com"),
+                allOf(withText(BuildConfig.TEST_LOGIN),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.login_email),
@@ -82,10 +82,10 @@ public class LoginActivityTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText3.perform(replaceText("123azeqsd"), closeSoftKeyboard());
+        textInputEditText3.perform(replaceText(BuildConfig.TEST_PASSWORD), closeSoftKeyboard());
 
         ViewInteraction textInputEditText4 = onView(
-                allOf(withText("123azeqsd"),
+                allOf(withText(BuildConfig.TEST_PASSWORD),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.login_password),
