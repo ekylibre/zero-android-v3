@@ -52,8 +52,6 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
 
             String string = value.value.toString();
 
-//            List<List<Point>> polygons = new ArrayList<>();
-//
             String[] polygons = string.substring(3, string.length()-3).split("]],\\[\\[");
             // Use only outer Polygon
             String[] points = polygons[0].split("],\\[");
@@ -66,7 +64,7 @@ public abstract class ApolloAdapters implements CustomTypeAdapter<Date> {
             return Polygon.fromLngLats(Collections.singletonList(lngLats));
 
 
-            // JSON test
+            // JSON test TODO try to make this working later and accept holes
 
 //            JSONObject json = new JSONObject();
 //            try {
