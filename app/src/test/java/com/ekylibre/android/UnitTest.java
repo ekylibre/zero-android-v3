@@ -2,24 +2,20 @@ package com.ekylibre.android;
 
 import com.ekylibre.android.utils.PhytosanitaryMiscibility;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-class UnitTest {
+
+public class UnitTest {
 
     @Test
-    void phytoMix_isCorrect() throws Exception {
+    public void phytoMix_isCorrect() throws Exception {
 
         HashMap<List<Integer>, Boolean> map = new HashMap<>();
 
