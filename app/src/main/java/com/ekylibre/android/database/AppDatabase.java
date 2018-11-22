@@ -97,6 +97,22 @@ public abstract class AppDatabase extends RoomDatabase {
         return database;
     }
 
+    public static synchronized AppDatabase getInMemoryInstance(Context ctx) {
+        context = ctx;
+        if (database == null)
+            database = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
+
+            return database;
+    }
+
+    public static synchronized AppDatabase getTestInstance(Context ctx) {
+        context = ctx;
+        if (database == null)
+            database = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,"db_tests")
+                    .build();
+        return database;
+    }
+
     /**
      * Manage migrations
      */
@@ -262,7 +278,7 @@ public abstract class AppDatabase extends RoomDatabase {
         try {
 
             String json;
-            database = AppDatabase.getInstance(context);
+//            database = AppDatabase.getInstance(context);
             Moshi moshi = new Moshi.Builder().build();
 
             // Load phytosanitary products from Lexicon

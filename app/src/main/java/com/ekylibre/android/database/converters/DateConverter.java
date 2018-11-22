@@ -23,11 +23,12 @@ import com.ekylibre.android.MainActivity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class DateConverter {
 
-    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd", MainActivity.LOCALE);
+    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat( "yyyy-MM-dd", Locale.FRANCE);
 
     @TypeConverter
     public static Date toDate(String value) {

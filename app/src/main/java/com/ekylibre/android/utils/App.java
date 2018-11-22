@@ -4,6 +4,8 @@ package com.ekylibre.android.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 
 public class App {
 
@@ -19,12 +21,32 @@ public class App {
     public static final String IMPLANTATION = "IMPLANTATION";
     public static final String IRRIGATION = "IRRIGATION";
 
+    private static AtomicBoolean isRunningTest;
+
+
     public static boolean isOnline(Context ctx) {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         boolean response = false;
         if (cm != null)
             response = cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
         return response;
+    }
+
+    public static synchronized boolean isRunningTest () {
+        if (null == isRunningTest) {
+            boolean istest;
+
+            try {
+                Class.forName ("android.support.test.espresso.Espresso");
+                istest = true;
+            } catch (ClassNotFoundException e) {
+                istest = false;
+            }
+
+            isRunningTest = new AtomicBoolean (istest);
+        }
+
+        return isRunningTest.get();
     }
 
 }

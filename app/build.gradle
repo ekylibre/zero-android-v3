@@ -25,6 +25,11 @@ android {
         ]
         resValue 'string', 'mapbox_token', mapbox_token
         signingConfig signingConfigs.config
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -39,6 +44,8 @@ android {
         }
         debug {
             buildConfigField "String", "API_URL", eky_debug_api_url
+            buildConfigField "String", "TEST_LOGIN", test_login
+            buildConfigField "String", "TEST_PASSWORD", test_password
         }
     }
     flavorDimensions "version"
@@ -74,6 +81,10 @@ android {
             variant.buildConfigField "String", "API_AGRICO", "\"${flavor.ext.api_agrico[variant.buildType.name]}\""
         }
     }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+    buildToolsVersion = '28.0.3'
 }
 
 apollo {
@@ -86,9 +97,6 @@ apollo {
 }
 
 dependencies {
-
-    def junit_version = '5.3.1'
-
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Support libraries
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -98,12 +106,19 @@ dependencies {
     implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     // Test libraries
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"
     testImplementation 'junit:junit:4.12'
+//    testImplementation 'org.mockito:mockito-core:2.23.0'
+//    androidTestImplementation 'org.mockito:mockito-android:2.23.0'
+//    androidTestImplementation "com.linkedin.dexmaker:dexmaker:2.21.0"
+    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.19.1'
+    androidTestImplementation 'androidx.test:core:1.0.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+//    testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+//    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
+//    testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
+
     // Google Services, needed for fixing SSL Handshake error
     implementation 'com.google.android.gms:play-services-base:16.0.1'
     implementation 'com.google.android.material:material:1.0.0'
@@ -111,6 +126,7 @@ dependencies {
     // Room database
     implementation 'androidx.room:room-runtime:2.0.0'
     annotationProcessor 'androidx.room:room-compiler:2.0.0'
+    testImplementation 'androidx.room:room-testing:2.0.0'
     // Retrofit & Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
@@ -127,6 +143,7 @@ dependencies {
     // Flavor specific libraries for Agriconomie.com
     agricoImplementation 'net.openid:appauth:0.7.1'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.4'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
 
 //    compile 'com.jakewharton.threetenabp:threetenabp:1.1.1'
 
