@@ -56,7 +56,6 @@ public class APITest {
 
         assertNotNull(response);
         accessToken = response.body();
-        assertNotNull(accessToken);
     }
 
     @AfterClass
@@ -66,6 +65,8 @@ public class APITest {
 
     @Test
     public void getFarmTest() {
+
+        assertNotNull(accessToken);
 
 //        SyncService.getFarm();
 

@@ -47,9 +47,13 @@ public class LoginActivityTest {
 
     private void clearSharedPrefs(Context context) {
         SharedPreferences prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
         if (prefs.contains("is_authenticated")) {
-            SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("is_authenticated", false);
+            editor.commit();
+        }
+        if (prefs.contains("last-sync-time")) {
+            editor.remove("last-sync-time");
             editor.commit();
         }
     }
@@ -114,22 +118,23 @@ public class LoginActivityTest {
             e.printStackTrace();
         }
 
-//        ViewInteraction textView = onView(
-//                allOf(withText("GAEC du bois joli"),
-//                        childAtPosition(
-//                                allOf(withId(R.id.action_bar),
-//                                        childAtPosition(
-//                                                withId(R.id.action_bar_container),
-//                                                0)),
-//                                0),
-//                        isDisplayed()));
-//        textView.check(matches(withText("GAEC du bois joli")));
-
         Context context = mActivityTestRule.getActivity();
         SharedPreferences prefs = context.getSharedPreferences("prefs", MODE_PRIVATE);
         boolean is_authenticated = prefs.getBoolean("is_authenticated", false);
 
         assertTrue(is_authenticated);
+
+        // Wait for sync ended
+        while (MainActivity.LAST_SYNC.format(MainActivity.lastSyncTime).equals("2018-01-01 12:00")) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // There must be more than 0 intervention
+        assertTrue(MainActivity.interventionsList.size() > 0);
     }
 
     private static Matcher<View> childAtPosition(
